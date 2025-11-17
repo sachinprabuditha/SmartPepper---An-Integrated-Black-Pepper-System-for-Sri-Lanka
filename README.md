@@ -125,12 +125,14 @@ curl http://localhost:3000/health
 ### Environment Variables
 
 **Blockchain (.env)**
+
 ```env
 SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_PROJECT_ID
 PRIVATE_KEY=your_deployer_private_key
 ```
 
 **Backend (.env)**
+
 ```env
 PORT=3000
 DB_HOST=localhost
@@ -152,30 +154,30 @@ IPFS_PORT=5001
 
 ### Auctions
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/auctions` | List all auctions |
-| GET | `/api/auctions/:id` | Get auction details |
-| POST | `/api/auctions` | Create new auction |
-| POST | `/api/auctions/:id/bid` | Place a bid |
-| POST | `/api/auctions/:id/end` | End auction |
-| POST | `/api/auctions/:id/settle` | Settle auction |
+| Method | Endpoint                   | Description         |
+| ------ | -------------------------- | ------------------- |
+| GET    | `/api/auctions`            | List all auctions   |
+| GET    | `/api/auctions/:id`        | Get auction details |
+| POST   | `/api/auctions`            | Create new auction  |
+| POST   | `/api/auctions/:id/bid`    | Place a bid         |
+| POST   | `/api/auctions/:id/end`    | End auction         |
+| POST   | `/api/auctions/:id/settle` | Settle auction      |
 
 ### Lots
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/lots` | List all pepper lots |
-| GET | `/api/lots/:lotId` | Get lot details |
-| POST | `/api/lots` | Create new lot |
+| Method | Endpoint           | Description          |
+| ------ | ------------------ | -------------------- |
+| GET    | `/api/lots`        | List all pepper lots |
+| GET    | `/api/lots/:lotId` | Get lot details      |
+| POST   | `/api/lots`        | Create new lot       |
 
 ### Compliance
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/compliance/check` | Run compliance check |
-| GET | `/api/compliance/:lotId` | Get compliance history |
-| POST | `/api/compliance/upload` | Upload certificate to IPFS |
+| Method | Endpoint                 | Description                |
+| ------ | ------------------------ | -------------------------- |
+| POST   | `/api/compliance/check`  | Run compliance check       |
+| GET    | `/api/compliance/:lotId` | Get compliance history     |
+| POST   | `/api/compliance/upload` | Upload certificate to IPFS |
 
 ## 🔌 WebSocket Events
 
@@ -185,15 +187,15 @@ Connect to: `ws://localhost:3000/auction`
 
 ```javascript
 // Join auction room
-socket.emit('join_auction', {
+socket.emit("join_auction", {
   auctionId: 1,
-  userAddress: '0x...'
+  userAddress: "0x...",
 });
 
 // Leave auction room
-socket.emit('leave_auction', {
+socket.emit("leave_auction", {
   auctionId: 1,
-  userAddress: '0x...'
+  userAddress: "0x...",
 });
 ```
 
@@ -201,17 +203,17 @@ socket.emit('leave_auction', {
 
 ```javascript
 // New bid placed
-socket.on('new_bid', (data) => {
+socket.on("new_bid", (data) => {
   // data: { auctionId, bidder, amount, timestamp, bidCount }
 });
 
 // Auction ended
-socket.on('auction_ended', (data) => {
+socket.on("auction_ended", (data) => {
   // data: { auctionId, winner, finalPrice, timestamp }
 });
 
 // Compliance update
-socket.on('compliance_update', (data) => {
+socket.on("compliance_update", (data) => {
   // data: { auctionId, passed, timestamp }
 });
 ```
@@ -252,6 +254,7 @@ See `backend/src/db/migrate.js` for full schema.
 ### PepperAuction.sol
 
 **Core Functions:**
+
 - `createLot()` - Register new pepper lot
 - `createAuction()` - Start auction for a lot
 - `setComplianceStatus()` - Set compliance result (owner only)
@@ -261,6 +264,7 @@ See `backend/src/db/migrate.js` for full schema.
 - `withdrawEscrow()` - Withdraw refunded bids
 
 **Security Features:**
+
 - ReentrancyGuard for bid/settlement functions
 - Pausable for emergency stops
 - Access control (Ownable)
@@ -305,6 +309,7 @@ This is an academic/demo project. Contributions welcome:
 ## 📞 Support
 
 For questions or issues:
+
 - Open an issue on GitHub
 - Check `DEPLOYMENT_ROADMAP.md` for architecture details
 

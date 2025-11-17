@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { AuctionList } from '@/components/auction/AuctionList';
-import { Pepper, TrendingUp, Shield, Zap } from 'lucide-react';
+import { Leaf, TrendingUp, Shield, Zap } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -10,7 +10,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex justify-center mb-6">
-              <Pepper className="w-16 h-16" />
+              <Leaf className="w-16 h-16" />
             </div>
             <h1 className="text-5xl font-bold mb-6">
               SmartPepper Blockchain Auction

@@ -2,7 +2,7 @@
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
-import { Pepper, Menu, X } from 'lucide-react';
+import { Leaf, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 export function Header() {
@@ -14,7 +14,7 @@ export function Header() {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-primary-600">
-            <Pepper className="w-8 h-8" />
+            <Leaf className="w-8 h-8" />
             <span>SmartPepper</span>
           </Link>
 

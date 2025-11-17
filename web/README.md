@@ -33,6 +33,37 @@
 ### Installation
 
 ```bash
+npm install
+```
+
+### 🔧 Fix TypeScript Errors in VS Code
+
+If you see "Cannot find module './providers'" or similar errors:
+
+**Option 1: Reload VS Code Window**
+
+1. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
+2. Type: "Developer: Reload Window"
+3. Press Enter
+
+**Option 2: Restart TypeScript Server**
+
+1. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
+2. Type: "TypeScript: Restart TS Server"
+3. Press Enter
+
+**Option 3: Delete and Reinstall**
+
+```bash
+rm -rf node_modules .next
+npm install
+```
+
+These errors appear when TypeScript hasn't indexed the newly installed dependencies yet. They will disappear after reloading!
+
+### Installation
+
+```bash
 # Install dependencies
 npm install
 
@@ -97,46 +128,54 @@ web/
 ## Key Components
 
 ### AuctionList
+
 Displays grid of auction cards with filters
 
 ### AuctionCard
+
 Individual auction preview with status badges
 
 ### AuctionTimer
+
 Real-time countdown with urgency indicators
 
 ### BidForm
+
 Web3-enabled bidding interface
 
 ### BidHistory
+
 Live bid updates via WebSocket
 
 ## Web3 Integration
 
 ### Wallet Connection
+
 ```typescript
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 // Supports MetaMask, WalletConnect, Coinbase Wallet
-<ConnectButton />
+<ConnectButton />;
 ```
 
 ### Smart Contract Interaction
+
 ```typescript
-import { useWriteContract } from 'wagmi';
+import { useWriteContract } from "wagmi";
 
 const { writeContract } = useWriteContract();
 
 writeContract({
   address: CONTRACT_ADDRESS,
   abi: PEPPER_AUCTION_ABI,
-  functionName: 'placeBid',
+  functionName: "placeBid",
   args: [auctionId],
   value: parseEther(bidAmount),
 });
 ```
 
 ### WebSocket Real-time Updates
+
 ```typescript
 // Auto-connects on app load
 const { joinAuction, leaveAuction } = useAuctionStore();
@@ -145,7 +184,7 @@ const { joinAuction, leaveAuction } = useAuctionStore();
 joinAuction(auctionId, userAddress);
 
 // Receive real-time bid updates
-socket.on('new_bid', (data) => {
+socket.on("new_bid", (data) => {
   // Update UI
 });
 ```
@@ -153,17 +192,20 @@ socket.on('new_bid', (data) => {
 ## Pages
 
 ### / (Home)
+
 - Hero section
 - Feature highlights
 - Active auctions preview
 - Platform statistics
 
 ### /auctions
+
 - Full auction list
 - Filter by status
 - Search functionality
 
 ### /auctions/[id]
+
 - Auction details
 - Live bidding interface
 - Bid history
@@ -171,11 +213,13 @@ socket.on('new_bid', (data) => {
 - Compliance status
 
 ### /create
+
 - Create new auction (farmers)
 - Lot registration
 - Certificate upload
 
 ### /my-auctions
+
 - User's auction history
 - Active bids
 - Won auctions
@@ -183,6 +227,7 @@ socket.on('new_bid', (data) => {
 ## Styling
 
 ### Tailwind CSS
+
 Custom theme with pepper-themed colors:
 
 ```javascript
@@ -198,6 +243,7 @@ colors: {
 ```
 
 ### Custom Components
+
 - `.btn-primary` - Primary action buttons
 - `.card` - Content cards
 - `.badge-*` - Status badges
@@ -206,17 +252,20 @@ colors: {
 ## Real-time Features
 
 ### Live Auction Updates
+
 - New bids appear instantly
 - Current price updates
 - Bid count increments
 - User join/leave notifications
 
 ### Countdown Timers
+
 - Updates every second
 - Urgency indicator (last 5 minutes)
 - Auto-refresh when auction ends
 
 ### Toast Notifications
+
 - Bid confirmations
 - Transaction status
 - Error messages
@@ -248,16 +297,19 @@ colors: {
 ## Troubleshooting
 
 ### Wallet Not Connecting
+
 1. Check MetaMask is installed
 2. Ensure correct network (Sepolia)
 3. Check WalletConnect project ID
 
 ### Bids Not Updating
+
 1. Verify backend WebSocket server running
 2. Check browser console for errors
 3. Confirm auction status is 'active'
 
 ### Transaction Failing
+
 1. Check wallet has sufficient ETH
 2. Verify contract address is correct
 3. Ensure bid amount meets minimum
