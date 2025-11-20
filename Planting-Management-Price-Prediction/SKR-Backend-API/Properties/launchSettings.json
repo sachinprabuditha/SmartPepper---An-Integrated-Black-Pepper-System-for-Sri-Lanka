@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "SKR-Backend-API": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "http://localhost:7001",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://0.0.0.0:7000;http://0.0.0.0:7001"
+    }
+  }
+}

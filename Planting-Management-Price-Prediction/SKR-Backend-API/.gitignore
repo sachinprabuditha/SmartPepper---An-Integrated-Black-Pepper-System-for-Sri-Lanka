@@ -1,0 +1,16 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
+
+# Config files (Secrets)
+appsettings.json
+appsettings.Development.json
+*.user
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
