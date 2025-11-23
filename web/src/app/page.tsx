@@ -1,35 +1,166 @@
+'use client';
+
 import Link from 'next/link';
 import { AuctionList } from '@/components/auction/AuctionList';
-import { Leaf, TrendingUp, Shield, Zap } from 'lucide-react';
+import { Leaf, TrendingUp, Shield, Zap, Users, ShoppingCart, Settings, Award, BarChart3, Package } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Home() {
+  const { user, isAuthenticated } = useAuth();
+
   return (
     <div>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
-        <div className="container mx-auto px-4">
+      {/* Hero Section - Role-aware */}
+      <section className="bg-gradient-to-br from-pepper-darkBrown via-pepper-mediumBrown to-pepper-cinnamon text-white py-20 relative overflow-hidden">
+        {/* Decorative overlay */}
+        <div className="absolute inset-0 bg-black/10"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex justify-center mb-6">
-              <Leaf className="w-16 h-16" />
+              <div className="bg-white/10 backdrop-blur-sm rounded-full p-4">
+                <Leaf className="w-16 h-16 text-pepper-gold" />
+              </div>
             </div>
-            <h1 className="text-5xl font-bold mb-6">
-              SmartPepper Blockchain Auction
-            </h1>
-            <p className="text-xl mb-8 text-primary-100">
-              Real-time pepper auctions powered by blockchain technology.
-              Transparent, secure, and compliant trading from farm to export.
-            </p>
-            <div className="flex gap-4 justify-center">
-              <Link href="/auctions" className="btn-primary text-lg px-8 py-3">
-                View Live Auctions
-              </Link>
-              <Link href="/create" className="btn bg-white text-primary-600 hover:bg-gray-100 text-lg px-8 py-3">
-                Create Auction
-              </Link>
-            </div>
+            
+            {isAuthenticated ? (
+              <>
+                <h1 className="text-5xl font-bold mb-4 text-shadow">
+                  Welcome back, {user?.name}! 🌶️
+                </h1>
+                <p className="text-xl mb-8 text-pepper-gold">
+                  {user?.role === 'farmer' && 'List your premium Sri Lankan black pepper lots and reach global buyers through our blockchain-powered auction platform.'}
+                  {user?.role === 'exporter' && 'Browse quality Ceylon pepper lots, place bids, and secure the finest spices in real-time.'}
+                  {user?.role === 'admin' && 'Monitor and manage the SmartPepper ecosystem - ensuring quality and compliance for Sri Lankan pepper exports.'}
+                </p>
+                <div className="flex gap-4 justify-center flex-wrap">
+                  {user?.role === 'farmer' && (
+                    <>
+                      <Link href="/dashboard/farmer" className="btn bg-pepper-gold text-pepper-black hover:bg-pepper-harvest font-semibold text-lg px-8 py-3">
+                        My Dashboard
+                      </Link>
+                      <Link href="/create" className="btn bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 hover:bg-white/30 text-lg px-8 py-3">
+                        Create Auction
+                      </Link>
+                    </>
+                  )}
+                  {user?.role === 'exporter' && (
+                    <>
+                      <Link href="/dashboard/exporter" className="btn bg-pepper-gold text-pepper-black hover:bg-pepper-harvest font-semibold text-lg px-8 py-3">
+                        My Dashboard
+                      </Link>
+                      <Link href="/auctions" className="btn bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 hover:bg-white/30 text-lg px-8 py-3">
+                        Browse Auctions
+                      </Link>
+                    </>
+                  )}
+                  {user?.role === 'admin' && (
+                    <>
+                      <Link href="/dashboard/admin" className="btn bg-pepper-gold text-pepper-black hover:bg-pepper-harvest font-semibold text-lg px-8 py-3">
+                        Admin Dashboard
+                      </Link>
+                      <Link href="/auctions" className="btn bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 hover:bg-white/30 text-lg px-8 py-3">
+                        View All Auctions
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 className="text-5xl font-bold mb-6">
+                  SmartPepper - Ceylon Black Pepper Auction
+                </h1>
+                <p className="text-xl mb-4 text-pepper-gold">
+                  Real-time auctions for premium Sri Lankan black pepper.
+                </p>
+                <p className="text-lg mb-8 text-white/90">
+                  Transparent, secure, and compliant trading from farm to export - powered by blockchain technology.
+                </p>
+                <div className="flex gap-4 justify-center flex-wrap">
+                  <Link href="/register" className="btn bg-pepper-gold text-pepper-black hover:bg-pepper-harvest font-semibold text-lg px-8 py-3">
+                    Get Started
+                  </Link>
+                  <Link href="/auctions" className="btn bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 hover:bg-white/30 text-lg px-8 py-3">
+                    Browse Auctions
+                  </Link>
+                  <Link href="/login" className="btn bg-transparent border-2 border-pepper-gold text-pepper-gold hover:bg-pepper-gold hover:text-pepper-black text-lg px-8 py-3">
+                    Login
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
+
+      {/* Role-specific Quick Actions */}
+      {isAuthenticated && (
+        <section className="py-12 bg-gradient-to-b from-amber-50 to-white dark:from-pepper-black dark:to-gray-800">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl font-bold mb-6 text-center text-pepper-darkBrown dark:text-pepper-gold">Quick Actions</h2>
+            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {user?.role === 'farmer' && (
+                <>
+                  <Link href="/create" className="card hover:shadow-lg transition-shadow p-6 text-center border-t-4 border-farmer-600">
+                    <Package className="w-10 h-10 mx-auto mb-3 text-farmer-600" />
+                    <h3 className="font-semibold mb-2">Create Auction</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">List your pepper lots</p>
+                  </Link>
+                  <Link href="/dashboard/farmer" className="card hover:shadow-lg transition-shadow p-6 text-center">
+                    <BarChart3 className="w-10 h-10 mx-auto mb-3 text-green-600" />
+                    <h3 className="font-semibold mb-2">View Analytics</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Track your performance</p>
+                  </Link>
+                  <Link href="/auctions" className="card hover:shadow-lg transition-shadow p-6 text-center">
+                    <Award className="w-10 h-10 mx-auto mb-3 text-green-600" />
+                    <h3 className="font-semibold mb-2">My Auctions</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Manage active auctions</p>
+                  </Link>
+                </>
+              )}
+              {user?.role === 'exporter' && (
+                <>
+                  <Link href="/auctions" className="card hover:shadow-lg transition-shadow p-6 text-center">
+                    <ShoppingCart className="w-10 h-10 mx-auto mb-3 text-blue-600" />
+                    <h3 className="font-semibold mb-2">Browse Auctions</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Find pepper lots</p>
+                  </Link>
+                  <Link href="/dashboard/exporter" className="card hover:shadow-lg transition-shadow p-6 text-center">
+                    <BarChart3 className="w-10 h-10 mx-auto mb-3 text-blue-600" />
+                    <h3 className="font-semibold mb-2">My Bids</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Track your bids</p>
+                  </Link>
+                  <Link href="/dashboard/exporter" className="card hover:shadow-lg transition-shadow p-6 text-center">
+                    <Award className="w-10 h-10 mx-auto mb-3 text-blue-600" />
+                    <h3 className="font-semibold mb-2">Won Auctions</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">View your wins</p>
+                  </Link>
+                </>
+              )}
+              {user?.role === 'admin' && (
+                <>
+                  <Link href="/dashboard/admin" className="card hover:shadow-lg transition-shadow p-6 text-center">
+                    <Users className="w-10 h-10 mx-auto mb-3 text-purple-600" />
+                    <h3 className="font-semibold mb-2">Manage Users</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">User management</p>
+                  </Link>
+                  <Link href="/dashboard/admin" className="card hover:shadow-lg transition-shadow p-6 text-center">
+                    <Settings className="w-10 h-10 mx-auto mb-3 text-purple-600" />
+                    <h3 className="font-semibold mb-2">System Settings</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Configure platform</p>
+                  </Link>
+                  <Link href="/auctions" className="card hover:shadow-lg transition-shadow p-6 text-center">
+                    <BarChart3 className="w-10 h-10 mx-auto mb-3 text-purple-600" />
+                    <h3 className="font-semibold mb-2">Analytics</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Platform insights</p>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Features Section */}
       <section className="py-16 bg-gray-50 dark:bg-gray-900">

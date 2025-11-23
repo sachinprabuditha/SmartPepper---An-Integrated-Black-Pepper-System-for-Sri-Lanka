@@ -13,6 +13,20 @@ import { BidForm } from '@/components/auction/BidForm';
 import { Loader2, CheckCircle, XCircle, User, Package, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+// Helper function to convert snake_case to camelCase
+function toCamelCase(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(toCamelCase);
+  } else if (obj !== null && typeof obj === 'object') {
+    return Object.keys(obj).reduce((acc, key) => {
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+      acc[camelKey] = toCamelCase(obj[key]);
+      return acc;
+    }, {} as any);
+  }
+  return obj;
+}
+
 export default function AuctionDetailPage() {
   const params = useParams();
   const auctionId = params.id as string;
@@ -29,8 +43,11 @@ export default function AuctionDetailPage() {
       try {
         setLoading(true);
         const response = await auctionApi.getById(parseInt(auctionId));
-        setAuction(response.data.auction);
-        setBids(response.data.bids || []);
+        // Transform snake_case to camelCase
+        const transformedAuction = toCamelCase(response.data.auction);
+        const transformedBids = toCamelCase(response.data.bids || []);
+        setAuction(transformedAuction);
+        setBids(transformedBids);
       } catch (error) {
         console.error('Failed to fetch auction:', error);
         toast.error('Failed to load auction details');
@@ -87,7 +104,7 @@ export default function AuctionDetailPage() {
           <div className="card">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h1 className="text-3xl font-bold mb-2">Auction #{auction.auctionId}</h1>
+                <h1 className="text-3xl font-bold mb-2 dark:text-white">Auction #{auction.auctionId}</h1>
                 <p className="text-gray-600 dark:text-gray-400">Lot ID: {auction.lotId}</p>
               </div>
               <div className="text-right">
@@ -157,7 +174,7 @@ export default function AuctionDetailPage() {
 
           {/* Pricing Information */}
           <div className="card">
-            <h2 className="text-xl font-semibold mb-4">Pricing</h2>
+            <h2 className="text-xl font-semibold mb-4 dark:text-white">Pricing</h2>
             <div className="grid md:grid-cols-3 gap-6">
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Start Price</p>

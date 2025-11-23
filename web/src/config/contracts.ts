@@ -22,6 +22,7 @@ export const PEPPER_AUCTION_ABI = [
 ] as const;
 
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '';
+export const CONTRACT_ABI = PEPPER_AUCTION_ABI;
 
 export const CHAIN_CONFIG = {
   sepolia: {

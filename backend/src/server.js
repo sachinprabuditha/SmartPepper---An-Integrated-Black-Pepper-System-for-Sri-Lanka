@@ -8,6 +8,7 @@ require('dotenv').config();
 
 const logger = require('./utils/logger');
 const db = require('./db/database');
+const authRoutes = require('./routes/auth');
 const auctionRoutes = require('./routes/auction');
 const lotRoutes = require('./routes/lot');
 const userRoutes = require('./routes/user');
@@ -34,6 +35,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/auctions', auctionRoutes);
 app.use('/api/lots', lotRoutes);
 app.use('/api/users', userRoutes);
@@ -61,24 +63,46 @@ app.use((err, req, res, next) => {
 
 // Initialize services
 async function initialize() {
+  let redisClient = null;
+  let dbConnected = false;
+
   try {
-    // Initialize database
-    await db.connect();
-    logger.info('Database connected');
+    // Initialize database (optional for now)
+    try {
+      await db.connect();
+      dbConnected = true;
+      if (db.isMock) {
+        logger.info('✅ Database: Using MOCK in-memory database (test data available)');
+        logger.info('💡 To use PostgreSQL, set DB_PASSWORD in .env file');
+      } else {
+        logger.info('✅ Database: PostgreSQL connected');
+      }
+    } catch (dbError) {
+      logger.warn('Database connection failed (continuing without DB):', dbError.message);
+    }
 
-    // Initialize Redis
-    const redisClient = redis.createClient({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: process.env.REDIS_PORT || 6379
-    });
-    
-    await redisClient.connect();
-    logger.info('Redis connected');
+    // Initialize Redis (optional for now)
+    try {
+      redisClient = redis.createClient({
+        host: process.env.REDIS_HOST || 'localhost',
+        port: process.env.REDIS_PORT || 6379
+      });
+      
+      await redisClient.connect();
+      logger.info('Redis connected');
+    } catch (redisError) {
+      logger.warn('Redis connection failed (continuing without Redis):', redisError.message);
+      redisClient = null;
+    }
 
-    // Initialize blockchain service
-    const blockchainService = new BlockchainService();
-    await blockchainService.initialize();
-    logger.info('Blockchain service initialized');
+    // Initialize blockchain service (optional for now)
+    try {
+      const blockchainService = new BlockchainService();
+      await blockchainService.initialize();
+      logger.info('Blockchain service initialized');
+    } catch (blockchainError) {
+      logger.warn('Blockchain service initialization failed (continuing without blockchain):', blockchainError.message);
+    }
 
     // Initialize WebSocket
     const io = new Server(httpServer, {
@@ -88,23 +112,39 @@ async function initialize() {
       }
     });
     
-    const auctionSocket = new AuctionWebSocket(io, redisClient);
-    auctionSocket.initialize();
-    logger.info('WebSocket server initialized');
+    if (redisClient) {
+      const auctionSocket = new AuctionWebSocket(io, redisClient);
+      auctionSocket.initialize();
+      logger.info('WebSocket server initialized');
+    } else {
+      logger.warn('WebSocket not initialized (Redis unavailable)');
+    }
 
     // Start server
     const PORT = process.env.PORT || 3000;
     httpServer.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT}`);
-      logger.info(`Environment: ${process.env.NODE_ENV}`);
+      logger.info(`🚀 Server running on port ${PORT}`);
+      logger.info(`🌍 Environment: ${process.env.NODE_ENV}`);
+      logger.info('📊 Services status:', {
+        database: dbConnected ? (db.isMock ? 'MOCK (in-memory)' : 'PostgreSQL') : 'disabled',
+        redis: redisClient !== null ? 'connected' : 'disabled',
+        websocket: redisClient !== null ? 'enabled' : 'disabled'
+      });
+      logger.info('');
+      logger.info('🎯 API Endpoints:');
+      logger.info(`   - Health: http://localhost:${PORT}/health`);
+      logger.info(`   - Auctions: http://localhost:${PORT}/api/auctions`);
+      logger.info(`   - Lots: http://localhost:${PORT}/api/lots`);
+      logger.info(`   - Users: http://localhost:${PORT}/api/users`);
+      logger.info('');
     });
 
     // Graceful shutdown
     process.on('SIGTERM', async () => {
       logger.info('SIGTERM received, shutting down gracefully');
       httpServer.close();
-      await redisClient.quit();
-      await db.disconnect();
+      if (redisClient) await redisClient.quit();
+      if (dbConnected) await db.disconnect();
       process.exit(0);
     });
 

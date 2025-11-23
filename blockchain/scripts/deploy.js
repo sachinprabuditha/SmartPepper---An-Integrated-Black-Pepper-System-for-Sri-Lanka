@@ -1,5 +1,4 @@
 const hre = require("hardhat");
-const logger = require('../backend/src/utils/logger');
 
 async function main() {
   console.log("Deploying PepperAuction contract...");

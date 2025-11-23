@@ -2,14 +2,13 @@ import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
 
 export interface Auction {
-  id: number;
   auctionId: number;
   lotId: string;
   farmerAddress: string;
   startPrice: string;
   reservePrice: string;
   currentBid: string;
-  currentBidderAddress: string | null;
+  currentBidder: string | null;
   startTime: string;
   endTime: string;
   status: string;
@@ -24,7 +23,7 @@ export interface Bid {
   auctionId: number;
   bidderAddress: string;
   amount: string;
-  timestamp: string;
+  placedAt: string;
   blockchainTxHash: string;
 }
 

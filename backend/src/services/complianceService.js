@@ -1,4 +1,3 @@
-const { create } = require('ipfs-http-client');
 const logger = require('../utils/logger');
 const crypto = require('crypto');
 
@@ -10,15 +9,21 @@ class ComplianceService {
 
   async initialize() {
     try {
-      this.ipfsClient = create({
-        host: process.env.IPFS_HOST || 'localhost',
-        port: process.env.IPFS_PORT || 5001,
-        protocol: process.env.IPFS_PROTOCOL || 'http'
-      });
-
-      logger.info('Compliance service initialized');
+      // Try to load IPFS client only if needed
+      // This prevents crashes if ipfs-http-client is incompatible
+      try {
+        const { create } = require('ipfs-http-client');
+        this.ipfsClient = create({
+          host: process.env.IPFS_HOST || 'localhost',
+          port: process.env.IPFS_PORT || 5001,
+          protocol: process.env.IPFS_PROTOCOL || 'http'
+        });
+        logger.info('Compliance service initialized with IPFS support');
+      } catch (ipfsError) {
+        logger.warn('IPFS client not available, continuing without IPFS support:', ipfsError.message);
+      }
     } catch (error) {
-      logger.warn('IPFS client initialization failed, continuing without IPFS:', error.message);
+      logger.warn('Compliance service initialization warning:', error.message);
     }
   }
 

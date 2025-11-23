@@ -12,27 +12,37 @@ router.get('/', async (req, res) => {
     const { status, farmer, limit = 50, offset = 0 } = req.query;
     
     let query = 'SELECT * FROM pepper_lots WHERE 1=1';
+    let countQuery = 'SELECT COUNT(*) FROM pepper_lots WHERE 1=1';
     const params = [];
+    const countParams = [];
     let paramIndex = 1;
+    let countParamIndex = 1;
 
     if (status) {
       query += ` AND status = $${paramIndex++}`;
+      countQuery += ` AND status = $${countParamIndex++}`;
       params.push(status);
+      countParams.push(status);
     }
 
     if (farmer) {
-      query += ` AND farmer_address = $${paramIndex++}`;
+      query += ` AND LOWER(farmer_address) = LOWER($${paramIndex++})`;
+      countQuery += ` AND LOWER(farmer_address) = LOWER($${countParamIndex++})`;
       params.push(farmer);
+      countParams.push(farmer);
     }
 
     query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
     params.push(limit, offset);
 
-    const result = await db.query(query, params);
+    const [result, countResult] = await Promise.all([
+      db.query(query, params),
+      db.query(countQuery, countParams)
+    ]);
 
     res.json({
       success: true,
-      count: result.rows.length,
+      count: parseInt(countResult.rows[0].count),
       lots: result.rows
     });
   } catch (error) {
@@ -142,7 +152,7 @@ router.post('/', async (req, res) => {
         certificateHash,
         certificateIpfsUrl,
         txHash,
-        'available'
+        'created'
       ]
     );
 

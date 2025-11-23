@@ -3,16 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 249, 250, 251;
+  --foreground-rgb: 44, 36, 32; /* pepper-black */
+  --background-start-rgb: 250, 248, 243; /* warm cream */
   --background-end-rgb: 255, 255, 255;
+  --accent-pepper: 184, 115, 51; /* cinnamon */
+  --accent-gold: 212, 165, 116; /* gold */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 17, 24, 39;
-    --background-end-rgb: 0, 0, 0;
+    --foreground-rgb: 232, 167, 93; /* harvest gold */
+    --background-start-rgb: 44, 36, 32; /* pepper black */
+    --background-end-rgb: 28, 22, 18;
   }
 }
 
@@ -50,12 +52,26 @@ body {
     @apply btn bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800;
   }
   
+  /* Form input dark mode styling */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"],
+  select {
+    @apply dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400;
+  }
+  
+  label {
+    @apply dark:text-gray-300;
+  }
+  
   .btn-secondary {
     @apply btn bg-gray-200 text-gray-900 hover:bg-gray-300 active:bg-gray-400;
   }
   
   .btn-success {
-    @apply btn bg-green-600 text-white hover:bg-green-700 active:bg-green-800;
+    @apply btn bg-farmer-600 text-white hover:bg-farmer-700 active:bg-farmer-800;
   }
   
   .btn-danger {
@@ -63,11 +79,11 @@ body {
   }
   
   .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700;
+    @apply bg-white dark:bg-pepper-darkBrown/40 dark:backdrop-blur-sm rounded-xl shadow-lg p-6 border-2 border-amber-100 dark:border-pepper-gold/20 hover:border-pepper-gold/40 transition-all;
   }
   
   .input {
-    @apply w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all;
+    @apply w-full px-4 py-2 rounded-lg border-2 border-amber-200 dark:border-pepper-gold/30 bg-white dark:bg-pepper-black/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-pepper-cinnamon focus:border-pepper-gold outline-none transition-all;
   }
   
   .badge {

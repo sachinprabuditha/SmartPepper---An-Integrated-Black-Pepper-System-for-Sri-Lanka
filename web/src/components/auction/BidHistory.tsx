@@ -36,7 +36,7 @@ export function BidHistory({ auctionId, bids }: BidHistoryProps) {
                 {bid.bidderAddress.slice(0, 6)}...{bid.bidderAddress.slice(-4)}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-500">
-                {formatDistanceToNow(new Date(bid.timestamp), { addSuffix: true })}
+                {formatDistanceToNow(new Date(bid.placedAt), { addSuffix: true })}
               </p>
             </div>
             <div className="text-right">

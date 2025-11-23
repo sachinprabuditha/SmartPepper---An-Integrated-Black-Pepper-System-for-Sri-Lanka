@@ -41,14 +41,18 @@ export function AuctionCard({ auction }: AuctionCardProps) {
   return (
     <div className="card hover:shadow-xl transition-shadow duration-200">
       <div className="flex justify-between items-start mb-4">
-        <h3 className="text-xl font-semibold">Lot #{auction.lotId}</h3>
+        <h3 className="text-xl font-semibold dark:text-white">Lot #{auction.lotId}</h3>
         {getStatusBadge(auction.status)}
       </div>
 
       <div className="space-y-3 mb-4">
         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <User className="w-4 h-4" />
-          <span className="font-mono text-xs">{auction.farmerAddress.slice(0, 6)}...{auction.farmerAddress.slice(-4)}</span>
+          <span className="font-mono text-xs">
+            {auction.farmerAddress 
+              ? `${auction.farmerAddress.slice(0, 6)}...${auction.farmerAddress.slice(-4)}`
+              : 'Unknown'}
+          </span>
         </div>
 
         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -73,13 +77,15 @@ export function AuctionCard({ auction }: AuctionCardProps) {
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Start Price</p>
             <p className="text-lg font-bold text-primary-600">
-              {parseFloat(auction.startPrice).toFixed(4)} ETH
+              {auction.startPrice ? (parseFloat(auction.startPrice) / 1e18).toFixed(4) : '0.0000'} ETH
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Current Bid</p>
             <p className="text-lg font-bold text-green-600">
-              {auction.currentBid !== '0' ? `${parseFloat(auction.currentBid).toFixed(4)} ETH` : 'No bids'}
+              {auction.currentBid && auction.currentBid !== '0' 
+                ? `${(parseFloat(auction.currentBid) / 1e18).toFixed(4)} ETH` 
+                : 'No bids'}
             </p>
           </div>
         </div>
@@ -87,7 +93,7 @@ export function AuctionCard({ auction }: AuctionCardProps) {
         <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-4">
           <span className="flex items-center gap-1">
             <TrendingUp className="w-4 h-4" />
-            {auction.bidCount} {auction.bidCount === 1 ? 'bid' : 'bids'}
+            {auction.bidCount || 0} {auction.bidCount === 1 ? 'bid' : 'bids'}
           </span>
         </div>
 

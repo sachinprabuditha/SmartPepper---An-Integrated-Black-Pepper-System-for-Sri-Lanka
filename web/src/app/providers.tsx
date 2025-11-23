@@ -7,6 +7,8 @@ import { RainbowKitProvider, getDefaultConfig } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 import { useEffect } from 'react';
 import { useAuctionStore } from '@/store/auctionStore';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 const queryClient = new QueryClient();
 
@@ -33,12 +35,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, [connectWebSocket, disconnectWebSocket]);
 
   return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
-          {children}
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <WagmiProvider config={config}>
+          <QueryClientProvider client={queryClient}>
+            <RainbowKitProvider>
+              {children}
+            </RainbowKitProvider>
+          </QueryClientProvider>
+        </WagmiProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

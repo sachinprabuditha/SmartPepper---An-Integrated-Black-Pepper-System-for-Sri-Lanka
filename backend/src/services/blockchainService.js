@@ -31,13 +31,14 @@ class BlockchainService {
   async initialize() {
     try {
       const rpcUrl = process.env.BLOCKCHAIN_RPC_URL || 'http://127.0.0.1:8545';
-      this.provider = new ethers.JsonRpcProvider(rpcUrl);
-
+      
       const contractAddress = process.env.CONTRACT_ADDRESS;
       if (!contractAddress) {
-        throw new Error('CONTRACT_ADDRESS not set in environment');
+        logger.warn('CONTRACT_ADDRESS not set - blockchain features will be disabled');
+        return; // Exit gracefully without throwing
       }
 
+      this.provider = new ethers.JsonRpcProvider(rpcUrl);
       this.contract = new ethers.Contract(contractAddress, CONTRACT_ABI, this.provider);
 
       if (process.env.PRIVATE_KEY) {
@@ -126,28 +127,56 @@ class BlockchainService {
       const receipt = await tx.wait();
       
       // Extract auction ID from event
-      const event = receipt.logs.find(log => {
-        try {
-          const parsed = this.contract.interface.parseLog(log);
-          return parsed.name === 'AuctionCreated';
-        } catch (e) {
-          return false;
+      let auctionId = null;
+      
+      // Try to parse events from receipt
+      if (receipt.logs && receipt.logs.length > 0) {
+        for (const log of receipt.logs) {
+          try {
+            const parsed = this.contract.interface.parseLog({
+              topics: log.topics,
+              data: log.data
+            });
+            
+            if (parsed && parsed.name === 'AuctionCreated') {
+              auctionId = parsed.args.auctionId;
+              logger.info('Parsed AuctionCreated event', { auctionId: auctionId.toString() });
+              break;
+            }
+          } catch (e) {
+            // Skip logs that don't match our interface
+            continue;
+          }
         }
-      });
+      }
 
-      const auctionId = event ? 
-        this.contract.interface.parseLog(event).args.auctionId : 
-        null;
+      // Fallback: Get total auctions count - 1 (since counter was already incremented)
+      if (!auctionId) {
+        try {
+          const totalAuctions = await this.contract.getTotalAuctions();
+          // The newly created auction ID is totalAuctions - 1 (counter increments before storing)
+          auctionId = totalAuctions > 0 ? totalAuctions - 1n : 0n;
+          logger.warn('Used getTotalAuctions as fallback for auction ID', { 
+            totalAuctions: totalAuctions.toString(),
+            auctionId: auctionId.toString() 
+          });
+        } catch (fallbackError) {
+          logger.error('Failed to get auction ID from event or fallback', fallbackError);
+          // Last resort: use 0 and let the database handle it
+          auctionId = 0n;
+          logger.error('Using default auction ID 0 - this may cause issues');
+        }
+      }
 
       logger.info('Auction created on blockchain', {
         lotId,
-        auctionId: auctionId?.toString(),
+        auctionId: auctionId.toString(),
         txHash: receipt.hash
       });
       
       return {
         txHash: receipt.hash,
-        auctionId: auctionId ? auctionId.toString() : null
+        auctionId: auctionId.toString()
       };
     } catch (error) {
       logger.error('Failed to create auction on blockchain:', error);

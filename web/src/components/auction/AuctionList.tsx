@@ -12,6 +12,20 @@ interface AuctionListProps {
   limit?: number;
 }
 
+// Helper function to convert snake_case to camelCase
+function toCamelCase(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(toCamelCase);
+  } else if (obj !== null && typeof obj === 'object') {
+    return Object.keys(obj).reduce((acc, key) => {
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+      acc[camelKey] = toCamelCase(obj[key]);
+      return acc;
+    }, {} as any);
+  }
+  return obj;
+}
+
 export function AuctionList({ status, farmer, limit = 50 }: AuctionListProps) {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +36,9 @@ export function AuctionList({ status, farmer, limit = 50 }: AuctionListProps) {
       try {
         setLoading(true);
         const response = await auctionApi.getAll({ status, farmer, limit });
-        setAuctions(response.data.auctions);
+        // Transform snake_case to camelCase
+        const transformedAuctions = toCamelCase(response.data.auctions);
+        setAuctions(transformedAuctions);
       } catch (err) {
         console.error('Failed to fetch auctions:', err);
         setError('Failed to load auctions');
@@ -61,7 +77,7 @@ export function AuctionList({ status, farmer, limit = 50 }: AuctionListProps) {
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
       {auctions.map((auction) => (
-        <AuctionCard key={auction.id} auction={auction} />
+        <AuctionCard key={auction.auctionId} auction={auction} />
       ))}
     </div>
   );

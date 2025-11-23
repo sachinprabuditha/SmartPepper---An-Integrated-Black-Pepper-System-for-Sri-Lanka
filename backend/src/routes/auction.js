@@ -22,27 +22,37 @@ router.get('/', async (req, res) => {
     const { status, farmer, limit = 50, offset = 0 } = req.query;
     
     let query = 'SELECT * FROM auctions WHERE 1=1';
+    let countQuery = 'SELECT COUNT(*) FROM auctions WHERE 1=1';
     const params = [];
+    const countParams = [];
     let paramIndex = 1;
+    let countParamIndex = 1;
 
     if (status) {
       query += ` AND status = $${paramIndex++}`;
+      countQuery += ` AND status = $${countParamIndex++}`;
       params.push(status);
+      countParams.push(status);
     }
 
     if (farmer) {
-      query += ` AND farmer_address = $${paramIndex++}`;
+      query += ` AND LOWER(farmer_address) = LOWER($${paramIndex++})`;
+      countQuery += ` AND LOWER(farmer_address) = LOWER($${countParamIndex++})`;
       params.push(farmer);
+      countParams.push(farmer);
     }
 
     query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
     params.push(limit, offset);
 
-    const result = await db.query(query, params);
+    const [result, countResult] = await Promise.all([
+      db.query(query, params),
+      db.query(countQuery, countParams)
+    ]);
 
     res.json({
       success: true,
-      count: result.rows.length,
+      count: parseInt(countResult.rows[0].count),
       auctions: result.rows
     });
   } catch (error) {
@@ -76,7 +86,7 @@ router.get('/:id', async (req, res) => {
 
     // Get bids
     const bidsResult = await db.query(
-      'SELECT * FROM bids WHERE auction_id = $1 ORDER BY timestamp DESC',
+      'SELECT * FROM bids WHERE auction_id = $1 ORDER BY placed_at DESC',
       [id]
     );
 
@@ -131,14 +141,6 @@ router.post('/', async (req, res) => {
 
     const lot = lotResult.rows[0];
 
-    // Get farmer ID
-    const farmerResult = await db.query(
-      'SELECT id FROM users WHERE wallet_address = $1',
-      [farmerAddress]
-    );
-
-    const farmerId = farmerResult.rows.length > 0 ? farmerResult.rows[0].id : null;
-
     // Create auction on blockchain
     const blockchainResult = await blockchainService.createAuction({
       lotId,
@@ -147,21 +149,34 @@ router.post('/', async (req, res) => {
       duration: parseInt(duration)
     });
 
+    // Validate and parse auction ID
+    let auctionIdNum;
+    if (!blockchainResult.auctionId || blockchainResult.auctionId === '0') {
+      // If we couldn't get the auction ID, generate one based on timestamp
+      // This is a fallback and should rarely happen
+      auctionIdNum = Math.floor(Date.now() / 1000); // Use timestamp as ID
+      logger.warn('Using timestamp-based auction ID as fallback', { auctionIdNum });
+    } else {
+      auctionIdNum = parseInt(blockchainResult.auctionId);
+      if (isNaN(auctionIdNum)) {
+        throw new Error(`Invalid auction ID: ${blockchainResult.auctionId}`);
+      }
+    }
+
     const startTime = new Date();
     const endTime = new Date(startTime.getTime() + parseInt(duration) * 1000);
 
     // Store in database
     const insertResult = await db.query(
       `INSERT INTO auctions (
-        auction_id, lot_id, farmer_id, farmer_address,
+        auction_id, lot_id, farmer_address,
         start_price, reserve_price, start_time, end_time,
         status, blockchain_tx_hash
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *`,
       [
-        parseInt(blockchainResult.auctionId),
+        auctionIdNum,
         lotId,
-        farmerId,
         farmerAddress,
         startPrice,
         reservePrice,
@@ -187,7 +202,7 @@ router.post('/', async (req, res) => {
         ) VALUES ($1, $2, $3, $4, $5, $6)`,
         [
           lotId,
-          parseInt(blockchainResult.auctionId),
+          auctionIdNum, // Use the database auction ID, not blockchain ID
           result.ruleName,
           result.ruleType,
           result.passed,
