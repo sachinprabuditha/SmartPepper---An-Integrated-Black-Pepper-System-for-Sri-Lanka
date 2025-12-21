@@ -51,12 +51,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (!mounted) return;
 
-      // Navigate based on user role
-      if (_selectedRole == 'farmer') {
-        context.go('/farmer/dashboard');
-      } else {
-        context.go('/exporter/dashboard');
-      }
+      // Navigate to main app with bottom navigation
+      context.go('/home');
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

@@ -39,12 +39,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      // Navigate based on user role
-      if (authProvider.user?.role == 'farmer') {
-        context.go('/farmer/dashboard');
-      } else {
-        context.go('/exporter/dashboard');
-      }
+      // Navigate to main app with bottom navigation
+      context.go('/home');
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

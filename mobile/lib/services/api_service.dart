@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../config/env.dart';
 
 class ApiService {
   late Dio _dio;
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   ApiService() {
     _dio = Dio(
@@ -18,10 +20,10 @@ class ApiService {
       InterceptorsWrapper(
         onRequest: (options, handler) async {
           // Add auth token if available
-          // final token = await _getToken();
-          // if (token != null) {
-          //   options.headers['Authorization'] = 'Bearer $token';
-          // }
+          final token = await _storage.read(key: 'auth_token');
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
           return handler.next(options);
         },
         onError: (error, handler) {

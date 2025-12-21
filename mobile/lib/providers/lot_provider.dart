@@ -13,6 +13,8 @@ class Lot {
   final String complianceStatus;
   final String? complianceCertificate;
   final String status;
+  final String? quality;
+  final DateTime? createdAt;
 
   Lot({
     required this.id,
@@ -25,21 +27,30 @@ class Lot {
     required this.complianceStatus,
     this.complianceCertificate,
     required this.status,
+    this.quality,
+    this.createdAt,
   });
 
   factory Lot.fromJson(Map<String, dynamic> json) {
     return Lot(
-      id: json['id'] ?? '',
-      lotId: json['lotId'] ?? '',
-      farmerName: json['farmerName'] ?? '',
-      farmerAddress: json['farmerAddress'] ?? '',
+      id: json['id']?.toString() ?? '',
+      lotId: json['lot_id'] ?? json['lotId'] ?? '',
+      farmerName: json['farmer_name'] ?? json['farmerName'] ?? '',
+      farmerAddress: json['farmer_address'] ?? json['farmerAddress'] ?? '',
       variety: json['variety'] ?? '',
-      quantity: (json['quantity'] ?? 0).toDouble(),
-      harvestDate:
-          DateTime.tryParse(json['harvestDate'] ?? '') ?? DateTime.now(),
-      complianceStatus: json['complianceStatus'] ?? 'pending',
-      complianceCertificate: json['complianceCertificate'],
+      quantity: double.tryParse(json['quantity']?.toString() ?? '0') ?? 0.0,
+      harvestDate: DateTime.tryParse(
+              json['harvest_date'] ?? json['harvestDate'] ?? '') ??
+          DateTime.now(),
+      complianceStatus:
+          json['compliance_status'] ?? json['complianceStatus'] ?? 'pending',
+      complianceCertificate:
+          json['compliance_certificate'] ?? json['complianceCertificate'],
       status: json['status'] ?? 'available',
+      quality: json['quality'],
+      createdAt:
+          DateTime.tryParse(json['created_at'] ?? json['createdAt'] ?? '') ??
+              DateTime.now(),
     );
   }
 }

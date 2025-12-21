@@ -14,6 +14,7 @@ import '../screens/exporter/live_auction_screen.dart';
 import '../screens/shared/lot_details_screen.dart';
 import '../screens/shared/traceability_screen.dart';
 import '../screens/shared/qr_scanner_screen.dart';
+import '../screens/shared/main_scaffold.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -41,6 +42,13 @@ class AppRouter {
         path: '/wallet-connect',
         name: 'walletConnect',
         builder: (context, state) => const WalletConnectScreen(),
+      ),
+
+      // Main App Route (with bottom navigation)
+      GoRoute(
+        path: '/home',
+        name: 'home',
+        builder: (context, state) => const MainScaffold(),
       ),
 
       // Farmer Routes

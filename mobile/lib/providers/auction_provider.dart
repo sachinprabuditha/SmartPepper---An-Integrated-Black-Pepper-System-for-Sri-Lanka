@@ -5,6 +5,7 @@ import '../services/blockchain_service.dart';
 
 class Auction {
   final String id;
+  final String auctionId;
   final String tokenId;
   final String lotId;
   final String farmerAddress;
@@ -14,9 +15,12 @@ class Auction {
   final DateTime startTime;
   final DateTime endTime;
   final String status;
+  final String? variety;
+  final double? quantity;
 
   Auction({
     required this.id,
+    required this.auctionId,
     required this.tokenId,
     required this.lotId,
     required this.farmerAddress,
@@ -26,20 +30,35 @@ class Auction {
     required this.startTime,
     required this.endTime,
     required this.status,
+    this.variety,
+    this.quantity,
   });
 
   factory Auction.fromJson(Map<String, dynamic> json) {
     return Auction(
-      id: json['id'] ?? '',
-      tokenId: json['tokenId'] ?? '',
-      lotId: json['lotId'] ?? '',
-      farmerAddress: json['farmerAddress'] ?? '',
-      startingPrice: (json['startingPrice'] ?? 0).toDouble(),
-      currentBid: (json['currentBid'] ?? 0).toDouble(),
-      highestBidder: json['highestBidder'],
-      startTime: DateTime.tryParse(json['startTime'] ?? '') ?? DateTime.now(),
-      endTime: DateTime.tryParse(json['endTime'] ?? '') ?? DateTime.now(),
+      id: json['id']?.toString() ?? '',
+      auctionId: json['auction_id'] ?? json['auctionId'] ?? '',
+      tokenId:
+          json['token_id']?.toString() ?? json['tokenId']?.toString() ?? '',
+      lotId: json['lot_id'] ?? json['lotId'] ?? '',
+      farmerAddress: json['farmer_address'] ?? json['farmerAddress'] ?? '',
+      startingPrice: double.tryParse(json['starting_price']?.toString() ??
+              json['startingPrice']?.toString() ??
+              '0') ??
+          0.0,
+      currentBid: double.tryParse(json['current_bid']?.toString() ??
+              json['currentBid']?.toString() ??
+              '0') ??
+          0.0,
+      highestBidder: json['highest_bidder'] ?? json['highestBidder'],
+      startTime:
+          DateTime.tryParse(json['start_time'] ?? json['startTime'] ?? '') ??
+              DateTime.now(),
+      endTime: DateTime.tryParse(json['end_time'] ?? json['endTime'] ?? '') ??
+          DateTime.now(),
       status: json['status'] ?? 'created',
+      variety: json['variety'],
+      quantity: double.tryParse(json['quantity']?.toString() ?? '0'),
     );
   }
 }
@@ -140,6 +159,7 @@ class AuctionProvider with ChangeNotifier {
       // Update current auction with new bid data
       _currentAuction = Auction(
         id: _currentAuction!.id,
+        auctionId: _currentAuction!.auctionId,
         tokenId: _currentAuction!.tokenId,
         lotId: _currentAuction!.lotId,
         farmerAddress: _currentAuction!.farmerAddress,
@@ -158,6 +178,7 @@ class AuctionProvider with ChangeNotifier {
     if (_currentAuction != null && data['auctionId'] == _currentAuction!.id) {
       _currentAuction = Auction(
         id: _currentAuction!.id,
+        auctionId: _currentAuction!.auctionId,
         tokenId: _currentAuction!.tokenId,
         lotId: _currentAuction!.lotId,
         farmerAddress: _currentAuction!.farmerAddress,

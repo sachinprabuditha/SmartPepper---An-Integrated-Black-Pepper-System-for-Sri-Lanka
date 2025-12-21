@@ -25,11 +25,8 @@ class _SplashScreenState extends State<SplashScreen> {
     final authProvider = context.read<AuthProvider>();
 
     if (authProvider.isAuthenticated) {
-      if (authProvider.user?.role == 'farmer') {
-        context.go('/farmer/dashboard');
-      } else {
-        context.go('/exporter/dashboard');
-      }
+      // Navigate to main app with bottom navigation
+      context.go('/home');
     } else {
       context.go('/login');
     }
