@@ -1,0 +1,2 @@
+// Placeholder for logo - Replace with actual logo later
+// This is a temporary file for development
