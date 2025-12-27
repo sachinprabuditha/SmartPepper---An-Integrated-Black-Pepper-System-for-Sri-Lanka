@@ -23,6 +23,10 @@ contract PepperPassport is ERC721URIStorage, Ownable, ReentrancyGuard {
         string harvestDate;
         bytes32 certificateHash;
         bool isActive;
+        // Compliance tracking
+        bool complianceApproved;
+        address complianceCheckedBy;
+        uint256 complianceCheckedAt;
     }
     
     struct ProcessingLog {
@@ -72,6 +76,14 @@ contract PepperPassport is ERC721URIStorage, Ownable, ReentrancyGuard {
         string certType,
         string certId,
         uint256 expiryDate
+    );
+    
+    event ComplianceStatusUpdated(
+        string indexed lotId,
+        uint256 indexed tokenId,
+        bool approved,
+        address indexed checkedBy,
+        uint256 timestamp
     );
     
     event PassportTransferred(
@@ -132,7 +144,10 @@ contract PepperPassport is ERC721URIStorage, Ownable, ReentrancyGuard {
             quantity: quantity,
             harvestDate: harvestDate,
             certificateHash: certificateHash,
-            isActive: true
+            isActive: true,
+            complianceApproved: false,
+            complianceCheckedBy: address(0),
+            complianceCheckedAt: 0
         });
         
         lotIdToTokenId[lotId] = tokenId;
@@ -304,6 +319,87 @@ contract PepperPassport is ERC721URIStorage, Ownable, ReentrancyGuard {
         certs = certifications[tokenId];
         metadataURI = tokenURI(tokenId);
     }
+
+    /**
+     * Update compliance status for a lot
+     * @param lotId The lot ID
+     * @param approved Whether the lot is approved or rejected
+     */
+    function updateComplianceStatus(
+        string memory lotId,
+        bool approved
+    ) external onlyOwner {
+        uint256 tokenId = lotIdToTokenId[lotId];
+        require(tokenId != 0, "Lot ID not found");
+        require(passportExists[tokenId], "Passport does not exist");
+        
+        passports[tokenId].complianceApproved = approved;
+        passports[tokenId].complianceCheckedBy = msg.sender;
+        passports[tokenId].complianceCheckedAt = block.timestamp;
+        
+        // Add to processing log
+        processingLogs[tokenId].push(ProcessingLog({
+            stage: approved ? "Compliance Approved" : "Compliance Rejected",
+            description: approved 
+                ? "Lot approved by admin for auction" 
+                : "Lot rejected by admin",
+            timestamp: block.timestamp,
+            recordedBy: msg.sender,
+            location: ""
+        }));
+        
+        emit ComplianceStatusUpdated(
+            lotId,
+            tokenId,
+            approved,
+            msg.sender,
+            block.timestamp
+        );
+    }
+    
+    /**
+     * @notice Check if a lot has been compliance approved
+     * @param lotId The lot ID
+     */
+    function isComplianceApproved(string memory lotId) 
+        external 
+        view 
+        returns (bool) 
+    {
+        uint256 tokenId = lotIdToTokenId[lotId];
+        if (tokenId == 0 || !passportExists[tokenId]) {
+            return false;
+        }
+        return passports[tokenId].complianceApproved;
+    }
+    
+    /**
+     * @notice Get compliance status details for a lot
+     * @param lotId The lot ID
+     */
+    function getComplianceStatus(string memory lotId)
+        external
+        view
+        returns (
+            bool approved,
+            address checkedBy,
+            uint256 checkedAt
+        )
+    {
+        uint256 tokenId = lotIdToTokenId[lotId];
+        require(tokenId != 0, "Lot ID not found");
+        require(passportExists[tokenId], "Passport does not exist");
+        
+        PassportData memory passport = passports[tokenId];
+        return (
+            passport.complianceApproved,
+            passport.complianceCheckedBy,
+            passport.complianceCheckedAt
+        );
+    }
+    
+    /**
+     * @notice 
     
     /**
      * @notice Transfer passport ownership (override to add event)

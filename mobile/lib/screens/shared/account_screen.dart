@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/storage_service.dart';
 import '../../config/theme.dart';
 
 class AccountScreen extends StatelessWidget {
@@ -379,12 +381,8 @@ class AccountScreen extends StatelessWidget {
                         context,
                         icon: Icons.account_balance_wallet,
                         title: 'Wallet Settings',
-                        subtitle: 'Manage your blockchain wallet',
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Wallet settings')),
-                          );
-                        },
+                        subtitle: 'View & export your private key',
+                        onTap: () => _showWalletSettings(context),
                       ),
                     ],
                   ),
@@ -856,6 +854,196 @@ class AccountScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  static Future<void> _showWalletSettings(BuildContext context) async {
+    final storageService = context.read<StorageService>();
+    final authProvider = context.read<AuthProvider>();
+    final user = authProvider.user;
+
+    final privateKey = await storageService.getPrivateKey();
+
+    if (!context.mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.account_balance_wallet, color: AppTheme.forestGreen),
+              SizedBox(width: 8),
+              Text('Wallet Settings'),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Wallet Address Section
+                const Text(
+                  'Wallet Address',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          user?.walletAddress ?? 'No wallet connected',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontFamily: 'monospace',
+                          ),
+                        ),
+                      ),
+                      if (user?.walletAddress != null)
+                        IconButton(
+                          icon: const Icon(Icons.copy, size: 18),
+                          onPressed: () {
+                            Clipboard.setData(
+                                ClipboardData(text: user!.walletAddress!));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Address copied!'),
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Private Key Section
+                const Text(
+                  'Private Key',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Colors.red,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (privateKey != null) ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red.shade200),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SelectableText(
+                            privateKey,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.copy,
+                              size: 18, color: Colors.red),
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: privateKey));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('⚠️ Private key copied!'),
+                                duration: Duration(seconds: 2),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.orange.shade200),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.warning, color: Colors.orange, size: 20),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Never share your private key! Anyone with this key can control your wallet.',
+                            style:
+                                TextStyle(fontSize: 11, color: Colors.orange),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else ...[
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Column(
+                      children: [
+                        Icon(Icons.key_off, size: 40, color: Colors.grey),
+                        SizedBox(height: 8),
+                        Text(
+                          'No private key stored',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Import your wallet to store the private key securely on this device.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            if (privateKey == null)
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Navigate to create lot screen which will show import dialog
+                  context.push('/create-lot');
+                },
+                icon: const Icon(Icons.import_export),
+                label: const Text('Import Wallet'),
+              ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

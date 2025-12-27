@@ -115,6 +115,8 @@ router.post('/', async (req, res) => {
       metadataURI,
       certificateHash,
       certificateIpfsUrl,
+      lotPictures,
+      certificateImages,
       txHash
     } = req.body;
 
@@ -132,7 +134,9 @@ router.post('/', async (req, res) => {
       variety, 
       quantity,
       origin,
-      farmLocation 
+      farmLocation,
+      lotPictures: lotPictures ? lotPictures.length : 0,
+      certificateImages: certificateImages ? certificateImages.length : 0
     });
 
     // Get or create farmer (case-insensitive lookup)
@@ -164,8 +168,8 @@ router.post('/', async (req, res) => {
         lot_id, farmer_id, farmer_address, variety, quantity,
         quality, harvest_date, origin, farm_location, organic_certified,
         metadata_uri, certificate_hash, certificate_ipfs_url,
-        blockchain_tx_hash, status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+        lot_pictures, certificate_images, blockchain_tx_hash, status
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       RETURNING *`,
       [
         lotId,
@@ -181,6 +185,8 @@ router.post('/', async (req, res) => {
         metadataURI,
         certificateHash,
         certificateIpfsUrl,
+        lotPictures ? JSON.stringify(lotPictures) : '[]',
+        certificateImages ? JSON.stringify(certificateImages) : '[]',
         txHash,
         'available'
       ]

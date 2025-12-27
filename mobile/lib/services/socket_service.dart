@@ -76,5 +76,20 @@ class SocketService {
     _socket.off('auctionUpdate');
   }
 
+  // Generic methods for custom events
+  void emit(String event, dynamic data) {
+    if (_connected) {
+      _socket.emit(event, data);
+    }
+  }
+
+  void on(String event, Function(dynamic) callback) {
+    _socket.on(event, callback);
+  }
+
+  void off(String event) {
+    _socket.off(event);
+  }
+
   bool get isConnected => _connected;
 }

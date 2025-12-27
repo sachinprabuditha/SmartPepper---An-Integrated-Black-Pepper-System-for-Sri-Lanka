@@ -48,6 +48,28 @@ class StorageService {
     return await _storage.read(key: 'private_key');
   }
 
+  // Generic storage methods
+  Future<void> saveString(String key, String value) async {
+    await _storage.write(key: key, value: value);
+  }
+
+  Future<String?> getString(String key) async {
+    return await _storage.read(key: key);
+  }
+
+  Future<void> saveInt(String key, int value) async {
+    await _storage.write(key: key, value: value.toString());
+  }
+
+  Future<int?> getInt(String key) async {
+    final value = await _storage.read(key: key);
+    return value != null ? int.tryParse(value) : null;
+  }
+
+  Future<void> remove(String key) async {
+    await _storage.delete(key: key);
+  }
+
   // Clear all data
   Future<void> clearAll() async {
     await _storage.deleteAll();

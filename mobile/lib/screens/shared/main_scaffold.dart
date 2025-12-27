@@ -6,6 +6,8 @@ import 'home_screen.dart';
 import 'auctions_screen.dart';
 import 'lots_screen.dart';
 import 'account_screen.dart';
+import '../farmer/farmer_dashboard.dart';
+import '../exporter/exporter_dashboard.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
@@ -17,42 +19,47 @@ class MainScaffold extends StatefulWidget {
 class _MainScaffoldState extends State<MainScaffold> {
   int _selectedIndex = 0;
 
-  late final List<Widget> _screens;
-  late final List<BottomNavigationBarItem> _navItems;
+  List<Widget> _getScreensForRole(String? role) {
+    // Return role-specific home screen
+    Widget homeScreen;
+    if (role?.toLowerCase() == 'farmer') {
+      homeScreen = const FarmerDashboard();
+    } else if (role?.toLowerCase() == 'exporter') {
+      homeScreen = const ExporterDashboard();
+    } else {
+      homeScreen = const HomeScreen();
+    }
 
-  @override
-  void initState() {
-    super.initState();
-    _screens = [
-      const HomeScreen(),
+    return [
+      homeScreen,
       const AuctionsScreen(),
       const LotsScreen(),
       const AccountScreen(),
     ];
-
-    _navItems = const [
-      BottomNavigationBarItem(
-        icon: Icon(Icons.home_outlined),
-        activeIcon: Icon(Icons.home),
-        label: 'Home',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.gavel_outlined),
-        activeIcon: Icon(Icons.gavel),
-        label: 'Auctions',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.inventory_2_outlined),
-        activeIcon: Icon(Icons.inventory_2),
-        label: 'Lots',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.person_outline),
-        activeIcon: Icon(Icons.person),
-        label: 'Account',
-      ),
-    ];
   }
+
+  final List<BottomNavigationBarItem> _navItems = const [
+    BottomNavigationBarItem(
+      icon: Icon(Icons.home_outlined),
+      activeIcon: Icon(Icons.home),
+      label: 'Home',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.gavel_outlined),
+      activeIcon: Icon(Icons.gavel),
+      label: 'Auctions',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.inventory_2_outlined),
+      activeIcon: Icon(Icons.inventory_2),
+      label: 'Lots',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.person_outline),
+      activeIcon: Icon(Icons.person),
+      label: 'Account',
+    ),
+  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -62,10 +69,13 @@ class _MainScaffoldState extends State<MainScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final screens = _getScreensForRole(authProvider.user?.role);
+
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-        children: _screens,
+        children: screens,
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(

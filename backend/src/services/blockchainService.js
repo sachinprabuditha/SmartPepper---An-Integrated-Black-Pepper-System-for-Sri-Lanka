@@ -21,10 +21,21 @@ const CONTRACT_ABI = [
   "function getTotalAuctions() external view returns (uint256)"
 ];
 
+const PASSPORT_ABI = [
+  "event PassportMinted(uint256 indexed tokenId, string indexed lotId, address indexed farmer, string metadataURI)",
+  "event ComplianceStatusUpdated(string indexed lotId, uint256 indexed tokenId, bool approved, address indexed checkedBy, uint256 timestamp)",
+  "function mintPassport(address farmer, string memory lotId, string memory variety, uint256 quantity, string memory harvestDate, string memory origin, bytes32 certificateHash, string memory metadataURI) external returns (uint256)",
+  "function updateComplianceStatus(string memory lotId, bool approved) external",
+  "function isComplianceApproved(string memory lotId) external view returns (bool)",
+  "function getComplianceStatus(string memory lotId) external view returns (bool approved, address checkedBy, uint256 checkedAt)",
+  "function addProcessingLog(uint256 tokenId, string memory stage, string memory description, string memory location) external"
+];
+
 class BlockchainService {
   constructor() {
     this.provider = null;
     this.contract = null;
+    this.passportContract = null;
     this.signer = null;
     this.pendingNonce = null; // Track pending nonce
     this.nonceLock = Promise.resolve(); // Mutex for nonce management
@@ -35,6 +46,8 @@ class BlockchainService {
       const rpcUrl = process.env.BLOCKCHAIN_RPC_URL || 'http://127.0.0.1:8545';
       
       const contractAddress = process.env.CONTRACT_ADDRESS;
+      const passportAddress = process.env.PASSPORT_CONTRACT_ADDRESS;
+      
       if (!contractAddress) {
         logger.warn('CONTRACT_ADDRESS not set - blockchain features will be disabled');
         return; // Exit gracefully without throwing
@@ -42,15 +55,27 @@ class BlockchainService {
 
       this.provider = new ethers.JsonRpcProvider(rpcUrl);
       this.contract = new ethers.Contract(contractAddress, CONTRACT_ABI, this.provider);
+      
+      // Initialize PepperPassport contract if address is available
+      if (passportAddress) {
+        this.passportContract = new ethers.Contract(passportAddress, PASSPORT_ABI, this.provider);
+        logger.info('PepperPassport contract initialized', { passportAddress });
+      } else {
+        logger.warn('PASSPORT_CONTRACT_ADDRESS not set - passport features will be limited');
+      }
 
       if (process.env.PRIVATE_KEY) {
         this.signer = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
         this.contract = this.contract.connect(this.signer);
+        if (this.passportContract) {
+          this.passportContract = this.passportContract.connect(this.signer);
+        }
       }
 
       logger.info('Blockchain service initialized', {
         network: await this.provider.getNetwork(),
-        contractAddress
+        contractAddress,
+        passportAddress
       });
 
       // Listen to contract events
@@ -332,6 +357,105 @@ class BlockchainService {
       };
     } catch (error) {
       logger.error('Failed to get lot:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update compliance status on blockchain
+   * @param {string} lotId - The lot ID
+   * @param {boolean} approved - Whether lot is approved or rejected
+   * @returns {string} Transaction hash
+   */
+  async updateLotComplianceOnChain(lotId, approved) {
+    try {
+      if (!this.passportContract) {
+        throw new Error('PepperPassport contract not initialized');
+      }
+
+      if (!this.signer) {
+        throw new Error('Signer not available - check PRIVATE_KEY in .env');
+      }
+
+      logger.info('Updating compliance status on blockchain', { 
+        lotId, 
+        approved,
+        signer: this.signer.address 
+      });
+
+      const nonce = await this.getNextNonce();
+      
+      const tx = await this.passportContract.updateComplianceStatus(
+        lotId,
+        approved,
+        { nonce }
+      );
+
+      logger.info('Compliance update transaction sent', {
+        lotId,
+        approved,
+        txHash: tx.hash,
+        nonce
+      });
+
+      const receipt = await tx.wait();
+
+      logger.info('Compliance status updated on blockchain', {
+        lotId,
+        approved,
+        txHash: receipt.hash,
+        blockNumber: receipt.blockNumber,
+        gasUsed: receipt.gasUsed.toString()
+      });
+
+      return receipt.hash;
+    } catch (error) {
+      logger.error('Failed to update compliance status on blockchain:', error);
+      this.resetNonce(); // Reset nonce on error
+      throw error;
+    }
+  }
+
+  /**
+   * Check if a lot is compliance approved on blockchain
+   * @param {string} lotId - The lot ID
+   * @returns {boolean} Whether lot is approved
+   */
+  async isLotComplianceApproved(lotId) {
+    try {
+      if (!this.passportContract) {
+        logger.warn('PepperPassport contract not initialized');
+        return false;
+      }
+
+      const approved = await this.passportContract.isComplianceApproved(lotId);
+      return approved;
+    } catch (error) {
+      logger.error('Failed to check compliance status:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get compliance status details from blockchain
+   * @param {string} lotId - The lot ID
+   * @returns {Object} Compliance status details
+   */
+  async getComplianceStatusFromChain(lotId) {
+    try {
+      if (!this.passportContract) {
+        throw new Error('PepperPassport contract not initialized');
+      }
+
+      const [approved, checkedBy, checkedAt] = await this.passportContract.getComplianceStatus(lotId);
+      
+      return {
+        approved,
+        checkedBy,
+        checkedAt: new Date(Number(checkedAt) * 1000)
+      };
+    } catch (error) {
+      logger.error('Failed to get compliance status from blockchain:', error);
       throw error;
     }
   }

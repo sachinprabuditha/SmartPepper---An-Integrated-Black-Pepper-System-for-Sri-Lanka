@@ -13,10 +13,21 @@ class Environment {
 
   // Blockchain Configuration
   static const String blockchainRpcUrl = 'http://192.168.8.116:8545';
+  static const int chainId = 1337; // Hardhat chain ID
   static const String contractAddress = '0xYourDeployedContractAddress';
+
+  // Smart Contract Addresses (Update after deployment)
+  static const String passportContractAddress =
+      '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6'; // PepperPassport
+  static const String auctionContractAddress =
+      '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318'; // PepperAuction
 
   // WebSocket Configuration
   static const String wsUrl = 'ws://192.168.8.116:3002';
+
+  // IPFS Configuration
+  static const String ipfsApiUrl = 'http://192.168.8.116:5001';
+  static const String ipfsGatewayUrl = 'http://192.168.8.116:8080';
 
   // App Configuration
   static const String appName = 'SmartPepper';

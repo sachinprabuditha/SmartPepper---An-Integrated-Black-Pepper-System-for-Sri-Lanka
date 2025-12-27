@@ -6,17 +6,17 @@ import { useEffect, useState } from 'react';
 import { Package, Search, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 
 interface Lot {
-  id: string;
-  lotId: string;
-  farmerName: string;
-  farmerAddress: string;
+  id?: string;
+  lot_id: string;
+  farmer_name?: string;
+  farmer_address?: string;
   variety: string;
   quantity: number;
-  harvestDate: string;
-  complianceStatus: string;
-  complianceCertificate?: string;
+  harvest_date: string;
+  compliance_status: string;
+  compliance_certificate?: string;
   status: string;
-  createdAt: string;
+  created_at: string;
 }
 
 export default function ManageLotsPage() {
@@ -38,12 +38,19 @@ export default function ManageLotsPage() {
     if (user && user.role === 'admin') {
       fetchLots();
     }
-  }, [user]);
+  }, [user, filterCompliance]);
 
   const fetchLots = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3002/api/lots');
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.8.116:3002';
+      
+      // Fetch from admin endpoint for pending lots if filter is 'pending'
+      const endpoint = filterCompliance === 'pending' 
+        ? `${API_BASE}/api/admin/lots/pending`
+        : `${API_BASE}/api/lots`;
+      
+      const response = await fetch(endpoint);
       
       if (!response.ok) {
         throw new Error('Failed to fetch lots');
@@ -59,11 +66,11 @@ export default function ManageLotsPage() {
   };
 
   const filteredLots = lots.filter(lot => {
-    const matchesSearch = (lot.lotId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (lot.farmerName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = (lot.lot_id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (lot.farmer_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (lot.variety || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || lot.status === filterStatus;
-    const matchesCompliance = filterCompliance === 'all' || lot.complianceStatus === filterCompliance;
+    const matchesCompliance = filterCompliance === 'all' || lot.compliance_status === filterCompliance;
     return matchesSearch && matchesStatus && matchesCompliance;
   });
 
@@ -166,7 +173,7 @@ export default function ManageLotsPage() {
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
             <div className="text-sm text-gray-600 dark:text-gray-400">Compliance Passed</div>
-            <div className="text-2xl font-bold text-purple-600">{lots.filter(l => l.complianceStatus === 'passed').length}</div>
+            <div className="text-2xl font-bold text-purple-600">{lots.filter(l => l.compliance_status === 'passed').length}</div>
           </div>
         </div>
 
@@ -205,21 +212,21 @@ export default function ManageLotsPage() {
                   </tr>
                 ) : (
                   filteredLots.map((lot) => (
-                    <tr key={lot.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <tr key={lot.id || lot.lot_id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {lot.lotId}
+                          {lot.lot_id}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          Created {new Date(lot.createdAt).toLocaleDateString()}
+                          Created {new Date(lot.created_at).toLocaleDateString()}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {lot.farmerName || 'N/A'}
+                          {lot.farmer_name || 'N/A'}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-                          {lot.farmerAddress ? `${lot.farmerAddress.slice(0, 6)}...${lot.farmerAddress.slice(-4)}` : 'No address'}
+                          {lot.farmer_address ? `${lot.farmer_address.slice(0, 6)}...${lot.farmer_address.slice(-4)}` : 'No address'}
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -227,20 +234,20 @@ export default function ManageLotsPage() {
                           <div><strong>Variety:</strong> {lot.variety}</div>
                           <div><strong>Quantity:</strong> {lot.quantity} kg</div>
                           <div className="text-gray-500 dark:text-gray-400">
-                            Harvest: {new Date(lot.harvestDate).toLocaleDateString()}
+                            Harvest: {new Date(lot.harvest_date).toLocaleDateString()}
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {lot.complianceStatus === 'passed' ? (
+                        {lot.compliance_status === 'passed' || lot.compliance_status === 'approved' ? (
                           <span className="flex items-center text-green-600 dark:text-green-400">
                             <CheckCircle className="w-4 h-4 mr-1" />
-                            Passed
+                            Approved
                           </span>
-                        ) : lot.complianceStatus === 'failed' ? (
+                        ) : lot.compliance_status === 'failed' || lot.compliance_status === 'rejected' ? (
                           <span className="flex items-center text-red-600 dark:text-red-400">
                             <XCircle className="w-4 h-4 mr-1" />
-                            Failed
+                            Rejected
                           </span>
                         ) : (
                           <span className="flex items-center text-yellow-600 dark:text-yellow-400">
@@ -253,17 +260,24 @@ export default function ManageLotsPage() {
                         <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           lot.status === 'available' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
                           lot.status === 'in_auction' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                          lot.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
                           'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
                         }`}>
                           {lot.status.replace('_', ' ')}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                         <button
-                          onClick={() => router.push(`/nft/passport/${lot.lotId}`)}
-                          className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+                          onClick={() => router.push(`/dashboard/admin/lots/${lot.lot_id}`)}
+                          className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300 font-medium"
                         >
-                          View Details
+                          Review
+                        </button>
+                        <button
+                          onClick={() => router.push(`/nft/passport/${lot.lot_id}`)}
+                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                        >
+                          NFT
                         </button>
                       </td>
                     </tr>

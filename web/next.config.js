@@ -8,7 +8,7 @@ const nextConfig = {
     NEXT_PUBLIC_CHAIN_ID: process.env.NEXT_PUBLIC_CHAIN_ID || '11155111', // Sepolia
   },
   images: {
-    domains: ['ipfs.io', 'gateway.pinata.cloud'],
+    domains: ['ipfs.io', 'gateway.pinata.cloud', '192.168.8.116'],
   },
   webpack: (config, { isServer }) => {
     // Suppress module resolution warnings for optional dependencies

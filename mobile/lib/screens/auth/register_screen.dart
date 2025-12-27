@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
@@ -41,7 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
       final authProvider = context.read<AuthProvider>();
-      final success = await authProvider.register(
+      final result = await authProvider.register(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text,
@@ -51,7 +52,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (!mounted) return;
 
-      if (success) {
+      if (result['success'] == true) {
+        // Show private key if it was generated (for farmers)
+        if (result['privateKey'] != null) {
+          await _showPrivateKeyDialog(
+            result['privateKey']!,
+            result['walletAddress']!,
+          );
+        }
+
         // Navigate to main app with bottom navigation
         context.go('/home');
       } else {
@@ -59,7 +68,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                authProvider.error ?? 'Registration failed. Please try again.'),
+                result['error'] ?? 'Registration failed. Please try again.'),
             backgroundColor: AppTheme.errorColor,
           ),
         );
@@ -371,6 +380,196 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showPrivateKeyDialog(
+      String privateKey, String walletAddress) async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.security, color: Colors.red),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '🔐 IMPORTANT: Save Your Wallet Key',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red, width: 2),
+                  ),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.warning, color: Colors.red),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'CRITICAL WARNING',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        '• Write down your private key NOW\n'
+                        '• Store it in a SAFE place\n'
+                        '• NEVER share it with anyone\n'
+                        '• If lost, you CANNOT create lots',
+                        style: TextStyle(fontSize: 13, height: 1.5),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Your Wallet Address:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          walletAddress,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontFamily: 'monospace',
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.copy, size: 20),
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: walletAddress));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Address copied!'),
+                              duration: Duration(seconds: 1),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Your Private Key:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Colors.red,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SelectableText(
+                          privateKey,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontFamily: 'monospace',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon:
+                            const Icon(Icons.copy, size: 20, color: Colors.red),
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: privateKey));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text('⚠️ Private key copied! Keep it safe!'),
+                              duration: Duration(seconds: 2),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.info_outline, color: Colors.blue, size: 20),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'You can access this key later from Profile > Wallet Settings',
+                          style: TextStyle(fontSize: 11, color: Colors.blue),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton.icon(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(Icons.check_circle),
+              label: const Text('I\'ve Saved My Key'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.forestGreen,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

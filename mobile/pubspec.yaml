@@ -59,6 +59,7 @@ dependencies:
   intl: ^0.18.1
   uuid: ^4.2.2
   crypto: ^3.0.3
+  timeago: ^3.6.1
 
   # Animations
   lottie: ^2.7.0
@@ -80,6 +81,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.1
+  flutter_launcher_icons: ^0.13.1
   integration_test:
     sdk: flutter
 
@@ -102,3 +104,12 @@ flutter:
   #         weight: 600
   #       - asset: assets/fonts/Poppins-Bold.ttf
   #         weight: 700
+
+# App Icon Configuration
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/logo_copy.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/logo_copy.png"
+  remove_alpha_ios: true

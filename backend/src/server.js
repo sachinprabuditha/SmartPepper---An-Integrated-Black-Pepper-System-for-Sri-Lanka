@@ -15,6 +15,7 @@ const userRoutes = require('./routes/user');
 const complianceRoutes = require('./routes/compliance');
 const processingRoutes = require('./routes/processing');
 const certificationsRoutes = require('./routes/certifications');
+const adminRoutes = require('./routes/admin');
 
 // Load NFT routes with error handling
 let nftPassportRoutes;
@@ -64,6 +65,8 @@ app.use('/api/compliance', complianceRoutes);
 app.use('/api/processing', processingRoutes);
 app.use('/api/certifications', certificationsRoutes);
 app.use('/api/nft-passport', nftPassportRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/traceability', require('./routes/traceability'));
 
 // Health check
 app.get('/health', (req, res) => {

@@ -99,7 +99,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> register({
+  Future<Map<String, dynamic>> register({
     required String email,
     required String password,
     required String name,
@@ -111,12 +111,35 @@ class AuthProvider with ChangeNotifier {
       _error = null;
       notifyListeners();
 
+      // Generate blockchain wallet for farmers
+      String? walletAddress;
+      String? privateKey;
+      if (role.toLowerCase() == 'farmer') {
+        try {
+          final walletData = await blockchainService.generateWallet();
+          walletAddress = walletData['address'];
+          privateKey = walletData['privateKey'];
+
+          // Store private key securely
+          await storageService.savePrivateKey(privateKey!);
+
+          print('✅ Wallet generated: $walletAddress');
+
+          // Fund the wallet with test ETH for gas fees
+          await blockchainService.fundWallet(walletAddress!);
+        } catch (e) {
+          print('⚠️ Wallet generation failed: $e');
+          // Continue registration even if wallet fails
+        }
+      }
+
       final response = await apiService.register({
         'email': email,
         'password': password,
         'name': name,
         'role': role,
         if (phone != null) 'phone': phone,
+        if (walletAddress != null) 'walletAddress': walletAddress,
       });
 
       await storageService.saveToken(response['token']);
@@ -125,12 +148,16 @@ class AuthProvider with ChangeNotifier {
 
       _loading = false;
       notifyListeners();
-      return true;
+      return {
+        'success': true,
+        'privateKey': privateKey,
+        'walletAddress': walletAddress,
+      };
     } catch (e) {
       _error = e.toString();
       _loading = false;
       notifyListeners();
-      return false;
+      return {'success': false, 'error': e.toString()};
     }
   }
 

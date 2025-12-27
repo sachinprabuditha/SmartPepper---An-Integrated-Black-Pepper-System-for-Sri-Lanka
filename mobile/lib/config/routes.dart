@@ -9,11 +9,14 @@ import '../screens/exporter/exporter_dashboard.dart';
 import '../screens/auth/wallet_connect_screen.dart';
 import '../screens/farmer/create_lot_screen.dart';
 import '../screens/farmer/my_lots_screen.dart';
+import '../screens/farmer/notifications_screen.dart';
+import '../screens/farmer/auction_monitor_screen.dart';
 import '../screens/exporter/browse_lots_screen.dart';
 import '../screens/exporter/live_auction_screen.dart';
 import '../screens/shared/lot_details_screen.dart';
 import '../screens/shared/traceability_screen.dart';
 import '../screens/shared/qr_scanner_screen.dart';
+import '../screens/shared/auctions_screen.dart';
 import '../screens/shared/main_scaffold.dart';
 
 class AppRouter {
@@ -72,6 +75,19 @@ class AppRouter {
         name: 'farmerLots',
         builder: (context, state) => const MyLotsScreen(),
       ),
+      GoRoute(
+        path: '/farmer/notifications',
+        name: 'farmerNotifications',
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/farmer/auction/:auctionId',
+        name: 'farmerAuctionMonitor',
+        builder: (context, state) {
+          final auctionId = state.pathParameters['auctionId']!;
+          return FarmerAuctionMonitorScreen(auctionId: auctionId);
+        },
+      ),
 
       // Exporter Routes
       GoRoute(
@@ -113,6 +129,16 @@ class AppRouter {
       GoRoute(
         path: '/qr-scanner',
         name: 'qrScanner',
+        builder: (context, state) => const QRScannerScreen(),
+      ),
+      GoRoute(
+        path: '/shared/auctions',
+        name: 'sharedAuctions',
+        builder: (context, state) => const AuctionsScreen(),
+      ),
+      GoRoute(
+        path: '/shared/qr-scanner',
+        name: 'sharedQrScanner',
         builder: (context, state) => const QRScannerScreen(),
       ),
     ],

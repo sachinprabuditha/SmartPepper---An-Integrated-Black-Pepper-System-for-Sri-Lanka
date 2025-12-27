@@ -189,4 +189,121 @@ class ApiService {
       rethrow;
     }
   }
+
+  // Generic HTTP methods
+  Future<dynamic> get(String endpoint,
+      {Map<String, dynamic>? queryParameters}) async {
+    try {
+      final response =
+          await _dio.get(endpoint, queryParameters: queryParameters);
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData.containsKey('error')) {
+          throw Exception(errorData['error']);
+        } else if (errorData is Map && errorData.containsKey('message')) {
+          throw Exception(errorData['message']);
+        }
+      }
+      throw Exception('Network error. Please check your connection.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> post(String endpoint, Map<String, dynamic>? data) async {
+    try {
+      final response = await _dio.post(endpoint, data: data);
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData.containsKey('error')) {
+          throw Exception(errorData['error']);
+        } else if (errorData is Map && errorData.containsKey('message')) {
+          throw Exception(errorData['message']);
+        }
+      }
+      throw Exception('Network error. Please check your connection.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> patch(String endpoint, Map<String, dynamic>? data) async {
+    try {
+      final response = await _dio.patch(endpoint, data: data);
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData.containsKey('error')) {
+          throw Exception(errorData['error']);
+        } else if (errorData is Map && errorData.containsKey('message')) {
+          throw Exception(errorData['message']);
+        }
+      }
+      throw Exception('Network error. Please check your connection.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> delete(String endpoint) async {
+    try {
+      final response = await _dio.delete(endpoint);
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData.containsKey('error')) {
+          throw Exception(errorData['error']);
+        } else if (errorData is Map && errorData.containsKey('message')) {
+          throw Exception(errorData['message']);
+        }
+      }
+      throw Exception('Network error. Please check your connection.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Processing Stages endpoint
+  Future<Map<String, dynamic>> addProcessingStage({
+    required String lotId,
+    required String stageType,
+    required String stageName,
+    required String location,
+    required String timestamp,
+    required String operatorName,
+    required Map<String, dynamic> qualityMetrics,
+    required String notes,
+  }) async {
+    try {
+      final response = await _dio.post('/processing/stages', data: {
+        'lotId': lotId,
+        'stageType': stageType,
+        'stageName': stageName,
+        'location': location,
+        'timestamp': timestamp,
+        'operatorName': operatorName,
+        'qualityMetrics': qualityMetrics,
+        'notes': notes,
+      });
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData.containsKey('error')) {
+          throw Exception(errorData['error']);
+        } else if (errorData is Map && errorData.containsKey('message')) {
+          throw Exception(errorData['message']);
+        }
+      }
+      throw Exception('Failed to add processing stage');
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

@@ -26,6 +26,10 @@ class Lot {
   final bool? organicCertified;
   final DateTime? complianceCheckedAt;
 
+  // Auction fields
+  final String? auctionId;
+  final double? currentBid;
+
   Lot({
     required this.id,
     required this.lotId,
@@ -47,6 +51,8 @@ class Lot {
     this.farmLocation,
     this.organicCertified,
     this.complianceCheckedAt,
+    this.auctionId,
+    this.currentBid,
   });
 
   factory Lot.fromJson(Map<String, dynamic> json) {
@@ -82,8 +88,21 @@ class Lot {
           : (json['complianceCheckedAt'] != null
               ? DateTime.tryParse(json['complianceCheckedAt'])
               : null),
+      auctionId: json['auction_id'] ?? json['auctionId'],
+      currentBid: json['current_bid'] != null || json['currentBid'] != null
+          ? double.tryParse(
+              (json['current_bid'] ?? json['currentBid'])?.toString() ?? '0')
+          : null,
     );
   }
+
+  // Status getters
+  bool get isPending => status == 'pending';
+  bool get isApproved => status == 'approved';
+  bool get isRejected => status == 'rejected';
+  bool get isListed => status == 'listed';
+  bool get isSold => status == 'sold';
+  bool get hasAuction => auctionId != null;
 }
 
 class LotProvider with ChangeNotifier {

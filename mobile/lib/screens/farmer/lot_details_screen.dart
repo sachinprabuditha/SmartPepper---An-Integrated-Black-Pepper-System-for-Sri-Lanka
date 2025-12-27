@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../providers/lot_provider.dart';
 import '../../config/theme.dart';
+import '../../services/api_service.dart';
+import 'add_certification_screen.dart';
+import 'add_processing_stage_screen.dart';
 
 class LotDetailsScreen extends StatelessWidget {
   final Lot lot;
@@ -242,6 +246,8 @@ class LotDetailsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  _buildCertificationManagementCard(context),
+                  const SizedBox(height: 16),
                   _buildTraceabilityCard(context),
                   const SizedBox(height: 40),
                 ],
@@ -375,11 +381,13 @@ class LotDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildComplianceCard(BuildContext context) {
-    final complianceColor = lot.complianceStatus.toLowerCase() == 'approved'
-        ? Colors.green
-        : lot.complianceStatus.toLowerCase() == 'pending'
-            ? Colors.orange
-            : Colors.red;
+    final statusLower = lot.complianceStatus.toLowerCase();
+    final complianceColor =
+        (statusLower == 'approved' || statusLower == 'passed')
+            ? Colors.green
+            : statusLower == 'pending'
+                ? Colors.orange
+                : Colors.red;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -403,9 +411,9 @@ class LotDetailsScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
-              lot.complianceStatus.toLowerCase() == 'approved'
+              (statusLower == 'approved' || statusLower == 'passed')
                   ? Icons.check_circle
-                  : lot.complianceStatus.toLowerCase() == 'pending'
+                  : statusLower == 'pending'
                       ? Icons.pending
                       : Icons.cancel,
               color: complianceColor,
@@ -439,6 +447,292 @@ class LotDetailsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildCertificationManagementCard(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 0,
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.verified,
+                    color: Colors.blue,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Certifications & Compliance',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Manage certificates and run compliance checks',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              AddCertificationScreen(lotId: lot.lotId),
+                        ),
+                      );
+                      if (result == true && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Refresh the page to see updated certifications'),
+                            backgroundColor: AppTheme.forestGreen,
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.add_circle_outline),
+                    label: const Text('Add Certificate'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.blue,
+                      side: const BorderSide(color: Colors.blue),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _runComplianceCheck(context),
+                    icon: const Icon(Icons.fact_check),
+                    label: const Text('Check Compliance'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.forestGreen,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          AddProcessingStageScreen(lotId: lot.lotId),
+                    ),
+                  );
+                  if (result == true && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            'Processing stage added! Refresh to see updates'),
+                        backgroundColor: AppTheme.forestGreen,
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.factory),
+                label: const Text('Add Processing Stage'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.forestGreen,
+                  side: const BorderSide(color: AppTheme.forestGreen),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _runComplianceCheck(BuildContext context) async {
+    // Show destination selection dialog
+    final destination = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Destination Market'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Choose the target export market for compliance check:'),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.public, color: Colors.blue),
+              title: const Text('European Union (EU)'),
+              onTap: () => Navigator.pop(context, 'EU'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.flag, color: Colors.red),
+              title: const Text('United States (FDA)'),
+              onTap: () => Navigator.pop(context, 'FDA'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.landscape, color: Colors.orange),
+              title: const Text('Middle East'),
+              onTap: () => Navigator.pop(context, 'MIDDLE_EAST'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+
+    if (destination == null || !context.mounted) return;
+
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Running compliance check...'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    try {
+      final apiService = ApiService();
+      final response = await apiService.post(
+        '/compliance/check/${lot.lotId}',
+        {'destination': destination},
+      );
+
+      if (context.mounted) {
+        Navigator.pop(context); // Close loading dialog
+
+        if (response['success'] == true) {
+          final status = response['complianceStatus'];
+          final passedCount = response['passedCount'] ?? 0;
+          final failedCount = response['failedCount'] ?? 0;
+          final totalCount = response['results']?.length ?? 0;
+
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Row(
+                children: [
+                  Icon(
+                    status == 'passed' ? Icons.check_circle : Icons.cancel,
+                    color: status == 'passed' ? Colors.green : Colors.red,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                      'Compliance ${status == 'passed' ? 'Passed' : 'Failed'}'),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Total Checks: $totalCount'),
+                  Text('Passed: $passedCount',
+                      style: const TextStyle(color: Colors.green)),
+                  Text('Failed: $failedCount',
+                      style: const TextStyle(color: Colors.red)),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'View full details in the traceability screen.',
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Close'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.push('/traceability/${lot.lotId}');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.forestGreen,
+                  ),
+                  child: const Text('View Details'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          throw Exception(response['error'] ?? 'Compliance check failed');
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildTraceabilityCard(BuildContext context) {
@@ -667,27 +961,207 @@ class LotDetailsScreen extends StatelessWidget {
             const Divider(),
             const SizedBox(height: 12),
 
-            // View on Blockchain Button
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Opening blockchain explorer...'),
+            // Action Buttons
+            if (lot.blockchainTxHash != null) ...[
+              Row(
+                children: [
+                  // View Full Traceability Button
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        context.push('/traceability/${lot.lotId}');
+                      },
+                      icon: const Icon(Icons.timeline, size: 20),
+                      label: const Text('Full Traceability'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.forestGreen,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
                     ),
-                  );
-                  // TODO: Open blockchain explorer with tx hash
-                },
-                icon: const Icon(Icons.open_in_new),
-                label: const Text('View on Blockchain'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppTheme.forestGreen,
-                  side: const BorderSide(color: AppTheme.forestGreen),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  // View on Blockchain Button (Quick Info)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final blockchainUrl = 'http://192.168.8.116:8545';
+                        // Show blockchain details dialog
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Row(
+                                children: [
+                                  Icon(Icons.link, color: AppTheme.forestGreen),
+                                  SizedBox(width: 8),
+                                  Text('Blockchain Traceability'),
+                                ],
+                              ),
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'This lot is registered on the blockchain for complete traceability.',
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    const Text(
+                                      'Transaction Hash:',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: SelectableText(
+                                              lot.blockchainTxHash!,
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontFamily: 'monospace',
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.copy,
+                                                size: 18),
+                                            onPressed: () {
+                                              Clipboard.setData(
+                                                ClipboardData(
+                                                    text:
+                                                        lot.blockchainTxHash!),
+                                              );
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                      'Transaction hash copied!'),
+                                                  duration:
+                                                      Duration(seconds: 1),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    const Text(
+                                      'Blockchain Network:',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green.shade50,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                            color: Colors.green.shade200),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.check_circle,
+                                            color: Colors.green,
+                                            size: 20,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Text(
+                                                  'Hardhat Local Network',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 13,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  blockchainUrl,
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    color: Colors.grey.shade700,
+                                                    fontFamily: 'monospace',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.shade50,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                            color: Colors.blue.shade200),
+                                      ),
+                                      child: const Row(
+                                        children: [
+                                          Icon(
+                                            Icons.info_outline,
+                                            color: Colors.blue,
+                                            size: 20,
+                                          ),
+                                          SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              'This transaction is permanently recorded and cannot be altered, ensuring complete transparency.',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.blue,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Close'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.open_in_new, size: 20),
+                      label: const Text('Quick Info'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppTheme.forestGreen,
+                        side: const BorderSide(color: AppTheme.forestGreen),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
+            ],
           ] else ...[
             const SizedBox(height: 16),
             Container(
@@ -830,11 +1304,15 @@ class LotDetailsScreen extends StatelessWidget {
   String _getComplianceMessage(String status) {
     switch (status.toLowerCase()) {
       case 'approved':
+      case 'passed':
         return 'All compliance checks passed';
       case 'pending':
         return 'Awaiting compliance verification';
       case 'rejected':
+      case 'failed':
         return 'Compliance issues detected';
+      case 'partial':
+        return 'Some compliance checks pending';
       default:
         return 'Status unknown';
     }
