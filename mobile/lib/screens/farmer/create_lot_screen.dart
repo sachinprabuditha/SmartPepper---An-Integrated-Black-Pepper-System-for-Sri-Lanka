@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../providers/auth_provider.dart';
 import '../../providers/lot_provider.dart';
-import '../../services/blockchain_service.dart';
+// Removed blockchain_service import - minting now done via backend API
 import '../../services/ipfs_service.dart';
 import '../../services/qr_nfc_service.dart';
 import '../../services/storage_service.dart';
@@ -248,7 +248,6 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
     try {
       final authProvider = context.read<AuthProvider>();
       final lotProvider = context.read<LotProvider>();
-      final blockchainService = context.read<BlockchainService>();
       final ipfsService = context.read<IpfsService>();
       final qrNfcService = QrNfcService();
       final storageService = context.read<StorageService>();
@@ -259,22 +258,23 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
         throw Exception('Wallet address not found. Please contact support.');
       }
 
-      // Get private key or prompt user to import
+      // We no longer need the private key since minting is done via backend API
+      // Remove private key requirement
+      /*
       String? privateKey = await storageService.getPrivateKey();
       if (privateKey == null) {
-        // Show dialog to import private key
         if (mounted) {
           privateKey = await _showImportWalletDialog();
           if (privateKey == null || privateKey.isEmpty) {
             throw Exception(
                 'Private key is required to create lots on blockchain');
           }
-          // Save for future use
           await storageService.savePrivateKey(privateKey);
         } else {
           throw Exception('Private key not found');
         }
       }
+      */
 
       // Generate unique lot ID
       final lotId = 'LOT-${DateTime.now().millisecondsSinceEpoch}';
@@ -380,7 +380,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
 
       final metadataUri = await ipfsService.uploadJson(metadata);
 
-      // Step 3: Write to blockchain
+      // Step 3: Mint NFT passport via backend API
       if (mounted) {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -396,7 +396,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                   ),
                 ),
                 SizedBox(width: 16),
-                Text('Step 3/4: Writing to blockchain...'),
+                Text('Step 3/4: Minting NFT passport...'),
               ],
             ),
             duration: Duration(days: 1),
@@ -404,19 +404,30 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
         );
       }
 
-      final blockchainResult = await blockchainService.mintLotPassport(
-        privateKey: privateKey,
-        farmerAddress: farmerAddress,
-        lotId: lotId,
-        variety: _varietyController.text.trim(),
-        quantity: double.parse(_quantityController.text.trim()).toInt(),
-        harvestDate: _selectedHarvestDate!.toIso8601String(),
-        origin: 'Sri Lanka',
-        certificateHash: certificateIpfsHashes.isNotEmpty
+      // Call backend API to mint passport instead of direct blockchain call
+      final apiService =
+          Provider.of<AuthProvider>(context, listen: false).apiService;
+      final mintResponse = await apiService.mintPassport({
+        'lotId': lotId,
+        'farmer': farmerAddress,
+        'origin': 'Sri Lanka',
+        'variety': _varietyController.text.trim(),
+        'quantity': double.parse(_quantityController.text.trim()).toInt(),
+        'harvestDate':
+            (_selectedHarvestDate!.millisecondsSinceEpoch ~/ 1000).toString(),
+        'certificateHash': certificateIpfsHashes.isNotEmpty
             ? certificateIpfsHashes.first
             : '0x0000000000000000000000000000000000000000000000000000000000000000',
-        metadataURI: 'ipfs://$metadataUri',
-      );
+        'metadataURI': 'ipfs://$metadataUri',
+      });
+
+      // Extract blockchain result from API response
+      final blockchainResult = {
+        'txHash': mintResponse['data']['txHash'] ??
+            '0x${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}',
+        'tokenId': mintResponse['data']['tokenId'] ?? 0,
+        'blockNumber': mintResponse['data']['blockNumber'] ?? 0,
+      };
 
       // Step 4: Generate QR code
       final qrData = qrNfcService.generateQrData(

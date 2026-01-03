@@ -8,8 +8,8 @@ const CONTRACT_ABI = [
   "event AuctionEnded(uint256 indexed auctionId, address indexed winner, uint256 finalPrice)",
   "event AuctionSettled(uint256 indexed auctionId, address indexed farmer, address indexed buyer, uint256 amount, uint256 platformFee)",
   "event ComplianceChecked(string indexed lotId, bool passed, uint256 timestamp)",
-  "function createLot(string memory lotId, string memory variety, uint256 quantity, string memory quality, string memory harvestDate, bytes32 certificateHash) external",
-  "function createAuction(string memory lotId, uint256 startPrice, uint256 reservePrice, uint256 duration) external returns (uint256)",
+  "function createLot(string memory lotId, address farmer, string memory variety, uint256 quantity, string memory quality, string memory harvestDate, bytes32 certificateHash, string memory origin, string memory metadataURI) external",
+  "function createAuction(string memory lotId, address farmer, uint256 startPrice, uint256 reservePrice, uint256 duration) external returns (uint256)",
   "function setComplianceStatus(uint256 auctionId, bool passed) external",
   "function placeBid(uint256 auctionId) external payable",
   "function endAuction(uint256 auctionId) external",
@@ -171,25 +171,28 @@ class BlockchainService {
 
   async createLot(lotData) {
     try {
-      const { lotId, variety, quantity, quality, harvestDate, certificateHash } = lotData;
+      const { lotId, farmer, variety, quantity, quality, harvestDate, certificateHash, origin, metadataURI } = lotData;
       
       // Get next nonce with proper synchronization
       const nonce = await this.getNextNonce();
       
       const tx = await this.contract.createLot(
         lotId,
+        farmer,
         variety,
         ethers.parseUnits(quantity.toString(), 0),
-        quality,
-        harvestDate,
-        certificateHash,
+        quality || 'Standard',
+        harvestDate || new Date().toISOString().split('T')[0],
+        certificateHash || ethers.zeroPadValue('0x00', 32),
+        origin || 'Sri Lanka',
+        metadataURI || '',
         { nonce } // Explicitly set nonce
       );
 
       const receipt = await tx.wait();
-      logger.info('Lot created on blockchain', { lotId, txHash: receipt.hash, nonce });
+      logger.info('Lot created on blockchain', { lotId, farmer, txHash: receipt.hash, nonce });
       
-      return receipt.hash;
+      return { txHash: receipt.hash, blockNumber: receipt.blockNumber };
     } catch (error) {
       logger.error('Failed to create lot on blockchain:', error);
       // Reset nonce on error to resync
@@ -200,13 +203,14 @@ class BlockchainService {
 
   async createAuction(auctionData) {
     try {
-      const { lotId, startPrice, reservePrice, duration } = auctionData;
+      const { lotId, farmer, startPrice, reservePrice, duration } = auctionData;
       
       // Get next nonce with proper synchronization
       const nonce = await this.getNextNonce();
       
       const tx = await this.contract.createAuction(
         lotId,
+        farmer,
         ethers.parseEther(startPrice.toString()),
         ethers.parseEther(reservePrice.toString()),
         duration,

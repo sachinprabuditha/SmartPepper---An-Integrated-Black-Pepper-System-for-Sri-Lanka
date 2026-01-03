@@ -3,8 +3,20 @@
 import Link from 'next/link';
 import { Auction } from '@/store/auctionStore';
 import { formatDistanceToNow } from 'date-fns';
-import { Clock, TrendingUp, User, CheckCircle, XCircle } from 'lucide-react';
+import { Clock, TrendingUp, User, CheckCircle, XCircle, DollarSign } from 'lucide-react';
 import { AuctionStatus } from '@/config/contracts';
+
+// Currency conversion
+const ETH_TO_LKR_RATE = 322580.65;
+
+function ethToLkr(eth: number): string {
+  return new Intl.NumberFormat('en-LK', {
+    style: 'currency',
+    currency: 'LKR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(eth * ETH_TO_LKR_RATE);
+}
 
 interface AuctionCardProps {
   auction: Auction;
@@ -74,19 +86,29 @@ export function AuctionCard({ auction }: AuctionCardProps) {
 
       <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
+          <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Start Price</p>
             <p className="text-lg font-bold text-primary-600">
               {auction.startPrice ? (parseFloat(auction.startPrice) / 1e18).toFixed(4) : '0.0000'} ETH
             </p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Current Bid</p>
-            <p className="text-lg font-bold text-green-600">
-              {auction.currentBid && auction.currentBid !== '0' 
-                ? `${(parseFloat(auction.currentBid) / 1e18).toFixed(4)} ETH` 
-                : 'No bids'}
+            <p className="text-xs text-gray-500 mt-1">
+              ≈ {auction.startPrice ? ethToLkr(parseFloat(auction.startPrice) / 1e18) : 'LKR 0'}
             </p>
+          </div>
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Current Bid</p>
+            {auction.currentBid && auction.currentBid !== '0' ? (
+              <>
+                <p className="text-lg font-bold text-green-600">
+                  {(parseFloat(auction.currentBid) / 1e18).toFixed(4)} ETH
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-medium">
+                  ≈ {ethToLkr(parseFloat(auction.currentBid) / 1e18)}
+                </p>
+              </>
+            ) : (
+              <p className="text-lg font-bold text-gray-400">No bids</p>
+            )}
           </div>
         </div>
 

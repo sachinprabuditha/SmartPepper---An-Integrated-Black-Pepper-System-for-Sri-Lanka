@@ -181,6 +181,7 @@ contract PepperAuction is Ownable, ReentrancyGuard, Pausable {
     /**
      * @notice Create a new pepper lot with NFT passport
      * @param lotId Unique identifier for the lot
+     * @param farmer Address of the farmer who owns the lot
      * @param variety Type of pepper (e.g., "Tellicherry", "Malabar")
      * @param quantity Quantity in kg
      * @param quality Quality grade (e.g., "Premium", "Grade A")
@@ -191,6 +192,7 @@ contract PepperAuction is Ownable, ReentrancyGuard, Pausable {
      */
     function createLot(
         string memory lotId,
+        address farmer,
         string memory variety,
         uint256 quantity,
         string memory quality,
@@ -198,14 +200,15 @@ contract PepperAuction is Ownable, ReentrancyGuard, Pausable {
         bytes32 certificateHash,
         string memory origin,
         string memory metadataURI
-    ) external whenNotPaused {
+    ) external onlyOwner whenNotPaused {
+        require(farmer != address(0), "Invalid farmer address");
         require(!lotExists[lotId], "Lot already exists");
         require(quantity > 0, "Quantity must be greater than 0");
         require(certificateHash != bytes32(0), "Certificate hash required");
         
         lots[lotId] = PepperLot({
             lotId: lotId,
-            farmer: msg.sender,
+            farmer: farmer,
             variety: variety,
             quantity: quantity,
             quality: quality,
@@ -220,7 +223,7 @@ contract PepperAuction is Ownable, ReentrancyGuard, Pausable {
         // Mint NFT Passport if contract is set
         if (address(passportContract) != address(0)) {
             uint256 tokenId = passportContract.mintPassport(
-                msg.sender,
+                farmer,
                 lotId,
                 variety,
                 quantity,
@@ -230,26 +233,29 @@ contract PepperAuction is Ownable, ReentrancyGuard, Pausable {
                 metadataURI
             );
             
-            emit PassportLinked(lotId, tokenId, msg.sender);
+            emit PassportLinked(lotId, tokenId, farmer);
         }
         
-        emit LotCreated(lotId, msg.sender, variety, quantity, certificateHash);
+        emit LotCreated(lotId, farmer, variety, quantity, certificateHash);
     }
     
     /**
      * @notice Create an auction for a pepper lot
      * @param lotId The lot to auction
+     * @param farmer Address of the farmer who owns the lot
      * @param startPrice Starting price in wei
      * @param reservePrice Minimum acceptable price
      * @param duration Auction duration in seconds
      */
     function createAuction(
         string memory lotId,
+        address farmer,
         uint256 startPrice,
         uint256 reservePrice,
         uint256 duration
-    ) external onlyFarmer(lotId) whenNotPaused returns (uint256) {
+    ) external onlyOwner whenNotPaused returns (uint256) {
         require(lotExists[lotId], "Lot does not exist");
+        require(lots[lotId].farmer == farmer, "Farmer address mismatch");
         require(lots[lotId].status == LotStatus.Available, "Lot not available");
         require(startPrice > 0, "Start price must be greater than 0");
         require(reservePrice >= startPrice, "Reserve price must be >= start price");
@@ -262,7 +268,7 @@ contract PepperAuction is Ownable, ReentrancyGuard, Pausable {
         auctions[auctionId] = Auction({
             auctionId: auctionId,
             lotId: lotId,
-            farmer: msg.sender,
+            farmer: farmer,
             startPrice: startPrice,
             reservePrice: reservePrice,
             currentBid: 0,
@@ -290,7 +296,7 @@ contract PepperAuction is Ownable, ReentrancyGuard, Pausable {
             }
         }
         
-        emit AuctionCreated(auctionId, lotId, msg.sender, startPrice, reservePrice, endTime);
+        emit AuctionCreated(auctionId, lotId, farmer, startPrice, reservePrice, endTime);
         
         return auctionId;
     }
@@ -407,6 +413,31 @@ contract PepperAuction is Ownable, ReentrancyGuard, Pausable {
             
             emit AuctionEnded(auctionId, address(0), 0);
         }
+    }
+    
+    /**
+     * @notice Deposit escrow for won auction (must be called by winner)
+     * @param auctionId The auction to deposit escrow for
+     */
+    function depositEscrow(uint256 auctionId) 
+        external 
+        payable
+        auctionExists(auctionId) 
+        nonReentrant 
+        whenNotPaused 
+    {
+        Auction storage auction = auctions[auctionId];
+        
+        require(auction.status == AuctionStatus.Ended, "Auction not ended");
+        require(msg.sender == auction.currentBidder, "Only winner can deposit escrow");
+        require(auction.escrowAmount == 0, "Escrow already deposited");
+        require(auction.currentBid > 0, "No winning bid");
+        require(msg.value == auction.currentBid, "Incorrect escrow amount");
+        
+        // Lock funds in contract
+        auction.escrowAmount = msg.value;
+        
+        emit EscrowDeposited(msg.sender, msg.value);
     }
     
     /**
@@ -547,6 +578,22 @@ contract PepperAuction is Ownable, ReentrancyGuard, Pausable {
     function getTotalAuctions() external view returns (uint256) {
         return auctionCounter;
     }
+    
+    /**
+     * @notice Admin function to reset lot status to Available
+     * @dev Used when an auction creation failed but changed lot status
+     * @param lotId The lot ID to reset
+     */
+    function resetLotStatus(string memory lotId) external onlyOwner {
+        require(lotExists[lotId], "Lot does not exist");
+        lots[lotId].status = LotStatus.Available;
+        emit LotStatusChanged(lotId, LotStatus.Available);
+    }
+    
+    /**
+     * @notice Event emitted when lot status is changed
+     */
+    event LotStatusChanged(string indexed lotId, LotStatus status);
     
     /**
      * @notice Helper function to convert uint to string

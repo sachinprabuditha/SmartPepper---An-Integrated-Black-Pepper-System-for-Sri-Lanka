@@ -50,11 +50,15 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
   List<Map<String, dynamic>> _durationOptions = [];
   List<Map<String, dynamic>> _templates = [];
   String? _selectedTemplateId;
-  double _minReservePrice = 100;
-  double _maxReservePrice = 1000000;
-  double _defaultBidIncrement = 5.0;
+  double _minReservePrice = 100; // LKR
+  double _maxReservePrice = 1000000; // LKR
+  double _defaultBidIncrement = 5.0; // percentage
   bool _requiresAdminApproval = false;
   bool _loadingGovernance = true;
+
+  // Exchange rate (LKR to ETH) - fetched from backend
+  double _lkrToEthRate =
+      0.0000031; // Default: 1 LKR ≈ 0.0000031 ETH (~320 LKR per USD, ~3100 USD per ETH)
 
   @override
   void initState() {
@@ -99,6 +103,10 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
             (settingsResponse['minReservePrice'] ?? 100).toDouble();
         _maxReservePrice =
             (settingsResponse['maxReservePrice'] ?? 1000000).toDouble();
+
+        // Get exchange rate
+        _lkrToEthRate =
+            (settingsResponse['lkrToEthRate'] ?? 0.0000031).toDouble();
         _defaultBidIncrement =
             (settingsResponse['defaultBidIncrement'] ?? 5.0).toDouble();
         _requiresAdminApproval =
@@ -300,7 +308,11 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text('Lot: ${_selectedLot!.lotId}'),
-            Text('Reserve Price: \$${_reservePriceController.text}'),
+            Text('Reserve Price: ${_reservePriceController.text} LKR'),
+            Text(
+              '(≈ ${(double.parse(_reservePriceController.text) * _lkrToEthRate).toStringAsFixed(4)} ETH)',
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            ),
             Text('Duration: $_durationDays days'),
             Text('Quantity: ${_quantityController.text} kg'),
             if (_selectedDestinations.isNotEmpty)
@@ -353,13 +365,16 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
       // Calculate start and end times
       // Start auction in 1 minute (allows time for blockchain transaction)
-      final startTime = DateTime.now().add(const Duration(minutes: 1));
+      final startTime = DateTime.now().add(const Duration(minutes: 5));
       final endTime = startTime.add(Duration(days: _durationDays));
 
       final auctionData = {
         'lotId': _selectedLot!.lotId,
         'farmerAddress': authProvider.user?.walletAddress ?? '',
         'reservePrice': double.parse(_reservePriceController.text),
+        'currency': 'LKR', // Farmer inputs in LKR
+        'reservePriceEth': double.parse(_reservePriceController.text) *
+            _lkrToEthRate, // Converted for blockchain
         'quantity': double.parse(_quantityController.text),
         'duration': _durationDays,
         'startTime': startTime.toIso8601String(),
@@ -971,46 +986,75 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
   }
 
   Widget _buildReservePriceField() {
-    return TextFormField(
-      controller: _reservePriceController,
-      style: const TextStyle(color: Colors.black87, fontSize: 16),
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      decoration: InputDecoration(
-        labelText: 'Minimum Price (Reserve Price) *',
-        labelStyle: const TextStyle(color: Colors.black87),
-        hintText: 'Min: $_minReservePrice, Max: $_maxReservePrice LKR',
-        prefixIcon: const Icon(Icons.attach_money, color: AppTheme.forestGreen),
-        suffixText: 'LKR/kg',
-        helperText:
-            'Admin-defined range: $_minReservePrice - $_maxReservePrice LKR',
-        helperMaxLines: 2,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: _reservePriceController,
+          style: const TextStyle(color: Colors.black87, fontSize: 16),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          onChanged: (value) {
+            setState(() {}); // Refresh to show ETH conversion
+          },
+          decoration: InputDecoration(
+            labelText: 'Reserve Price (LKR) *',
+            labelStyle: const TextStyle(color: Colors.black87),
+            hintText: 'Min: $_minReservePrice, Max: $_maxReservePrice LKR',
+            prefixIcon:
+                const Icon(Icons.attach_money, color: AppTheme.forestGreen),
+            suffixText: 'LKR',
+            helperText:
+                'Price range: $_minReservePrice - $_maxReservePrice LKR (per lot)',
+            helperMaxLines: 2,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide:
+                  const BorderSide(color: AppTheme.forestGreen, width: 2),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter reserve price';
+            }
+            final price = double.tryParse(value);
+            if (price == null || price <= 0) {
+              return 'Please enter a valid price';
+            }
+            // Governance validation
+            if (price < _minReservePrice) {
+              return 'Price must be at least $_minReservePrice LKR';
+            }
+            if (price > _maxReservePrice) {
+              return 'Price cannot exceed $_maxReservePrice LKR';
+            }
+            return null;
+          },
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.forestGreen, width: 2),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter reserve price';
-        }
-        final price = double.tryParse(value);
-        if (price == null || price <= 0) {
-          return 'Please enter a valid price';
-        }
-        // Governance validation
-        if (price < _minReservePrice) {
-          return 'Price must be at least $_minReservePrice LKR';
-        }
-        if (price > _maxReservePrice) {
-          return 'Price cannot exceed $_maxReservePrice LKR';
-        }
-        return null;
-      },
+        // Show ETH conversion
+        if (_reservePriceController.text.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8, left: 12),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline, size: 16, color: Colors.blue),
+                const SizedBox(width: 6),
+                Text(
+                  'Equivalent: ${((double.tryParse(_reservePriceController.text) ?? 0) * _lkrToEthRate).toStringAsFixed(4)} ETH',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.blue[700],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 

@@ -22,8 +22,8 @@ class Environment {
   static const String auctionContractAddress =
       '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318'; // PepperAuction
 
-  // WebSocket Configuration
-  static const String wsUrl = 'ws://192.168.8.116:3002';
+  // WebSocket Configuration (with /auction namespace)
+  static const String wsUrl = 'ws://192.168.8.116:3002/auction';
 
   // IPFS Configuration
   static const String ipfsApiUrl = 'http://192.168.8.116:5001';

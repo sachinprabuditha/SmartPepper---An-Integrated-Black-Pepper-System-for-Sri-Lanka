@@ -214,6 +214,27 @@ class ApiService {
     }
   }
 
+  // NFT Passport endpoints
+  Future<Map<String, dynamic>> mintPassport(Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.post('/nft-passport/mint', data: data);
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData.containsKey('error')) {
+          throw Exception('Failed to mint passport: ${errorData['error']}');
+        } else if (errorData is Map && errorData.containsKey('message')) {
+          throw Exception('Failed to mint passport: ${errorData['message']}');
+        }
+      }
+      throw Exception(
+          'Failed to mint passport: Network error. Please check your connection.');
+    } catch (e) {
+      throw Exception('Failed to mint passport: ${e.toString()}');
+    }
+  }
+
   // File upload
   Future<String> uploadFile(String filePath) async {
     try {

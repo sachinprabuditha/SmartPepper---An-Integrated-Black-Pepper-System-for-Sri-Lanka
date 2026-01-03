@@ -11,8 +11,30 @@ import { PEPPER_AUCTION_ABI, CONTRACT_ADDRESS } from '@/config/contracts';
 import { AuctionTimer } from '@/components/auction/AuctionTimer';
 import { BidHistory } from '@/components/auction/BidHistory';
 import { BidForm } from '@/components/auction/BidForm';
-import { Loader2, CheckCircle, XCircle, User, Package, Calendar, Users, Wifi } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, User, Package, Calendar, Users, Wifi, DollarSign } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+// Currency conversion constants
+const LKR_TO_ETH_RATE = 0.0000031; // 1 LKR ≈ 0.0000031 ETH
+const ETH_TO_LKR_RATE = 322580.65; // 1 ETH ≈ 322,580 LKR
+
+// Currency conversion helpers
+function ethToLkr(ethAmount: number): number {
+  return ethAmount * ETH_TO_LKR_RATE;
+}
+
+function formatLkr(amount: number): string {
+  return new Intl.NumberFormat('en-LK', {
+    style: 'currency',
+    currency: 'LKR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
+
+function formatEth(amount: number): string {
+  return `${amount.toFixed(4)} ETH`;
+}
 
 // Helper function to convert snake_case to camelCase
 function toCamelCase(obj: any): any {
@@ -50,6 +72,10 @@ export default function AuctionDetailPage() {
         // Transform snake_case to camelCase
         const transformedAuction = toCamelCase(response.data.auction);
         const transformedBids = toCamelCase(response.data.bids || []);
+        
+        console.log('📊 Fetched auction:', transformedAuction);
+        console.log('📊 Auction ID:', transformedAuction.auctionId, typeof transformedAuction.auctionId);
+        
         setAuction(transformedAuction);
         setBids(transformedBids);
       } catch (error) {
@@ -293,31 +319,56 @@ export default function AuctionDetailPage() {
             </div>
           </div>
 
-          {/* Pricing Information */}
+          {/* Pricing Information - Dual Currency Display */}
           <div className="card">
-            <h2 className="text-xl font-semibold mb-4 dark:text-white">Pricing</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold dark:text-white">Pricing</h2>
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-lg text-xs">
+                <DollarSign className="w-3 h-3 text-blue-600" />
+                <span className="text-blue-700">Dual Currency</span>
+              </div>
+            </div>
             <div className="grid md:grid-cols-3 gap-6">
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Start Price</p>
+              <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Start Price</p>
                 <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">
-                  {parseFloat(auction.startPrice).toFixed(4)} ETH
+                  {formatEth(parseFloat(auction.startPrice))}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  ≈ {formatLkr(ethToLkr(parseFloat(auction.startPrice)))}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Reserve Price</p>
+              <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Reserve Price</p>
                 <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">
-                  {parseFloat(auction.reservePrice).toFixed(4)} ETH
+                  {formatEth(parseFloat(auction.reservePrice))}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  ≈ {formatLkr(ethToLkr(parseFloat(auction.reservePrice)))}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Current Bid</p>
-                <p className="text-3xl font-bold text-green-600">
-                  {auction.currentBid !== '0' 
-                    ? `${parseFloat(auction.currentBid).toFixed(4)} ETH`
-                    : 'No bids yet'
-                  }
-                </p>
+              <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Current Bid</p>
+                {auction.currentBid !== '0' ? (
+                  <>
+                    <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                      {formatEth(parseFloat(auction.currentBid))}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 font-medium">
+                      ≈ {formatLkr(ethToLkr(parseFloat(auction.currentBid)))}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-2xl font-bold text-gray-400">No bids yet</p>
+                )}
               </div>
+            </div>
+            
+            {/* Currency Information Footer */}
+            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                <span className="font-semibold">Exchange Rate:</span> 1 ETH ≈ {formatLkr(ETH_TO_LKR_RATE)} • All blockchain transactions use ETH
+              </p>
             </div>
           </div>
 
@@ -339,10 +390,14 @@ export default function AuctionDetailPage() {
           )}
 
           {/* Bid Form */}
-          {isActive && !hasEnded && !isFarmer && (
+          {isActive && !hasEnded && !isFarmer && auction.auctionId && (
             <div className="card">
               <h3 className="text-lg font-semibold mb-4">Place Your Bid</h3>
-              <BidForm auction={auction} />
+              <BidForm 
+                auctionId={Number(auction.auctionId)}
+                currentBid={auction.currentBid || '0'}
+                minimumBid={auction.startPrice || '0'}
+              />
             </div>
           )}
 

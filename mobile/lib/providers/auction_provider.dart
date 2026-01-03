@@ -11,6 +11,7 @@ class Auction {
   final String farmerAddress;
   final double startingPrice;
   final double currentBid;
+  final double? currentBidLkr; // LKR equivalent of current bid
   final String? highestBidder;
   final DateTime startTime;
   final DateTime endTime;
@@ -28,6 +29,7 @@ class Auction {
     required this.farmerAddress,
     required this.startingPrice,
     required this.currentBid,
+    this.currentBidLkr,
     this.highestBidder,
     required this.startTime,
     required this.endTime,
@@ -59,6 +61,9 @@ class Auction {
               json['currentBid']?.toString() ??
               '0') ??
           0.0,
+      currentBidLkr: double.tryParse(json['current_bid_lkr']?.toString() ??
+          json['currentBidLkr']?.toString() ??
+          '0'),
       highestBidder: json['highest_bidder']?.toString() ??
           json['highestBidder']?.toString(),
       startTime: DateTime.tryParse(json['start_time']?.toString() ??

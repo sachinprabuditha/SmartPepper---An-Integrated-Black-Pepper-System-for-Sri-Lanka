@@ -369,6 +369,113 @@ class NFTPassportService {
       return false;
     }
   }
+
+  /**
+   * Mint a new NFT passport
+   */
+  async mintPassport(passportData) {
+    if (!this.contract) {
+      throw new Error('NFT Passport contract not initialized');
+    }
+
+    try {
+      const {
+        farmer,
+        lotId,
+        variety,
+        quantity,
+        harvestDate,
+        origin,
+        certificateHash,
+        metadataURI
+      } = passportData;
+
+      logger.info('Minting NFT passport on blockchain:', { lotId, farmer, variety });
+
+      // Convert certificateHash to bytes32 if it's a string
+      let certHashBytes32;
+      if (certificateHash && certificateHash.startsWith('0x')) {
+        // Already in hex format
+        certHashBytes32 = certificateHash;
+      } else if (certificateHash) {
+        // Convert IPFS hash to bytes32 (take first 32 bytes of hash)
+        const hash = ethers.keccak256(ethers.toUtf8Bytes(certificateHash));
+        certHashBytes32 = hash;
+      } else {
+        // Empty hash
+        certHashBytes32 = ethers.zeroPadValue('0x00', 32);
+      }
+
+      // Call the smart contract mintPassport function
+      const tx = await this.contract.mintPassport(
+        farmer,
+        lotId,
+        variety,
+        quantity.toString(),
+        harvestDate.toString(),
+        origin || 'Sri Lanka',
+        certHashBytes32,
+        metadataURI || ''
+      );
+
+      logger.info('NFT mint transaction sent:', { txHash: tx.hash });
+
+      // Wait for transaction confirmation
+      const receipt = await tx.wait();
+      
+      logger.info('NFT mint transaction confirmed:', { 
+        txHash: receipt.hash,
+        blockNumber: receipt.blockNumber,
+        gasUsed: receipt.gasUsed.toString()
+      });
+
+      // Extract tokenId from events
+      let tokenId = null;
+      if (receipt.logs && receipt.logs.length > 0) {
+        try {
+          // Parse the PassportMinted event
+          const iface = new ethers.Interface(PASSPORT_CONTRACT_ABI);
+          for (const log of receipt.logs) {
+            try {
+              const parsed = iface.parseLog(log);
+              if (parsed && parsed.name === 'PassportMinted') {
+                tokenId = Number(parsed.args.tokenId);
+                logger.info('Extracted tokenId from event:', tokenId);
+                break;
+              }
+            } catch (e) {
+              // Skip logs that don't match our interface
+              continue;
+            }
+          }
+        } catch (error) {
+          logger.warn('Failed to parse mint event logs:', error.message);
+        }
+      }
+
+      // If we couldn't get tokenId from events, query the contract
+      if (tokenId === null) {
+        try {
+          tokenId = Number(await this.contract.lotIdToTokenId(lotId));
+          logger.info('Retrieved tokenId from contract:', tokenId);
+        } catch (error) {
+          logger.warn('Failed to retrieve tokenId from contract:', error.message);
+          // Use a fallback tokenId
+          tokenId = 0;
+        }
+      }
+
+      return {
+        txHash: receipt.hash,
+        tokenId: tokenId,
+        blockNumber: receipt.blockNumber
+      };
+
+    } catch (error) {
+      logger.error('Failed to mint NFT passport:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = NFTPassportService;

@@ -28,16 +28,40 @@ export const auctionApi = {
   
   placeBid: (id: number, data: {
     bidderAddress: string;
+    bidderName?: string;
     amount: string;
-    txHash: string;
   }) =>
     api.post(`/auctions/${id}/bid`, data),
   
+  getBids: (id: number) =>
+    api.get(`/auctions/${id}/bids`),
+  
+  getUserBids: (userId: string) =>
+    api.get(`/auctions/bids/user/${userId}`),
+  
+  lockEscrow: (id: number, data: {
+    winnerAddress: string;
+    amount: string;
+    txHash: string;
+  }) =>
+    api.post(`/auctions/${id}/escrow/lock`, data),
+  
+  settle: (id: number, data: {
+    settlerAddress: string;
+    txHash: string;
+  }) =>
+    api.post(`/auctions/${id}/settle`, data),
+  
+  cancel: (id: number, data: {
+    cancellerAddress: string;
+    reason: string;
+    detailedReason?: string;
+    refundTxHash?: string;
+  }) =>
+    api.post(`/auctions/${id}/cancel`, data),
+  
   end: (id: number) =>
     api.post(`/auctions/${id}/end`),
-  
-  settle: (id: number) =>
-    api.post(`/auctions/${id}/settle`),
 };
 
 // Lots
@@ -88,6 +112,30 @@ export const complianceApi = {
   
   uploadCertificate: (file: string) =>
     api.post('/compliance/upload', { file }),
+};
+
+// Escrow
+export const escrowApi = {
+  deposit: (data: {
+    auctionId: number;
+    exporterAddress: string;
+    amount: string;
+    txHash: string;
+    userId: string;
+  }) =>
+    api.post('/escrow/deposit', data),
+  
+  getStatus: (auctionId: number) =>
+    api.get(`/escrow/status/${auctionId}`),
+  
+  verify: (data: {
+    auctionId: number;
+    txHash: string;
+  }) =>
+    api.post('/escrow/verify', data),
+  
+  getUserDeposits: (userId: string) =>
+    api.get(`/escrow/user/${userId}`),
 };
 
 export default api;

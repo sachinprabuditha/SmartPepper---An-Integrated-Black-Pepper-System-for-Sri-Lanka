@@ -97,12 +97,18 @@ class _FarmerAuctionMonitorScreenState
   void _setupRealtimeUpdates() {
     final socketService = context.read<SocketService>();
 
-    // Listen for bid updates
-    socketService.on('bid_placed', (data) {
+    // Listen for bid updates (backend emits 'new_bid')
+    socketService.on('new_bid', (data) {
+      print('📡 Received new_bid event: $data');
+      if (!mounted) return; // Check if widget is still mounted
+
       if (data['auctionId'] == widget.auctionId ||
           data['auctionId'].toString() == _auction?.auctionId) {
         setState(() {
           if (_auction != null) {
+            // Backend sends 'amount' (ETH) and 'amountLkr' fields
+            final bidAmount = data['amount'] ?? data['bidAmount'];
+            final bidAmountLkr = data['amountLkr'];
             _auction = Auction(
               id: _auction!.id,
               auctionId: _auction!.auctionId,
@@ -110,11 +116,13 @@ class _FarmerAuctionMonitorScreenState
               lotId: _auction!.lotId,
               farmerAddress: _auction!.farmerAddress,
               startingPrice: _auction!.startingPrice,
-              currentBid:
-                  double.tryParse(data['bidAmount']?.toString() ?? '0') ??
-                      _auction!.currentBid,
-              highestBidder:
-                  data['bidderId']?.toString() ?? _auction!.highestBidder,
+              currentBid: double.tryParse(bidAmount?.toString() ?? '0') ??
+                  _auction!.currentBid,
+              currentBidLkr: double.tryParse(bidAmountLkr?.toString() ?? '0') ??
+                  _auction!.currentBidLkr,
+              highestBidder: data['bidder']?.toString() ??
+                  data['bidderId']?.toString() ??
+                  _auction!.highestBidder,
               startTime: _auction!.startTime,
               endTime: _auction!.endTime,
               status: _auction!.status,
@@ -130,6 +138,9 @@ class _FarmerAuctionMonitorScreenState
 
     // Listen for auction end
     socketService.on('auction_ended', (data) {
+      print('🏁 Received auction_ended event: $data');
+      if (!mounted) return; // Check if widget is still mounted
+
       if (data['auctionId'] == widget.auctionId ||
           data['auctionId'].toString() == _auction?.auctionId) {
         setState(() {
@@ -162,7 +173,13 @@ class _FarmerAuctionMonitorScreenState
       }
     });
 
+    // Listen for auction joined confirmation
+    socketService.on('auction_joined', (data) {
+      print('✅ Successfully joined auction room: ${data['auctionId']}');
+    });
+
     // Join auction room for real-time updates
+    print('📡 Joining auction room: ${widget.auctionId}');
     socketService.emit('join_auction', {'auctionId': widget.auctionId});
   }
 
@@ -503,7 +520,7 @@ class _FarmerAuctionMonitorScreenState
           ),
           const SizedBox(height: 8),
           Text(
-            'LKR ${(_auction!.currentBid ?? _auction!.startingPrice).toStringAsFixed(2)}',
+            'LKR ${(_auction!.currentBidLkr ?? (_auction!.currentBid ?? _auction!.startingPrice) * 322580.65).toStringAsFixed(2)}',
             style: const TextStyle(
               color: AppTheme.pepperGold,
               fontSize: 36,
@@ -637,7 +654,7 @@ class _FarmerAuctionMonitorScreenState
                   ),
                 ),
                 Text(
-                  'LKR ${_auction!.currentBid!.toStringAsFixed(2)}',
+                  'LKR ${(_auction!.currentBidLkr ?? _auction!.currentBid! * 322580.65).toStringAsFixed(2)}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

@@ -17,6 +17,7 @@ const processingRoutes = require('./routes/processing');
 const certificationsRoutes = require('./routes/certifications');
 const adminRoutes = require('./routes/admin');
 const governanceRoutes = require('./routes/governance');
+const escrowRoutes = require('./routes/escrow');
 const { startAuctionStatusMonitor } = require('./services/auctionStatusService');
 
 // Load NFT routes with error handling
@@ -69,6 +70,7 @@ app.use('/api/certifications', certificationsRoutes);
 app.use('/api/nft-passport', nftPassportRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/governance', governanceRoutes);
+app.use('/api/escrow', escrowRoutes);
 app.use('/api/traceability', require('./routes/traceability'));
 
 // Health check
@@ -148,9 +150,13 @@ async function initialize() {
       }
     });
     
+    // Make io available to routes
+    app.set('io', io);
+    
     if (redisClient) {
       const auctionSocket = new AuctionWebSocket(io, redisClient);
       auctionSocket.initialize();
+      app.set('auctionSocket', auctionSocket); // Make available to routes
       logger.info('WebSocket server initialized');
     } else {
       logger.warn('WebSocket not initialized (Redis unavailable)');

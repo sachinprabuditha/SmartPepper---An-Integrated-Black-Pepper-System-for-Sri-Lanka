@@ -19,6 +19,18 @@ export function BidHistory({ auctionId, bids }: BidHistoryProps) {
     );
   }
 
+  // Helper function to safely format date
+  const formatBidDate = (placedAt: string | Date | undefined) => {
+    if (!placedAt) return 'just now';
+    try {
+      const date = new Date(placedAt);
+      if (isNaN(date.getTime())) return 'just now';
+      return formatDistanceToNow(date, { addSuffix: true });
+    } catch (error) {
+      return 'just now';
+    }
+  };
+
   return (
     <div className="space-y-3 max-h-96 overflow-y-auto">
       {bids.map((bid, index) => (
@@ -36,7 +48,7 @@ export function BidHistory({ auctionId, bids }: BidHistoryProps) {
                 {bid.bidderAddress.slice(0, 6)}...{bid.bidderAddress.slice(-4)}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-500">
-                {formatDistanceToNow(new Date(bid.placedAt), { addSuffix: true })}
+                {formatBidDate(bid.placedAt)}
               </p>
             </div>
             <div className="text-right">

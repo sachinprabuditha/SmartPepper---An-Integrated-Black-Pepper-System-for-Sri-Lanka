@@ -32,11 +32,13 @@ async function main() {
   await linkTx.wait();
   console.log("✅ Contracts linked successfully\n");
 
-  // 4. Transfer PepperPassport ownership to PepperAuction
-  console.log("4️⃣ Transferring PepperPassport ownership...");
+  // 4. Transfer ownership of PepperPassport to PepperAuction
+  // This allows PepperAuction.createLot() to call mintPassport() internally
+  console.log("4️⃣ Transferring PepperPassport ownership to PepperAuction...");
   const transferTx = await pepperPassport.transferOwnership(auctionAddress);
   await transferTx.wait();
-  console.log("✅ Ownership transferred\n");
+  console.log("✅ PepperPassport ownership transferred to PepperAuction");
+  console.log("   New Owner:", auctionAddress, "\n");
 
   // Save deployment info
   const deploymentInfo = {

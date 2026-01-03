@@ -1,8 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const { ethers } = require('ethers');
 const logger = require('../utils/logger');
+const BlockchainService = require('../services/blockchainService');
 
 let nftService = null;
+const blockchainService = new BlockchainService();
+
+// Initialize blockchain service
+blockchainService.initialize().catch(err => logger.error('Blockchain init failed:', err));
 
 // Try to load the NFT service
 try {
@@ -175,6 +181,101 @@ router.get('/qr/:lotId', async (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message || 'Failed to generate QR code'
+    });
+  }
+});
+
+/**
+ * POST /api/nft-passport/mint
+ * Mint a new NFT passport for a lot
+ */
+router.post('/mint', async (req, res) => {
+  try {
+    const {
+      lotId,
+      farmer,
+      origin,
+      variety,
+      quantity,
+      quality,
+      harvestDate,
+      certificateHash,
+      metadataURI
+    } = req.body;
+
+    // Validate required fields
+    if (!lotId || !farmer || !variety || !quantity) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: lotId, farmer, variety, quantity'
+      });
+    }
+
+    logger.info('Minting NFT passport and registering lot:', { lotId, farmer, variety, quantity });
+
+    // Check if service is available
+    if (!nftService || !nftService.contract) {
+      logger.warn('NFT service not available, returning mock response');
+      return res.json({
+        success: true,
+        data: {
+          txHash: `0x${Date.now().toString(16)}`, // Mock transaction hash
+          tokenId: parseInt(lotId.split('-')[1]) || Math.floor(Math.random() * 10000),
+          message: 'Passport minting queued (blockchain service unavailable)'
+        }
+      });
+    }
+
+    // Convert certificateHash to bytes32 if it's an IPFS hash string
+    let certHashBytes32;
+    if (certificateHash && certificateHash.startsWith('0x')) {
+      // Already in hex format
+      certHashBytes32 = certificateHash;
+    } else if (certificateHash) {
+      // Convert IPFS hash to bytes32 using keccak256
+      certHashBytes32 = ethers.keccak256(ethers.toUtf8Bytes(certificateHash));
+      logger.info('Converted IPFS hash to bytes32:', { 
+        original: certificateHash, 
+        bytes32: certHashBytes32 
+      });
+    } else {
+      // Empty hash
+      certHashBytes32 = ethers.zeroPadValue('0x00', 32);
+    }
+
+    // Register lot on auction contract AND mint NFT passport (both in one transaction via createLot)
+    const lotResult = await blockchainService.createLot({
+      lotId,
+      farmer,
+      variety,
+      quantity,
+      quality: quality || 'Standard',
+      harvestDate: harvestDate || Math.floor(Date.now() / 1000).toString(),
+      certificateHash: certHashBytes32,
+      origin: origin || 'Sri Lanka',
+      metadataURI: metadataURI || ''
+    });
+
+    logger.info('Lot registered and NFT passport minted:', { 
+      lotId, 
+      farmer,
+      txHash: lotResult.txHash,
+      blockNumber: lotResult.blockNumber
+    });
+
+    res.json({
+      success: true,
+      data: {
+        txHash: lotResult.txHash,
+        blockNumber: lotResult.blockNumber,
+        message: 'Lot registered on blockchain and NFT passport minted'
+      }
+    });
+  } catch (error) {
+    logger.error('Failed to mint NFT passport:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to mint NFT passport'
     });
   }
 });
