@@ -14,7 +14,7 @@
 
 ## Tech Stack
 
-- **Framework:** Next.js 14 (App Router)
+- **Framework:** Next.js 14 (App Router) 
 - **UI:** React 18, Tailwind CSS
 - **Web3:** Wagmi, Viem, RainbowKit
 - **State:** Zustand
