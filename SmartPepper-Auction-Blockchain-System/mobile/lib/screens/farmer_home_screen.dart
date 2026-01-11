@@ -1,117 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import '../../providers/auth_provider.dart';
-import '../../config/theme.dart';
-import '../../services/notification_service.dart';
-import '../../services/offline_sync_service.dart';
-import '../../services/api_service.dart';
-import '../../models/lot.dart';
+import '../providers/auth_provider.dart';
+import '../config/theme.dart';
 
-class FarmerDashboard extends StatefulWidget {
-  const FarmerDashboard({super.key});
+class FarmerHomeScreen extends StatefulWidget {
+  const FarmerHomeScreen({super.key});
 
   @override
-  State<FarmerDashboard> createState() => _FarmerDashboardState();
+  State<FarmerHomeScreen> createState() => _FarmerHomeScreenState();
 }
 
-class _FarmerDashboardState extends State<FarmerDashboard> {
-  int _unreadNotifications = 0;
-  bool _isSyncing = false;
-  int _pendingSyncCount = 0;
-  int _activeLots = 0;
-  int _inAuction = 0;
-  int _soldLots = 0;
-  double _totalRevenue = 0.0;
+class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
+  int _selectedIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadNotificationCount();
-    _loadSyncStatus();
-    _loadStatistics();
-  }
+  void _onItemTapped(int index) {
+    setState(() => _selectedIndex = index);
 
-  Future<void> _loadStatistics() async {
-    try {
-      final apiService = context.read<ApiService>();
-      final authProvider = context.read<AuthProvider>();
-
-      // Get current user's ID to filter their lots only
-      final farmerId = authProvider.user?.id;
-
-      if (farmerId != null) {
-        final lotsData = await apiService.getLots(farmerAddress: farmerId);
-        final lots = lotsData.map<Lot>((data) => Lot.fromJson(data)).toList();
-
-        if (mounted) {
-          setState(() {
-            _activeLots = lots.where((lot) => lot.status == 'approved').length;
-            _inAuction = lots.where((lot) => lot.isInAuction).length;
-            _soldLots = lots.where((lot) => lot.isSold).length;
-            _totalRevenue = lots
-                .where((lot) => lot.isSold && lot.currentBid != null)
-                .fold(0.0, (sum, lot) => sum + lot.currentBid!);
-          });
-        }
-      }
-    } catch (e) {
-      // Ignore errors - will show 0 values
-    }
-  }
-
-  Future<void> _loadNotificationCount() async {
-    try {
-      final notificationService = context.read<NotificationService>();
-      final count = await notificationService.getUnreadCount();
-      if (mounted) {
-        setState(() => _unreadNotifications = count);
-      }
-    } catch (e) {
-      // Ignore errors
-    }
-  }
-
-  Future<void> _loadSyncStatus() async {
-    try {
-      final syncService = context.read<OfflineSyncService>();
-      final count = await syncService.getPendingCount();
-      if (mounted) {
-        setState(() => _pendingSyncCount = count);
-      }
-    } catch (e) {
-      // Ignore errors
-    }
-  }
-
-  Future<void> _triggerSync() async {
-    setState(() => _isSyncing = true);
-    try {
-      final syncService = context.read<OfflineSyncService>();
-      final result = await syncService.syncPendingData();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result.message),
-            backgroundColor: result.success ? Colors.green : Colors.orange,
-          ),
-        );
-        await _loadSyncStatus();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Sync failed: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isSyncing = false);
-      }
+    switch (index) {
+      case 0:
+        // Already on home
+        break;
+      case 1:
+        context.push('/farmer/scan');
+        break;
+      case 2:
+        context.push('/farmer/reports');
+        break;
+      case 3:
+        context.push('/farmer/analytics');
+        break;
+      case 4:
+        context.push('/farmer/profile');
+        break;
     }
   }
 
@@ -131,49 +52,19 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
           },
         ),
         title: const Text(
-          'smartPepper',
+          'SmartPepper',
           style: TextStyle(
             color: AppTheme.pepperGold,
             fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined,
-                    color: AppTheme.pepperGold),
-                onPressed: () async {
-                  await context.push('/farmer/notifications');
-                  _loadNotificationCount();
-                },
-              ),
-              if (_unreadNotifications > 0)
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
-                    ),
-                    child: Text(
-                      _unreadNotifications > 9 ? '9+' : '$_unreadNotifications',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-            ],
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined,
+                color: AppTheme.pepperGold),
+            onPressed: () {
+              context.push('/farmer/notifications');
+            },
           ),
         ],
       ),
@@ -203,62 +94,6 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
 
               const SizedBox(height: 24),
 
-              // Offline Sync Status
-              if (_pendingSyncCount > 0)
-                Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.orange.shade300),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.sync, color: Colors.orange.shade700),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '$_pendingSyncCount items pending sync',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange.shade900,
-                              ),
-                            ),
-                            Text(
-                              'Connect to internet to sync',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.orange.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: _isSyncing ? null : _triggerSync,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange.shade700,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: _isSyncing
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text('Sync'),
-                      ),
-                    ],
-                  ),
-                ),
-
               // Quick Actions
               Row(
                 children: [
@@ -276,31 +111,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                       icon: Icons.inventory_outlined,
                       label: 'My Lots',
                       color: AppTheme.sriLankanLeaf,
-                      onTap: () => context.push('/farmer/my-lots'),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildActionCard(
-                      icon: Icons.gavel,
-                      label: 'Live Auctions',
-                      color: Colors.blue,
-                      onTap: () => context.push('/shared/auctions'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildActionCard(
-                      icon: Icons.qr_code,
-                      label: 'Scan QR',
-                      color: Colors.purple,
-                      onTap: () => context.push('/shared/qr-scanner'),
+                      onTap: () => context.push('/farmer/lots'),
                     ),
                   ),
                 ],
@@ -334,7 +145,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                           child: _buildStatCard(
                             icon: Icons.eco,
                             label: 'Active Lots',
-                            value: '$_activeLots',
+                            value: '8',
                             color: AppTheme.sriLankanLeaf,
                           ),
                         ),
@@ -343,7 +154,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                           child: _buildStatCard(
                             icon: Icons.trending_up,
                             label: 'In Auction',
-                            value: '$_inAuction',
+                            value: '3',
                             color: AppTheme.pepperGold,
                           ),
                         ),
@@ -356,7 +167,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                           child: _buildStatCard(
                             icon: Icons.check_circle,
                             label: 'Sold',
-                            value: '$_soldLots',
+                            value: '24',
                             color: AppTheme.sriLankanLeaf,
                           ),
                         ),
@@ -365,8 +176,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                           child: _buildStatCard(
                             icon: Icons.attach_money,
                             label: 'Revenue',
-                            value:
-                                '\$${(_totalRevenue / 1000).toStringAsFixed(1)}K',
+                            value: '\$12.5K',
                             color: AppTheme.pepperGold,
                           ),
                         ),
@@ -428,6 +238,65 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
               ),
             ],
           ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.forestGreen,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: AppTheme.forestGreen,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: AppTheme.pepperGold,
+          unselectedItemColor: Colors.white60,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.qr_code_scanner_outlined),
+              activeIcon: Icon(Icons.qr_code_scanner),
+              label: 'Scan',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.article_outlined),
+              activeIcon: Icon(Icons.article),
+              label: 'Report',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart_outlined),
+              activeIcon: Icon(Icons.bar_chart),
+              label: 'Reports',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Account',
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/farmer/create-lot'),
+        backgroundColor: AppTheme.pepperGold,
+        foregroundColor: AppTheme.forestGreen,
+        icon: const Icon(Icons.add),
+        label: const Text(
+          'Create Lot',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
     );

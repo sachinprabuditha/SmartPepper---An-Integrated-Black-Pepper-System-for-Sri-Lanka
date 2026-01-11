@@ -60,7 +60,8 @@ export default function TraceabilityPage() {
   const fetchTraceability = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://192.168.8.116:3002/api/traceability/${lotId}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
+      const response = await fetch(`${apiUrl}/api/traceability/${lotId}`);
       const result = await response.json();
       
       if (result.success) {

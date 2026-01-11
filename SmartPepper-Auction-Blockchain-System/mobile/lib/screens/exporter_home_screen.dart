@@ -89,7 +89,7 @@ class _ExporterHomeScreenState extends State<ExporterHomeScreen> {
 
               // Title
               const Text(
-                'smartPepper',
+                'SmartPepper',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,

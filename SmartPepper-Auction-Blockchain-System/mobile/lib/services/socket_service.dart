@@ -61,15 +61,15 @@ class SocketService {
   }
 
   void onNewBid(Function(dynamic) callback) {
-    _socket.on('new_bid', callback);  // Match backend event name
+    _socket.on('new_bid', callback); // Match backend event name
   }
 
   void onAuctionEnd(Function(dynamic) callback) {
-    _socket.on('auction_ended', callback);  // Match backend event name
+    _socket.on('auction_ended', callback); // Match backend event name
   }
 
   void onAuctionUpdate(Function(dynamic) callback) {
-    _socket.on('auction_update', callback);  // Match backend event name
+    _socket.on('auction_update', callback); // Match backend event name
   }
 
   // Remove listeners
