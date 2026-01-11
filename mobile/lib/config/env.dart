@@ -6,13 +6,13 @@ class Environment {
   // - Physical Device: Use your computer's IP (check with ipconfig/ifconfig)
 
   static const String apiBaseUrl =
-      'http://192.168.8.116:3002/api'; // Physical device (Wi-Fi)
+      'http://192.168.0.116:3002/api'; // Physical device (Wi-Fi)
 
   // Uncomment for emulator:
   // static const String apiBaseUrl = 'http://10.0.2.2:3002/api';
 
   // Blockchain Configuration
-  static const String blockchainRpcUrl = 'http://192.168.8.116:8545';
+  static const String blockchainRpcUrl = 'http://192.168.0.116:8545';
   static const int chainId = 1337; // Hardhat chain ID
   static const String contractAddress = '0xYourDeployedContractAddress';
 
@@ -23,11 +23,11 @@ class Environment {
       '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318'; // PepperAuction
 
   // WebSocket Configuration (with /auction namespace)
-  static const String wsUrl = 'ws://192.168.8.116:3002/auction';
+  static const String wsUrl = 'ws://192.168.0.116:3002/auction';
 
   // IPFS Configuration
-  static const String ipfsApiUrl = 'http://192.168.8.116:5001';
-  static const String ipfsGatewayUrl = 'http://192.168.8.116:8080';
+  static const String ipfsApiUrl = 'http://192.168.0.116:5001';
+  static const String ipfsGatewayUrl = 'http://192.168.0.116:8080';
 
   // App Configuration
   static const String appName = 'SmartPepper';
