@@ -11,7 +11,7 @@ const authenticate = async (req, res, next) => {
   try {
     // Get token from header
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
@@ -23,36 +23,46 @@ const authenticate = async (req, res, next) => {
 
     // Verify token
     const decoded = jwt.verify(token, JWT_SECRET);
+    const firestore = db.getDb();
 
     // Check if session exists and is valid
-    const sessionResult = await db.query(
-      `SELECT user_id, expires_at FROM user_sessions 
-       WHERE token = $1 AND expires_at > NOW()`,
-      [token]
-    );
+    const sessionSnap = await firestore.collection('user_sessions')
+      .where('token', '==', token)
+      .limit(1)
+      .get();
 
-    if (sessionResult.rows.length === 0) {
+    if (sessionSnap.empty) {
+      logger.info('Auth Error: Session Snap Empty for token');
       return res.status(401).json({
         success: false,
         error: 'Invalid or expired session'
       });
     }
 
-    // Get user details
-    const userResult = await db.query(
-      `SELECT id, email, role, wallet_address, is_active 
-       FROM users WHERE id = $1`,
-      [decoded.userId]
-    );
+    const session = sessionSnap.docs[0].data();
+    if (session.expires_at) {
+      const expiresAt = session.expires_at.toDate ? session.expires_at.toDate() : new Date(session.expires_at);
+      if (expiresAt < new Date()) {
+        logger.info('Auth Error: Session is expired', { expiresAt, now: new Date() });
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid or expired session'
+        });
+      }
+    }
 
-    if (userResult.rows.length === 0) {
+    // Get user details
+    const userDoc = await firestore.collection('users').doc(decoded.userId).get();
+
+    if (!userDoc.exists) {
+      logger.info('Auth Error: User details not found for ID', decoded.userId);
       return res.status(401).json({
         success: false,
         error: 'User not found'
       });
     }
 
-    const user = userResult.rows[0];
+    const user = { id: userDoc.id, ...userDoc.data() };
 
     // Check if user is active
     if (!user.is_active) {
@@ -72,7 +82,7 @@ const authenticate = async (req, res, next) => {
         error: 'Invalid token'
       });
     }
-    
+
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
         success: false,
@@ -132,14 +142,16 @@ const checkPermission = (resource, action) => {
         return next();
       }
 
+      const firestore = db.getDb();
       // Check if user has permission
-      const result = await db.query(
-        `SELECT id FROM permissions 
-         WHERE role = $1 AND resource = $2 AND action = $3`,
-        [req.user.role, resource, action]
-      );
+      const permSnap = await firestore.collection('permissions')
+        .where('role', '==', req.user.role)
+        .where('resource', '==', resource)
+        .where('action', '==', action)
+        .limit(1)
+        .get();
 
-      if (result.rows.length === 0) {
+      if (permSnap.empty) {
         return res.status(403).json({
           success: false,
           error: `Permission denied: Cannot ${action} ${resource}`
@@ -163,7 +175,7 @@ const checkPermission = (resource, action) => {
 const optionalAuth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return next();
     }
@@ -171,14 +183,14 @@ const optionalAuth = async (req, res, next) => {
     const token = authHeader.replace('Bearer ', '');
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    const userResult = await db.query(
-      `SELECT id, email, role, wallet_address 
-       FROM users WHERE id = $1 AND is_active = true`,
-      [decoded.userId]
-    );
+    const firestore = db.getDb();
+    const userDoc = await firestore.collection('users').doc(decoded.userId).get();
 
-    if (userResult.rows.length > 0) {
-      req.user = userResult.rows[0];
+    if (userDoc.exists) {
+      const user = { id: userDoc.id, ...userDoc.data() };
+      if (user.is_active) {
+        req.user = user;
+      }
     }
 
     next();
@@ -195,18 +207,17 @@ const logActivity = (action) => {
   return async (req, res, next) => {
     try {
       if (req.user) {
-        await db.query(
-          `INSERT INTO activity_logs (user_id, action, resource_type, resource_id, details, ip_address)
-           VALUES ($1, $2, $3, $4, $5, $6)`,
-          [
-            req.user.id,
-            action,
-            req.params.resourceType || null,
-            req.params.id || req.params.lotId || req.params.auctionId || null,
-            JSON.stringify({ method: req.method, path: req.path }),
-            req.ip
-          ]
-        );
+        const firestore = db.getDb();
+        const admin = require('firebase-admin');
+        await firestore.collection('activity_logs').add({
+          user_id: req.user.id,
+          action: action,
+          resource_type: req.params.resourceType || null,
+          resource_id: req.params.id || req.params.lotId || req.params.auctionId || null,
+          details: JSON.stringify({ method: req.method, path: req.path }),
+          ip_address: req.ip,
+          created_at: admin.firestore.FieldValue.serverTimestamp()
+        });
       }
     } catch (error) {
       logger.error('Activity logging error:', error);
