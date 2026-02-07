@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { ethers } = require('ethers');
-const db = require('../db/database');
+const admin = require('firebase-admin');
 const logger = require('../utils/logger');
+
+const db = admin.firestore();
 
 /**
  * POST /api/escrow/deposit
@@ -34,36 +36,37 @@ router.post('/deposit', async (req, res) => {
     }
 
     // Record escrow in database
-    const result = await db.query(
-      `INSERT INTO escrow_deposits (
-        auction_id,
-        exporter_address,
-        amount,
-        tx_hash,
-        user_id,
-        status,
-        deposited_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, NOW())
-      RETURNING *`,
-      [auctionId, exporterAddress, amount, txHash, userId, 'deposited']
-    );
+    const escrowData = {
+      auction_id: auctionId,
+      exporter_address: exporterAddress,
+      amount,
+      tx_hash: txHash,
+      user_id: userId || null,
+      status: 'deposited',
+      deposited_at: admin.firestore.FieldValue.serverTimestamp(),
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    const docRef = await db.collection('escrow_deposits').add(escrowData);
 
     // Update auction status
-    await db.query(
-      `UPDATE auctions 
-       SET escrow_deposited = true, escrow_amount = $1, escrow_tx_hash = $2
-       WHERE auction_id = $3`,
-      [amount, txHash, auctionId]
-    );
+    const auctionRef = db.collection('auctions').doc(auctionId);
+    await auctionRef.update({
+      escrow_deposited: true,
+      escrow_amount: amount,
+      escrow_tx_hash: txHash,
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    });
 
     logger.info('Escrow deposit recorded successfully', {
-      escrowId: result.rows[0].id,
+      escrowId: docRef.id,
       auctionId
     });
 
+    const doc = await docRef.get();
     res.json({
       success: true,
-      escrow: result.rows[0]
+      escrow: { id: doc.id, ...doc.data() }
     });
   } catch (error) {
     logger.error('Error recording escrow deposit:', error);
@@ -85,41 +88,32 @@ router.get('/status/:auctionId', async (req, res) => {
     logger.info(`Fetching escrow status for auction ${auctionId}`);
 
     // Get auction with escrow info
-    const auctionResult = await db.query(
-      `SELECT 
-        auction_id,
-        status,
-        escrow_deposited,
-        escrow_amount,
-        escrow_tx_hash,
-        current_bid,
-        highest_bidder,
-        end_time
-       FROM auctions
-       WHERE auction_id = $1`,
-      [auctionId]
-    );
+    const auctionDoc = await db.collection('auctions').doc(auctionId).get();
 
-    if (auctionResult.rows.length === 0) {
+    if (!auctionDoc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Auction not found'
       });
     }
 
-    const auction = auctionResult.rows[0];
+    const auction = { id: auctionDoc.id, ...auctionDoc.data() };
 
     // Get escrow deposit record if exists
-    const escrowResult = await db.query(
-      `SELECT * FROM escrow_deposits
-       WHERE auction_id = $1
-       ORDER BY deposited_at DESC
-       LIMIT 1`,
-      [auctionId]
-    );
+    const escrowSnapshot = await db.collection('escrow_deposits')
+      .where('auction_id', '==', auctionId)
+      .orderBy('deposited_at', 'desc')
+      .limit(1)
+      .get();
+
+    let escrowRecord = null;
+    if (!escrowSnapshot.empty) {
+      const doc = escrowSnapshot.docs[0];
+      escrowRecord = { id: doc.id, ...doc.data() };
+    }
 
     // Calculate time remaining to deposit
-    const endTime = new Date(auction.end_time);
+    const endTime = auction.end_time.toDate();
     const depositDeadline = new Date(endTime.getTime() + 24 * 60 * 60 * 1000); // 24 hours after end
     const now = new Date();
     const timeRemaining = depositDeadline - now;
@@ -128,7 +122,7 @@ router.get('/status/:auctionId', async (req, res) => {
     res.json({
       success: true,
       escrowStatus: {
-        auctionId: auction.auction_id,
+        auctionId: auction.id,
         auctionStatus: auction.status,
         escrowDeposited: auction.escrow_deposited || false,
         escrowAmount: auction.escrow_amount,
@@ -138,7 +132,7 @@ router.get('/status/:auctionId', async (req, res) => {
         depositDeadline: depositDeadline.toISOString(),
         hoursRemaining,
         isExpired: timeRemaining <= 0,
-        escrowRecord: escrowResult.rows[0] || null
+        escrowRecord
       }
     });
   } catch (error) {
@@ -182,12 +176,19 @@ router.post('/verify', async (req, res) => {
     }
 
     // Update verification status
-    await db.query(
-      `UPDATE escrow_deposits 
-       SET verified = true, verified_at = NOW()
-       WHERE auction_id = $1 AND tx_hash = $2`,
-      [auctionId, txHash]
-    );
+    const snapshot = await db.collection('escrow_deposits')
+      .where('auction_id', '==', auctionId)
+      .where('tx_hash', '==', txHash)
+      .get();
+
+    const batch = db.batch();
+    snapshot.forEach(doc => {
+      batch.update(doc.ref, {
+        verified: true,
+        verified_at: admin.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    await batch.commit();
 
     logger.info('Escrow transaction verified', { auctionId, txHash });
 
@@ -216,27 +217,44 @@ router.get('/user/:userId', async (req, res) => {
 
     logger.info(`Fetching escrow deposits for user ${userId}`);
 
-    const result = await db.query(
-      `SELECT 
-        e.*,
-        a.auction_id,
-        a.lot_id,
-        a.status as auction_status,
-        p.variety,
-        p.quantity,
-        p.quality
-       FROM escrow_deposits e
-       JOIN auctions a ON e.auction_id = a.auction_id
-       LEFT JOIN pepper_lots p ON a.lot_id = p.lot_id
-       WHERE e.user_id = $1
-       ORDER BY e.deposited_at DESC`,
-      [userId]
-    );
+    // Get escrow deposits for user
+    const escrowSnapshot = await db.collection('escrow_deposits')
+      .where('user_id', '==', userId)
+      .orderBy('deposited_at', 'desc')
+      .get();
+
+    const deposits = [];
+
+    // For each escrow, fetch related auction and lot info
+    for (const escrowDoc of escrowSnapshot.docs) {
+      const escrow = { id: escrowDoc.id, ...escrowDoc.data() };
+      
+      // Get auction info
+      const auctionDoc = await db.collection('auctions').doc(escrow.auction_id).get();
+      if (auctionDoc.exists) {
+        const auction = auctionDoc.data();
+        escrow.auction_status = auction.status;
+        escrow.lot_id = auction.lot_id;
+
+        // Get lot info
+        if (auction.lot_id) {
+          const lotDoc = await db.collection('pepper_lots').doc(auction.lot_id).get();
+          if (lotDoc.exists) {
+            const lot = lotDoc.data();
+            escrow.variety = lot.variety;
+            escrow.quantity = lot.quantity;
+            escrow.quality = lot.quality;
+          }
+        }
+      }
+
+      deposits.push(escrow);
+    }
 
     res.json({
       success: true,
-      count: result.rows.length,
-      deposits: result.rows
+      count: deposits.length,
+      deposits
     });
   } catch (error) {
     logger.error('Error fetching user escrow deposits:', error);

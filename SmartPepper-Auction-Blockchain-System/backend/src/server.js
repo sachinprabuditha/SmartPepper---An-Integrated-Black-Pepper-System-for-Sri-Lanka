@@ -18,6 +18,7 @@ const certificationsRoutes = require('./routes/certifications');
 const adminRoutes = require('./routes/admin');
 const governanceRoutes = require('./routes/governance');
 const escrowRoutes = require('./routes/escrow');
+const notificationsRoutes = require('./routes/notifications');
 const { startAuctionStatusMonitor } = require('./services/auctionStatusService');
 
 // Load NFT routes with error handling
@@ -64,6 +65,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/auctions', auctionRoutes);
 app.use('/api/lots', lotRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/notifications', notificationsRoutes);
 app.use('/api/compliance', complianceRoutes);
 app.use('/api/processing', processingRoutes);
 app.use('/api/certifications', certificationsRoutes);
@@ -105,9 +107,11 @@ async function initialize() {
       dbConnected = true;
       if (db.isMock) {
         logger.info('✅ Database: Using MOCK in-memory database (test data available)');
-        logger.info('💡 To use PostgreSQL, set DB_PASSWORD in .env file');
+        logger.info('💡 To use Firebase, set FIREBASE_PROJECT_ID or FIREBASE_SERVICE_ACCOUNT in .env file');
+      } else if (db.isFirebase) {
+        logger.info('✅ Database: Firebase Firestore connected');
       } else {
-        logger.info('✅ Database: PostgreSQL connected');
+        logger.info('✅ Database: Connected');
       }
     } catch (dbError) {
       logger.warn('Database connection failed (continuing without DB):', dbError.message);
@@ -168,7 +172,7 @@ async function initialize() {
       logger.info(`🚀 Server running on port ${PORT}`);
       logger.info(`🌍 Environment: ${process.env.NODE_ENV}`);
       logger.info('📊 Services status:', {
-        database: dbConnected ? (db.isMock ? 'MOCK (in-memory)' : 'PostgreSQL') : 'disabled',
+        database: dbConnected ? (db.isMock ? 'MOCK (in-memory)' : (db.isFirebase ? 'Firebase Firestore' : 'Connected')) : 'disabled',
         redis: redisClient !== null ? 'connected' : 'disabled',
         websocket: redisClient !== null ? 'enabled' : 'disabled'
       });

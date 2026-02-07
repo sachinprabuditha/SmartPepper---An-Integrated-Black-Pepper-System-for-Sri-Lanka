@@ -9,6 +9,7 @@ class User {
   final String name;
   final String role;
   final String? walletAddress;
+  final String? phone;
   final bool verified;
 
   User({
@@ -17,6 +18,7 @@ class User {
     required this.name,
     required this.role,
     this.walletAddress,
+    this.phone,
     this.verified = false,
   });
 
@@ -27,6 +29,7 @@ class User {
       name: json['name'] ?? '',
       role: json['role'] ?? '',
       walletAddress: json['walletAddress'],
+      phone: json['phone'],
       verified: json['verified'] ?? false,
     );
   }

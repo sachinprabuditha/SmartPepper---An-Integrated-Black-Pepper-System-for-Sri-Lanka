@@ -1,8 +1,44 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/database');
+const admin = require('firebase-admin');
 const logger = require('../utils/logger');
 const BlockchainService = require('../services/blockchainService');
+
+// Get Firestore instance
+const db = admin.firestore();
+
+/**
+ * Helper function to convert Firestore Timestamps to ISO strings
+ */
+const convertTimestamps = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  
+  const converted = Array.isArray(obj) ? [] : {};
+  
+  for (const key in obj) {
+    const value = obj[key];
+    
+    // Check if it's a Firestore Timestamp
+    if (value && typeof value === 'object' && '_seconds' in value && '_nanoseconds' in value) {
+      // Convert to ISO string
+      const date = new Date(value._seconds * 1000 + value._nanoseconds / 1000000);
+      converted[key] = date.toISOString();
+    } else if (value && typeof value.toDate === 'function') {
+      // Firestore Timestamp object with toDate method
+      converted[key] = value.toDate().toISOString();
+    } else if (Array.isArray(value)) {
+      // Recursively convert arrays
+      converted[key] = value.map(item => convertTimestamps(item));
+    } else if (value && typeof value === 'object') {
+      // Recursively convert nested objects
+      converted[key] = convertTimestamps(value);
+    } else {
+      converted[key] = value;
+    }
+  }
+  
+  return converted;
+};
 
 // Initialize blockchain service
 const blockchainService = new BlockchainService();
@@ -22,36 +58,95 @@ router.get('/lots/pending', async (req, res) => {
     // TODO: Add auth middleware to verify admin role
     // For now, assuming request is from authenticated admin
     
-    const query = `
-      SELECT 
-        pl.*,
-        u.name as farmer_name,
-        u.email as farmer_email,
-        u.phone as farmer_phone
-      FROM pepper_lots pl
-      LEFT JOIN users u ON pl.farmer_id = u.id
-      WHERE pl.status = 'pending' OR pl.compliance_status = 'pending'
-      ORDER BY pl.created_at DESC
-      LIMIT $1 OFFSET $2
-    `;
+    // Query pepper_lots collection for pending lots
+    const lotsSnapshot = await db.collection('pepper_lots')
+      .where('status', 'in', ['pending'])
+      .orderBy('created_at', 'desc')
+      .limit(parseInt(limit))
+      .offset(parseInt(offset))
+      .get();
     
-    const countQuery = `
-      SELECT COUNT(*) 
-      FROM pepper_lots 
-      WHERE status = 'pending' OR compliance_status = 'pending'
-    `;
+    const compliancePendingSnapshot = await db.collection('pepper_lots')
+      .where('compliance_status', '==', 'pending')
+      .orderBy('created_at', 'desc')
+      .limit(parseInt(limit))
+      .offset(parseInt(offset))
+      .get();
     
-    const [result, countResult] = await Promise.all([
-      db.query(query, [limit, offset]),
-      db.query(countQuery)
-    ]);
+    // Combine results and remove duplicates
+    const lotMap = new Map();
     
-    logger.info(`Admin fetched ${result.rows.length} pending lots`);
+    for (const doc of lotsSnapshot.docs) {
+      lotMap.set(doc.id, { id: doc.id, ...doc.data() });
+    }
+    
+    for (const doc of compliancePendingSnapshot.docs) {
+      if (!lotMap.has(doc.id)) {
+        lotMap.set(doc.id, { id: doc.id, ...doc.data() });
+      }
+    }
+    
+    const lots = Array.from(lotMap.values());
+    
+    // Fetch farmer details for each lot
+    const lotsWithFarmers = await Promise.all(
+      lots.map(async (lot) => {
+        let farmerData = null;
+        
+        // Try to fetch by farmer_id first
+        if (lot.farmer_id) {
+          const farmerDoc = await db.collection('users').doc(lot.farmer_id).get();
+          if (farmerDoc.exists) {
+            farmerData = farmerDoc.data();
+          }
+        }
+        
+        // If no farmer found by ID, try by wallet address
+        if (!farmerData && lot.farmer_address) {
+          const farmerSnapshot = await db.collection('users')
+            .where('wallet_address_lower', '==', lot.farmer_address.toLowerCase())
+            .limit(1)
+            .get();
+          
+          if (!farmerSnapshot.empty) {
+            farmerData = farmerSnapshot.docs[0].data();
+          }
+        }
+        
+        // Add farmer details if found
+        if (farmerData) {
+          return {
+            ...lot,
+            farmer_name: farmerData.name,
+            farmer_email: farmerData.email,
+            farmer_phone: farmerData.phone
+          };
+        }
+        
+        return lot;
+      })
+    );
+    
+    // Get count for pending lots
+    const pendingStatusSnapshot = await db.collection('pepper_lots')
+      .where('status', '==', 'pending')
+      .get();
+    
+    const pendingComplianceSnapshot = await db.collection('pepper_lots')
+      .where('compliance_status', '==', 'pending')
+      .get();
+    
+    // Count unique lots
+    const countSet = new Set();
+    pendingStatusSnapshot.docs.forEach(doc => countSet.add(doc.id));
+    pendingComplianceSnapshot.docs.forEach(doc => countSet.add(doc.id));
+    
+    logger.info(`Admin fetched ${lotsWithFarmers.length} pending lots`);
     
     res.json({
       success: true,
-      count: parseInt(countResult.rows[0].count),
-      lots: result.rows
+      count: countSet.size,
+      lots: lotsWithFarmers.map(lot => convertTimestamps(lot))
     });
   } catch (error) {
     logger.error('Error fetching pending lots:', error);
@@ -71,26 +166,54 @@ router.get('/lots/:lotId', async (req, res) => {
   try {
     const { lotId } = req.params;
     
-    const result = await db.query(`
-      SELECT 
-        pl.*,
-        u.name as farmer_name,
-        u.email as farmer_email,
-        u.phone as farmer_phone,
-        u.wallet_address
-      FROM pepper_lots pl
-      LEFT JOIN users u ON pl.farmer_id = u.id
-      WHERE pl.lot_id = $1
-    `, [lotId]);
+    // Get lot by lot_id field
+    const lotsSnapshot = await db.collection('pepper_lots')
+      .where('lot_id', '==', lotId)
+      .limit(1)
+      .get();
     
-    if (result.rows.length === 0) {
+    if (lotsSnapshot.empty) {
       return res.status(404).json({
         success: false,
         error: 'Lot not found'
       });
     }
     
-    const lot = result.rows[0];
+    const lotDoc = lotsSnapshot.docs[0];
+    const lot = { id: lotDoc.id, ...lotDoc.data() };
+    
+    // Fetch farmer details - try by farmer_id first, then by farmer_address
+    let farmerData = null;
+    
+    if (lot.farmer_id) {
+      const farmerDoc = await db.collection('users').doc(lot.farmer_id).get();
+      if (farmerDoc.exists) {
+        farmerData = farmerDoc.data();
+      }
+    }
+    
+    // If no farmer found by ID, try by wallet address
+    if (!farmerData && lot.farmer_address) {
+      const farmerSnapshot = await db.collection('users')
+        .where('wallet_address_lower', '==', lot.farmer_address.toLowerCase())
+        .limit(1)
+        .get();
+      
+      if (!farmerSnapshot.empty) {
+        farmerData = farmerSnapshot.docs[0].data();
+      }
+    }
+    
+    // Add farmer details to lot if found
+    if (farmerData) {
+      lot.farmer_name = farmerData.name;
+      lot.farmer_email = farmerData.email;
+      lot.farmer_phone = farmerData.phone;
+      lot.wallet_address = farmerData.wallet_address || lot.farmer_address;
+    } else {
+      // Fallback: set farmer_address as the wallet_address
+      lot.wallet_address = lot.farmer_address;
+    }
     
     // Parse lot_pictures and certificate_images if they're stored as JSON strings
     if (lot.lot_pictures && typeof lot.lot_pictures === 'string') {
@@ -109,9 +232,11 @@ router.get('/lots/:lotId', async (req, res) => {
       }
     }
     
+    logger.info('Returning lot details:', { lotId, hasFarmerData: !!farmerData });
+    
     res.json({
       success: true,
-      lot
+      lot: convertTimestamps(lot)
     });
   } catch (error) {
     logger.error('Error fetching lot details:', error);
@@ -150,58 +275,52 @@ router.put('/lots/:lotId/compliance', async (req, res) => {
     
     logger.info(`Admin ${adminName || adminId} ${status} lot ${lotId}`, { reason });
     
-    // Update lot compliance status
-    const updateQuery = `
-      UPDATE pepper_lots
-      SET 
-        compliance_status = $1,
-        status = $2,
-        compliance_checked_at = NOW(),
-        rejection_reason = $3,
-        updated_at = NOW()
-      WHERE lot_id = $4
-      RETURNING *
-    `;
+    // Find lot by lot_id
+    const lotsSnapshot = await db.collection('pepper_lots')
+      .where('lot_id', '==', lotId)
+      .limit(1)
+      .get();
     
-    const newStatus = status === 'approved' ? 'approved' : 'rejected';
-    const lotStatus = status === 'approved' ? 'available' : 'rejected';
-    
-    const result = await db.query(updateQuery, [
-      newStatus,
-      lotStatus,
-      status === 'rejected' ? reason : null,
-      lotId
-    ]);
-    
-    if (result.rows.length === 0) {
+    if (lotsSnapshot.empty) {
       return res.status(404).json({
         success: false,
         error: 'Lot not found'
       });
     }
     
-    const updatedLot = result.rows[0];
+    const lotDocRef = lotsSnapshot.docs[0].ref;
+    const newStatus = status === 'approved' ? 'approved' : 'rejected';
+    const lotStatus = status === 'approved' ? 'available' : 'rejected';
+    
+    // Update lot compliance status
+    const updateData = {
+      compliance_status: newStatus,
+      status: lotStatus,
+      compliance_checked_at: admin.firestore.FieldValue.serverTimestamp(),
+      rejection_reason: status === 'rejected' ? reason : null,
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    };
+    
+    await lotDocRef.update(updateData);
+    
+    // Get updated lot
+    const updatedLotDoc = await lotDocRef.get();
+    const updatedLot = { id: updatedLotDoc.id, ...updatedLotDoc.data() };
     
     // Log the admin action
-    await db.query(`
-      INSERT INTO admin_actions (
-        admin_id,
-        action_type,
-        target_type,
-        target_id,
-        details,
-        created_at
-      ) VALUES ($1, $2, $3, $4, $5, NOW())
-    `, [
-      adminId || 'system',
-      status === 'approved' ? 'approve_lot' : 'reject_lot',
-      'lot',
-      lotId,
-      JSON.stringify({ reason, lotId, adminName })
-    ]).catch(err => {
+    try {
+      await db.collection('admin_actions').add({
+        admin_id: adminId || 'system',
+        action_type: status === 'approved' ? 'approve_lot' : 'reject_lot',
+        target_type: 'lot',
+        target_id: lotId,
+        details: { reason, lotId, adminName },
+        created_at: admin.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (err) {
       // Don't fail the main operation if logging fails
       logger.warn('Failed to log admin action:', err);
-    });
+    }
     
     // Update blockchain with compliance status
     let blockchainTxHash = null;
@@ -216,10 +335,9 @@ router.put('/lots/:lotId/compliance', async (req, res) => {
       
       // Update blockchain_tx_hash in database
       if (blockchainTxHash) {
-        await db.query(
-          'UPDATE pepper_lots SET blockchain_tx_hash = $1 WHERE lot_id = $2',
-          [blockchainTxHash, lotId]
-        );
+        await lotDocRef.update({
+          blockchain_tx_hash: blockchainTxHash
+        });
         logger.info('Blockchain transaction hash updated in database', { lotId, blockchainTxHash });
       }
     } catch (blockchainErr) {
@@ -254,32 +372,39 @@ router.put('/lots/:lotId/compliance', async (req, res) => {
  */
 router.get('/stats', async (req, res) => {
   try {
-    const statsQueries = [
-      // Pending lots
-      db.query(`SELECT COUNT(*) as count FROM pepper_lots WHERE status = 'pending' OR compliance_status = 'pending'`),
-      // Total lots
-      db.query(`SELECT COUNT(*) as count FROM pepper_lots`),
-      // Approved lots
-      db.query(`SELECT COUNT(*) as count FROM pepper_lots WHERE compliance_status = 'approved'`),
-      // Rejected lots
-      db.query(`SELECT COUNT(*) as count FROM pepper_lots WHERE compliance_status = 'rejected'`),
-      // Active auctions
-      db.query(`SELECT COUNT(*) as count FROM auctions WHERE status = 'active'`),
-      // Total users
-      db.query(`SELECT COUNT(*) as count FROM users`),
-    ];
+    // Execute all queries in parallel
+    const [
+      pendingStatusSnapshot,
+      pendingComplianceSnapshot,
+      totalLotsSnapshot,
+      approvedLotsSnapshot,
+      rejectedLotsSnapshot,
+      activeAuctionsSnapshot,
+      totalUsersSnapshot
+    ] = await Promise.all([
+      db.collection('pepper_lots').where('status', '==', 'pending').get(),
+      db.collection('pepper_lots').where('compliance_status', '==', 'pending').get(),
+      db.collection('pepper_lots').get(),
+      db.collection('pepper_lots').where('compliance_status', '==', 'approved').get(),
+      db.collection('pepper_lots').where('compliance_status', '==', 'rejected').get(),
+      db.collection('auctions').where('status', '==', 'active').get(),
+      db.collection('users').get()
+    ]);
     
-    const [pending, total, approved, rejected, activeAuctions, totalUsers] = await Promise.all(statsQueries);
+    // Count unique pending lots (status OR compliance_status = pending)
+    const pendingSet = new Set();
+    pendingStatusSnapshot.docs.forEach(doc => pendingSet.add(doc.id));
+    pendingComplianceSnapshot.docs.forEach(doc => pendingSet.add(doc.id));
     
     res.json({
       success: true,
       stats: {
-        pendingLots: parseInt(pending.rows[0].count),
-        totalLots: parseInt(total.rows[0].count),
-        approvedLots: parseInt(approved.rows[0].count),
-        rejectedLots: parseInt(rejected.rows[0].count),
-        activeAuctions: parseInt(activeAuctions.rows[0].count),
-        totalUsers: parseInt(totalUsers.rows[0].count)
+        pendingLots: pendingSet.size,
+        totalLots: totalLotsSnapshot.size,
+        approvedLots: approvedLotsSnapshot.size,
+        rejectedLots: rejectedLotsSnapshot.size,
+        activeAuctions: activeAuctionsSnapshot.size,
+        totalUsers: totalUsersSnapshot.size
       }
     });
   } catch (error) {

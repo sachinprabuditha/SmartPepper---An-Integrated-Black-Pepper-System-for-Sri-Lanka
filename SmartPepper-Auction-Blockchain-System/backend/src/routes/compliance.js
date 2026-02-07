@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/database');
+const admin = require('firebase-admin');
 const logger = require('../utils/logger');
+
+const db = admin.firestore();
 
 // Compliance rules definitions
 const COMPLIANCE_RULES = {
@@ -12,18 +14,26 @@ const COMPLIANCE_RULES = {
       category: 'certification',
       severity: 'critical',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT * FROM certifications 
-           WHERE lot_id = $1 AND cert_type = 'organic' 
-           AND is_valid = true AND expiry_date > NOW()`,
-          [lotId]
-        );
-        return {
-          passed: result.rows.length > 0,
-          details: result.rows.length > 0 
-            ? `Valid organic certificate found: ${result.rows[0].cert_number}`
-            : 'Missing valid organic certification for EU export'
-        };
+        const snapshot = await db.collection('certifications')
+          .where('lot_id', '==', lotId)
+          .where('cert_type', '==', 'organic')
+          .where('is_valid', '==', true)
+          .get();
+
+        let passed = false;
+        let details = 'Missing valid organic certification for EU export';
+
+        for (const doc of snapshot.docs) {
+          const cert = doc.data();
+          const expiryDate = cert.expiry_date.toDate();
+          if (expiryDate > new Date()) {
+            passed = true;
+            details = `Valid organic certificate found: ${cert.cert_number}`;
+            break;
+          }
+        }
+
+        return { passed, details };
       }
     },
     {
@@ -32,18 +42,26 @@ const COMPLIANCE_RULES = {
       category: 'certification',
       severity: 'critical',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT * FROM certifications 
-           WHERE lot_id = $1 AND cert_type = 'fumigation' 
-           AND is_valid = true AND expiry_date > NOW()`,
-          [lotId]
-        );
-        return {
-          passed: result.rows.length > 0,
-          details: result.rows.length > 0 
-            ? `Valid fumigation certificate found: ${result.rows[0].cert_number}`
-            : 'Missing valid fumigation certification for EU export'
-        };
+        const snapshot = await db.collection('certifications')
+          .where('lot_id', '==', lotId)
+          .where('cert_type', '==', 'fumigation')
+          .where('is_valid', '==', true)
+          .get();
+
+        let passed = false;
+        let details = 'Missing valid fumigation certification for EU export';
+
+        for (const doc of snapshot.docs) {
+          const cert = doc.data();
+          const expiryDate = cert.expiry_date.toDate();
+          if (expiryDate > new Date()) {
+            passed = true;
+            details = `Valid fumigation certificate found: ${cert.cert_number}`;
+            break;
+          }
+        }
+
+        return { passed, details };
       }
     },
     {
@@ -52,17 +70,26 @@ const COMPLIANCE_RULES = {
       category: 'quality',
       severity: 'major',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT quality FROM pepper_lots WHERE lot_id = $1`,
-          [lotId]
-        );
+        // Query by lot_id field, not document ID
+        const snapshot = await db.collection('pepper_lots')
+          .where('lot_id', '==', lotId)
+          .limit(1)
+          .get();
+        
+        if (snapshot.empty) {
+          return { passed: false, details: 'Lot not found' };
+        }
+
+        const lot = snapshot.docs[0].data();
         const acceptableGrades = ['A', 'AA', 'AAA'];
-        const passed = result.rows.length > 0 && acceptableGrades.includes(result.rows[0].quality);
+        const quality = lot.quality;
+        const passed = acceptableGrades.includes(quality);
+
         return {
           passed,
           details: passed 
-            ? `Quality grade ${result.rows[0].quality} meets EU standards`
-            : `Quality grade ${result.rows[0]?.quality || 'unknown'} does not meet EU standards (requires A, AA, or AAA)`
+            ? `Quality grade ${quality} meets EU standards`
+            : `Quality grade ${quality || 'unknown'} does not meet EU standards (requires A, AA, or AAA)`
         };
       }
     },
@@ -72,35 +99,38 @@ const COMPLIANCE_RULES = {
       category: 'quality',
       severity: 'major',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT quality_metrics->>'moisture' as moisture
-           FROM processing_stages
-           WHERE lot_id = $1 AND stage_type = 'drying'
-           ORDER BY timestamp DESC LIMIT 1`,
-          [lotId]
-        );
+        const snapshot = await db.collection('processing_stages')
+          .where('lot_id', '==', lotId)
+          .where('stage_type', '==', 'drying')
+          .orderBy('timestamp', 'desc')
+          .limit(1)
+          .get();
         
-        if (result.rows.length === 0) {
+        if (snapshot.empty) {
           return {
             passed: false,
             details: 'No drying stage data found - moisture content unknown'
           };
         }
         
-        const moisture = parseFloat(result.rows[0].moisture);
-        if (isNaN(moisture)) {
+        const stage = snapshot.docs[0].data();
+        const moisture = stage.quality_metrics?.moisture;
+
+        if (!moisture || isNaN(parseFloat(moisture))) {
           return {
             passed: false,
             details: 'Moisture content not recorded in drying stage'
           };
         }
         
-        const passed = moisture <= 12.5;
+        const moistureValue = parseFloat(moisture);
+        const passed = moistureValue <= 12.5;
+
         return {
           passed,
           details: passed
-            ? `Moisture content ${moisture}% meets EU limit (≤12.5%)`
-            : `Moisture content ${moisture}% exceeds EU limit of 12.5%`
+            ? `Moisture content ${moistureValue}% meets EU limit (≤12.5%)`
+            : `Moisture content ${moistureValue}% exceeds EU limit of 12.5%`
         };
       }
     },
@@ -110,19 +140,26 @@ const COMPLIANCE_RULES = {
       category: 'safety',
       severity: 'critical',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT * FROM certifications 
-           WHERE lot_id = $1 AND cert_type = 'pesticide_test' 
-           AND is_valid = true AND expiry_date > NOW()`,
-          [lotId]
-        );
+        const snapshot = await db.collection('certifications')
+          .where('lot_id', '==', lotId)
+          .where('cert_type', '==', 'pesticide_test')
+          .where('is_valid', '==', true)
+          .get();
         
-        return {
-          passed: result.rows.length > 0,
-          details: result.rows.length > 0
-            ? `Valid pesticide residue test certificate: ${result.rows[0].cert_number}`
-            : 'Missing pesticide residue test certificate required for EU export'
-        };
+        let passed = false;
+        let details = 'Missing pesticide residue test certificate required for EU export';
+
+        for (const doc of snapshot.docs) {
+          const cert = doc.data();
+          const expiryDate = cert.expiry_date.toDate();
+          if (expiryDate > new Date()) {
+            passed = true;
+            details = `Valid pesticide residue test certificate: ${cert.cert_number}`;
+            break;
+          }
+        }
+
+        return { passed, details };
       }
     },
     {
@@ -131,22 +168,22 @@ const COMPLIANCE_RULES = {
       category: 'packaging',
       severity: 'major',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT quality_metrics->>'package_material' as material
-           FROM processing_stages
-           WHERE lot_id = $1 AND stage_type = 'packaging'
-           ORDER BY timestamp DESC LIMIT 1`,
-          [lotId]
-        );
+        const snapshot = await db.collection('processing_stages')
+          .where('lot_id', '==', lotId)
+          .where('stage_type', '==', 'packaging')
+          .orderBy('timestamp', 'desc')
+          .limit(1)
+          .get();
         
-        if (result.rows.length === 0) {
+        if (snapshot.empty) {
           return {
             passed: false,
             details: 'No packaging stage data found'
           };
         }
         
-        const material = result.rows[0].material;
+        const stage = snapshot.docs[0].data();
+        const material = stage.quality_metrics?.package_material;
         const foodGradeMaterials = ['HDPE', 'PP', 'PET', 'Glass', 'Jute_with_liner', 'Food_grade_plastic'];
         const passed = material && foodGradeMaterials.includes(material);
         
@@ -164,15 +201,13 @@ const COMPLIANCE_RULES = {
       category: 'documentation',
       severity: 'major',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT stage_type FROM processing_stages 
-           WHERE lot_id = $1 
-           ORDER BY timestamp`,
-          [lotId]
-        );
+        const snapshot = await db.collection('processing_stages')
+          .where('lot_id', '==', lotId)
+          .orderBy('timestamp')
+          .get();
         
         const requiredStages = ['harvest', 'drying', 'grading', 'packaging'];
-        const recordedStages = result.rows.map(r => r.stage_type);
+        const recordedStages = snapshot.docs.map(doc => doc.data().stage_type);
         const missingStages = requiredStages.filter(s => !recordedStages.includes(s));
         
         const passed = missingStages.length === 0;
@@ -192,18 +227,26 @@ const COMPLIANCE_RULES = {
       category: 'certification',
       severity: 'critical',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT * FROM certifications 
-           WHERE lot_id = $1 AND cert_type = 'phytosanitary' 
-           AND is_valid = true AND expiry_date > NOW()`,
-          [lotId]
-        );
-        return {
-          passed: result.rows.length > 0,
-          details: result.rows.length > 0 
-            ? `Valid phytosanitary certificate found`
-            : 'Missing phytosanitary certification for FDA approval'
-        };
+        const snapshot = await db.collection('certifications')
+          .where('lot_id', '==', lotId)
+          .where('cert_type', '==', 'phytosanitary')
+          .where('is_valid', '==', true)
+          .get();
+
+        let passed = false;
+        let details = 'Missing phytosanitary certification for FDA approval';
+
+        for (const doc of snapshot.docs) {
+          const cert = doc.data();
+          const expiryDate = cert.expiry_date.toDate();
+          if (expiryDate > new Date()) {
+            passed = true;
+            details = 'Valid phytosanitary certificate found';
+            break;
+          }
+        }
+
+        return { passed, details };
       }
     },
     {
@@ -212,16 +255,16 @@ const COMPLIANCE_RULES = {
       category: 'certification',
       severity: 'critical',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT * FROM certifications 
-           WHERE lot_id = $1 AND cert_type = 'fumigation' 
-           AND is_valid = true`,
-          [lotId]
-        );
+        const snapshot = await db.collection('certifications')
+          .where('lot_id', '==', lotId)
+          .where('cert_type', '==', 'fumigation')
+          .where('is_valid', '==', true)
+          .get();
+
         return {
-          passed: result.rows.length > 0,
-          details: result.rows.length > 0 
-            ? `Fumigation documentation complete`
+          passed: !snapshot.empty,
+          details: !snapshot.empty 
+            ? 'Fumigation documentation complete'
             : 'Missing fumigation documentation'
         };
       }
@@ -232,28 +275,38 @@ const COMPLIANCE_RULES = {
       category: 'quality',
       severity: 'major',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT quality_metrics->>'moisture' as moisture
-           FROM processing_stages
-           WHERE lot_id = $1 AND stage_type = 'drying'
-           ORDER BY timestamp DESC LIMIT 1`,
-          [lotId]
-        );
+        const snapshot = await db.collection('processing_stages')
+          .where('lot_id', '==', lotId)
+          .where('stage_type', '==', 'drying')
+          .orderBy('timestamp', 'desc')
+          .limit(1)
+          .get();
         
-        if (result.rows.length === 0 || !result.rows[0].moisture) {
+        if (snapshot.empty) {
           return {
             passed: false,
             details: 'Moisture content not documented'
           };
         }
         
-        const moisture = parseFloat(result.rows[0].moisture);
-        const passed = moisture <= 13.0;
+        const stage = snapshot.docs[0].data();
+        const moisture = stage.quality_metrics?.moisture;
+
+        if (!moisture || isNaN(parseFloat(moisture))) {
+          return {
+            passed: false,
+            details: 'Moisture content not documented'
+          };
+        }
+        
+        const moistureValue = parseFloat(moisture);
+        const passed = moistureValue <= 13.0;
+
         return {
           passed,
           details: passed
-            ? `Moisture ${moisture}% meets FDA standards (≤13.0%)`
-            : `Moisture ${moisture}% exceeds FDA limit of 13.0%`
+            ? `Moisture ${moistureValue}% meets FDA standards (≤13.0%)`
+            : `Moisture ${moistureValue}% exceeds FDA limit of 13.0%`
         };
       }
     },
@@ -263,31 +316,25 @@ const COMPLIANCE_RULES = {
       category: 'packaging',
       severity: 'critical',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT quality_metrics->>'package_material' as material,
-                  quality_metrics->>'labeling' as labeling
-           FROM processing_stages
-           WHERE lot_id = $1 AND stage_type = 'packaging'
-           ORDER BY timestamp DESC LIMIT 1`,
-          [lotId]
-        );
+        const snapshot = await db.collection('processing_stages')
+          .where('lot_id', '==', lotId)
+          .where('stage_type', '==', 'packaging')
+          .orderBy('timestamp', 'desc')
+          .limit(1)
+          .get();
         
-        if (result.rows.length === 0) {
+        if (snapshot.empty) {
           return {
             passed: false,
             details: 'Packaging information not documented'
           };
         }
         
-        const material = result.rows[0].material;
+        const stage = snapshot.docs[0].data();
+        const material = stage.quality_metrics?.package_material;
         const fdaApprovedMaterials = ['HDPE', 'PP', 'PET', 'Glass', 'FDA_approved_plastic'];
-        const materialOk = material && fdaApprovedMaterials.includes(material);
+        const passed = material && fdaApprovedMaterials.includes(material);
         
-        // Check labeling (should include origin, batch, expiry)
-        const labeling = result.rows[0].labeling;
-        const labelingOk = labeling && typeof labeling === 'string';
-        
-        const passed = materialOk;
         return {
           passed,
           details: passed
@@ -302,17 +349,16 @@ const COMPLIANCE_RULES = {
       category: 'safety',
       severity: 'critical',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT * FROM certifications 
-           WHERE lot_id = $1 AND cert_type = 'pesticide_test' 
-           AND is_valid = true`,
-          [lotId]
-        );
+        const snapshot = await db.collection('certifications')
+          .where('lot_id', '==', lotId)
+          .where('cert_type', '==', 'pesticide_test')
+          .where('is_valid', '==', true)
+          .get();
         
         return {
-          passed: result.rows.length > 0,
-          details: result.rows.length > 0
-            ? `Pesticide MRL test certificate on file: ${result.rows[0].cert_number}`
+          passed: !snapshot.empty,
+          details: !snapshot.empty
+            ? `Pesticide MRL test certificate on file: ${snapshot.docs[0].data().cert_number}`
             : 'Missing pesticide maximum residue level (MRL) test certificate'
         };
       }
@@ -325,18 +371,26 @@ const COMPLIANCE_RULES = {
       category: 'certification',
       severity: 'major',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT * FROM certifications 
-           WHERE lot_id = $1 AND cert_type = 'halal' 
-           AND is_valid = true AND expiry_date > NOW()`,
-          [lotId]
-        );
-        return {
-          passed: result.rows.length > 0,
-          details: result.rows.length > 0 
-            ? `Valid halal certificate found`
-            : 'Halal certification recommended for Middle East export'
-        };
+        const snapshot = await db.collection('certifications')
+          .where('lot_id', '==', lotId)
+          .where('cert_type', '==', 'halal')
+          .where('is_valid', '==', true)
+          .get();
+
+        let passed = false;
+        let details = 'Halal certification recommended for Middle East export';
+
+        for (const doc of snapshot.docs) {
+          const cert = doc.data();
+          const expiryDate = cert.expiry_date.toDate();
+          if (expiryDate > new Date()) {
+            passed = true;
+            details = 'Valid halal certificate found';
+            break;
+          }
+        }
+
+        return { passed, details };
       }
     },
     {
@@ -345,17 +399,26 @@ const COMPLIANCE_RULES = {
       category: 'quality',
       severity: 'major',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT quality FROM pepper_lots WHERE lot_id = $1`,
-          [lotId]
-        );
+        // Query by lot_id field, not document ID
+        const snapshot = await db.collection('pepper_lots')
+          .where('lot_id', '==', lotId)
+          .limit(1)
+          .get();
+        
+        if (snapshot.empty) {
+          return { passed: false, details: 'Lot not found' };
+        }
+
+        const lot = snapshot.docs[0].data();
         const premiumGrades = ['AA', 'AAA', 'Premium'];
-        const passed = result.rows.length > 0 && premiumGrades.includes(result.rows[0].quality);
+        const quality = lot.quality;
+        const passed = premiumGrades.includes(quality);
+
         return {
           passed,
           details: passed
-            ? `Quality grade ${result.rows[0].quality} meets Middle East premium standards`
-            : `Quality grade ${result.rows[0]?.quality || 'unknown'} does not meet premium requirements (requires AA, AAA, or Premium)`
+            ? `Quality grade ${quality} meets Middle East premium standards`
+            : `Quality grade ${quality || 'unknown'} does not meet premium requirements (requires AA, AAA, or Premium)`
         };
       }
     },
@@ -365,28 +428,38 @@ const COMPLIANCE_RULES = {
       category: 'quality',
       severity: 'major',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT quality_metrics->>'moisture' as moisture
-           FROM processing_stages
-           WHERE lot_id = $1 AND stage_type = 'drying'
-           ORDER BY timestamp DESC LIMIT 1`,
-          [lotId]
-        );
+        const snapshot = await db.collection('processing_stages')
+          .where('lot_id', '==', lotId)
+          .where('stage_type', '==', 'drying')
+          .orderBy('timestamp', 'desc')
+          .limit(1)
+          .get();
         
-        if (result.rows.length === 0 || !result.rows[0].moisture) {
+        if (snapshot.empty) {
           return {
             passed: false,
             details: 'Moisture content not documented'
           };
         }
         
-        const moisture = parseFloat(result.rows[0].moisture);
-        const passed = moisture <= 11.0;
+        const stage = snapshot.docs[0].data();
+        const moisture = stage.quality_metrics?.moisture;
+
+        if (!moisture || isNaN(parseFloat(moisture))) {
+          return {
+            passed: false,
+            details: 'Moisture content not documented'
+          };
+        }
+        
+        const moistureValue = parseFloat(moisture);
+        const passed = moistureValue <= 11.0;
+
         return {
           passed,
           details: passed
-            ? `Moisture ${moisture}% meets Middle East premium standards (≤11.0%)`
-            : `Moisture ${moisture}% exceeds Middle East premium limit of 11.0%`
+            ? `Moisture ${moistureValue}% meets Middle East premium standards (≤11.0%)`
+            : `Moisture ${moistureValue}% exceeds Middle East premium limit of 11.0%`
         };
       }
     },
@@ -396,22 +469,22 @@ const COMPLIANCE_RULES = {
       category: 'packaging',
       severity: 'major',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT quality_metrics->>'package_material' as material
-           FROM processing_stages
-           WHERE lot_id = $1 AND stage_type = 'packaging'
-           ORDER BY timestamp DESC LIMIT 1`,
-          [lotId]
-        );
+        const snapshot = await db.collection('processing_stages')
+          .where('lot_id', '==', lotId)
+          .where('stage_type', '==', 'packaging')
+          .orderBy('timestamp', 'desc')
+          .limit(1)
+          .get();
         
-        if (result.rows.length === 0) {
+        if (snapshot.empty) {
           return {
             passed: false,
             details: 'Packaging information not available'
           };
         }
         
-        const material = result.rows[0].material;
+        const stage = snapshot.docs[0].data();
+        const material = stage.quality_metrics?.package_material;
         const acceptedMaterials = ['Jute_with_liner', 'PP', 'HDPE', 'Food_grade_plastic'];
         const passed = material && acceptedMaterials.includes(material);
         
@@ -429,17 +502,16 @@ const COMPLIANCE_RULES = {
       category: 'certification',
       severity: 'major',
       check: async (lotId) => {
-        const result = await db.query(
-          `SELECT * FROM certifications 
-           WHERE lot_id = $1 AND cert_type = 'origin' 
-           AND is_valid = true`,
-          [lotId]
-        );
+        const snapshot = await db.collection('certifications')
+          .where('lot_id', '==', lotId)
+          .where('cert_type', '==', 'origin')
+          .where('is_valid', '==', true)
+          .get();
         
         return {
-          passed: result.rows.length > 0,
-          details: result.rows.length > 0
-            ? `Certificate of origin on file: ${result.rows[0].cert_number}`
+          passed: !snapshot.empty,
+          details: !snapshot.empty
+            ? `Certificate of origin on file: ${snapshot.docs[0].data().cert_number}`
             : 'Certificate of origin recommended for Middle East customs'
         };
       }
@@ -481,11 +553,14 @@ router.post('/check/:lotId', async (req, res) => {
         const checkResult = await rule.check(lotId);
         
         // Store result in database
-        await db.query(
-          `INSERT INTO compliance_checks (lot_id, rule_name, rule_type, passed, details)
-           VALUES ($1, $2, $3, $4, $5)`,
-          [lotId, rule.name, rule.category, checkResult.passed, JSON.stringify(checkResult.details)]
-        );
+        await db.collection('compliance_checks').add({
+          lot_id: lotId,
+          rule_name: rule.name,
+          rule_type: rule.category,
+          passed: checkResult.passed,
+          details: JSON.stringify(checkResult.details),
+          checked_at: admin.firestore.FieldValue.serverTimestamp()
+        });
 
         results.push({
           code: rule.code,
@@ -521,12 +596,22 @@ router.post('/check/:lotId', async (req, res) => {
 
     // Update lot compliance status
     const complianceStatus = criticalFailed ? 'failed' : (allPassed ? 'passed' : 'failed');
-    await db.query(
-      `UPDATE pepper_lots 
-       SET compliance_status = $1, compliance_checked_at = NOW()
-       WHERE lot_id = $2`,
-      [complianceStatus, lotId]
-    );
+    
+    // Find lot by lot_id field (not document ID)
+    const lotSnapshot = await db.collection('pepper_lots')
+      .where('lot_id', '==', lotId)
+      .limit(1)
+      .get();
+    
+    if (!lotSnapshot.empty) {
+      const lotRef = lotSnapshot.docs[0].ref;
+      await lotRef.update({
+        compliance_status: complianceStatus,
+        compliance_checked_at: admin.firestore.FieldValue.serverTimestamp()
+      });
+    } else {
+      logger.warn('Lot not found for compliance status update:', lotId);
+    }
 
     logger.info('Compliance check completed:', { 
       lotId, 
@@ -568,18 +653,21 @@ router.post('/check/:lotId', async (req, res) => {
  */
 router.get('/history/:lotId', async (req, res) => {
   try {
-    const { lotId} = req.params;
+    const { lotId } = req.params;
 
-    const result = await db.query(
-      `SELECT * FROM compliance_checks 
-       WHERE lot_id = $1 
-       ORDER BY checked_at DESC`,
-      [lotId]
-    );
+    const snapshot = await db.collection('compliance_checks')
+      .where('lot_id', '==', lotId)
+      .orderBy('checked_at', 'desc')
+      .get();
+
+    const checks = [];
+    snapshot.forEach(doc => {
+      checks.push({ id: doc.id, ...doc.data() });
+    });
 
     res.json({
       success: true,
-      checks: result.rows
+      checks
     });
   } catch (error) {
     logger.error('Error fetching compliance history:', error);

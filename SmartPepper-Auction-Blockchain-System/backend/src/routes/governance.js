@@ -1,20 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/database');
+const admin = require('firebase-admin');
 const logger = require('../utils/logger');
+
+const db = admin.firestore();
 
 // GET /api/governance/settings - Fetch governance settings
 router.get('/settings', async (req, res) => {
   try {
     logger.info('Fetching governance settings');
 
-    const result = await db.query('SELECT * FROM governance_settings LIMIT 1');
+    const snapshot = await db.collection('governance_settings').limit(1).get();
 
-    if (result.rows.length === 0) {
+    if (snapshot.empty) {
       return res.status(404).json({ error: 'Governance settings not found' });
     }
 
-    const settings = result.rows[0];
+    const doc = snapshot.docs[0];
+    const settings = doc.data();
 
     res.json({
       defaultMinDuration: settings.default_min_duration_hours,
@@ -24,6 +27,9 @@ router.get('/settings', async (req, res) => {
       minReservePrice: parseFloat(settings.min_reserve_price),
       maxReservePrice: parseFloat(settings.max_reserve_price),
       requiresAdminApproval: settings.requires_admin_approval,
+      // Add exchange rates (use defaults if not set)
+      lkrToEthRate: parseFloat(settings.lkr_to_eth_rate || 0.0000031),
+      usdToEthRate: parseFloat(settings.usd_to_eth_rate || 0.00032),
       updatedAt: settings.updated_at,
     });
   } catch (error) {
@@ -48,40 +54,41 @@ router.put('/settings', async (req, res) => {
 
     logger.info('Updating governance settings');
 
-    const result = await db.query(
-      `UPDATE governance_settings 
-       SET default_min_duration_hours = $1,
-           default_max_duration_hours = $2,
-           default_bid_increment = $3,
-           allowed_durations = $4,
-           min_reserve_price = $5,
-           max_reserve_price = $6,
-           requires_admin_approval = $7,
-           updated_at = NOW(),
-           updated_by = $8
-       RETURNING *`,
-      [
-        defaultMinDuration,
-        defaultMaxDuration,
-        defaultBidIncrement,
-        allowedDurations,
-        minReservePrice,
-        maxReservePrice,
-        requiresAdminApproval,
-        updatedBy || 'admin',
-      ]
-    );
+    // Get first document or create new one
+    const snapshot = await db.collection('governance_settings').limit(1).get();
+    
+    const settingsData = {
+      default_min_duration_hours: defaultMinDuration,
+      default_max_duration_hours: defaultMaxDuration,
+      default_bid_increment: defaultBidIncrement,
+      allowed_durations: allowedDurations,
+      min_reserve_price: minReservePrice,
+      max_reserve_price: maxReservePrice,
+      requires_admin_approval: requiresAdminApproval,
+      updated_at: admin.firestore.FieldValue.serverTimestamp(),
+      updated_by: updatedBy || 'admin'
+    };
+
+    let docRef;
+    if (snapshot.empty) {
+      docRef = await db.collection('governance_settings').add(settingsData);
+    } else {
+      docRef = snapshot.docs[0].ref;
+      await docRef.update(settingsData);
+    }
 
     // Log governance action
-    await db.query(
-      `INSERT INTO governance_logs (action, performed_by, details)
-       VALUES ($1, $2, $3)`,
-      ['Settings Updated', updatedBy || 'admin', 'Updated global governance settings']
-    );
+    await db.collection('governance_logs').add({
+      action: 'Settings Updated',
+      performed_by: updatedBy || 'admin',
+      details: 'Updated global governance settings',
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    });
 
+    const updatedDoc = await docRef.get();
     res.json({
       message: 'Governance settings updated successfully',
-      settings: result.rows[0],
+      settings: { id: updatedDoc.id, ...updatedDoc.data() },
     });
   } catch (error) {
     logger.error('Error updating governance settings:', error);
@@ -94,24 +101,27 @@ router.get('/templates', async (req, res) => {
   try {
     logger.info('Fetching auction templates');
 
-    const result = await db.query(
-      `SELECT * FROM auction_rule_templates 
-       WHERE active = true 
-       ORDER BY created_at DESC`
-    );
+    const snapshot = await db.collection('auction_rule_templates')
+      .where('active', '==', true)
+      .orderBy('created_at', 'desc')
+      .get();
 
-    const templates = result.rows.map((row) => ({
-      id: row.template_id,
-      name: row.name,
-      description: row.description,
-      minDuration: row.min_duration_hours,
-      maxDuration: row.max_duration_hours,
-      minBidIncrement: parseFloat(row.min_bid_increment),
-      maxReservePrice: parseFloat(row.max_reserve_price),
-      requiresApproval: row.requires_approval,
-      active: row.active,
-      createdAt: row.created_at,
-    }));
+    const templates = [];
+    snapshot.forEach(doc => {
+      const row = doc.data();
+      templates.push({
+        id: doc.id,
+        name: row.name,
+        description: row.description,
+        minDuration: row.min_duration_hours,
+        maxDuration: row.max_duration_hours,
+        minBidIncrement: parseFloat(row.min_bid_increment),
+        maxReservePrice: parseFloat(row.max_reserve_price),
+        requiresApproval: row.requires_approval,
+        active: row.active,
+        createdAt: row.created_at,
+      });
+    });
 
     res.json({ templates });
   } catch (error) {
@@ -139,34 +149,34 @@ router.post('/templates', async (req, res) => {
     // Generate template_id from name
     const templateId = name.toLowerCase().replace(/\s+/g, '-');
 
-    const result = await db.query(
-      `INSERT INTO auction_rule_templates 
-       (template_id, name, description, min_duration_hours, max_duration_hours, 
-        min_bid_increment, max_reserve_price, requires_approval)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING *`,
-      [
-        templateId,
-        name,
-        description,
-        minDuration,
-        maxDuration,
-        minBidIncrement,
-        maxReservePrice,
-        requiresApproval,
-      ]
-    );
+    const templateData = {
+      template_id: templateId,
+      name,
+      description,
+      min_duration_hours: minDuration,
+      max_duration_hours: maxDuration,
+      min_bid_increment: minBidIncrement,
+      max_reserve_price: maxReservePrice,
+      requires_approval: requiresApproval,
+      active: true,
+      created_at: admin.firestore.FieldValue.serverTimestamp(),
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    const docRef = await db.collection('auction_rule_templates').add(templateData);
 
     // Log governance action
-    await db.query(
-      `INSERT INTO governance_logs (action, performed_by, details)
-       VALUES ($1, $2, $3)`,
-      ['Template Created', createdBy || 'admin', `Created template: ${name}`]
-    );
+    await db.collection('governance_logs').add({
+      action: 'Template Created',
+      performed_by: createdBy || 'admin',
+      details: `Created template: ${name}`,
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    });
 
+    const doc = await docRef.get();
     res.json({
       message: 'Template created successfully',
-      template: result.rows[0],
+      template: { id: doc.id, ...doc.data() },
     });
   } catch (error) {
     logger.error('Error creating template:', error);
@@ -191,39 +201,36 @@ router.put('/templates/:id', async (req, res) => {
 
     logger.info('Updating auction template:', id);
 
-    const result = await db.query(
-      `UPDATE auction_rule_templates 
-       SET name = $1, description = $2, min_duration_hours = $3,
-           max_duration_hours = $4, min_bid_increment = $5,
-           max_reserve_price = $6, requires_approval = $7, updated_at = NOW()
-       WHERE template_id = $8
-       RETURNING *`,
-      [
-        name,
-        description,
-        minDuration,
-        maxDuration,
-        minBidIncrement,
-        maxReservePrice,
-        requiresApproval,
-        id,
-      ]
-    );
+    const docRef = db.collection('auction_rule_templates').doc(id);
+    const doc = await docRef.get();
 
-    if (result.rows.length === 0) {
+    if (!doc.exists) {
       return res.status(404).json({ error: 'Template not found' });
     }
 
-    // Log governance action
-    await db.query(
-      `INSERT INTO governance_logs (action, performed_by, details)
-       VALUES ($1, $2, $3)`,
-      ['Template Updated', updatedBy || 'admin', `Updated template: ${name}`]
-    );
+    await docRef.update({
+      name,
+      description,
+      min_duration_hours: minDuration,
+      max_duration_hours: maxDuration,
+      min_bid_increment: minBidIncrement,
+      max_reserve_price: maxReservePrice,
+      requires_approval: requiresApproval,
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    });
 
+    // Log governance action
+    await db.collection('governance_logs').add({
+      action: 'Template Updated',
+      performed_by: updatedBy || 'admin',
+      details: `Updated template: ${name}`,
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    const updatedDoc = await docRef.get();
     res.json({
       message: 'Template updated successfully',
-      template: result.rows[0],
+      template: { id: updatedDoc.id, ...updatedDoc.data() },
     });
   } catch (error) {
     logger.error('Error updating template:', error);
@@ -239,24 +246,25 @@ router.delete('/templates/:id', async (req, res) => {
 
     logger.info('Deleting auction template:', id);
 
-    const result = await db.query(
-      `UPDATE auction_rule_templates 
-       SET active = false, updated_at = NOW()
-       WHERE template_id = $1
-       RETURNING *`,
-      [id]
-    );
+    const docRef = db.collection('auction_rule_templates').doc(id);
+    const doc = await docRef.get();
 
-    if (result.rows.length === 0) {
+    if (!doc.exists) {
       return res.status(404).json({ error: 'Template not found' });
     }
 
+    await docRef.update({
+      active: false,
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    });
+
     // Log governance action
-    await db.query(
-      `INSERT INTO governance_logs (action, performed_by, details)
-       VALUES ($1, $2, $3)`,
-      ['Template Deleted', deletedBy || 'admin', `Deleted template: ${result.rows[0].name}`]
-    );
+    await db.collection('governance_logs').add({
+      action: 'Template Deleted',
+      performed_by: deletedBy || 'admin',
+      details: `Deleted template: ${doc.data().name}`,
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    });
 
     res.json({ message: 'Template deleted successfully' });
   } catch (error) {
@@ -272,28 +280,30 @@ router.get('/cancellations', async (req, res) => {
 
     logger.info('Fetching cancellation requests');
 
-    let query = 'SELECT * FROM cancellation_requests ORDER BY created_at DESC';
-    const params = [];
+    let query = db.collection('cancellation_requests');
 
     if (status) {
-      query = 'SELECT * FROM cancellation_requests WHERE status = $1 ORDER BY created_at DESC';
-      params.push(status);
+      query = query.where('status', '==', status);
     }
 
-    const result = await db.query(query, params);
+    const snapshot = await query.orderBy('created_at', 'desc').get();
 
-    const requests = result.rows.map((row) => ({
-      id: row.id,
-      auctionId: row.auction_id,
-      lotId: row.lot_id,
-      requestedBy: row.requested_by,
-      reason: row.reason,
-      status: row.status,
-      createdAt: row.created_at,
-      reviewedAt: row.reviewed_at,
-      reviewedBy: row.reviewed_by,
-      adminComments: row.admin_comments,
-    }));
+    const requests = [];
+    snapshot.forEach(doc => {
+      const row = doc.data();
+      requests.push({
+        id: doc.id,
+        auctionId: row.auction_id,
+        lotId: row.lot_id,
+        requestedBy: row.requested_by,
+        reason: row.reason,
+        status: row.status,
+        createdAt: row.created_at,
+        reviewedAt: row.reviewed_at,
+        reviewedBy: row.reviewed_by,
+        adminComments: row.admin_comments,
+      });
+    });
 
     res.json({ requests });
   } catch (error) {
@@ -311,42 +321,37 @@ router.post('/cancellations/:id/approve', async (req, res) => {
     logger.info('Approving cancellation request:', id);
 
     // Get request details
-    const requestResult = await db.query(
-      'SELECT * FROM cancellation_requests WHERE id = $1',
-      [id]
-    );
+    const requestRef = db.collection('cancellation_requests').doc(id);
+    const requestDoc = await requestRef.get();
 
-    if (requestResult.rows.length === 0) {
+    if (!requestDoc.exists) {
       return res.status(404).json({ error: 'Cancellation request not found' });
     }
 
-    const request = requestResult.rows[0];
+    const request = requestDoc.data();
 
     // Update request status
-    await db.query(
-      `UPDATE cancellation_requests 
-       SET status = 'approved', reviewed_at = NOW(), 
-           reviewed_by = $1, admin_comments = $2
-       WHERE id = $3`,
-      [reviewedBy, comments, id]
-    );
+    await requestRef.update({
+      status: 'approved',
+      reviewed_at: admin.firestore.FieldValue.serverTimestamp(),
+      reviewed_by: reviewedBy,
+      admin_comments: comments
+    });
 
     // Update auction status to ended
-    await db.query(
-      'UPDATE auctions SET status = $1 WHERE auction_id = $2',
-      ['ended', request.auction_id]
-    );
+    const auctionRef = db.collection('auctions').doc(request.auction_id);
+    await auctionRef.update({
+      status: 'ended',
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    });
 
     // Log governance action
-    await db.query(
-      `INSERT INTO governance_logs (action, performed_by, details)
-       VALUES ($1, $2, $3)`,
-      [
-        'Cancellation Approved',
-        reviewedBy || 'admin',
-        `Approved cancellation for auction: ${request.auction_id}`,
-      ]
-    );
+    await db.collection('governance_logs').add({
+      action: 'Cancellation Approved',
+      performed_by: reviewedBy || 'admin',
+      details: `Approved cancellation for auction: ${request.auction_id}`,
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    });
 
     res.json({ message: 'Cancellation request approved successfully' });
   } catch (error) {
@@ -364,36 +369,30 @@ router.post('/cancellations/:id/reject', async (req, res) => {
     logger.info('Rejecting cancellation request:', id);
 
     // Get request details
-    const requestResult = await db.query(
-      'SELECT * FROM cancellation_requests WHERE id = $1',
-      [id]
-    );
+    const requestRef = db.collection('cancellation_requests').doc(id);
+    const requestDoc = await requestRef.get();
 
-    if (requestResult.rows.length === 0) {
+    if (!requestDoc.exists) {
       return res.status(404).json({ error: 'Cancellation request not found' });
     }
 
-    const request = requestResult.rows[0];
+    const request = requestDoc.data();
 
     // Update request status
-    await db.query(
-      `UPDATE cancellation_requests 
-       SET status = 'rejected', reviewed_at = NOW(), 
-           reviewed_by = $1, admin_comments = $2
-       WHERE id = $3`,
-      [reviewedBy, comments, id]
-    );
+    await requestRef.update({
+      status: 'rejected',
+      reviewed_at: admin.firestore.FieldValue.serverTimestamp(),
+      reviewed_by: reviewedBy,
+      admin_comments: comments
+    });
 
     // Log governance action
-    await db.query(
-      `INSERT INTO governance_logs (action, performed_by, details)
-       VALUES ($1, $2, $3)`,
-      [
-        'Cancellation Rejected',
-        reviewedBy || 'admin',
-        `Rejected cancellation for auction: ${request.auction_id}`,
-      ]
-    );
+    await db.collection('governance_logs').add({
+      action: 'Cancellation Rejected',
+      performed_by: reviewedBy || 'admin',
+      details: `Rejected cancellation for auction: ${request.auction_id}`,
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    });
 
     res.json({ message: 'Cancellation request rejected successfully' });
   } catch (error) {
@@ -409,21 +408,23 @@ router.get('/logs', async (req, res) => {
 
     logger.info('Fetching governance logs');
 
-    const result = await db.query(
-      `SELECT * FROM governance_logs 
-       ORDER BY created_at DESC 
-       LIMIT $1`,
-      [limit]
-    );
+    const snapshot = await db.collection('governance_logs')
+      .orderBy('created_at', 'desc')
+      .limit(parseInt(limit))
+      .get();
 
-    const logs = result.rows.map((row) => ({
-      id: row.id,
-      action: row.action,
-      performedBy: row.performed_by,
-      details: row.details,
-      blockchainTxHash: row.blockchain_tx_hash,
-      createdAt: row.created_at,
-    }));
+    const logs = [];
+    snapshot.forEach(doc => {
+      const row = doc.data();
+      logs.push({
+        id: doc.id,
+        action: row.action,
+        performedBy: row.performed_by,
+        details: row.details,
+        blockchainTxHash: row.blockchain_tx_hash,
+        createdAt: row.created_at,
+      });
+    });
 
     res.json({ logs });
   } catch (error) {

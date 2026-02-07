@@ -1,7 +1,42 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/database');
+const admin = require('firebase-admin');
 const logger = require('../utils/logger');
+
+const db = admin.firestore();
+
+/**
+ * Helper function to convert Firestore Timestamps to ISO strings
+ */
+const convertTimestamps = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  
+  const converted = Array.isArray(obj) ? [] : {};
+  
+  for (const key in obj) {
+    const value = obj[key];
+    
+    // Check if it's a Firestore Timestamp
+    if (value && typeof value === 'object' && '_seconds' in value && '_nanoseconds' in value) {
+      // Convert to ISO string
+      const date = new Date(value._seconds * 1000 + value._nanoseconds / 1000000);
+      converted[key] = date.toISOString();
+    } else if (value && typeof value.toDate === 'function') {
+      // Firestore Timestamp object with toDate method
+      converted[key] = value.toDate().toISOString();
+    } else if (Array.isArray(value)) {
+      // Recursively convert arrays
+      converted[key] = value.map(item => convertTimestamps(item));
+    } else if (value && typeof value === 'object') {
+      // Recursively convert nested objects
+      converted[key] = convertTimestamps(value);
+    } else {
+      converted[key] = value;
+    }
+  }
+  
+  return converted;
+};
 
 /**
  * GET /api/traceability/:lotId
@@ -23,165 +58,108 @@ router.get('/:lotId', async (req, res) => {
     
     logger.info('Fetching complete traceability for lot:', lotId);
 
-    // 1. Get Lot Information
-    const lotResult = await db.query(
-      `SELECT 
-        lot_id,
-        farmer_address,
-        variety,
-        quantity,
-        quality,
-        harvest_date,
-        origin,
-        farm_location,
-        organic_certified,
-        certificate_hash,
-        certificate_ipfs_url,
-        lot_pictures,
-        certificate_images,
-        metadata_uri,
-        status,
-        blockchain_tx_hash,
-        created_at,
-        updated_at
-      FROM pepper_lots 
-      WHERE lot_id = $1`,
-      [lotId]
-    );
+    // 1. Get Lot Information - query by lot_id field
+    const lotSnapshot = await db.collection('pepper_lots')
+      .where('lot_id', '==', lotId)
+      .limit(1)
+      .get();
 
-    if (lotResult.rows.length === 0) {
+    if (lotSnapshot.empty) {
       return res.status(404).json({
         success: false,
         error: 'Lot not found'
       });
     }
 
-    const lot = lotResult.rows[0];
+    const lotDoc = lotSnapshot.docs[0];
+    const lot = { id: lotDoc.id, ...lotDoc.data() };
 
     // 2. Get Processing Stages
-    const processingResult = await db.query(
-      `SELECT 
-        stage_type,
-        stage_name,
-        location,
-        operator_name,
-        quality_metrics,
-        notes,
-        blockchain_tx_hash,
-        timestamp
-      FROM processing_stages 
-      WHERE lot_id = $1 
-      ORDER BY timestamp ASC`,
-      [lotId]
-    );
+    const processingSnapshot = await db.collection('processing_stages')
+      .where('lot_id', '==', lotId)
+      .orderBy('timestamp', 'asc')
+      .get();
+
+    const processingStages = [];
+    processingSnapshot.forEach(doc => {
+      processingStages.push(doc.data());
+    });
 
     // 3. Get Certifications
-    const certificationsResult = await db.query(
-      `SELECT 
-        cert_type,
-        cert_number,
-        issuer,
-        issue_date,
-        expiry_date,
-        document_hash,
-        ipfs_url,
-        is_valid,
-        verification_status,
-        verified_by,
-        verified_at,
-        created_at
-      FROM certifications 
-      WHERE lot_id = $1 
-      ORDER BY created_at ASC`,
-      [lotId]
-    );
+    const certificationsSnapshot = await db.collection('certifications')
+      .where('lot_id', '==', lotId)
+      .orderBy('created_at', 'asc')
+      .get();
+
+    const certifications = [];
+    certificationsSnapshot.forEach(doc => {
+      certifications.push(doc.data());
+    });
 
     // 4. Get Compliance Checks
-    const complianceResult = await db.query(
-      `SELECT 
-        rule_name,
-        rule_type,
-        passed,
-        details,
-        checked_at
-      FROM compliance_checks 
-      WHERE lot_id = $1 
-      ORDER BY checked_at DESC`,
-      [lotId]
-    );
+    const complianceSnapshot = await db.collection('compliance_checks')
+      .where('lot_id', '==', lotId)
+      .orderBy('checked_at', 'desc')
+      .get();
+
+    const complianceChecks = [];
+    complianceSnapshot.forEach(doc => {
+      complianceChecks.push(doc.data());
+    });
 
     // 5. Get Auction History
-    const auctionResult = await db.query(
-      `SELECT 
-        auction_id,
-        start_price,
-        reserve_price,
-        current_bid,
-        current_bidder,
-        start_time,
-        end_time,
-        status,
-        compliance_passed,
-        blockchain_tx_hash,
-        created_at
-      FROM auctions 
-      WHERE lot_id = $1 
-      ORDER BY created_at DESC`,
-      [lotId]
-    );
+    const auctionSnapshot = await db.collection('auctions')
+      .where('lot_id', '==', lotId)
+      .orderBy('created_at', 'desc')
+      .get();
+
+    const auctions = [];
+    auctionSnapshot.forEach(doc => {
+      auctions.push({ id: doc.id, ...doc.data() });
+    });
 
     // 6. Get Bid History for auctions
     let allBids = [];
-    if (auctionResult.rows.length > 0) {
-      for (const auction of auctionResult.rows) {
-        const bidsResult = await db.query(
-          `SELECT 
-            bidder_address,
-            amount,
-            blockchain_tx_hash,
-            placed_at
-          FROM bids 
-          WHERE auction_id = $1 
-          ORDER BY placed_at DESC`,
-          [auction.auction_id]
-        );
-        
-        allBids = allBids.concat(bidsResult.rows.map(bid => ({
+    for (const auction of auctions) {
+      const bidsSnapshot = await db.collection('bids')
+        .where('auction_id', '==', auction.id)
+        .orderBy('placed_at', 'desc')
+        .get();
+      
+      bidsSnapshot.forEach(doc => {
+        const bid = doc.data();
+        allBids.push({
           ...bid,
-          auction_id: auction.auction_id
-        })));
-      }
+          auction_id: auction.id
+        });
+      });
     }
 
     // 7. Get User Information (Farmer)
-    const farmerResult = await db.query(
-      `SELECT 
-        wallet_address,
-        user_type,
-        name,
-        email,
-        location
-      FROM users 
-      WHERE wallet_address = $1`,
-      [lot.farmer_address]
-    );
+    let farmerInfo = null;
+    if (lot.farmer_address) {
+      const farmerSnapshot = await db.collection('users')
+        .where('wallet_address', '==', lot.farmer_address)
+        .limit(1)
+        .get();
+      
+      if (!farmerSnapshot.empty) {
+        farmerInfo = farmerSnapshot.docs[0].data();
+      }
+    }
 
     // 8. Get Buyer Information (if sold)
     let buyerInfo = null;
-    const soldAuction = auctionResult.rows.find(a => a.status === 'settled');
+    const soldAuction = auctions.find(a => a.status === 'settled');
     if (soldAuction && soldAuction.current_bidder) {
-      const buyerResult = await db.query(
-        `SELECT 
-          wallet_address,
-          user_type,
-          name,
-          email,
-          location
-        FROM users 
-        WHERE wallet_address = $1`,
-        [soldAuction.current_bidder]
-      );
-      buyerInfo = buyerResult.rows[0] || null;
+      const buyerSnapshot = await db.collection('users')
+        .where('wallet_address', '==', soldAuction.current_bidder)
+        .limit(1)
+        .get();
+      
+      if (!buyerSnapshot.empty) {
+        buyerInfo = buyerSnapshot.docs[0].data();
+      }
     }
 
     // 9. Build Complete Timeline
@@ -193,7 +171,7 @@ router.get('/:lotId', async (req, res) => {
       timestamp: lot.created_at,
       description: 'Lot registered on blockchain',
       actor: lot.farmer_address,
-      actor_name: farmerResult.rows[0]?.name || 'Farmer',
+      actor_name: farmerInfo?.name || 'Farmer',
       blockchain_tx: lot.blockchain_tx_hash,
       data: {
         variety: lot.variety,
@@ -204,7 +182,7 @@ router.get('/:lotId', async (req, res) => {
     });
 
     // Add processing stages
-    processingResult.rows.forEach(stage => {
+    processingStages.forEach(stage => {
       timeline.push({
         type: 'processing_stage',
         timestamp: stage.timestamp,
@@ -222,7 +200,7 @@ router.get('/:lotId', async (req, res) => {
     });
 
     // Add certifications
-    certificationsResult.rows.forEach(cert => {
+    certifications.forEach(cert => {
       timeline.push({
         type: 'certification_added',
         timestamp: cert.created_at,
@@ -244,7 +222,7 @@ router.get('/:lotId', async (req, res) => {
     });
 
     // Add compliance checks
-    complianceResult.rows.forEach(check => {
+    complianceChecks.forEach(check => {
       timeline.push({
         type: 'compliance_check',
         timestamp: check.checked_at,
@@ -262,16 +240,16 @@ router.get('/:lotId', async (req, res) => {
     });
 
     // Add auction events
-    auctionResult.rows.forEach(auction => {
+    auctions.forEach(auction => {
       timeline.push({
         type: 'auction_created',
         timestamp: auction.created_at,
         description: 'Auction created',
         actor: lot.farmer_address,
-        actor_name: farmerResult.rows[0]?.name || 'Farmer',
+        actor_name: farmerInfo?.name || 'Farmer',
         blockchain_tx: auction.blockchain_tx_hash,
         data: {
-          auction_id: auction.auction_id,
+          auction_id: auction.id,
           start_price: auction.start_price,
           reserve_price: auction.reserve_price,
           start_time: auction.start_time,
@@ -288,7 +266,7 @@ router.get('/:lotId', async (req, res) => {
           actor_name: 'Auction System',
           blockchain_tx: null,
           data: {
-            auction_id: auction.auction_id,
+            auction_id: auction.id,
             final_price: auction.current_bid,
             winner: auction.current_bidder
           }
@@ -304,7 +282,7 @@ router.get('/:lotId', async (req, res) => {
           actor_name: buyerInfo?.name || 'Buyer',
           blockchain_tx: null,
           data: {
-            auction_id: auction.auction_id,
+            auction_id: auction.id,
             price_paid: auction.current_bid,
             new_owner: auction.current_bidder
           }
@@ -329,23 +307,27 @@ router.get('/:lotId', async (req, res) => {
     });
 
     // Sort timeline by timestamp
-    timeline.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    timeline.sort((a, b) => {
+      const aTime = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp);
+      const bTime = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp);
+      return aTime - bTime;
+    });
 
     // 10. Calculate Statistics
     const stats = {
       total_events: timeline.length,
-      processing_stages: processingResult.rows.length,
-      certifications: certificationsResult.rows.length,
-      compliance_checks: complianceResult.rows.length,
-      auctions: auctionResult.rows.length,
+      processing_stages: processingStages.length,
+      certifications: certifications.length,
+      compliance_checks: complianceChecks.length,
+      auctions: auctions.length,
       total_bids: allBids.length,
       blockchain_transactions: timeline.filter(e => e.blockchain_tx).length,
-      days_in_system: Math.ceil((new Date() - new Date(lot.created_at)) / (1000 * 60 * 60 * 24))
+      days_in_system: lot.created_at ? Math.ceil((new Date() - lot.created_at.toDate()) / (1000 * 60 * 60 * 24)) : 0
     };
 
     // 11. Determine Current Status
-    const passedChecks = complianceResult.rows.filter(c => c.passed).length;
-    const totalChecks = complianceResult.rows.length;
+    const passedChecks = complianceChecks.filter(c => c.passed).length;
+    const totalChecks = complianceChecks.length;
     const complianceStatus = totalChecks === 0 ? 'not_checked' : 
                             passedChecks === totalChecks ? 'passed' : 
                             passedChecks > 0 ? 'partial' : 'failed';
@@ -354,11 +336,11 @@ router.get('/:lotId', async (req, res) => {
       stage: lot.status,
       description: getStatusDescription(lot.status),
       current_owner: lot.farmer_address,
-      current_owner_name: farmerResult.rows[0]?.name || 'Farmer',
+      current_owner_name: farmerInfo?.name || 'Farmer',
       compliance_status: complianceStatus,
       compliance_checks_passed: passedChecks,
       compliance_checks_total: totalChecks,
-      is_in_auction: auctionResult.rows.some(a => a.status === 'active')
+      is_in_auction: auctions.some(a => a.status === 'active')
     };
 
     if (soldAuction) {
@@ -373,7 +355,7 @@ router.get('/:lotId', async (req, res) => {
       
       // Basic Lot Info
       lot_info: {
-        lot_id: lot.lot_id,
+        lot_id: lot.lot_id || lotId,
         variety: lot.variety,
         quantity: lot.quantity,
         quality: lot.quality,
@@ -400,23 +382,23 @@ router.get('/:lotId', async (req, res) => {
 
       // Stakeholders
       stakeholders: {
-        farmer: farmerResult.rows[0] || { wallet_address: lot.farmer_address },
+        farmer: farmerInfo || { wallet_address: lot.farmer_address },
         buyer: buyerInfo,
-        certifiers: certificationsResult.rows.map(c => c.issuer),
-        operators: [...new Set(processingResult.rows.map(p => p.operator_name).filter(Boolean))]
+        certifiers: certifications.map(c => c.issuer),
+        operators: [...new Set(processingStages.map(p => p.operator_name).filter(Boolean))]
       },
 
       // Processing History
-      processing_stages: processingResult.rows,
+      processing_stages: processingStages,
 
       // Certifications
-      certifications: certificationsResult.rows,
+      certifications: certifications,
 
       // Compliance History
-      compliance_checks: complianceResult.rows,
+      compliance_checks: complianceChecks,
 
       // Auction History
-      auctions: auctionResult.rows,
+      auctions: auctions,
 
       // Bid History
       bids: allBids,
@@ -434,7 +416,8 @@ router.get('/:lotId', async (req, res) => {
       blockchain_tx: stats.blockchain_transactions 
     });
 
-    res.json(traceabilityData);
+    // Convert all timestamps before sending response
+    res.json(convertTimestamps(traceabilityData));
 
   } catch (error) {
     logger.error('Error fetching traceability:', error);

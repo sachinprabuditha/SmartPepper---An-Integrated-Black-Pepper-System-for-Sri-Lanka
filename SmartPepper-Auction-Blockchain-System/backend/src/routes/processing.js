@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/database');
+const admin = require('firebase-admin');
 const logger = require('../utils/logger');
+
+const db = admin.firestore();
 
 /**
  * POST /api/processing/stages
@@ -27,20 +29,27 @@ router.post('/stages', async (req, res) => {
       });
     }
 
-    const result = await db.query(
-      `INSERT INTO processing_stages (
-        lot_id, stage_type, stage_name, location, operator_name,
-        quality_metrics, notes, blockchain_tx_hash
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING *`,
-      [lotId, stageType, stageName, location, operatorName, qualityMetrics, notes, blockchainTxHash]
-    );
+    const stageData = {
+      lot_id: lotId,
+      stage_type: stageType,
+      stage_name: stageName,
+      location: location || null,
+      operator_name: operatorName || null,
+      quality_metrics: qualityMetrics || null,
+      notes: notes || null,
+      blockchain_tx_hash: blockchainTxHash || null,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    const docRef = await db.collection('processing_stages').add(stageData);
 
     logger.info('Processing stage added:', { lotId, stageType });
 
+    const doc = await docRef.get();
     res.status(201).json({
       success: true,
-      stage: result.rows[0]
+      stage: { id: doc.id, ...doc.data() }
     });
   } catch (error) {
     logger.error('Error adding processing stage:', error);
@@ -60,16 +69,19 @@ router.get('/stages/:lotId', async (req, res) => {
   try {
     const { lotId } = req.params;
 
-    const result = await db.query(
-      `SELECT * FROM processing_stages 
-       WHERE lot_id = $1 
-       ORDER BY timestamp ASC`,
-      [lotId]
-    );
+    const snapshot = await db.collection('processing_stages')
+      .where('lot_id', '==', lotId)
+      .orderBy('timestamp', 'asc')
+      .get();
+
+    const stages = [];
+    snapshot.forEach(doc => {
+      stages.push({ id: doc.id, ...doc.data() });
+    });
 
     res.json({
       success: true,
-      stages: result.rows
+      stages
     });
   } catch (error) {
     logger.error('Error fetching processing stages:', error);

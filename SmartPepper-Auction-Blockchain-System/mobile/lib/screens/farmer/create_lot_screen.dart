@@ -469,6 +469,8 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
         'lotId': lotId,
         'farmerAddress': farmerAddress,
         'farmerName': authProvider.user?.name ?? 'Unknown',
+        'farmerEmail': authProvider.user?.email,
+        'farmerPhone': authProvider.user?.phone,
         'variety': _varietyController.text.trim(),
         'quantity': double.parse(_quantityController.text.trim()),
         'quality': _selectedQuality,
