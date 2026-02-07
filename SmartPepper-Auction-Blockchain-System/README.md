@@ -36,7 +36,7 @@ This repository contains the **foundational implementation** (midpoint milestone
 - ✅ Core PepperAuction smart contract with escrow mechanism
 - ✅ Real-time bidding engine with WebSocket support
 - ✅ Basic compliance rule engine (IPFS certificate validation)
-- ✅ PostgreSQL + Redis backend infrastructure
+- ✅ Firebase + Redis backend infrastructure
 - ✅ Flutter mobile app (in active development)
 - ✅ Web dashboard (in active development)
 
@@ -110,7 +110,7 @@ To develop a blockchain-enabled real-time auction system for verified black pepp
    - Enable live bidding with sub-300ms updates via WebSockets
    - Implement escrow payments secured by smart contracts
    - Provide on-chain settlement with automatic rule enforcement
-   - Build backend using Node.js, PostgreSQL, and Redis
+   - Build backend using Node.js, Firebase, and Redis
 
 3. **Compliance Rule Engine**
 
@@ -428,7 +428,7 @@ Transaction Data → Analytics Engine → Insights Dashboard → Stakeholder Rep
 
 - **WebSocket Server:** Real-time bidding with <300ms latency
 - **Redis Cache:** Fast bid validation and leaderboard updates
-- **PostgreSQL Database:** Persistent storage of auction history
+- **Firebase Database:** Persistent storage of auction history
 - **Smart Contracts:** Automated auction rule enforcement
 
 **Features:**
@@ -616,7 +616,7 @@ Transaction Data → Analytics Engine → Insights Dashboard → Stakeholder Rep
 ### Prerequisites
 
 - Node.js >= 18.x
-- PostgreSQL >= 14
+- Firebase
 - Redis >= 7
 - IPFS node (optional for certificate storage)
 - MetaMask or Web3 wallet
@@ -1251,7 +1251,7 @@ Blockchain, Real-time Auction, Smart Contracts, Agricultural Supply Chain, Trace
 
 ---
 
-**Built with:** Solidity • Hardhat • Node.js • Express • WebSocket • PostgreSQL • Redis • IPFS • Ethers.js • Flutter • React • Next.js
+**Built with:** Solidity • Hardhat • Node.js • Express • WebSocket • Firebase • Redis • IPFS • Ethers.js • Flutter • React • Next.js
 
 🌶️ **SmartPepper** - Empowering smallholder farmers through blockchain-enabled transparent trade and verified exports.
 
