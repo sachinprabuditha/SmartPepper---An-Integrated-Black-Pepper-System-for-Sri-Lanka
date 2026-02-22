@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:skr_frontend_mobile/core/network/api_client.dart';
+import 'package:mobile/core/network/api_client.dart';
 import '../../../../core/utils/constants.dart';
 import '../models/prediction_input_model.dart';
 import '../models/prediction_output_model.dart';

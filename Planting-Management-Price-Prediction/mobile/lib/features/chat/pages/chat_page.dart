@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skr_frontend_mobile/core/theme/app_theme.dart';
+import 'package:mobile/core/theme/app_theme.dart';
 
 import '../models/chat_model.dart';
 import '../services/chat_service.dart';
