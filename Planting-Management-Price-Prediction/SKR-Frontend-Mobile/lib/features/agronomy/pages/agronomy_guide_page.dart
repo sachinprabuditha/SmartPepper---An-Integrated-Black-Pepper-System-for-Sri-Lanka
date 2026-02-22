@@ -23,7 +23,7 @@ final districtsProvider = FutureProvider<List<District>>((ref) async {
 });
 
 // Provider for soil types by district
-final soilsByDistrictProvider = FutureProvider.family<List<SoilType>, int>(
+final soilsByDistrictProvider = FutureProvider.family<List<SoilType>, String>(
   (ref, districtId) async {
     final service = ref.read(agronomyServiceProvider);
     return await service.fetchSoilsByDistrict(districtId);
@@ -33,8 +33,8 @@ final soilsByDistrictProvider = FutureProvider.family<List<SoilType>, int>(
 // Provider for all guides (with variety details and steps) by district and soil type
 // Using a custom key class to ensure stable comparison
 class DistrictSoilKey {
-  final int districtId;
-  final int? soilTypeId; // Made optional
+  final String districtId;
+  final String? soilTypeId; // Made optional
 
   DistrictSoilKey(this.districtId, this.soilTypeId);
 
@@ -63,8 +63,8 @@ final allGuidesByDistrictAndSoilProvider = FutureProvider.family<List<AgronomyGu
 // Provider for agronomy guide
 // Using a custom key class to ensure stable comparison
 class GuideKey {
-  final int districtId;
-  final int soilTypeId;
+  final String districtId;
+  final String soilTypeId;
   final String varietyId;
 
   GuideKey(this.districtId, this.soilTypeId, this.varietyId);

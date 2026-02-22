@@ -7,56 +7,9 @@ import '../../../../core/widgets/dropdown_field.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/loading_spinner.dart';
 import '../../../../core/utils/validators.dart';
-import '../../agronomy/services/agronomy_service.dart';
-import '../../agronomy/models/district_model.dart';
-import '../../agronomy/models/soil_type_model.dart';
-import '../../agronomy/models/variety_model.dart';
 import '../../../../core/network/api_client.dart';
 
-// Provider for AgronomyService
-final _editAgronomyServiceProvider = Provider<AgronomyService>((ref) {
-  return AgronomyService(ApiClient());
-});
 
-// Provider for all districts
-final _editAllDistrictsProvider = FutureProvider<List<District>>((ref) async {
-  final service = ref.read(_editAgronomyServiceProvider);
-  return await service.fetchAllDistricts();
-});
-
-// Provider for soil types by district
-final _editSoilsByDistrictProvider = FutureProvider.family<List<SoilType>, int>(
-  (ref, districtId) async {
-    final service = ref.read(_editAgronomyServiceProvider);
-    return await service.fetchSoilsByDistrict(districtId);
-  },
-);
-
-// Provider for varieties by district and soil type
-class _EditDistrictSoilKey {
-  final int districtId;
-  final int soilTypeId;
-
-  const _EditDistrictSoilKey(this.districtId, this.soilTypeId);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _EditDistrictSoilKey &&
-          runtimeType == other.runtimeType &&
-          districtId == other.districtId &&
-          soilTypeId == other.soilTypeId;
-
-  @override
-  int get hashCode => districtId.hashCode ^ soilTypeId.hashCode;
-}
-
-final _editVarietiesByDistrictAndSoilProvider = FutureProvider.family<List<BlackPepperVariety>, _EditDistrictSoilKey>(
-  (ref, key) async {
-    final service = ref.read(_editAgronomyServiceProvider);
-    return await service.fetchVarietiesByDistrictAndSoil(key.districtId, key.soilTypeId);
-  },
-);
 
 class EditFarmPage extends ConsumerStatefulWidget {
   final FarmRecord farm;
@@ -73,9 +26,6 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
   late TextEditingController _areaHectaresController;
   late TextEditingController _totalVinesController;
 
-  District? _selectedDistrict;
-  SoilType? _selectedSoilType;
-  BlackPepperVariety? _selectedVariety;
   DateTime? _farmStartDate;
 
   @override
@@ -115,9 +65,6 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
 
   Future<void> _handleSubmit() async {
     if (_formKey.currentState!.validate() &&
-        _selectedDistrict != null &&
-        _selectedSoilType != null &&
-        _selectedVariety != null &&
         _farmStartDate != null) {
       try {
         final areaHectares = double.tryParse(_areaHectaresController.text.trim());
@@ -135,12 +82,10 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
         await ref.read(plantationControllerProvider.notifier).updateFarm(
               farmId: widget.farm.id,
               farmName: _farmNameController.text.trim(),
-              districtId: _selectedDistrict!.id,
-              soilTypeId: _selectedSoilType!.id,
-              chosenVarietyId: _selectedVariety!.id,
               farmStartDate: _farmStartDate,
               areaHectares: areaHectares,
               totalVines: totalVines,
+              // District, Soil, Variety are read-only and not updated
             );
 
         if (mounted) {
@@ -173,26 +118,7 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
 
   @override
   Widget build(BuildContext context) {
-    final districtsAsync = ref.watch(_editAllDistrictsProvider);
-    
-    // Initialize selected district from farm data when districts load (only once)
-    districtsAsync.whenData((districts) {
-      if (_selectedDistrict == null && widget.farm.district.isNotEmpty && districts.isNotEmpty) {
-        // Find the district that matches by name
-        final matchingDistrict = districts.firstWhere(
-          (d) => d.name == widget.farm.district,
-          orElse: () => districts.first,
-        );
-        // Use addPostFrameCallback to avoid setting state during build
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted && _selectedDistrict == null) {
-            setState(() {
-              _selectedDistrict = matchingDistrict;
-            });
-          }
-        });
-      }
-    });
+
 
     return Scaffold(
       appBar: AppBar(
@@ -211,53 +137,31 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
                 validator: (value) => Validators.required(value, fieldName: 'Farm name'),
               ),
               const SizedBox(height: 16),
-              districtsAsync.when(
-                data: (districts) {
-                  // Find the matching district from the list by ID to ensure instance equality
-                  District? validSelectedDistrict;
-                  if (_selectedDistrict != null) {
-                    try {
-                      validSelectedDistrict = districts.firstWhere(
-                        (d) => d.id == _selectedDistrict!.id,
-                      );
-                    } catch (e) {
-                      // District not found in list, set to null
-                      validSelectedDistrict = null;
-                    }
-                  }
-                  
-                  return DropdownField<District>(
-                    label: 'District',
-                    value: validSelectedDistrict,
-                    items: districts
-                        .map((district) => DropdownMenuItem(
-                              value: district,
-                              child: Text(district.name),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedDistrict = value;
-                        _selectedSoilType = null;
-                        _selectedVariety = null;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null) return 'Please select a district';
-                      return null;
-                    },
-                  );
-                },
-                loading: () => const LoadingSpinner(message: 'Loading districts...'),
-                error: (error, stack) => Text(
-                  'Error loading districts: ${error.toString()}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.red),
-                ),
+              // Read Only District
+              InputField(
+                label: 'District',
+                controller: TextEditingController(text: widget.farm.district),
+                readOnly: true,
+                validator: null,
               ),
               const SizedBox(height: 16),
-              if (_selectedDistrict != null) _buildSoilTypeSelector(),
+              
+              // Read Only Soil Type
+              InputField(
+                label: 'Soil Type',
+                controller: TextEditingController(text: widget.farm.soilType),
+                readOnly: true,
+                validator: null,
+              ),
               const SizedBox(height: 16),
-              if (_selectedDistrict != null && _selectedSoilType != null) _buildVarietySelector(),
+
+              // Read Only Variety
+              InputField(
+                label: 'Chosen Variety',
+                controller: TextEditingController(text: widget.farm.chosenVariety),
+                readOnly: true,
+                validator: null,
+              ),
               const SizedBox(height: 16),
               // Planting Date
               GestureDetector(
@@ -317,169 +221,5 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
     );
   }
 
-  Widget _buildSoilTypeSelector() {
-    final soilsAsync = ref.watch(_editSoilsByDistrictProvider(_selectedDistrict!.id));
 
-    return soilsAsync.when(
-      data: (soils) {
-        if (soils.isEmpty) {
-          return const SizedBox.shrink();
-        }
-
-        // Initialize selected soil type from farm data
-        if (_selectedSoilType == null && soils.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              setState(() {
-                _selectedSoilType = soils.first;
-              });
-            }
-          });
-        }
-
-        return DropdownField<SoilType>(
-          label: 'Soil Type',
-          value: _selectedSoilType,
-          items: soils
-              .map((soil) => DropdownMenuItem(
-                    value: soil,
-                    child: Text(soil.typeName),
-                  ))
-              .toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedSoilType = value;
-              _selectedVariety = null;
-            });
-          },
-          validator: (value) {
-            if (value == null) return 'Please select a soil type';
-            return null;
-          },
-        );
-      },
-      loading: () => const LoadingSpinner(message: 'Loading soil types...'),
-      error: (error, stack) => Text(
-        'Error loading soil types: ${error.toString()}',
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.red),
-      ),
-    );
-  }
-
-  Widget _buildVarietySelector() {
-    final key = _EditDistrictSoilKey(_selectedDistrict!.id, _selectedSoilType!.id);
-    final varietiesAsync = ref.watch(_editVarietiesByDistrictAndSoilProvider(key));
-
-    return varietiesAsync.when(
-      data: (varieties) {
-        if (varieties.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Text(
-              'No varieties available for selected district and soil type',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.red,
-                  ),
-            ),
-          );
-        }
-
-        // Initialize selected variety from farm data
-        if (_selectedVariety == null && widget.farm.chosenVariety.isNotEmpty) {
-          final matchingVariety = varieties.firstWhere(
-            (v) => v.name == widget.farm.chosenVariety,
-            orElse: () => varieties.first,
-          );
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              setState(() {
-                _selectedVariety = matchingVariety;
-              });
-            }
-          });
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            DropdownField<BlackPepperVariety>(
-              label: 'Chosen Variety',
-              value: _selectedVariety,
-              items: varieties
-                  .map((variety) => DropdownMenuItem(
-                        value: variety,
-                        child: Text(variety.name),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedVariety = value;
-                });
-              },
-              validator: (value) {
-                if (value == null) return 'Please select a variety';
-                return null;
-              },
-            ),
-            const SizedBox(height: 8),
-            if (_selectedVariety != null)
-              Card(
-                color: Colors.green[50],
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Variety Information',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      const SizedBox(height: 8),
-                      _buildInfoRow('Specialities', _selectedVariety!.specialities ?? 'N/A'),
-                      _buildInfoRow('Soil', _selectedVariety!.soilTypeRecommendation ?? 'N/A'),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
-      loading: () => const LoadingSpinner(message: 'Loading varieties...'),
-      error: (error, stack) => Padding(
-        padding: const EdgeInsets.only(bottom: 16.0),
-        child: Text(
-          'Error loading varieties: ${error.toString()}',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.red),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              '$label:',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value.isNotEmpty ? value : 'N/A',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

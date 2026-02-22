@@ -48,7 +48,7 @@ class AgronomyService {
   }
 
   /// Fetches soil types for a specific district
-  Future<List<SoilType>> fetchSoilsByDistrict(int districtId) async {
+  Future<List<SoilType>> fetchSoilsByDistrict(String districtId) async {
     try {
       final response = await _apiClient.dio.get(
         '${AppConstants.agronomyBase}/districts/$districtId/soils',
@@ -83,8 +83,8 @@ class AgronomyService {
 
   /// Fetches agronomy guide for district, soil type, and variety combination
   Future<AgronomyGuideResponse> fetchGuide({
-    required int districtId,
-    required int soilTypeId,
+    required String districtId,
+    required String soilTypeId,
     required String varietyId,
   }) async {
     try {
@@ -119,7 +119,7 @@ class AgronomyService {
     }
   }
 
-  /// Fetches planting guide data for a specific district (Deprecated - kept for backward compatibility)
+  /// Fetches planting guide data for a specific district (Deprecated - kept for backward compatibility if needed, but updated for String)
   @Deprecated('Use fetchGuide with districtId, soilTypeId, and varietyId instead')
   Future<PlantingGuide> fetchGuideData(String districtName) async {
     try {
@@ -149,48 +149,13 @@ class AgronomyService {
     }
   }
 
-  /// Fetches varieties by their IDs
-  Future<List<BlackPepperVariety>> fetchVarietiesByIds(List<String> ids) async {
-    try {
-      final response = await _apiClient.dio.post(
-        '${AppConstants.agronomyBase}/varieties',
-        data: ids,
-      );
-
-      final apiResponse = ApiResponseModel<List<BlackPepperVariety>>.fromJson(
-        response.data,
-        (json) {
-          if (json is List) {
-            return json.map((e) => BlackPepperVariety.fromJson(e as Map<String, dynamic>)).toList();
-          }
-          return <BlackPepperVariety>[];
-        },
-      );
-
-      if (apiResponse.success && apiResponse.data != null) {
-        return apiResponse.data!;
-      } else {
-        throw Exception(apiResponse.message);
-      }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final apiResponse = ApiResponseModel<dynamic>.fromJson(
-          e.response!.data,
-          (json) => json,
-        );
-        throw Exception(apiResponse.message);
-      }
-      throw Exception('Network error: ${e.message}');
-    }
-  }
-
   /// Fetches all guides (with variety details and steps) for a specific district and soil type combination
-  Future<List<AgronomyGuideResponse>> fetchAllGuidesByDistrictAndSoil(int districtId, int soilTypeId) async {
+  Future<List<AgronomyGuideResponse>> fetchAllGuidesByDistrictAndSoil(String districtId, String soilTypeId) async {
     return searchGuides(districtId, soilTypeId);
   }
 
   /// Searches for agronomy guides by district and optional soil type
-  Future<List<AgronomyGuideResponse>> searchGuides(int districtId, int? soilTypeId) async {
+  Future<List<AgronomyGuideResponse>> searchGuides(String districtId, String? soilTypeId) async {
     try {
       final Map<String, dynamic> queryParams = {'districtId': districtId};
       if (soilTypeId != null) {
@@ -249,7 +214,7 @@ class AgronomyService {
   }
 
   /// Fetches varieties available for a specific district and soil type combination
-  Future<List<BlackPepperVariety>> fetchVarietiesByDistrictAndSoil(int districtId, int soilTypeId) async {
+  Future<List<BlackPepperVariety>> fetchVarietiesByDistrictAndSoil(String districtId, String soilTypeId) async {
     try {
       final response = await _apiClient.dio.get(
         '${AppConstants.agronomyBase}/districts/$districtId/soils/$soilTypeId/varieties',
@@ -316,4 +281,3 @@ class AgronomyService {
     }
   }
 }
-

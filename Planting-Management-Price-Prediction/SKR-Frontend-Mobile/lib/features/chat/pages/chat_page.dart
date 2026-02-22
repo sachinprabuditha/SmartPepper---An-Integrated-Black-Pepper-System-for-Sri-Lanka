@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skr_frontend_mobile/core/theme/app_theme.dart';
+
 import '../models/chat_model.dart';
 import '../services/chat_service.dart';
-// Import Farm Logic
-import '../../plantation/models/farm_record_model.dart';
+import '../widgets/conversation_sidebar.dart';
+import '../providers/conversation_provider.dart';
+import '../providers/message_provider.dart';
+
+// Farm Logic
 import '../../plantation/controllers/plantation_controller.dart';
 
 class ChatPage extends ConsumerStatefulWidget {
@@ -17,9 +21,9 @@ class ChatPage extends ConsumerStatefulWidget {
 class _ChatPageState extends ConsumerState<ChatPage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final List<ChatMessage> _messages = [];
+
   bool _isLoading = false;
-  String? _selectedFarmId; // Null = Guide Mode
+  String? _selectedFarmId;
 
   @override
   void dispose() {
@@ -40,167 +44,260 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     });
   }
 
+  /// ===============================
+  /// SEND MESSAGE
+  /// ===============================
   Future<void> _sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
+    final activeConversationId =
+        ref.read(activeConversationProvider);
+
     _controller.clear();
-    setState(() {
-      _messages.add(ChatMessage(
-        text: text,
-        isUser: true,
-        timestamp: DateTime.now(),
-      ));
-      _isLoading = true;
-    });
+
+    /// Add user message instantly
+    ref.read(messagesProvider.notifier).add(
+          ChatMessage(
+            text: text,
+            isUser: true,
+            timestamp: DateTime.now(),
+          ),
+        );
+
+    setState(() => _isLoading = true);
     _scrollToBottom();
 
     try {
       final chatService = ref.read(chatServiceProvider);
-      // Pass the selected farm ID (or null for Guide Mode)
-      final response = await chatService.sendMessage(text, activeFarmId: _selectedFarmId);
 
-      setState(() {
-        _messages.add(ChatMessage(
-          text: response.reply,
-          isUser: false,
-          timestamp: DateTime.now(),
-          sources: response.sources
-        ));
-        _isLoading = false;
-      });
+      final response = await chatService.sendMessage(
+        text,
+        conversationId: activeConversationId,
+        activeFarmId: _selectedFarmId,
+      );
+
+      /// update active conversation automatically
+      final isNewConversation = activeConversationId == null;
+      ref.read(activeConversationProvider.notifier).state =
+          response.conversationId;
+
+      if (isNewConversation) {
+        ref.invalidate(conversationsProvider);
+      }
+
+      /// add assistant message
+      ref.read(messagesProvider.notifier).add(
+            ChatMessage(
+              text: response.reply,
+              isUser: false,
+              timestamp: DateTime.now(),
+              sources: response.sources,
+            ),
+          );
     } catch (e) {
-      setState(() {
-        _messages.add(ChatMessage(
-          text: 'Error: ${e.toString()}',
-          isUser: false,
-          timestamp: DateTime.now(),
-        ));
-        _isLoading = false;
-      });
+      ref.read(messagesProvider.notifier).add(
+            ChatMessage(
+              text: "Error: $e",
+              isUser: false,
+              timestamp: DateTime.now(),
+            ),
+          );
     }
+
+    setState(() => _isLoading = false);
     _scrollToBottom();
   }
 
+  /// ===============================
+  /// UI
+  /// ===============================
   @override
   Widget build(BuildContext context) {
-    // Fetch farms for the dropdown
     final farmsAsync = ref.watch(farmsProvider);
-    
+
+    /// ⭐ messages now come from provider
+    final messages = ref.watch(messagesProvider);
+
     return Scaffold(
+      drawer: const ConversationSidebar(),
+
       appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         title: const Text('AI Assistant'),
         backgroundColor: AppTheme.primaryGreen,
         foregroundColor: Colors.white,
         actions: [
-          // Farm Selector in AppBar
           farmsAsync.when(
             data: (farms) {
-               if (farms.isEmpty) return const SizedBox.shrink();
-               return DropdownButtonHideUnderline(
-                 child: DropdownButton<String?>(
-                   dropdownColor: AppTheme.primaryGreen,
-                   icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                   value: _selectedFarmId,
-                   hint: const Text("Mode: Guide", style: TextStyle(color: Colors.white70)),
-                   items: [
-                     const DropdownMenuItem<String?>(
-                       value: null,
-                       child: Text("Mode: Guide (General)", style: TextStyle(color: Colors.white)),
-                     ),
-                     ...farms.map((f) => DropdownMenuItem<String?>(
-                       value: f.id,
-                       child: Text("Mode: ${f.farmName}", style: TextStyle(color: Colors.white)),
-                     ))
-                   ],
-                   onChanged: (value) {
-                     setState(() {
-                       _selectedFarmId = value;
-                     });
-                   },
-                 ),
-               );
+              if (farms.isEmpty) return const SizedBox.shrink();
+
+              return DropdownButtonHideUnderline(
+                child: DropdownButton<String?>(
+                  dropdownColor: AppTheme.primaryGreen,
+                  icon:
+                      const Icon(Icons.arrow_drop_down, color: Colors.white),
+                  value: _selectedFarmId,
+                  hint: const Text("Mode: Guide",
+                      style: TextStyle(color: Colors.white70)),
+                  items: [
+                    const DropdownMenuItem<String?>(
+                      value: null,
+                      child: Text(
+                        "Mode: Guide (General)",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    ...farms.map(
+                      (f) => DropdownMenuItem<String?>(
+                        value: f.id,
+                        child: Text(
+                          "Mode: ${f.farmName}",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    )
+                  ],
+                  onChanged: (value) {
+                    setState(() => _selectedFarmId = value);
+                  },
+                ),
+              );
             },
             loading: () => const SizedBox.shrink(),
-            error: (_,__) => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
           ),
           const SizedBox(width: 16),
         ],
       ),
+
       body: Column(
         children: [
-          // Mode Indicator
+          /// MODE INDICATOR
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-            color: _selectedFarmId == null ? Colors.blueGrey[100] : Colors.green[100],
+            padding:
+                const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+            color: _selectedFarmId == null
+                ? Colors.blueGrey[100]
+                : Colors.green[100],
             child: Text(
-              _selectedFarmId == null 
-                ? "🌱 Guide Mode: General agronomy advice only." 
-                : "🌿 Farmer Mode: Advice tailored to this farm.",
+              _selectedFarmId == null
+                  ? "🌱 Guide Mode: General agronomy advice only."
+                  : "🌿 Farmer Mode: Advice tailored to this farm.",
               style: TextStyle(
-                fontSize: 12, 
-                color: _selectedFarmId == null ? Colors.blueGrey[800] : Colors.green[800],
-                fontWeight: FontWeight.bold
+                fontSize: 12,
+                color: _selectedFarmId == null
+                    ? Colors.blueGrey[800]
+                    : Colors.green[800],
+                fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
           ),
-          
+
+          /// CHAT LIST
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
+              itemCount: messages.length,
               itemBuilder: (context, index) {
-                final msg = _messages[index];
-                return _buildMessageBubble(msg);
+                return _buildMessageBubble(messages[index]);
               },
             ),
           ),
+
           if (_isLoading)
             const Padding(
               padding: EdgeInsets.all(8.0),
               child: CircularProgressIndicator(),
             ),
+
           _buildInputArea(),
         ],
       ),
     );
   }
 
+  /// ===============================
+  /// MESSAGE BUBBLE
+  /// ===============================
   Widget _buildMessageBubble(ChatMessage msg) {
+    final isUser = msg.isUser;
+
     return Align(
-      alignment: msg.isUser ? Alignment.centerRight : Alignment.centerLeft,
+      alignment:
+          isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: msg.isUser ? AppTheme.primaryGreen : Colors.grey[200],
-          borderRadius: BorderRadius.circular(12),
+          color:
+              isUser ? AppTheme.primaryGreen : Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(14),
         ),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.78,
+        ),
         child: Column(
-           crossAxisAlignment: CrossAxisAlignment.start,
-           children: [
-             Text(
-               msg.text,
-               style: TextStyle(color: msg.isUser ? Colors.white : Colors.black87),
-             ),
-             if (!msg.isUser && msg.sources != null && msg.sources!.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(
-                    "Sources: ${msg.sources!.join(', ')}",
-                    style: TextStyle(fontSize: 10, color: Colors.grey[600], fontStyle: FontStyle.italic),
-                  ),
-                )
-           ],
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              msg.text,
+              style: TextStyle(
+                color: isUser ? Colors.white : Colors.black87,
+                height: 1.4,
+              ),
+            ),
+
+            /// SOURCES
+            if (!isUser &&
+                msg.sources != null &&
+                msg.sources!.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Sources",
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    ...msg.sources!.map(
+                      (s) => Text(
+                        "• $s",
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+          ],
         ),
       ),
     );
   }
 
+  /// ===============================
+  /// INPUT AREA
+  /// ===============================
   Widget _buildInputArea() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -210,11 +307,14 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             child: TextField(
               controller: _controller,
               decoration: InputDecoration(
-                hintText: _selectedFarmId == null ? 'Ask about black pepper...' : 'Ask about your farm...',
+                hintText: _selectedFarmId == null
+                    ? 'Ask about black pepper...'
+                    : 'Ask about your farm...',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16),
               ),
               onSubmitted: (_) => _sendMessage(),
             ),

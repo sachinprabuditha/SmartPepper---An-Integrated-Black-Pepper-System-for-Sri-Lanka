@@ -18,14 +18,15 @@ final sessionProvider = FutureProvider.family<SessionModel, String>((ref, sessio
 });
 
 final sessionControllerProvider = StateNotifierProvider.family<SessionController, AsyncValue<List<SessionModel>>, String>((ref, seasonId) {
-  return SessionController(ref.read(sessionServiceProvider), seasonId);
+  return SessionController(ref.read(sessionServiceProvider), seasonId, ref);
 });
 
 class SessionController extends StateNotifier<AsyncValue<List<SessionModel>>> {
   final SessionService _sessionService;
   final String _seasonId;
+  final Ref _ref;
 
-  SessionController(this._sessionService, this._seasonId) : super(const AsyncValue.loading()) {
+  SessionController(this._sessionService, this._seasonId, this._ref) : super(const AsyncValue.loading()) {
     fetchSessions();
   }
 
@@ -97,6 +98,9 @@ class SessionController extends StateNotifier<AsyncValue<List<SessionModel>>> {
           state = AsyncValue.data([...currentSessions]);
         }
       }
+
+      // Invalidate the specific session provider to ensure EditSessionPage gets fresh data
+      _ref.invalidate(sessionProvider(sessionId));
       
       return updatedSession;
     } catch (e) {
@@ -113,6 +117,9 @@ class SessionController extends StateNotifier<AsyncValue<List<SessionModel>>> {
         final currentSessions = state.value ?? [];
         state = AsyncValue.data(currentSessions.where((s) => s.id != sessionId).toList());
       }
+
+      // Invalidate the specific session provider
+      _ref.invalidate(sessionProvider(sessionId));
     } catch (e) {
       rethrow;
     }

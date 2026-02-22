@@ -101,6 +101,26 @@ class SeasonCard extends ConsumerWidget {
                         ],
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: season.status == 'season-end' ? Colors.red[50] : Colors.green[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: season.status == 'season-end' ? Colors.red[200]! : Colors.green[200]!,
+                        ),
+                      ),
+                      child: Text(
+                        season.status == 'season-end' ? 'Ended' : 'Active',
+                        style: TextStyle(
+                          color: season.status == 'season-end' ? Colors.red[700] : Colors.green[700],
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     Icon(
                       Icons.chevron_right,
                       color: Colors.grey[400],
@@ -181,6 +201,7 @@ class SeasonCard extends ConsumerWidget {
                           'Loading farm...',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: Colors.grey[600],
+                                fontSize: 13,
                               ),
                         ),
                       ],
@@ -316,4 +337,3 @@ class SeasonCard extends ConsumerWidget {
     );
   }
 }
-

@@ -13,8 +13,8 @@ class PlantationService {
   /// Start a new plantation (Part 02 - Planting Start)
   Future<FarmRecord> startPlantation({
     required String farmName,
-    required int districtId,
-    required int soilTypeId,
+    required String districtId,
+    required String soilTypeId,
     required String chosenVarietyId,
     required DateTime farmStartDate,
     required double areaHectares,
@@ -122,8 +122,8 @@ class PlantationService {
   Future<FarmRecord> updateFarm({
     required String farmId,
     String? farmName,
-    int? districtId,
-    int? soilTypeId,
+    String? districtId,
+    String? soilTypeId,
     String? chosenVarietyId,
     DateTime? farmStartDate,
     double? areaHectares,

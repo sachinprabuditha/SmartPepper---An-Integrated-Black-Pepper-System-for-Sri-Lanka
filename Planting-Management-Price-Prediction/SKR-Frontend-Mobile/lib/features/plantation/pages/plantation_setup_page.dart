@@ -24,7 +24,7 @@ final allDistrictsProvider = FutureProvider<List<District>>((ref) async {
 });
 
 // Provider for soil types by district
-final soilsByDistrictProvider = FutureProvider.family<List<SoilType>, int>(
+final soilsByDistrictProvider = FutureProvider.family<List<SoilType>, String>(
   (ref, districtId) async {
     final service = ref.read(agronomyServiceProvider);
     return await service.fetchSoilsByDistrict(districtId);
@@ -41,8 +41,8 @@ final varietiesByDistrictAndSoilProvider = FutureProvider.family<List<BlackPeppe
 
 // Custom key class for District and Soil Type combination
 class DistrictSoilKey {
-  final int districtId;
-  final int soilTypeId;
+  final String districtId;
+  final String soilTypeId;
 
   const DistrictSoilKey(this.districtId, this.soilTypeId);
 
