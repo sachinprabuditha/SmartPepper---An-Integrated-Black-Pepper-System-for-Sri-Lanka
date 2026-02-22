@@ -19,7 +19,7 @@ ResearchProject/
 │   ├── rag_data/           # RAG documentation and data
 │   └── ...
 │
-├── SKR-Frontend-Mobile/    # Flutter Mobile Application
+├── mobile/                  # Flutter Mobile Application
 │   ├── lib/
 │   │   ├── core/           # Core utilities (Networking, Theme)
 │   │   ├── features/       # Feature-based modules (Auth, Plantation, etc.)
@@ -64,7 +64,7 @@ graph TD
 *   **Authentication**: JWT & Firebase Admin SDK
 *   **Documentation**: REST API Architecture
 
-### Frontend (`SKR-Frontend-Mobile`)
+### Frontend (`mobile`)
 *   **Framework**: Flutter (Dart)
 *   **State Management**: Flutter Riverpod
 *   **Networking**: Dio, HTTP
@@ -96,7 +96,7 @@ graph TD
 ### 2. Frontend Setup
 1.  Navigate to the frontend directory:
     ```bash
-    cd SKR-Frontend-Mobile
+    cd mobile
     ```
 2.  Install dependencies:
     ```bash
