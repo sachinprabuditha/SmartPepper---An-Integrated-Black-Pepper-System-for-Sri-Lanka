@@ -1,0 +1,17 @@
+{
+    "loamy": {
+        "name": "Loamy"
+    },
+    "sandy": {
+        "name": "Sandy"
+    },
+    "clay_loam": {
+        "name": "Clay-Loam"
+    },
+    "red_yellow_podzolic": {
+        "name": "Red-Yellow Podzolic"
+    },
+    "gravelly": {
+        "name": "Gravelly"
+    }
+}

@@ -1,0 +1,189 @@
+{
+    "kandy_loamy_var_panniyur_1": {
+        "districtId": "kandy",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": "Support Establishment",
+                "details": "Plant Gliricidia sepium supports 12 months before pepper planting."
+            },
+            {
+                "stepNumber": 2,
+                "title": "Pit Preparation",
+                "details": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure."
+            }
+        ]
+    },
+    "kandy_clay_loam_var_iw_5": {
+        "districtId": "kandy",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_iw_5",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": "Drainage Management",
+                "details": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils."
+            },
+            {
+                "stepNumber": 2,
+                "title": "Soil Amendment",
+                "details": "Mix sand and organic matter into the pit to improve aeration."
+            }
+        ]
+    },
+    "kandy_red_yellow_podzolic_var_gk_49": {
+        "districtId": "kandy",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": "Soil Enrichment",
+                "details": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils."
+            },
+            {
+                "stepNumber": 2,
+                "title": "Planting",
+                "details": "Plant cuttings with high orthotropic vigor."
+            }
+        ]
+    },
+    "galle_sandy_var_kuching": {
+        "districtId": "galle",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": "Moisture Conservation",
+                "details": "Sandy coastal soils dry fast; use coconut husk burial around the base."
+            },
+            {
+                "stepNumber": 2,
+                "title": "Irrigation",
+                "details": "Water frequently (every 2-3 days) during dry spells."
+            }
+        ]
+    },
+    "kurunegala_gravelly_var_kuching": {
+        "districtId": "kurunegala",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": "Pit Filling",
+                "details": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung."
+            },
+            {
+                "stepNumber": 2,
+                "title": "Water Retention",
+                "details": "Create a basin around the plant to catch rainwater."
+            }
+        ]
+    },
+    "hambantota_sandy_var_kuching": {
+        "districtId": "hambantota",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": "Irrigation Planning",
+                "details": "Critical: Apply 50L water per vine every 10 days."
+            },
+            {
+                "stepNumber": 2,
+                "title": "Soil Amendment",
+                "details": "Add large quantities of compost to improve water holding capacity."
+            }
+        ]
+    },
+    "hambantota_gravelly_var_kuching": {
+        "districtId": "hambantota",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": "Hardpan Management",
+                "details": "Break up any hard subsoil layers before planting."
+            },
+            {
+                "stepNumber": 2,
+                "title": "Drought Protection",
+                "details": "Heavy mulching is mandatory."
+            }
+        ]
+    },
+    "anuradhapura_loamy_var_gk_49": {
+        "districtId": "anuradhapura",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": "Shade Management",
+                "details": "Maintain 50% shade levels using Gliricidia."
+            },
+            {
+                "stepNumber": 2,
+                "title": "Mulching",
+                "details": "Apply thick mulch before the onset of dry season."
+            }
+        ]
+    },
+    "anuradhapura_gravelly_var_kuching": {
+        "districtId": "anuradhapura",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": "Pit Filling",
+                "details": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung."
+            },
+            {
+                "stepNumber": 2,
+                "title": "Water Retention",
+                "details": "Create a basin around the plant to catch rainwater."
+            }
+        ]
+    },
+    "jaffna_sandy_var_kuching": {
+        "districtId": "jaffna",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": "Irrigation Planning",
+                "details": "Critical: Apply 50L water per vine every 10 days."
+            },
+            {
+                "stepNumber": 2,
+                "title": "Soil Amendment",
+                "details": "Add large quantities of compost to improve water holding capacity."
+            }
+        ]
+    },
+    "jaffna_gravelly_var_kuching": {
+        "districtId": "jaffna",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": "Hardpan Management",
+                "details": "Break up any hard subsoil layers before planting."
+            },
+            {
+                "stepNumber": 2,
+                "title": "Drought Protection",
+                "details": "Heavy mulching is mandatory."
+            }
+        ]
+    }
+}

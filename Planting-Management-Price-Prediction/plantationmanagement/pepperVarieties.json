@@ -1,0 +1,47 @@
+{
+    "var_panniyur_1": {
+        "name": "Panniyur-1",
+        "specialities": "World's first hybrid pepper; features long spikes and very high yield.",
+        "suitabilityReason": "Vigorous grower that thrives in open areas with high humidity.",
+        "soilTypeRecommendation": "Prefers well-drained loamy soil.",
+        "spacingMeters": "2.5 x 2.5",
+        "vinesPerHectare": 1600,
+        "pitDimensionsCm": "60 x 60 x 60"
+    },
+    "var_kuching": {
+        "name": "Kuching",
+        "specialities": "High piperine content and excellent dry-to-green recovery ratio.",
+        "suitabilityReason": "More tolerant to adverse conditions and reliable in drier zones.",
+        "soilTypeRecommendation": "Thrives in sandy loam or well-drained gravelly soil.",
+        "spacingMeters": "2.0 x 2.0",
+        "vinesPerHectare": 2500,
+        "pitDimensionsCm": "50 x 50 x 50"
+    },
+    "var_gk_49": {
+        "name": "GK 49",
+        "specialities": "A high-yielding local selection with very high pungency.",
+        "suitabilityReason": "Highly adaptable to Sri Lankan local conditions and pest resistant.",
+        "soilTypeRecommendation": "Adapts well to Red-Yellow Podzolic soils.",
+        "spacingMeters": "2.5 x 2.5",
+        "vinesPerHectare": 1600,
+        "pitDimensionsCm": "60 x 60 x 60"
+    },
+    "var_iw_5": {
+        "name": "IW 5",
+        "specialities": "Features a high growth rate during early establishment and stable yields.",
+        "suitabilityReason": "Well-suited for mid-country elevations.",
+        "soilTypeRecommendation": "Well-drained loamy or clay-loam soil.",
+        "spacingMeters": "2.5 x 2.5",
+        "vinesPerHectare": 1600,
+        "pitDimensionsCm": "60 x 60 x 60"
+    },
+    "var_local": {
+        "name": "Local",
+        "specialities": "Traditional Sri Lankan pepper variety with stable yield and strong adaptability.",
+        "suitabilityReason": "Naturally adapted to local climatic and soil conditions with minimal input requirements.",
+        "soilTypeRecommendation": "Grows well in a wide range of soils with good drainage.",
+        "spacingMeters": "2.5 x 2.5",
+        "vinesPerHectare": 1600,
+        "pitDimensionsCm": "60 x 60 x 60"
+    }
+}

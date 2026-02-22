@@ -1,0 +1,184 @@
+{
+    "kandy": {
+        "name": "Kandy",
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ]
+    },
+    "matale": {
+        "name": "Matale",
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ]
+    },
+    "ratnapura": {
+        "name": "Ratnapura",
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ]
+    },
+    "kegalle": {
+        "name": "Kegalle",
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ]
+    },
+    "nuwara_eliya": {
+        "name": "Nuwara Eliya",
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ]
+    },
+    "badulla": {
+        "name": "Badulla",
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ]
+    },
+    "colombo": {
+        "name": "Colombo",
+        "soilTypes": [
+            "loamy",
+            "sandy"
+        ]
+    },
+    "gampaha": {
+        "name": "Gampaha",
+        "soilTypes": [
+            "loamy",
+            "sandy"
+        ]
+    },
+    "kalutara": {
+        "name": "Kalutara",
+        "soilTypes": [
+            "loamy",
+            "sandy"
+        ]
+    },
+    "galle": {
+        "name": "Galle",
+        "soilTypes": [
+            "loamy",
+            "sandy"
+        ]
+    },
+    "matara": {
+        "name": "Matara",
+        "soilTypes": [
+            "loamy",
+            "sandy"
+        ]
+    },
+    "kurunegala": {
+        "name": "Kurunegala",
+        "soilTypes": [
+            "gravelly",
+            "loamy"
+        ]
+    },
+    "monaragala": {
+        "name": "Monaragala",
+        "soilTypes": [
+            "gravelly",
+            "loamy"
+        ]
+    },
+    "anuradhapura": {
+        "name": "Anuradhapura",
+        "soilTypes": [
+            "gravelly",
+            "loamy"
+        ]
+    },
+    "polonnaruwa": {
+        "name": "Polonnaruwa",
+        "soilTypes": [
+            "gravelly",
+            "loamy"
+        ]
+    },
+    "hambantota": {
+        "name": "Hambantota",
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "puttalam": {
+        "name": "Puttalam",
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "mannar": {
+        "name": "Mannar",
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "jaffna": {
+        "name": "Jaffna",
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "kilinochchi": {
+        "name": "Kilinochchi",
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "mullaitivu": {
+        "name": "Mullaitivu",
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "vavuniya": {
+        "name": "Vavuniya",
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "trincomalee": {
+        "name": "Trincomalee",
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "batticaloa": {
+        "name": "Batticaloa",
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "ampara": {
+        "name": "Ampara",
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    }
+}
