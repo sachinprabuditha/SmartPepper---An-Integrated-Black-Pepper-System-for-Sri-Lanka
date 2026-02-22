@@ -11,6 +11,7 @@ class InputField extends StatelessWidget {
   final Widget? suffixIcon;
   final void Function(String)? onChanged;
   final TextCapitalization? textCapitalization;
+  final bool readOnly;
 
   const InputField({
     super.key,
@@ -24,6 +25,7 @@ class InputField extends StatelessWidget {
     this.suffixIcon,
     this.onChanged,
     this.textCapitalization,
+    this.readOnly = false,
   });
 
   @override
@@ -35,6 +37,7 @@ class InputField extends StatelessWidget {
       keyboardType: keyboardType,
       maxLines: maxLines,
       onChanged: onChanged,
+      readOnly: readOnly,
       textCapitalization: textCapitalization ?? TextCapitalization.none,
       decoration: InputDecoration(
         labelText: label,

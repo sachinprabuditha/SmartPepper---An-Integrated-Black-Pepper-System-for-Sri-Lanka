@@ -14,7 +14,7 @@ class ApiClient {
   // Common ports: 5000, 7001 (HTTP), 7000 (HTTPS)
   // For Android emulator, use 10.0.2.2 instead of localhost
   // UPDATED: Using LAN IP for Physical Device Support
-  static const String baseUrl = 'http://10.177.80.11:7001/api';
+  static const String baseUrl = 'http://10.0.2.2:5000/api';
 
   ApiClient() {
     _dio = Dio(BaseOptions(

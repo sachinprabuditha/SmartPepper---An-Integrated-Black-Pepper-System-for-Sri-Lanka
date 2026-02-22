@@ -1,5 +1,5 @@
 class District {
-  final int id;
+  final String id;
   final String name;
 
   District({
@@ -9,7 +9,7 @@ class District {
 
   factory District.fromJson(Map<String, dynamic> json) {
     return District(
-      id: json['id'] as int,
+      id: json['id'].toString(), // Handle both string and int input safely
       name: json['name'] as String,
     );
   }

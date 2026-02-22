@@ -1,5 +1,5 @@
 class GuideStep {
-  final int id;
+  final String id;
   final int stepNumber;
   final String title;
   final String details;
@@ -13,7 +13,7 @@ class GuideStep {
 
   factory GuideStep.fromJson(Map<String, dynamic> json) {
     return GuideStep(
-      id: json['id'] as int,
+      id: json['id'].toString(),
       stepNumber: json['stepNumber'] as int,
       title: json['title'] as String,
       details: json['details'] as String,

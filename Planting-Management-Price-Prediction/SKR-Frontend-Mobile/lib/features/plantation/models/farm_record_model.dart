@@ -3,6 +3,7 @@ class FarmRecord {
   final String userId;
   final String farmName;
   final String district;
+  final String soilType;
   final String chosenVariety;
   final DateTime farmStartDate;
   final double areaHectares;
@@ -14,6 +15,7 @@ class FarmRecord {
     required this.userId,
     required this.farmName,
     required this.district,
+    required this.soilType,
     required this.chosenVariety,
     required this.farmStartDate,
     required this.areaHectares,
@@ -31,8 +33,9 @@ class FarmRecord {
       id: idValue.toString(),
       userId: (json['user_id'] ?? json['userId'] ?? json['UserId'] ?? '').toString(),
       farmName: (json['farm_name'] ?? json['farmName'] ?? json['FarmName'] ?? '').toString(),
-      district: (json['district'] ?? json['District'] ?? '').toString(),
-      chosenVariety: (json['chosen_variety'] ?? json['chosenVariety'] ?? json['ChosenVariety'] ?? '').toString(),
+      district: _parseName(json['district'] ?? json['District']),
+      soilType: _parseName(json['soil_type'] ?? json['soilType'] ?? json['SoilType'], key: 'typeName'),
+      chosenVariety: _parseName(json['chosen_variety'] ?? json['chosenVariety'] ?? json['ChosenVariety'] ?? json['PepperVariety']),
       farmStartDate: _parseDateTime(
         _getDateValue(json, 'farm_start_date') ??
         _getDateValue(json, 'farmStartDate') ??
@@ -53,12 +56,22 @@ class FarmRecord {
       'user_id': userId,
       'farm_name': farmName,
       'district': district,
+      'soil_type': soilType,
       'chosen_variety': chosenVariety,
       'farm_start_date': farmStartDate.toIso8601String(),
       'area_hectares': areaHectares,
       'total_vines': totalVines,
       'created_at': createdAt.toIso8601String(),
     };
+  }
+
+  static String _parseName(dynamic value, {String key = 'name'}) {
+    if (value == null) return '';
+    if (value is String) return value;
+    if (value is Map) {
+      return (value[key] ?? value['name'] ?? '').toString();
+    }
+    return value.toString();
   }
 
   static int _parseInt(dynamic value) {

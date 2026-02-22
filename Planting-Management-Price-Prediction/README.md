@@ -8,26 +8,29 @@ The project is divided into two main components:
 
 ```
 ResearchProject/
-├── SKR-Backend-API/        # ASP.NET Core Web API Backend
-│   ├── Config/            # Configuration files
-│   ├── Controllers/       # API Endpoints
-│   ├── Data/             # Database Context
-│   ├── Models/           # Entity Models
-│   ├── Services/         # Business Logic & ML Services
+├── plantationmanagement/    # Node.js (Express) Backend
+│   ├── src/
+│   │   ├── config/         # Database & Firebase config
+│   │   ├── controllers/    # API Request Handlers
+│   │   ├── models/         # Sequelize Models
+│   │   ├── routes/         # API Routes
+│   │   ├── services/       # Business Logic & AI Services
+│   │   └── utils/          # Helper functions
+│   ├── rag_data/           # RAG documentation and data
 │   └── ...
 │
 ├── SKR-Frontend-Mobile/    # Flutter Mobile Application
 │   ├── lib/
-│   │   ├── core/         # Core utilities (Networking, Theme)
-│   │   ├── features/     # Feature-based modules (Auth, Plantation, etc.)
-│   │   └── main.dart     # App Entry point
+│   │   ├── core/           # Core utilities (Networking, Theme)
+│   │   ├── features/       # Feature-based modules (Auth, Plantation, etc.)
+│   │   └── main.dart       # App Entry point
 │   └── ...
 └── ...
 ```
 
 ## 🚀 Functions & Modules
 
-The system is built around several key functional areas, mirrored in both the Backend API and Frontend App:
+The system is built around several key functional areas:
 
 *   **Authentication (`Auth`)**: User registration, login, and secure token management (JWT).
 *   **Plantations (`Plantation`)**: Management of plantation details, location data, and tracking.
@@ -35,62 +38,60 @@ The system is built around several key functional areas, mirrored in both the Ba
 *   **Seasons (`Seasons`)**: Tracking growing seasons and harvest periods.
 *   **Sessions (`Sessions`)**: Management of specific working or data collection sessions.
 *   **Predictions (`Prediction`)**: AI/ML-powered price and yield predictions using ONNX models.
-*   **Chat (`Chat`)**: Communication or AI assistant interface (PepperKnowledge).
-*   **Knowledge Base (`PepperKnowledgeAdmin`)**: Administration of agricultural domain knowledge.
+*   **Chat (`Chat`)**: Communication or AI assistant interface (RAG-powered).
 
 ## 🏗️ Architecture
 
 ```mermaid
 graph TD
     Client[Mobile App (Flutter)]
-    API[Backend API (.NET 8)]
+    API[Backend API (Node.js/Express)]
     DB[(PostgreSQL Database)]
-    ML[ML Services (ONNX)]
+    AI[AI/ML Services (ONNX, OpenAI)]
 
     Client -->|HTTP/REST| API
-    API -->|EF Core| DB
-    API -->|Inference| ML
+    API -->|Sequelize| DB
+    API -->|Inference| AI
 ```
 
 ## 🛠️ Tech Stack
 
-### Backend (`SKR-Backend-API`)
-*   **Framework**: ASP.NET Core 8.0 (Web API)
+### Backend (`plantationmanagement`)
+*   **Framework**: Node.js (Express)
 *   **Database**: PostgreSQL
-*   **ORM**: Entity Framework Core 8.0
-*   **AI/ML**: Microsoft.ML.OnnxRuntime, OpenAI
-*   **Authentication**: JWT Bearer
-*   **Documentation**: Swagger / OpenAPI
+*   **ORM**: Sequelize
+*   **AI/ML**: ONNX Runtime, OpenAI (for RAG)
+*   **Authentication**: JWT & Firebase Admin SDK
+*   **Documentation**: REST API Architecture
 
 ### Frontend (`SKR-Frontend-Mobile`)
 *   **Framework**: Flutter (Dart)
 *   **State Management**: Flutter Riverpod
 *   **Networking**: Dio, HTTP
 *   **Local Storage**: Flutter Secure Storage, Shared Preferences
-*   **Utilities**: Intl, UUID, Json Serializable
 
 ## ⚙️ Setup & Installation
 
 ### Prerequisites
-*   .NET 8.0 SDK
+*   Node.js (v18 or higher)
 *   Flutter SDK
 *   PostgreSQL Server
 
 ### 1. Backend Setup
 1.  Navigate to the backend directory:
     ```bash
-    cd SKR-Backend-API
+    cd plantationmanagement
     ```
-2.  Update the connection string in `appsettings.json` to point to your PostgreSQL instance.
-3.  Apply database migrations:
+2.  Install dependencies:
     ```bash
-    dotnet ef database update
+    npm install
     ```
+3.  Create a `.env` file with your database and API credentials.
 4.  Run the API:
     ```bash
-    dotnet run
+    npm run dev
     ```
-    The API will usually start on `http://localhost:5270` or `https://localhost:7227` (check console output).
+    The API will usually start on `http://localhost:7001`.
 
 ### 2. Frontend Setup
 1.  Navigate to the frontend directory:
@@ -101,9 +102,8 @@ graph TD
     ```bash
     flutter pub get
     ```
-3.  Configure the API Base URL in `lib/core/network/api_client.dart` (or equivalent config file) to match your backend URL.
+3.  Configure the API Base URL in `lib/core/network/api_client.dart` to `http://localhost:7001`.
     *   *Note: For Android Emulator, use `10.0.2.2` instead of `localhost`.*
-    *   *Note: For Physical Device, use your machine's LAN IP.*
 4.  Run the app:
     ```bash
     flutter run

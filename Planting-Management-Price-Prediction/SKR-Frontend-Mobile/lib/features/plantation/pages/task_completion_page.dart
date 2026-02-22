@@ -1001,7 +1001,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                                       DropdownMenuItem(value: 'kg', child: Text('kg')),
                                       DropdownMenuItem(value: 'liters', child: Text('L')),
                                       DropdownMenuItem(value: 'bags', child: Text('bags')),
-                                      DropdownMenuItem(value: 'units', child: Text('units')),
+                                      DropdownMenuItem(value: 'pieces', child: Text('pieces')),
                                     ],
                                     onChanged: (value) {
                                       if (value != null && dialogContext.mounted) {

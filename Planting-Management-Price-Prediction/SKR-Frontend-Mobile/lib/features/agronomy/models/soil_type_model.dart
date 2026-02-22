@@ -1,5 +1,5 @@
 class SoilType {
-  final int id;
+  final String id;
   final String typeName;
 
   SoilType({
@@ -9,8 +9,8 @@ class SoilType {
 
   factory SoilType.fromJson(Map<String, dynamic> json) {
     return SoilType(
-      id: json['id'] as int,
-      typeName: json['typeName'] as String,
+      id: json['id'].toString(),
+      typeName: (json['typeName'] ?? json['name'] ?? '').toString(),
     );
   }
 

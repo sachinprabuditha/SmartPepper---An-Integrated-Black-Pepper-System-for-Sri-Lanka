@@ -1,10 +1,10 @@
 import 'guide_step_model.dart';
 
 class AgronomyGuideResponse {
-  final int id;
-  final int districtId;
+  final String id;
+  final String districtId;
   final String districtName;
-  final int soilTypeId;
+  final String soilTypeId;
   final String soilTypeName;
   final String varietyId;
   final String varietyName;
@@ -35,10 +35,10 @@ class AgronomyGuideResponse {
 
   factory AgronomyGuideResponse.fromJson(Map<String, dynamic> json) {
     return AgronomyGuideResponse(
-      id: json['id'] as int,
-      districtId: json['districtId'] as int,
+      id: json['id']?.toString() ?? '',
+      districtId: json['districtId']?.toString() ?? '',
       districtName: json['districtName'] as String,
-      soilTypeId: json['soilTypeId'] as int,
+      soilTypeId: json['soilTypeId']?.toString() ?? '',
       soilTypeName: json['soilTypeName'] as String,
       varietyId: json['varietyId'] as String,
       varietyName: json['varietyName'] as String,
