@@ -1,184 +1,52 @@
-# Backend API Development Commands
+# Backend API Development Commands (Node.js)
+
+This project has been migrated from .NET to **Node.js (Express)**.
 
 ## 1. Navigate to Backend Directory
 ```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Backend-API"
+cd "Planting-Management-Price-Prediction/plantationmanagement"
 ```
 
-## 2. Restore NuGet Packages
+## 2. Install Dependencies
 ```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Backend-API"
-dotnet restore
+npm install
 ```
 
-## 3. Build the Project
-```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Backend-API"
-dotnet build
-```
+## 3. Environment Configuration
+Create a `.env` file in the `plantationmanagement` directory with the following variables:
+- `PORT` (default: 7001)
+- `DATABASE_URL` (PostgreSQL connection string)
+- `JWT_SECRET`
+- `FIREBASE_PROJECT_ID`
+- `OPENAI_API_KEY` (if using RAG features)
+- `QDRANT_URL` (if using vector storage)
 
 ## 4. Run the API (Development Mode)
 ```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Backend-API"
-dotnet run
+npm run dev
 ```
+This uses `nodemon` to automatically restart the server when files change.
 
-The API will start on:
-- **HTTP**: `http://localhost:7001`
-- **HTTPS**: `https://localhost:7000`
-- **Swagger UI**: `http://localhost:7001` (root URL)
-
-### Accessing Swagger UI
-
-**Automatic Browser Opening:**
-- When running from Visual Studio, the browser should open automatically to `http://localhost:7001`
-- When running from command line (`dotnet run`), the browser may or may not open automatically depending on your system settings
-
-**Manual Access:**
-If the browser doesn't open automatically, manually navigate to:
-- **Swagger UI**: `http://localhost:7001`
-- **Swagger JSON**: `http://localhost:7001/swagger/v1/swagger.json`
-
-**Quick Access Command (PowerShell):**
+## 5. Run the API (Production Mode)
 ```powershell
-# After starting the API, open Swagger UI in your default browser
-Start-Process "http://localhost:7001"
+npm start
 ```
 
-**Note**: Swagger UI is configured to be at the root URL, so just go to `http://localhost:7001` in your browser.
-
-## 5. Run with Specific Environment
-```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Backend-API"
-dotnet run --environment Development
-```
-
-## 6. Run in Release Mode
-```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Backend-API"
-dotnet run --configuration Release
-```
-
-## 7. Stop the API
-Press `Ctrl+C` in the terminal where the API is running
-
-## 8. Clean Build (if you have issues)
-```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Backend-API"
-dotnet clean
-dotnet restore
-dotnet build
-dotnet run
-```
-
-## 9. Watch Mode (Auto-reload on file changes)
-```powershell
-cd "F:\Year 4\My Research\YResearchProject\SKR-Backend-API"
-dotnet watch run
-```
-
-This will automatically restart the API when you make code changes.
-
-## 10. Build Without Running
-```powershell
-cd "F:\Year 4\My Research\YResearchProject\SKR-Backend-API"
-dotnet build --no-restore
-```
-
-## 11. Check if API is Running
-Open your browser and navigate to:
-- **Swagger UI**: `http://localhost:7001` (root URL - Swagger is configured here)
-- **Swagger JSON**: `http://localhost:7001/swagger/v1/swagger.json`
-
-Or use PowerShell to test:
-```powershell
-# Test if API is running
-Invoke-WebRequest -Uri "http://localhost:7001/swagger/v1/swagger.json" -UseBasicParsing
-
-# Or test the root (Swagger UI)
-Invoke-WebRequest -Uri "http://localhost:7001" -UseBasicParsing
-```
-
-**Troubleshooting Swagger UI:**
-- If Swagger UI doesn't load, make sure the API is running (`dotnet run`)
-- Check the console output for any errors
-- Try accessing `http://localhost:7001/swagger/v1/swagger.json` directly to see if Swagger is generating the JSON
-- Make sure you're using HTTP (port 7001), not HTTPS (port 7000) unless you have SSL certificates configured
-
-## 12. View API Logs
-When running with `dotnet run`, logs will appear in the terminal. For more detailed logging, check:
-- Console output (terminal)
-- `appsettings.json` and `appsettings.Development.json` for log level configuration
-
-## 13. Run Database Migrations (if using EF Core Migrations)
-```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Backend-API"
-dotnet ef database update
-```
-
-## 14. Create New Migration (if using EF Core Migrations)
-```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Backend-API"
-dotnet ef migrations add MigrationName
-```
-
-## Quick Reference
-
-### Common Workflow
-```powershell
-# 1. Navigate to backend directory
-cd "F:\Year 4\My Research\ResearchProject\SKR-Backend-API"
-
-# 2. Restore packages (first time or after adding new packages)
-dotnet restore
-
-# 3. Build the project
-dotnet build
-
-# 4. Run the API
-dotnet run
-
-# Or use watch mode for auto-reload
-dotnet watch run
-```
-
-### API Endpoints
+## 6. API Endpoints
 - **Base URL**: `http://localhost:7001`
-- **Swagger UI**: `http://localhost:7001`
-- **API Endpoints**: `http://localhost:7001/api/{controller}/{action}`
+- **Auth**: `http://localhost:7001/api/auth`
+- **Farms**: `http://localhost:7001/api/farms`
+- **Agronomy**: `http://localhost:7001/api/agronomy`
 
-### Important Notes
-- The API uses **PostgreSQL** database (configured in `appsettings.json`)
-- Make sure PostgreSQL is running before starting the API
-- **CORS** is enabled to allow requests from the Flutter app
-- **JWT Authentication** is configured for secure API access
-- In Development mode, **Swagger UI** is available at the root URL
+## 7. Database Migration (Sequelize)
+The project uses Sequelize ORM.
+- **Sync Models**: Handled automatically in `src/config/db.js` (using `sync()`).
 
-### Troubleshooting
+## 8. Common Scripts
+- **Start**: `node src/app.js`
+- **Dev**: `nodemon src/app.js`
 
-#### Port Already in Use
-If port 7001 is already in use, you can:
-1. Stop the process using the port
-2. Or change the port in `Properties/launchSettings.json`
-
-#### Database Connection Issues
-Check your `appsettings.json` connection string:
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Host=localhost;Port=5432;Database=ResearchDB;Username=postgres;Password=123456"
-}
-```
-
-#### Build Errors
-1. Clean and rebuild:
-   ```powershell
-   dotnet clean
-   dotnet restore
-   dotnet build
-   ```
-
-2. Check for missing NuGet packages:
-   ```powershell
-   dotnet restore
-   ```
-
+## 9. Troubleshooting
+- **Port already in use**: Kill the process on port 7001 or change `PORT` in `.env`.
+- **Database Connection**: Ensure PostgreSQL is running and the connection string in `.env` is correct.
+- **Firebase Keys**: Ensure `serviceAccountKey.json` is present in the root of the backend folder (but ignored by git).
