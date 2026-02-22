@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smartpepper_mobile/screens/shared/language_settings_screen.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/language_provider.dart';
 import '../../services/storage_service.dart';
 import '../../config/theme.dart';
+import '../../localization/app_localizations.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -12,6 +15,7 @@ class AccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    final languageProvider = context.watch<LanguageProvider>();
     final user = authProvider.user;
 
     return Scaffold(
@@ -31,7 +35,7 @@ class AccountScreen extends StatelessWidget {
             icon: const Icon(Icons.edit, color: Colors.white),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Edit profile')),
+                SnackBar(content: Text(context.tr('profile_edit'))),
               );
             },
           ),
@@ -288,15 +292,15 @@ class AccountScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
+                          const Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.account_balance_wallet,
                                 color: AppTheme.pepperGold,
                                 size: 32,
                               ),
-                              const SizedBox(width: 12),
-                              const Expanded(
+                              SizedBox(width: 12),
+                              Expanded(
                                 child: Text(
                                   'Connect Your Wallet',
                                   style: TextStyle(
@@ -395,7 +399,7 @@ class AccountScreen extends StatelessWidget {
                       _buildMenuItem(
                         context,
                         icon: Icons.notifications,
-                        title: 'Notifications',
+                        title: context.tr('settings_notifications'),
                         subtitle: 'Manage notification preferences',
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -406,11 +410,15 @@ class AccountScreen extends StatelessWidget {
                       _buildMenuItem(
                         context,
                         icon: Icons.language,
-                        title: 'Language',
-                        subtitle: 'English',
+                        title: context.tr('settings_language'),
+                        subtitle: languageProvider.currentLanguageName,
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Language settings')),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const LanguageSettingsScreen(),
+                            ),
                           );
                         },
                       ),

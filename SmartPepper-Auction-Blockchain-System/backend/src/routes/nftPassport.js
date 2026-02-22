@@ -20,14 +20,14 @@ try {
   
   // Initialize service (don't block if it fails)
   nftService.initialize().catch(err => {
-    logger.error('Failed to initialize NFT Passport service:', err);
-    logger.warn('NFT Passport service running in limited mode - metadata generation still available');
+    logger.warn('NFT Passport service initialization error:', err?.message || 'Unknown error');
+    logger.info('ℹ️  NFT Passport service running in limited mode - metadata generation still available');
   });
   
   logger.info('NFT Passport routes loaded successfully');
 } catch (err) {
-  logger.error('Failed to load NFT Passport service:', err);
-  logger.warn('NFT routes will return errors - service not available');
+  logger.warn('IPFS client not available, continuing without IPFS support:', err?.message || 'Unknown error');
+  logger.info('ℹ️  NFT routes will work with local metadata storage');
 }
 
 /**

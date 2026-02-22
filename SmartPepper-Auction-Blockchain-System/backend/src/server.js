@@ -125,9 +125,9 @@ async function initialize() {
       });
       
       await redisClient.connect();
-      logger.info('Redis connected');
+      logger.info('✅ Redis connected - Real-time WebSocket features enabled');
     } catch (redisError) {
-      logger.warn('Redis connection failed (continuing without Redis):', redisError.message);
+      logger.info('ℹ️  Redis not configured - WebSocket real-time updates disabled (optional)');
       redisClient = null;
     }
 
@@ -161,9 +161,9 @@ async function initialize() {
       const auctionSocket = new AuctionWebSocket(io, redisClient);
       auctionSocket.initialize();
       app.set('auctionSocket', auctionSocket); // Make available to routes
-      logger.info('WebSocket server initialized');
+      logger.info('✅ WebSocket server initialized for real-time auction updates');
     } else {
-      logger.warn('WebSocket not initialized (Redis unavailable)');
+      logger.info('ℹ️  WebSocket real-time updates disabled (requires Redis)');
     }
 
     // Start server

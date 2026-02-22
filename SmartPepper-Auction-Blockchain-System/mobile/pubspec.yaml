@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # UI & Icons
   cupertino_icons: ^1.0.6
@@ -57,7 +59,7 @@ dependencies:
   connectivity_plus: ^5.0.2
 
   # Utils
-  intl: ^0.18.1
+  intl: ^0.19.0
   uuid: ^4.2.2
   crypto: ^3.0.3
   timeago: ^3.6.1
@@ -94,6 +96,7 @@ flutter:
     - assets/icons/
     - assets/animations/
     - assets/abis/
+    - assets/translations/
 
   # fonts:
   #   - family: Poppins
