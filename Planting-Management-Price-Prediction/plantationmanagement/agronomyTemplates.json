@@ -1,0 +1,50 @@
+{
+    "6943fcfe-613f-288b-782a-557300000000": {
+        "taskName": "Land Clearing & Slope Management",
+        "phase": "Landscaping",
+        "timingMonthsAfterStarting": 0,
+        "instructionalDetails": "Clear all vegetation. For slopes over 10°, establish contour bunds or terraces to prevent soil erosion. Ensure soil depth is at least 0.75m.",
+        "taskType": "Preparation",
+        "varietyKey": "ALL"
+    },
+    "6943fcfe-613f-288b-782a-557400000000": {
+        "taskName": "Support Tree (Gliricidia) Planting",
+        "phase": "Landscaping",
+        "timingMonthsAfterStarting": 0,
+        "instructionalDetails": "Plant 3.0m long Gliricidia stakes at the recommended spacing (e.g., 2.5m x 2.5m). These must sprout and grow to provide shade and support for the pepper vine.",
+        "taskType": "Preparation",
+        "varietyKey": "ALL"
+    },
+    "6943fcfe-613f-288b-782a-557500000000": {
+        "taskName": "Pit Digging",
+        "phase": "Landscaping",
+        "timingMonthsAfterStarting": 0,
+        "instructionalDetails": "Dig pits of 60cm x 60cm x 60cm. For hard soils, use 50cm x 50cm x 50cm. Let the pit air for 2 weeks before filling.",
+        "taskType": "Preparation",
+        "varietyKey": "ALL"
+    },
+    "6943fd2d-613f-288b-782a-557700000000": {
+        "taskName": "Pit Filling & Soil Preparation",
+        "phase": "Planting",
+        "timingMonthsAfterStarting": 0,
+        "instructionalDetails": "Fill pits with a mixture of topsoil, 10kg of cow dung/compost, and 60g of Saphos Phosphate. Create a small mound to prevent water logging.",
+        "taskType": "Planting",
+        "varietyKey": "ALL"
+    },
+    "694402f9-613f-288b-782a-558b00000000": {
+        "taskName": "Shade Regulation (Critical)",
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 4,
+        "instructionalDetails": "Panniyur-1 is highly sensitive to heavy shade. Prune the Gliricidia support branches to ensure the vine receives at least 50-60% sunlight.",
+        "taskType": "Pruning",
+        "varietyKey": "var_panniyur_1"
+    },
+    "6944031d-613f-288b-782a-558e00000000": {
+        "taskName": "Moisture Conservation Mulching",
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 3,
+        "instructionalDetails": "Kuching is drought-tolerant but needs a strong root base. Apply a thick layer of dried leaves or coconut husks around the base.",
+        "taskType": "Maintenance",
+        "varietyKey": "var_kuching"
+    }
+}
