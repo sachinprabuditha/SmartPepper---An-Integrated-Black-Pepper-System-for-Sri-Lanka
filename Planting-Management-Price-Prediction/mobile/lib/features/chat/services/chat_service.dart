@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skr_frontend_mobile/core/network/api_client.dart';
+import 'package:mobile/core/network/api_client.dart';
 import '../models/chat_model.dart';
 
 final chatServiceProvider = Provider<ChatService>((ref) {

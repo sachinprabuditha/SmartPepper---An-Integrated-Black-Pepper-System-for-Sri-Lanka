@@ -1,4 +1,4 @@
-package com.example.skr_frontend_mobile
+package com.example.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

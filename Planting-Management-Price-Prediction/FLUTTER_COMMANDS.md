@@ -14,7 +14,7 @@ flutter emulators
 
 ## 2. Run the App on Emulator
 ```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Frontend-Mobile"
+cd "F:\Year 4\My Research\ResearchProject\SmartPepper---An-Integrated-Black-Pepper-System-for-Sri-Lanka\Planting-Management-Price-Prediction\mobile"
 flutter run -d emulator-5554
 ```
 
@@ -48,13 +48,13 @@ Or use Ctrl+C in the terminal
 
 ### Check Connected Devices
 ```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Frontend-Mobile"
+cd "F:\Year 4\My Research\ResearchProject\SmartPepper---An-Integrated-Black-Pepper-System-for-Sri-Lanka\Planting-Management-Price-Prediction\mobile"
 flutter devices
 ```
 
 ### Clean Build (if you have issues)
 ```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Frontend-Mobile"
+cd "F:\Year 4\My Research\ResearchProject\SmartPepper---An-Integrated-Black-Pepper-System-for-Sri-Lanka\Planting-Management-Price-Prediction\mobile"
 flutter clean
 flutter pub get
 flutter run
@@ -63,13 +63,13 @@ flutter run
 ### Full Restart (stop and start again)
 ```powershell
 # Stop: Press 'q' in Flutter terminal, then:
-cd "F:\Year 4\My Research\ResearchProject\SKR-Frontend-Mobile"
+cd "F:\Year 4\My Research\ResearchProject\SmartPepper---An-Integrated-Black-Pepper-System-for-Sri-Lanka\Planting-Management-Price-Prediction\mobile"
 flutter run -d emulator-5554
 ```
 
 ### Run in Release Mode
 ```powershell
-cd "F:\Year 4\My Research\ResearchProject\SKR-Frontend-Mobile"
+cd "F:\Year 4\My Research\ResearchProject\SmartPepper---An-Integrated-Black-Pepper-System-for-Sri-Lanka\Planting-Management-Price-Prediction\mobile"
 flutter run --release -d emulator-5554
 ```
 
