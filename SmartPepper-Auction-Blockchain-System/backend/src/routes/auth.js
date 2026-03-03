@@ -353,4 +353,95 @@ router.post('/refresh', async (req, res) => {
   }
 });
 
+/**
+ * PUT /api/auth/profile
+ * Update user profile
+ */
+router.put('/profile', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: 'No token provided'
+      });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const { name, phone, address, city, language, walletAddress } = req.body;
+
+    // Build update object dynamically
+    const updates = {};
+    
+    if (name !== undefined) updates.name = name;
+    if (phone !== undefined) updates.phone = phone;
+    if (address !== undefined) updates.address = address;
+    if (city !== undefined) updates.city = city;
+    if (language !== undefined) updates.language = language;
+    if (walletAddress !== undefined) {
+      updates.wallet_address = walletAddress;
+      updates.wallet_address_lower = walletAddress.toLowerCase();
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No fields to update'
+      });
+    }
+
+    updates.updated_at = admin.firestore.FieldValue.serverTimestamp();
+
+    // Get user and update
+    const firestore = db.getDb();
+    const userRef = firestore.collection('users').doc(decoded.userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    await userRef.update(updates);
+    const updatedDoc = await userRef.get();
+    const userData = updatedDoc.data();
+
+    // Return sanitized user data
+    const user = {
+      id: updatedDoc.id,
+      email: userData.email,
+      name: userData.name,
+      role: userData.role || userData.user_type,
+      walletAddress: userData.wallet_address,
+      phone: userData.phone,
+      address: userData.address,
+      city: userData.city,
+      language: userData.language
+    };
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      user
+    });
+  } catch (error) {
+    logger.error('Update profile error:', error);
+    
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid token'
+      });
+    }
+    
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update profile'
+    });
+  }
+});
+
 module.exports = router;

@@ -5,6 +5,8 @@ class AuctionWebSocket {
     this.io = io;
     this.redis = redisClient;
     this.auctionNamespace = io.of('/auction');
+    // In-memory cache for when Redis is not available
+    this.memoryCache = new Map();
   }
 
   initialize() {
@@ -161,23 +163,26 @@ class AuctionWebSocket {
     }
   }
 
-  // Get auction state from Redis
+  // Get auction state from Redis or memory cache
   async getAuctionState(auctionId) {
     try {
-      const key = `auction:${auctionId}`;
-      const state = await this.redis.get(key);
-      
-      return state ? JSON.parse(state) : {};
+      if (this.redis) {
+        const key = `auction:${auctionId}`;
+        const state = await this.redis.get(key);
+        return state ? JSON.parse(state) : {};
+      } else {
+        // Use in-memory cache when Redis is not available
+        return this.memoryCache.get(`auction:${auctionId}`) || {};
+      }
     } catch (error) {
-      logger.error('Error getting auction state from Redis:', error);
+      logger.error('Error getting auction state:', error);
       return {};
     }
   }
 
-  // Update auction state in Redis
+  // Update auction state in Redis or memory cache
   async updateAuctionState(auctionId, updates) {
     try {
-      const key = `auction:${auctionId}`;
       const currentState = await this.getAuctionState(auctionId);
       
       const newState = {
@@ -186,11 +191,22 @@ class AuctionWebSocket {
         updatedAt: new Date().toISOString()
       };
 
-      await this.redis.setEx(key, 86400, JSON.stringify(newState)); // 24 hour TTL
+      if (this.redis) {
+        const key = `auction:${auctionId}`;
+        await this.redis.setEx(key, 86400, JSON.stringify(newState)); // 24 hour TTL
+      } else {
+        // Use in-memory cache when Redis is not available
+        this.memoryCache.set(`auction:${auctionId}`, newState);
+        
+        // Auto-cleanup after 24 hours
+        setTimeout(() => {
+          this.memoryCache.delete(`auction:${auctionId}`);
+        }, 86400 * 1000);
+      }
       
       return newState;
     } catch (error) {
-      logger.error('Error updating auction state in Redis:', error);
+      logger.error('Error updating auction state:', error);
       throw error;
     }
   }

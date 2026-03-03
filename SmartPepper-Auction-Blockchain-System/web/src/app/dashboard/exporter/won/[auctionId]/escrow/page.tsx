@@ -268,8 +268,12 @@ export default function EscrowDepositPage({ params }: EscrowPageProps) {
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
-              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-                {auction.status}
+              <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                auction.status === 'settled' 
+                  ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' 
+                  : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
+              }`}>
+                {auction.status === 'settled' ? 'Settled ✅' : auction.status}
               </span>
             </div>
           </div>
@@ -323,7 +327,28 @@ export default function EscrowDepositPage({ params }: EscrowPageProps) {
         )}
 
         {/* Deposit Button */}
-        {alreadyDeposited ? (
+        {auction.status === 'settled' ? (
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 text-center">
+            <span className="text-4xl mb-4 inline-block">✅</span>
+            <h3 className="text-xl font-bold text-green-900 dark:text-green-200 mb-2">
+              Auction Settled Successfully
+            </h3>
+            <p className="text-green-700 dark:text-green-300 mb-4">
+              This auction has been finalized on the blockchain. Payment has been transferred to the farmer.
+            </p>
+            {auction.blockchain_tx_hash && (
+              <p className="text-sm text-green-600 dark:text-green-400 font-mono mb-2">
+                Settlement TX: {auction.blockchain_tx_hash}
+              </p>
+            )}
+            <Link
+              href="/dashboard/exporter/won"
+              className="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              ← Back to Won Auctions
+            </Link>
+          </div>
+        ) : alreadyDeposited ? (
           <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 text-center">
             <span className="text-4xl mb-4 inline-block">✅</span>
             <h3 className="text-xl font-bold text-green-900 dark:text-green-200 mb-2">
@@ -337,6 +362,9 @@ export default function EscrowDepositPage({ params }: EscrowPageProps) {
                 TX: {escrowStatus.escrowTxHash}
               </p>
             )}
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
+              ⏳ Awaiting automatic settlement after compliance verification...
+            </p>
           </div>
         ) : isExpired ? (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">

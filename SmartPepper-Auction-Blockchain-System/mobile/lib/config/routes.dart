@@ -12,11 +12,16 @@ import '../screens/farmer/my_lots_screen.dart';
 import '../screens/farmer/notifications_screen.dart';
 import '../screens/farmer/auction_monitor_screen.dart';
 import '../screens/exporter/browse_lots_screen.dart';
-import '../screens/exporter/live_auction_screen.dart';
+import '../screens/exporter/my_bids_screen.dart';
+import '../screens/exporter/won_auctions_screen.dart';
+import '../screens/exporter/exporter_profile_screen.dart';
+import '../screens/exporter/exporter_notifications_screen.dart';
+import '../screens/exporter/live_auctions_browser_screen.dart';
 import '../screens/shared/lot_details_screen.dart';
 import '../screens/shared/traceability_screen.dart';
 import '../screens/shared/qr_scanner_screen.dart';
 import '../screens/shared/auctions_screen.dart';
+import '../screens/shared/auction_by_id_screen.dart';
 import '../screens/shared/main_scaffold.dart';
 
 class AppRouter {
@@ -105,11 +110,44 @@ class AppRouter {
         name: 'liveAuction',
         builder: (context, state) {
           final auctionId = state.pathParameters['auctionId']!;
-          return LiveAuctionScreen(auctionId: auctionId);
+          return AuctionByIdScreen(auctionId: auctionId);
         },
+      ),
+      GoRoute(
+        path: '/exporter/bids',
+        name: 'myBids',
+        builder: (context, state) => const MyBidsScreen(),
+      ),
+      GoRoute(
+        path: '/exporter/live-auctions',
+        name: 'liveAuctions',
+        builder: (context, state) => const LiveAuctionsBrowserScreen(),
+      ),
+      GoRoute(
+        path: '/exporter/won',
+        name: 'wonAuctions',
+        builder: (context, state) => const WonAuctionsScreen(),
+      ),
+      GoRoute(
+        path: '/exporter/profile',
+        name: 'exporterProfile',
+        builder: (context, state) => const ExporterProfileScreen(),
+      ),
+      GoRoute(
+        path: '/exporter/notifications',
+        name: 'exporterNotifications',
+        builder: (context, state) => const ExporterNotificationsScreen(),
       ),
 
       // Shared Routes
+      GoRoute(
+        path: '/auction/:auctionId',
+        name: 'auctionDetails',
+        builder: (context, state) {
+          final auctionId = state.pathParameters['auctionId']!;
+          return AuctionByIdScreen(auctionId: auctionId);
+        },
+      ),
       GoRoute(
         path: '/lot/:lotId',
         name: 'lotDetails',

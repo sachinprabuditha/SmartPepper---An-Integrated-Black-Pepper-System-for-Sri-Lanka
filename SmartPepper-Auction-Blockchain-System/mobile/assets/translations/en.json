@@ -177,6 +177,9 @@
   
   "notification_new_bid": "New bid placed on your auction",
   "notification_auction_won": "Congratulations! You won the auction",
+  "notification_auction_sold": "Auction completed successfully",
+  "notification_auction_no_sale": "Auction ended without sale",
+  "notification_auction_settled": "Auction settlement completed",
   "notification_auction_lost": "Auction ended. You were outbid",
   "notification_auction_ending": "Auction ending soon",
   "notification_payment_received": "Payment received",

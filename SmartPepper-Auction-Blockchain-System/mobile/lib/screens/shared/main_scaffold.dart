@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/theme.dart';
+import '../../localization/app_localizations.dart';
 import 'home_screen.dart';
 import 'auctions_screen.dart';
 import 'lots_screen.dart';
 import 'account_screen.dart';
 import '../farmer/farmer_dashboard.dart';
 import '../exporter/exporter_dashboard.dart';
+import '../exporter/browse_lots_screen.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
@@ -22,44 +24,52 @@ class _MainScaffoldState extends State<MainScaffold> {
   List<Widget> _getScreensForRole(String? role) {
     // Return role-specific home screen
     Widget homeScreen;
+    Widget lotsScreen;
+
     if (role?.toLowerCase() == 'farmer') {
       homeScreen = const FarmerDashboard();
+      lotsScreen = const LotsScreen(); // Farmers can create/manage their lots
     } else if (role?.toLowerCase() == 'exporter') {
       homeScreen = const ExporterDashboard();
+      lotsScreen =
+          const BrowseLotsScreen(); // Exporters only browse approved lots
     } else {
       homeScreen = const HomeScreen();
+      lotsScreen = const LotsScreen();
     }
 
     return [
       homeScreen,
       const AuctionsScreen(),
-      const LotsScreen(),
+      lotsScreen,
       const AccountScreen(),
     ];
   }
 
-  final List<BottomNavigationBarItem> _navItems = const [
-    BottomNavigationBarItem(
-      icon: Icon(Icons.home_outlined),
-      activeIcon: Icon(Icons.home),
-      label: 'Home',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.gavel_outlined),
-      activeIcon: Icon(Icons.gavel),
-      label: 'Auctions',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.inventory_2_outlined),
-      activeIcon: Icon(Icons.inventory_2),
-      label: 'Lots',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.person_outline),
-      activeIcon: Icon(Icons.person),
-      label: 'Account',
-    ),
-  ];
+  List<BottomNavigationBarItem> _getNavItems(BuildContext context) {
+    return [
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.home_outlined),
+        activeIcon: const Icon(Icons.home),
+        label: context.tr('nav_home'),
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.gavel_outlined),
+        activeIcon: const Icon(Icons.gavel),
+        label: context.tr('nav_auctions'),
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.inventory_2_outlined),
+        activeIcon: const Icon(Icons.inventory_2),
+        label: context.tr('nav_lots'),
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.person_outline),
+        activeIcon: const Icon(Icons.person),
+        label: context.tr('nav_account'),
+      ),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -95,7 +105,7 @@ class _MainScaffoldState extends State<MainScaffold> {
           unselectedItemColor: Colors.grey,
           selectedFontSize: 12,
           unselectedFontSize: 12,
-          items: _navItems,
+          items: _getNavItems(context),
         ),
       ),
     );

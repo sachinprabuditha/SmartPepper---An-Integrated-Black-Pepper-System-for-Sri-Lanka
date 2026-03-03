@@ -41,8 +41,12 @@ class Auction {
   });
 
   factory Auction.fromJson(Map<String, dynamic> json) {
+    // Extract ID with fallback to auction_id (backend uses auction_id)
+    final extractedId =
+        json['id']?.toString() ?? json['auction_id']?.toString() ?? '';
+
     return Auction(
-      id: json['id']?.toString() ?? '',
+      id: extractedId,
       auctionId:
           json['auction_id']?.toString() ?? json['auctionId']?.toString() ?? '',
       tokenId:
@@ -108,15 +112,17 @@ class AuctionProvider with ChangeNotifier {
   String? get error => _error;
 
   void _initializeSocket() {
-    socketService.connect();
+    // Socket is already connected at app startup
+    // Just set up event listeners
+    print('🎧 Setting up auction event listeners...');
 
     socketService.onNewBid((data) {
-      print('New bid received: $data');
+      print('📥 New bid received: $data');
       _updateCurrentAuction(data);
     });
 
     socketService.onAuctionEnd((data) {
-      print('Auction ended: $data');
+      print('📥 Auction ended: $data');
       _handleAuctionEnd(data);
     });
   }
@@ -133,6 +139,11 @@ class AuctionProvider with ChangeNotifier {
       print('✅ Received ${response.length} auctions from API');
       _auctions = response.map((json) => Auction.fromJson(json)).toList();
       print('✅ Parsed ${_auctions.length} auction objects');
+
+      // Debug: Log parsed auction IDs
+      for (var auction in _auctions) {
+        print('   📦 Auction: id=${auction.id}, status=${auction.status}');
+      }
     } catch (e) {
       print('❌ Error fetching auctions: $e');
       _error = e.toString();
@@ -144,11 +155,17 @@ class AuctionProvider with ChangeNotifier {
 
   Future<void> joinAuction(String auctionId) async {
     try {
-      final auctionData = await apiService.getAuctionById(auctionId);
+      final response = await apiService.getAuctionById(auctionId);
+      // Backend returns { "success": true, "auction": {...}, "bids": [] }
+      // Extract the auction object from the response
+      final auctionData = response['auction'] ?? response;
+      print('🔍 Parsing auction data: status = ${auctionData['status']}');
       _currentAuction = Auction.fromJson(auctionData);
+      print('✅ Current auction status set to: ${_currentAuction?.status}');
       socketService.joinAuction(auctionId);
       notifyListeners();
     } catch (e) {
+      print('❌ Error in joinAuction: $e');
       _error = e.toString();
       notifyListeners();
     }
@@ -162,13 +179,17 @@ class AuctionProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> placeBid(String auctionId, double amount) async {
+  Future<bool> placeBid(
+      String auctionId, double amount, String bidderAddress) async {
     _loading = true;
     _error = null;
     notifyListeners();
 
     try {
-      await apiService.placeBid(auctionId, {'amount': amount});
+      await apiService.placeBid(auctionId, {
+        'amount': amount,
+        'bidderAddress': bidderAddress,
+      });
       _loading = false;
       notifyListeners();
       return true;

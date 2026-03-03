@@ -1,0 +1,3134 @@
+[
+    {
+        "key":  "app_name",
+        "en":  "SmartPepper",
+        "si":  "ස්මාර්ට්පෙපර්",
+        "ta":  "ஸ்மார்ட்பெப்பர்"
+    },
+    {
+        "key":  "app_tagline",
+        "en":  "Blockchain-Enabled Pepper Export System",
+        "si":  "බ්ලොක්චේන් සක්‍රිය ගම්මිරිස් අපනයන පද්ධතිය",
+        "ta":  "பிளாக்செயின் இயக்கப்பட்ட மிளகு ஏற்றுமதி அமைப்பு"
+    },
+    {
+        "key":  "common_ok",
+        "en":  "OK",
+        "si":  "හරි",
+        "ta":  "சரி"
+    },
+    {
+        "key":  "common_cancel",
+        "en":  "Cancel",
+        "si":  "අවලංගු කරන්න",
+        "ta":  "ரத்து செய்"
+    },
+    {
+        "key":  "common_confirm",
+        "en":  "Confirm",
+        "si":  "තහවුරු කරන්න",
+        "ta":  "உறுதிப்படுத்து"
+    },
+    {
+        "key":  "common_save",
+        "en":  "Save",
+        "si":  "සුරකින්න",
+        "ta":  "சேமி"
+    },
+    {
+        "key":  "common_delete",
+        "en":  "Delete",
+        "si":  "මකන්න",
+        "ta":  "நீக்கு"
+    },
+    {
+        "key":  "common_edit",
+        "en":  "Edit",
+        "si":  "සංස්කරණය",
+        "ta":  "திருத்து"
+    },
+    {
+        "key":  "common_view",
+        "en":  "View",
+        "si":  "බලන්න",
+        "ta":  "பார்"
+    },
+    {
+        "key":  "common_submit",
+        "en":  "Submit",
+        "si":  "ඉදිරිපත් කරන්න",
+        "ta":  "சமர்ப்பி"
+    },
+    {
+        "key":  "common_search",
+        "en":  "Search",
+        "si":  "සොයන්න",
+        "ta":  "தேடு"
+    },
+    {
+        "key":  "common_filter",
+        "en":  "Filter",
+        "si":  "පෙරහන",
+        "ta":  "வடிகட்டு"
+    },
+    {
+        "key":  "common_loading",
+        "en":  "Loading...",
+        "si":  "පූරණය වෙමින්...",
+        "ta":  "ஏற்றுகிறது..."
+    },
+    {
+        "key":  "common_error",
+        "en":  "Error",
+        "si":  "දෝෂය",
+        "ta":  "பிழை"
+    },
+    {
+        "key":  "common_success",
+        "en":  "Success",
+        "si":  "සාර්ථකයි",
+        "ta":  "வெற்றி"
+    },
+    {
+        "key":  "common_retry",
+        "en":  "Retry",
+        "si":  "නැවත උත්සාහ කරන්න",
+        "ta":  "மீண்டும் முயற்சி"
+    },
+    {
+        "key":  "common_close",
+        "en":  "Close",
+        "si":  "වසන්න",
+        "ta":  "மூடு"
+    },
+    {
+        "key":  "common_back",
+        "en":  "Back",
+        "si":  "ආපසු",
+        "ta":  "பின்"
+    },
+    {
+        "key":  "common_next",
+        "en":  "Next",
+        "si":  "ඊළඟ",
+        "ta":  "அடுத்து"
+    },
+    {
+        "key":  "common_yes",
+        "en":  "Yes",
+        "si":  "ඔව්",
+        "ta":  "ஆம்"
+    },
+    {
+        "key":  "common_no",
+        "en":  "No",
+        "si":  "නැත",
+        "ta":  "இல்லை"
+    },
+    {
+        "key":  "auth_login",
+        "en":  "Login",
+        "si":  "පිවිසෙන්න",
+        "ta":  "உள்நுழை"
+    },
+    {
+        "key":  "auth_logout",
+        "en":  "Logout",
+        "si":  "නික්මෙන්න",
+        "ta":  "வெளியேறு"
+    },
+    {
+        "key":  "auth_register",
+        "en":  "Register",
+        "si":  "ලියාපදිංචි වන්න",
+        "ta":  "பதிவு செய்"
+    },
+    {
+        "key":  "auth_email",
+        "en":  "Email",
+        "si":  "විද්‍යුත් තැපෑල",
+        "ta":  "மின்னஞ்சல்"
+    },
+    {
+        "key":  "auth_password",
+        "en":  "Password",
+        "si":  "මුරපදය",
+        "ta":  "கடவுச்சொல்"
+    },
+    {
+        "key":  "auth_confirm_password",
+        "en":  "Confirm Password",
+        "si":  "මුරපදය තහවුරු කරන්න",
+        "ta":  "கடவுச்சொல்லை உறுதிப்படுத்து"
+    },
+    {
+        "key":  "auth_forgot_password",
+        "en":  "Forgot Password?",
+        "si":  "මුරපදය අමතක ද?",
+        "ta":  "கடவுச்சொல் மறந்துவிட்டதா?"
+    },
+    {
+        "key":  "auth_dont_have_account",
+        "en":  "Don\u0027t have an account?",
+        "si":  "ගිණුමක් නොමැතිද?",
+        "ta":  "கணக்கு இல்லையா?"
+    },
+    {
+        "key":  "auth_already_have_account",
+        "en":  "Already have an account?",
+        "si":  "දැනටමත් ගිණුමක් තිබේද?",
+        "ta":  "ஏற்கனவே கணக்கு உள்ளதா?"
+    },
+    {
+        "key":  "auth_sign_up",
+        "en":  "Sign Up",
+        "si":  "ලියාපදිංචි වන්න",
+        "ta":  "பதிவு செய்"
+    },
+    {
+        "key":  "auth_sign_in",
+        "en":  "Sign In",
+        "si":  "පිවිසෙන්න",
+        "ta":  "உள்நுழை"
+    },
+    {
+        "key":  "auth_welcome",
+        "en":  "Welcome to SmartPepper",
+        "si":  "ස්මාර්ට්පෙපර් වෙත සාදරයෙන් පිළිගනිමු",
+        "ta":  "ஸ்மார்ட்பெப்பருக்கு வரவேற்கிறோம்"
+    },
+    {
+        "key":  "auth_welcome_back",
+        "en":  "Welcome Back!",
+        "si":  "නැවත සාදරයෙන් පිළිගනිමු!",
+        "ta":  "மீண்டும் வரவேற்கிறோம்!"
+    },
+    {
+        "key":  "auth_full_name",
+        "en":  "Full Name",
+        "si":  "සම්පූර්ණ නම",
+        "ta":  "முழு பெயர்"
+    },
+    {
+        "key":  "auth_phone_number",
+        "en":  "Phone Number",
+        "si":  "දුරකථන අංකය",
+        "ta":  "தொலைபேசி எண்"
+    },
+    {
+        "key":  "auth_role",
+        "en":  "Role",
+        "si":  "භූමිකාව",
+        "ta":  "பங்கு"
+    },
+    {
+        "key":  "auth_farmer",
+        "en":  "Farmer",
+        "si":  "ගොවියා",
+        "ta":  "விவசாயி"
+    },
+    {
+        "key":  "auth_exporter",
+        "en":  "Exporter",
+        "si":  "අපනයනකරු",
+        "ta":  "ஏற்றுமதியாளர்"
+    },
+    {
+        "key":  "auth_admin",
+        "en":  "Administrator",
+        "si":  "පරිපාලක",
+        "ta":  "நிர்வாகி"
+    },
+    {
+        "key":  "nav_home",
+        "en":  "Home",
+        "si":  "මුල් පිටුව",
+        "ta":  "முகப்பு"
+    },
+    {
+        "key":  "nav_lots",
+        "en":  "Lots",
+        "si":  "කණ්ඩායම්",
+        "ta":  "தொகுதிகள்"
+    },
+    {
+        "key":  "nav_auctions",
+        "en":  "Auctions",
+        "si":  "වෙන්දේසි",
+        "ta":  "ஏலங்கள்"
+    },
+    {
+        "key":  "nav_profile",
+        "en":  "Profile",
+        "si":  "පැතිකඩ",
+        "ta":  "சுயவிவரம்"
+    },
+    {
+        "key":  "nav_settings",
+        "en":  "Settings",
+        "si":  "සැකසුම්",
+        "ta":  "அமைப்புகள்"
+    },
+    {
+        "key":  "nav_wallet",
+        "en":  "Wallet",
+        "si":  "මුදල් පසුම්බිය",
+        "ta":  "பணப்பை"
+    },
+    {
+        "key":  "nav_notifications",
+        "en":  "Notifications",
+        "si":  "දැනුම්දීම්",
+        "ta":  "அறிவிப்புகள்"
+    },
+    {
+        "key":  "nav_account",
+        "en":  "Account",
+        "si":  "ගිණුම",
+        "ta":  "கணக்கு"
+    },
+    {
+        "key":  "lot_title",
+        "en":  "Pepper Lots",
+        "si":  "ගම්මිරිස් කණ්ඩායම්",
+        "ta":  "மிளகு தொகுதிகள்"
+    },
+    {
+        "key":  "lot_create",
+        "en":  "Create New Lot",
+        "si":  "නව කණ්ඩායමක් සාදන්න",
+        "ta":  "புதிய தொகுதியை உருவாக்கு"
+    },
+    {
+        "key":  "lot_my_lots",
+        "en":  "My Lots",
+        "si":  "මගේ කණ්ඩායම්",
+        "ta":  "எனது தொகுதிகள்"
+    },
+    {
+        "key":  "lot_all_lots",
+        "en":  "All Lots",
+        "si":  "සියලුම කණ්ඩායම්",
+        "ta":  "அனைத்து தொகுதிகள்"
+    },
+    {
+        "key":  "lot_details",
+        "en":  "Lot Details",
+        "si":  "කණ්ඩායම් විස්තර",
+        "ta":  "தொகுதி விவரங்கள்"
+    },
+    {
+        "key":  "lot_id",
+        "en":  "Lot ID",
+        "si":  "කණ්ඩායම් හැඳුනුම්පත",
+        "ta":  "தொகுதி அடையாளம்"
+    },
+    {
+        "key":  "lot_weight",
+        "en":  "Weight (kg)",
+        "si":  "බර (කි.ග්‍රෑ.)",
+        "ta":  "எடை (கிலோ)"
+    },
+    {
+        "key":  "lot_quality_grade",
+        "en":  "Quality Grade",
+        "si":  "ගුණාත්මක ශ්‍රේණිය",
+        "ta":  "தர வகை"
+    },
+    {
+        "key":  "lot_harvest_date",
+        "en":  "Harvest Date",
+        "si":  "අස්වැන්න ලබා ගත් දිනය",
+        "ta":  "அறுவடை தேதி"
+    },
+    {
+        "key":  "lot_processing_method",
+        "en":  "Processing Method",
+        "si":  "සැකසුම් ක්‍රමය",
+        "ta":  "செயலாக்க முறை"
+    },
+    {
+        "key":  "lot_certifications",
+        "en":  "Certifications",
+        "si":  "සහතික",
+        "ta":  "சான்றிதழ்கள்"
+    },
+    {
+        "key":  "lot_status",
+        "en":  "Status",
+        "si":  "තත්ත්වය",
+        "ta":  "நிலை"
+    },
+    {
+        "key":  "lot_pending",
+        "en":  "Pending",
+        "si":  "පොරොත්තුව",
+        "ta":  "நிலுவையில்"
+    },
+    {
+        "key":  "lot_approved",
+        "en":  "Approved",
+        "si":  "අනුමත",
+        "ta":  "அனுமதிக்கப்பட்டது"
+    },
+    {
+        "key":  "lot_rejected",
+        "en":  "Rejected",
+        "si":  "ප්‍රතික්ෂේප",
+        "ta":  "நிராகரிக்கப்பட்டது"
+    },
+    {
+        "key":  "lot_in_auction",
+        "en":  "In Auction",
+        "si":  "වෙන්දේසියේ",
+        "ta":  "ஏலத்தில்"
+    },
+    {
+        "key":  "lot_sold",
+        "en":  "Sold",
+        "si":  "විකුණා ඇත",
+        "ta":  "விற்கப்பட்டது"
+    },
+    {
+        "key":  "lot_description",
+        "en":  "Description",
+        "si":  "විස්තරය",
+        "ta":  "விளக்கம்"
+    },
+    {
+        "key":  "lot_location",
+        "en":  "Location",
+        "si":  "ස්ථානය",
+        "ta":  "இடம்"
+    },
+    {
+        "key":  "lot_upload_certificate",
+        "en":  "Upload Certificate",
+        "si":  "සහතිකය උඩුගත කරන්න",
+        "ta":  "சான்றிதழை பதிவேற்று"
+    },
+    {
+        "key":  "lot_view_certificate",
+        "en":  "View Certificate",
+        "si":  "සහතිකය බලන්න",
+        "ta":  "சான்றிதழைப் பார்"
+    },
+    {
+        "key":  "lot_qr_code",
+        "en":  "QR Code",
+        "si":  "QR කේතය",
+        "ta":  "QR குறியீடு"
+    },
+    {
+        "key":  "lot_scan_qr",
+        "en":  "Scan QR Code",
+        "si":  "QR කේතය ස්කෑන් කරන්න",
+        "ta":  "QR குறியீட்டை ஸ்கேன் செய்"
+    },
+    {
+        "key":  "lot_traceability",
+        "en":  "Traceability",
+        "si":  "ලුහුබැඳීම",
+        "ta":  "கண்காணிப்பு"
+    },
+    {
+        "key":  "lot_farm_details",
+        "en":  "Farm Details",
+        "si":  "ගොවිපල විස්තර",
+        "ta":  "பண்ணை விவரங்கள்"
+    },
+    {
+        "key":  "auction_title",
+        "en":  "Auctions",
+        "si":  "වෙන්දේසි",
+        "ta":  "ஏலங்கள்"
+    },
+    {
+        "key":  "auction_live",
+        "en":  "Live Auctions",
+        "si":  "සජීවී වෙන්දේසි",
+        "ta":  "நேரடி ஏலங்கள்"
+    },
+    {
+        "key":  "auction_upcoming",
+        "en":  "Upcoming Auctions",
+        "si":  "ඉදිරි වෙන්දේසි",
+        "ta":  "வரவிருக்கும் ஏலங்கள்"
+    },
+    {
+        "key":  "auction_completed",
+        "en":  "Completed Auctions",
+        "si":  "සම්පූර්ණ වෙන්දේසි",
+        "ta":  "நிறைவடைந்த ஏலங்கள்"
+    },
+    {
+        "key":  "auction_my_auctions",
+        "en":  "My Auctions",
+        "si":  "මගේ වෙන්දේසි",
+        "ta":  "எனது ஏலங்கள்"
+    },
+    {
+        "key":  "auction_create",
+        "en":  "Create Auction",
+        "si":  "වෙන්දේසියක් සාදන්න",
+        "ta":  "ஏலத்தை உருவாக்கு"
+    },
+    {
+        "key":  "auction_details",
+        "en":  "Auction Details",
+        "si":  "වෙන්දේසි විස්තර",
+        "ta":  "ஏல விவரங்கள்"
+    },
+    {
+        "key":  "auction_id",
+        "en":  "Auction ID",
+        "si":  "වෙන්දේසි හැඳුනුම්පත",
+        "ta":  "ஏல அடையாளம்"
+    },
+    {
+        "key":  "auction_start_time",
+        "en":  "Start Time",
+        "si":  "ආරම්භක වේලාව",
+        "ta":  "தொடக்க நேரம்"
+    },
+    {
+        "key":  "auction_end_time",
+        "en":  "End Time",
+        "si":  "අවසන් වේලාව",
+        "ta":  "முடிவு நேரம்"
+    },
+    {
+        "key":  "auction_reserve_price",
+        "en":  "Reserve Price",
+        "si":  "සංචිත මිල",
+        "ta":  "இருப்பு விலை"
+    },
+    {
+        "key":  "auction_current_bid",
+        "en":  "Current Bid",
+        "si":  "වත්මන් ලංසුව",
+        "ta":  "தற்போதைய ஏலம்"
+    },
+    {
+        "key":  "auction_highest_bidder",
+        "en":  "Highest Bidder",
+        "si":  "ඉහළම ලංසුකරු",
+        "ta":  "அதிக ஏலதாரர்"
+    },
+    {
+        "key":  "auction_place_bid",
+        "en":  "Place Bid",
+        "si":  "ලංසු තබන්න",
+        "ta":  "ஏலம் வை"
+    },
+    {
+        "key":  "auction_bid_amount",
+        "en":  "Bid Amount",
+        "si":  "ලංසු මුදල",
+        "ta":  "ஏல தொகை"
+    },
+    {
+        "key":  "auction_bid_history",
+        "en":  "Bid History",
+        "si":  "ලංසු ඉතිහාසය",
+        "ta":  "ஏல வரலாறு"
+    },
+    {
+        "key":  "auction_time_remaining",
+        "en":  "Time Remaining",
+        "si":  "ඉතිරි කාලය",
+        "ta":  "எஞ்சிய நேரம்"
+    },
+    {
+        "key":  "auction_ended",
+        "en":  "Ended",
+        "si":  "අවසන්",
+        "ta":  "முடிவடைந்தது"
+    },
+    {
+        "key":  "auction_won",
+        "en":  "Won",
+        "si":  "ජයගත්",
+        "ta":  "வென்றது"
+    },
+    {
+        "key":  "auction_lost",
+        "en":  "Lost",
+        "si":  "අහිමි වුණා",
+        "ta":  "இழந்தது"
+    },
+    {
+        "key":  "auction_participate",
+        "en":  "Join Auction",
+        "si":  "වෙන්දේසියට එක්වන්න",
+        "ta":  "ஏலத்தில் சேர்"
+    },
+    {
+        "key":  "auction_leave",
+        "en":  "Leave Auction",
+        "si":  "වෙන්දේසියෙන් ඉවත් වන්න",
+        "ta":  "ஏலத்தை விட்டு வெளியேறு"
+    },
+    {
+        "key":  "auction_settle",
+        "en":  "Settle Auction",
+        "si":  "වෙන්දේසිය සමථයකට පත් කරන්න",
+        "ta":  "ஏலத்தை தீர்வு செய்"
+    },
+    {
+        "key":  "auction_winning_bid",
+        "en":  "Winning Bid",
+        "si":  "ජයග්‍රහණ ලංසුව",
+        "ta":  "வெற்றி ஏலம்"
+    },
+    {
+        "key":  "auction_total_bids",
+        "en":  "Total Bids",
+        "si":  "මුළු ලංසු",
+        "ta":  "மொத்த ஏலங்கள்"
+    },
+    {
+        "key":  "compliance_title",
+        "en":  "Compliance",
+        "si":  "අනුකූලතාව",
+        "ta":  "இணக்கம்"
+    },
+    {
+        "key":  "compliance_check",
+        "en":  "Compliance Check",
+        "si":  "අනුකූලතා පරීක්ෂාව",
+        "ta":  "இணக்க சோதனை"
+    },
+    {
+        "key":  "compliance_status",
+        "en":  "Compliance Status",
+        "si":  "අනුකූලතා තත්ත්වය",
+        "ta":  "இணக்க நிலை"
+    },
+    {
+        "key":  "compliance_passed",
+        "en":  "Passed",
+        "si":  "සමත්",
+        "ta":  "தேர்ச்சி"
+    },
+    {
+        "key":  "compliance_failed",
+        "en":  "Failed",
+        "si":  "අසමත්",
+        "ta":  "தோல்வி"
+    },
+    {
+        "key":  "compliance_pending",
+        "en":  "Pending",
+        "si":  "පොරොත්තුව",
+        "ta":  "நிலுவையில்"
+    },
+    {
+        "key":  "compliance_certificate",
+        "en":  "Certificate",
+        "si":  "සහතිකය",
+        "ta":  "சான்றிதழ்"
+    },
+    {
+        "key":  "compliance_organic",
+        "en":  "Organic",
+        "si":  "කාබනික",
+        "ta":  "கரிமம்"
+    },
+    {
+        "key":  "compliance_fumigation",
+        "en":  "Fumigation",
+        "si":  "දුම් දැමීම",
+        "ta":  "புகையிடல்"
+    },
+    {
+        "key":  "compliance_export_license",
+        "en":  "Export License",
+        "si":  "අපනයන බලපත්‍රය",
+        "ta":  "ஏற்றுமதி உரிமம்"
+    },
+    {
+        "key":  "compliance_packaging",
+        "en":  "Packaging Standard",
+        "si":  "ඇසුරුම් ප්‍රමිතිය",
+        "ta":  "பேக்கேஜிங் தரநிலை"
+    },
+    {
+        "key":  "compliance_destination",
+        "en":  "Destination Requirements",
+        "si":  "ගමනාන්ත අවශ්‍යතා",
+        "ta":  "இலக்கு தேவைகள்"
+    },
+    {
+        "key":  "compliance_eu",
+        "en":  "EU Standards",
+        "si":  "යුරෝපීය සංගම් ප්‍රමිති",
+        "ta":  "ஐரோப்பிய யூனியன் தரநிலைகள்"
+    },
+    {
+        "key":  "compliance_fda",
+        "en":  "FDA Requirements",
+        "si":  "FDA අවශ්‍යතා",
+        "ta":  "FDA தேவைகள்"
+    },
+    {
+        "key":  "compliance_halal",
+        "en":  "Halal Certification",
+        "si":  "හලාල් සහතිකය",
+        "ta":  "ஹலால் சான்றிதழ்"
+    },
+    {
+        "key":  "payment_title",
+        "en":  "Payment",
+        "si":  "ගෙවීම",
+        "ta":  "கொடுப்பனவு"
+    },
+    {
+        "key":  "payment_escrow",
+        "en":  "Escrow",
+        "si":  "එස්ක්‍රෝ",
+        "ta":  "எஸ்க்ரோ"
+    },
+    {
+        "key":  "payment_amount",
+        "en":  "Amount",
+        "si":  "මුදල",
+        "ta":  "தொகை"
+    },
+    {
+        "key":  "payment_status",
+        "en":  "Payment Status",
+        "si":  "ගෙවීම් තත්ත්වය",
+        "ta":  "கொடுப்பனவு நிலை"
+    },
+    {
+        "key":  "payment_pending",
+        "en":  "Pending",
+        "si":  "පොරොත්තුව",
+        "ta":  "நிலுவையில்"
+    },
+    {
+        "key":  "payment_completed",
+        "en":  "Completed",
+        "si":  "සම්පූර්ණ",
+        "ta":  "நிறைவடைந்தது"
+    },
+    {
+        "key":  "payment_released",
+        "en":  "Released",
+        "si":  "මුදා හැර ඇත",
+        "ta":  "வெளியிடப்பட்டது"
+    },
+    {
+        "key":  "payment_refunded",
+        "en":  "Refunded",
+        "si":  "ආපසු ගෙවා ඇත",
+        "ta":  "திரும்பப்பெற்றது"
+    },
+    {
+        "key":  "payment_wallet_balance",
+        "en":  "Wallet Balance",
+        "si":  "මුදල් පසුම්බි ශේෂය",
+        "ta":  "பணப்பை இருப்பு"
+    },
+    {
+        "key":  "payment_withdraw",
+        "en":  "Withdraw",
+        "si":  "ආපසු ගන්න",
+        "ta":  "திரும்பப்பெறு"
+    },
+    {
+        "key":  "payment_deposit",
+        "en":  "Deposit",
+        "si":  "තැන්පත් කරන්න",
+        "ta":  "வைப்பு"
+    },
+    {
+        "key":  "payment_history",
+        "en":  "Payment History",
+        "si":  "ගෙවීම් ඉතිහාසය",
+        "ta":  "கொடுப்பனவு வரலாறு"
+    },
+    {
+        "key":  "payment_transaction_id",
+        "en":  "Transaction ID",
+        "si":  "ගනුදෙනු හැඳුනුම්පත",
+        "ta":  "பரிவர்த்தனை அடையாளம்"
+    },
+    {
+        "key":  "shipment_title",
+        "en":  "Shipment",
+        "si":  "නැව්ගත කිරීම",
+        "ta":  "அனுப்புதல்"
+    },
+    {
+        "key":  "shipment_details",
+        "en":  "Shipment Details",
+        "si":  "නැව්ගත කිරීම් විස්තර",
+        "ta":  "அனுப்புதல் விவரங்கள்"
+    },
+    {
+        "key":  "shipment_tracking",
+        "en":  "Tracking",
+        "si":  "ලුහුබැඳීම",
+        "ta":  "கண்காணிப்பு"
+    },
+    {
+        "key":  "shipment_container",
+        "en":  "Container Number",
+        "si":  "බහාලුම් අංකය",
+        "ta":  "கொள்கலன் எண்"
+    },
+    {
+        "key":  "shipment_port_origin",
+        "en":  "Port of Origin",
+        "si":  "මුල් වරාය",
+        "ta":  "தோற்று துறைமுகம்"
+    },
+    {
+        "key":  "shipment_port_destination",
+        "en":  "Port of Destination",
+        "si":  "ගමනාන්ත වරාය",
+        "ta":  "இலக்கு துறைமுகம்"
+    },
+    {
+        "key":  "shipment_departure_date",
+        "en":  "Departure Date",
+        "si":  "පිටත්වීමේ දිනය",
+        "ta":  "புறப்படும் தேதி"
+    },
+    {
+        "key":  "shipment_arrival_date",
+        "en":  "Arrival Date",
+        "si":  "පැමිණීමේ දිනය",
+        "ta":  "வருகை தேதி"
+    },
+    {
+        "key":  "shipment_status",
+        "en":  "Status",
+        "si":  "තත්ත්වය",
+        "ta":  "நிலை"
+    },
+    {
+        "key":  "shipment_in_transit",
+        "en":  "In Transit",
+        "si":  "ප්‍රවාහනයේ",
+        "ta":  "போக்குவரத்தில்"
+    },
+    {
+        "key":  "shipment_delivered",
+        "en":  "Delivered",
+        "si":  "බෙදා හැර ඇත",
+        "ta":  "வழங்கப்பட்டது"
+    },
+    {
+        "key":  "shipment_customs_clearance",
+        "en":  "Customs Clearance",
+        "si":  "රේගු නිෂ්කාශනය",
+        "ta":  "சுங்க அனுமதி"
+    },
+    {
+        "key":  "profile_title",
+        "en":  "Profile",
+        "si":  "පැතිකඩ",
+        "ta":  "சுயவிவரம்"
+    },
+    {
+        "key":  "profile_edit",
+        "en":  "Edit Profile",
+        "si":  "පැතිකඩ සංස්කරණය කරන්න",
+        "ta":  "சுயவிவரத்தைத் திருத்து"
+    },
+    {
+        "key":  "profile_farmer_info",
+        "en":  "Farmer Information",
+        "si":  "ගොවි තොරතුරු",
+        "ta":  "விவசாயி தகவல்"
+    },
+    {
+        "key":  "profile_exporter_info",
+        "en":  "Exporter Information",
+        "si":  "අපනයන තොරතුරු",
+        "ta":  "ஏற்றுமதியாளர் தகவல்"
+    },
+    {
+        "key":  "profile_farm_location",
+        "en":  "Farm Location",
+        "si":  "ගොවිපල ස්ථානය",
+        "ta":  "பண்ணை இடம்"
+    },
+    {
+        "key":  "profile_farm_size",
+        "en":  "Farm Size",
+        "si":  "ගොවිපල ප්‍රමාණය",
+        "ta":  "பண்ணை அளவு"
+    },
+    {
+        "key":  "profile_company_name",
+        "en":  "Company Name",
+        "si":  "සමාගම් නාමය",
+        "ta":  "நிறுவனப் பெயர்"
+    },
+    {
+        "key":  "profile_business_license",
+        "en":  "Business License",
+        "si":  "ව්‍යාපාර බලපත්‍රය",
+        "ta":  "வணிக உரிமம்"
+    },
+    {
+        "key":  "profile_verification",
+        "en":  "Verification",
+        "si":  "සත්‍යාපනය",
+        "ta":  "சரிபார்ப்பு"
+    },
+    {
+        "key":  "profile_verified",
+        "en":  "Verified",
+        "si":  "සත්‍යාපිත",
+        "ta":  "சரிபார்க்கப்பட்டது"
+    },
+    {
+        "key":  "profile_unverified",
+        "en":  "Unverified",
+        "si":  "අසත්‍යාපිත",
+        "ta":  "சரிபார்க்கப்படவில்லை"
+    },
+    {
+        "key":  "profile_documents",
+        "en":  "Documents",
+        "si":  "ලේඛන",
+        "ta":  "ஆவணங்கள்"
+    },
+    {
+        "key":  "settings_title",
+        "en":  "Settings",
+        "si":  "සැකසුම්",
+        "ta":  "அமைப்புகள்"
+    },
+    {
+        "key":  "settings_language",
+        "en":  "Language",
+        "si":  "භාෂාව",
+        "ta":  "மொழி"
+    },
+    {
+        "key":  "settings_select_language",
+        "en":  "Select Language",
+        "si":  "භාෂාව තෝරන්න",
+        "ta":  "மொழியைத் தேர்ந்தெடு"
+    },
+    {
+        "key":  "settings_change_language",
+        "en":  "Change Language",
+        "si":  "භාෂාව වෙනස් කරන්න",
+        "ta":  "மொழியை மாற்று"
+    },
+    {
+        "key":  "settings_notifications",
+        "en":  "Notifications",
+        "si":  "දැනුම්දීම්",
+        "ta":  "அறிவிப்புகள்"
+    },
+    {
+        "key":  "settings_enable_notifications",
+        "en":  "Enable Notifications",
+        "si":  "දැනුම්දීම් සබල කරන්න",
+        "ta":  "அறிவிப்புகளை இயக்கு"
+    },
+    {
+        "key":  "settings_security",
+        "en":  "Security",
+        "si":  "ආරක්ෂාව",
+        "ta":  "பாதுகாப்பு"
+    },
+    {
+        "key":  "settings_change_password",
+        "en":  "Change Password",
+        "si":  "මුරපදය වෙනස් කරන්න",
+        "ta":  "கடவுச்சொல்லை மாற்று"
+    },
+    {
+        "key":  "settings_biometric",
+        "en":  "Biometric Authentication",
+        "si":  "ජීව මිතික සත්‍යාපනය",
+        "ta":  "உயிரியல் அங்கீகாரம்"
+    },
+    {
+        "key":  "settings_theme",
+        "en":  "Theme",
+        "si":  "තේමාව",
+        "ta":  "தீம்"
+    },
+    {
+        "key":  "settings_dark_mode",
+        "en":  "Dark Mode",
+        "si":  "අඳුරු මාදිලිය",
+        "ta":  "இருண்ட பயன்முறை"
+    },
+    {
+        "key":  "settings_about",
+        "en":  "About",
+        "si":  "පිළිබඳව",
+        "ta":  "பற்றி"
+    },
+    {
+        "key":  "settings_version",
+        "en":  "Version",
+        "si":  "අනුවාදය",
+        "ta":  "பதிப்பு"
+    },
+    {
+        "key":  "settings_terms",
+        "en":  "Terms \u0026 Conditions",
+        "si":  "නියමයන් සහ කොන්දේසි",
+        "ta":  "விதிமுறைகள் \u0026 நிபந்தனைகள்"
+    },
+    {
+        "key":  "settings_privacy",
+        "en":  "Privacy Policy",
+        "si":  "රහස්‍යතා ප්‍රතිපත්තිය",
+        "ta":  "தனியுரிமைக் கொள்கை"
+    },
+    {
+        "key":  "settings_support",
+        "en":  "Support",
+        "si":  "සහාය",
+        "ta":  "ஆதரவு"
+    },
+    {
+        "key":  "notification_new_bid",
+        "en":  "New bid placed on your auction",
+        "si":  "ඔබේ වෙන්දේසියට නව ලංසුවක් තැබූවා",
+        "ta":  "உங்கள் ஏலத்தில் புதிய ஏலம் வைக்கப்பட்டுள்ளது"
+    },
+    {
+        "key":  "notification_auction_won",
+        "en":  "Congratulations! You won the auction",
+        "si":  "සුභපැතුම්! ඔබ වෙන්දේසිය ජයගත්තා",
+        "ta":  "வாழ்த்துக்கள்! நீங்கள் ஏலத்தை வென்றீர்கள்"
+    },
+    {
+        "key":  "notification_auction_sold",
+        "en":  "Auction completed successfully",
+        "si":  "වෙන්දේසිය සාර්ථකව නිම කෙරුණා",
+        "ta":  "ஏலம் வெற்றிகரமாக முடிந்தது"
+    },
+    {
+        "key":  "notification_auction_no_sale",
+        "en":  "Auction ended without sale",
+        "si":  "වෙන්දේසිය විකිණීමකින් තොරව අවසන් විය",
+        "ta":  "ஏலம் விற்பனை இல்லாமல் முடிந்தது"
+    },
+    {
+        "key":  "notification_auction_settled",
+        "en":  "Auction settlement completed",
+        "si":  "වෙන්දේසි පියවීම සම්පූර්ණයි",
+        "ta":  "ஏல தீர்வு முடிந்தது"
+    },
+    {
+        "key":  "notification_auction_lost",
+        "en":  "Auction ended. You were outbid",
+        "si":  "වෙන්දේසිය අවසන්. ඔබ අභිබවා ගියා",
+        "ta":  "ஏலம் முடிவடைந்தது. நீங்கள் தோற்கடிக்கப்பட்டீர்கள்"
+    },
+    {
+        "key":  "notification_auction_ending",
+        "en":  "Auction ending soon",
+        "si":  "වෙන්දේසිය ඉක්මනින් අවසන්",
+        "ta":  "ஏலம் விரைவில் முடிவடைகிறது"
+    },
+    {
+        "key":  "notification_payment_received",
+        "en":  "Payment received",
+        "si":  "ගෙවීම ලැබිණි",
+        "ta":  "கொடுப்பனவு பெறப்பட்டது"
+    },
+    {
+        "key":  "notification_compliance_approved",
+        "en":  "Compliance check passed",
+        "si":  "අනුකූලතා පරීක්ෂාව සමත්",
+        "ta":  "இணக்க சோதனை தேர்ச்சி"
+    },
+    {
+        "key":  "notification_compliance_rejected",
+        "en":  "Compliance check failed",
+        "si":  "අනුකූලතා පරීක්ෂාව අසමත්",
+        "ta":  "இணக்க சோதனை தோல்வி"
+    },
+    {
+        "key":  "notification_shipment_update",
+        "en":  "Shipment status updated",
+        "si":  "නැව්ගත කිරීම් තත්ත්වය යාවත්කාලීන කළා",
+        "ta":  "அனுப்புதல் நிலை புதுப்பிக்கப்பட்டது"
+    },
+    {
+        "key":  "error_network",
+        "en":  "Network error. Please check your connection",
+        "si":  "ජාල දෝෂයකි. ඔබේ සම්බන්ධතාවය පරීක්ෂා කරන්න",
+        "ta":  "பிணைய பிழை. உங்கள் இணைப்பை சரிபார்க்கவும்"
+    },
+    {
+        "key":  "error_invalid_input",
+        "en":  "Invalid input. Please check your data",
+        "si":  "වලංගු නොවන ආදානය. ඔබේ දත්ත පරීක්ෂා කරන්න",
+        "ta":  "தவறான உள்ளீடு. உங்கள் தரவை சரிபார்க்கவும்"
+    },
+    {
+        "key":  "error_authentication",
+        "en":  "Authentication failed",
+        "si":  "සත්‍යාපනය අසාර්ථක විය",
+        "ta":  "அங்கீகாரம் தோல்வி"
+    },
+    {
+        "key":  "error_permission_denied",
+        "en":  "Permission denied",
+        "si":  "අවසරය ප්‍රතික්ෂේප විය",
+        "ta":  "அனுமதி மறுக்கப்பட்டது"
+    },
+    {
+        "key":  "error_not_found",
+        "en":  "Resource not found",
+        "si":  "සම්පත හමු නොවිණි",
+        "ta":  "வளம் கிடைக்கவில்லை"
+    },
+    {
+        "key":  "error_server",
+        "en":  "Server error. Please try again later",
+        "si":  "සේවාදායක දෝෂයකි. පසුව නැවත උත්සාහ කරන්න",
+        "ta":  "சர்வர் பிழை. பின்னர் மீண்டும் முயற்சிக்கவும்"
+    },
+    {
+        "key":  "error_blockchain",
+        "en":  "Blockchain transaction failed",
+        "si":  "බ්ලොක්චේන් ගනුදෙනුව අසාර්ථක විය",
+        "ta":  "பிளாக்செயின் பரிவர்த்தனை தோல்வி"
+    },
+    {
+        "key":  "success_lot_created",
+        "en":  "Lot created successfully",
+        "si":  "කණ්ඩායම සාර්ථකව සාදන ලදී",
+        "ta":  "தொகுதி வெற்றிகரமாக உருவாக்கப்பட்டது"
+    },
+    {
+        "key":  "success_auction_created",
+        "en":  "Auction created successfully",
+        "si":  "වෙන්දේසිය සාර්ථකව සාදන ලදී",
+        "ta":  "ஏலம் வெற்றிகரமாக உருவாக்கப்பட்டது"
+    },
+    {
+        "key":  "success_bid_placed",
+        "en":  "Bid placed successfully",
+        "si":  "ලංසුව සාර්ථකව තබන ලදී",
+        "ta":  "ஏலம் வெற்றிகரமாக வைக்கப்பட்டது"
+    },
+    {
+        "key":  "success_payment_completed",
+        "en":  "Payment completed successfully",
+        "si":  "ගෙවීම සාර්ථකව සම්පූර්ණ කළා",
+        "ta":  "கொடுப்பனவு வெற்றிகரமாக நிறைவடைந்தது"
+    },
+    {
+        "key":  "success_profile_updated",
+        "en":  "Profile updated successfully",
+        "si":  "පැතිකඩ සාර්ථකව යාවත්කාලීන කළා",
+        "ta":  "சுயவிவரம் வெற்றிகரமாக புதுப்பிக்கப்பட்டது"
+    },
+    {
+        "key":  "success_settings_saved",
+        "en":  "Settings saved successfully",
+        "si":  "සැකසුම් සුරකින ලදී",
+        "ta":  "அமைப்புகள் சேமிக்கப்பட்டன"
+    },
+    {
+        "key":  "confirm_delete_lot",
+        "en":  "Are you sure you want to delete this lot?",
+        "si":  "ඔබට මෙම කණ්ඩායම මැකීමට අවශ්‍ය බව විශ්වාසද?",
+        "ta":  "இந்த தொகுதியை நீக்க விரும்புகிறீர்களா?"
+    },
+    {
+        "key":  "confirm_place_bid",
+        "en":  "Are you sure you want to place this bid?",
+        "si":  "ඔබට මෙම ලංසුව තැබීමට අවශ්‍ය බව විශ්වාසද?",
+        "ta":  "இந்த ஏலத்தை வைக்க விரும்புகிறீர்களா?"
+    },
+    {
+        "key":  "confirm_end_auction",
+        "en":  "Are you sure you want to end this auction?",
+        "si":  "ඔබට මෙම වෙන්දේසිය අවසන් කිරීමට අවශ්‍ය බව විශ්වාසද?",
+        "ta":  "இந்த ஏலத்தை முடிக்க விரும்புகிறீர்களா?"
+    },
+    {
+        "key":  "confirm_logout",
+        "en":  "Are you sure you want to logout?",
+        "si":  "ඔබට නික්මෙන්න අවශ්‍ය බව විශ්වාසද?",
+        "ta":  "வெளியேற விரும்புகிறீர்களா?"
+    },
+    {
+        "key":  "blockchain_connecting",
+        "en":  "Connecting to blockchain...",
+        "si":  "බ්ලොක්චේන් වෙත සම්බන්ධ වෙමින්...",
+        "ta":  "பிளாக்செயினுடன் இணைக்கிறது..."
+    },
+    {
+        "key":  "blockchain_transaction_pending",
+        "en":  "Transaction pending...",
+        "si":  "ගනුදෙනුව පොරොත්තුවෙන්...",
+        "ta":  "பரிவர்த்தனை நிலுவையில்..."
+    },
+    {
+        "key":  "blockchain_transaction_confirmed",
+        "en":  "Transaction confirmed",
+        "si":  "ගනුදෙනුව තහවුරු කළා",
+        "ta":  "பரிவர்த்தனை உறுதிப்படுத்தப்பட்டது"
+    },
+    {
+        "key":  "blockchain_view_on_explorer",
+        "en":  "View on Explorer",
+        "si":  "එක්ස්ප්ලෝරර් හි බලන්න",
+        "ta":  "எக்ஸ்ப்ளோரரில் பார்"
+    },
+    {
+        "key":  "qr_scan_instruction",
+        "en":  "Scan QR code to view lot details",
+        "si":  "කණ්ඩායම් විස්තර බැලීමට QR කේතය ස්කෑන් කරන්න",
+        "ta":  "தொகுதி விவரங்களைப் பார்க்க QR குறியீட்டை ஸ்கேன் செய்யவும்"
+    },
+    {
+        "key":  "qr_scan_failed",
+        "en":  "Failed to scan QR code",
+        "si":  "QR කේතය ස්කෑන් කිරීම අසාර්ථක විය",
+        "ta":  "QR குறியீட்டை ஸ்கேன் செய்ய தோல்வி"
+    },
+    {
+        "key":  "qr_generate",
+        "en":  "Generate QR Code",
+        "si":  "QR කේතය උත්පාදනය කරන්න",
+        "ta":  "QR குறியீட்டை உருவாக்கு"
+    },
+    {
+        "key":  "dashboard_welcome",
+        "en":  "Welcome",
+        "si":  "සාදරයෙන් පිළිගනිමු",
+        "ta":  "வரவேற்கிறோம்"
+    },
+    {
+        "key":  "dashboard_total_lots",
+        "en":  "Total Lots",
+        "si":  "මුළු කණ්ඩායම්",
+        "ta":  "மொத்த தொகுதிகள்"
+    },
+    {
+        "key":  "dashboard_active_auctions",
+        "en":  "Active Auctions",
+        "si":  "ක්‍රියාකාරී වෙන්දේසි",
+        "ta":  "செயலில் உள்ள ஏலங்கள்"
+    },
+    {
+        "key":  "dashboard_total_earnings",
+        "en":  "Total Earnings",
+        "si":  "මුළු ඉපැයීම්",
+        "ta":  "மொத்த வருமானம்"
+    },
+    {
+        "key":  "dashboard_pending_payments",
+        "en":  "Pending Payments",
+        "si":  "පොරොත්තු ගෙවීම්",
+        "ta":  "நிலுவையில் உள்ள கொடுப்பனவுகள்"
+    },
+    {
+        "key":  "dashboard_recent_activity",
+        "en":  "Recent Activity",
+        "si":  "මෑත ක්‍රියාකාරකම්",
+        "ta":  "சமீபத்திய செயல்பாடுகள்"
+    },
+    {
+        "key":  "dashboard_statistics",
+        "en":  "Statistics",
+        "si":  "සංඛ්‍යාලේඛන",
+        "ta":  "புள்ளிவிவரங்கள்"
+    },
+    {
+        "key":  "empty_no_lots",
+        "en":  "No lots available",
+        "si":  "කණ්ඩායම් නොමැත",
+        "ta":  "தொகுதிகள் இல்லை"
+    },
+    {
+        "key":  "empty_no_auctions",
+        "en":  "No auctions available",
+        "si":  "වෙන්දේසි නොමැත",
+        "ta":  "ஏலங்கள் இல்லை"
+    },
+    {
+        "key":  "empty_no_bids",
+        "en":  "No bids yet",
+        "si":  "තවම ලංසු නැත",
+        "ta":  "இன்னும் ஏலங்கள் இல்லை"
+    },
+    {
+        "key":  "empty_no_notifications",
+        "en":  "No notifications",
+        "si":  "දැනුම්දීම් නැත",
+        "ta":  "அறிவிப்புகள் இல்லை"
+    },
+    {
+        "key":  "empty_no_transactions",
+        "en":  "No transactions",
+        "si":  "ගනුදෙනු නැත",
+        "ta":  "பரிவர்த்தனைகள் இல்லை"
+    },
+    {
+        "key": "lot_register_new",
+        "en": "Register New Lot",
+        "si": "නව කණ්ඩායමක් ලියාපදිංචි කරන්න",
+        "ta": "புதிய தொகுதியை பதிவு செய்யுங்கள்"
+    },
+    {
+        "key": "lot_register_info",
+        "en": "Please provide all the required information about your pepper lot",
+        "si": "කරුණාකර ඔබේ ගම්මිරිස් කණ්ඩායම පිළිබඳ සියලු අවශ්‍ය තොරතුරු ලබා දෙන්න",
+        "ta": "உங்கள் மிளகுத் தொகுதி பற்றிய அனைத்து தேவையான தகவல்களையும் வழங்கவும்"
+    },
+    {
+        "key": "auth_farmer_name",
+        "en": "Farmer Name",
+        "si": "ගොවියාගේ නම",
+        "ta": "விவசாயி பெயர்"
+    },
+    {
+        "key": "lot_farm_address",
+        "en": "Farm Address",
+        "si": "ගොවිපල ලිපිනය",
+        "ta": "பண்ணை முகவரி"
+    },
+    {
+        "key": "lot_farm_address_hint",
+        "en": "Enter your farm location",
+        "si": "ඔබේ ගොවිපල ස්ථානය ඇතුළත් කරන්න",
+        "ta": "உங்கள் பண்ணை இருப்பிடத்தை உள்ளிடவும்"
+    },
+    {
+        "key": "validation_farm_address",
+        "en": "Please enter farm address",
+        "si": "කරුණාකර ගොවිපල ලිපිනය ඇතුළත් කරන්න",
+        "ta": "பண்ணை முகவரியை உள்ளிடவும்"
+    },
+    {
+        "key": "lot_variety",
+        "en": "Pepper Variety",
+        "si": "ගම්මිරිස් ප්‍රභේදය",
+        "ta": "மிளகு வகை"
+    },
+    {
+        "key": "lot_variety_hint",
+        "en": "e.g., Panniyur-1, Karimunda",
+        "si": "උදා: Panniyur-1, Karimunda",
+        "ta": "எ.கா: Panniyur-1, Karimunda"
+    },
+    {
+        "key": "validation_variety",
+        "en": "Please select variety",
+        "si": "කරුණාකර ප්‍රභේදය තෝරන්න",
+        "ta": "வகையைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "lot_quantity",
+        "en": "Quantity (kg)",
+        "si": "ප්‍රමාණය (කි.ග්‍රෑ.)",
+        "ta": "அளவு (கிலோ)"
+    },
+    {
+        "key": "lot_quantity_hint",
+        "en": "Enter quantity in kilograms",
+        "si": "කිලෝග්‍රෑම් වලින් ප්‍රමාණය ඇතුළත් කරන්න",
+        "ta": "கிலோகிராமில் அளவை உள்ளிடவும்"
+    },
+    {
+        "key": "validation_quantity",
+        "en": "Please enter quantity",
+        "si": "කරුණාකර ප්‍රමාණය ඇතුළත් කරන්න",
+        "ta": "அளவை உள்ளிடவும்"
+    },
+    {
+        "key": "validation_invalid_quantity",
+        "en": "Please enter a valid quantity",
+        "si": "කරුණාකර වලංගු ප්‍රමාණයක් ඇතුළත් කරන්න",
+        "ta": "சரியான அளவை உள்ளிடவும்"
+    },
+    {
+        "key": "lot_quality",
+        "en": "Quality Grade",
+        "si": "ගුණාත්මක ශ්‍රේණිය",
+        "ta": "தர வகை"
+    },
+    {
+        "key": "lot_harvest_date_hint",
+        "en": "Select harvest date",
+        "si": "අස්වැන්න ලබා ගත් දිනය තෝරන්න",
+        "ta": "அறுவடை தேதியை தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "validation_harvest_date",
+        "en": "Please select harvest date",
+        "si": "කරුණාකර අස්වැන්න ලබා ගත් දිනය තෝරන්න",
+        "ta": "அறுவடை தேதியை தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "common_description_optional",
+        "en": "Description (Optional)",
+        "si": "විස්තරය (අභාවය)",
+        "ta": "விளக்கம் (விருப்பமானது)"
+    },
+    {
+        "key": "lot_description_hint",
+        "en": "Add any additional information",
+        "si": "වෙනත් තොරතුරු එක් කරන්න",
+        "ta": "கூடுதல் தகவல்களை சேர்க்கவும்"
+    },
+    {
+        "key": "lot_pictures",
+        "en": "Lot Pictures",
+        "si": "කණ්ඩායම් පින්තූර",
+        "ta": "தொகுதி படங்கள்"
+    },
+    {
+        "key": "common_add",
+        "en": "Add",
+        "si": "එක් කරන්න",
+        "ta": "சேர்க்கவும்"
+    },
+    {
+        "key": "empty_no_pictures",
+        "en": "No pictures added yet",
+        "si": "තවම පින්තූර එකතු කර නැත",
+        "ta": "இன்னும் படங்கள் சேர்க்கப்படவில்லை"
+    },
+    {
+        "key": "lot_required_quality",
+        "en": "Required for quality verification",
+        "si": "ගුණාත්මක සත්‍යාපනය සඳහා අවශ්‍යයි",
+        "ta": "தர சரிபார்ப்புக்கு தேவை"
+    },
+    {
+        "key": "lot_certificates",
+        "en": "Certificates",
+        "si": "සහතික",
+        "ta": "சான்றிதழ்கள்"
+    },
+    {
+        "key": "empty_no_certificates",
+        "en": "No certificates added yet",
+        "si": "තවම සහතික එකතු කර නැත",
+        "ta": "இன்னும் சான்றிதழ்கள் சேர்க்கப்படவில்லை"
+    },
+    {
+        "key": "lot_register_button",
+        "en": "Register Lot",
+        "si": "කණ්ඩායම ලියාපදිංචි කරන්න",
+        "ta": "தொகுதியைப் பதிவு செய்யுங்கள்"
+    },
+    {
+        "key": "validation_lot_pictures",
+        "en": "Please add at least 3 pictures of your lot",
+        "si": "කරුණාකර ඔබේ කණ්ඩායම පිළිබඳ අවම වශයෙන් පින්තූර 3ක් එක් කරන්න",
+        "ta": "உங்கள் தொகுதியின் குறைந்தது 3 படங்களைச் சேர்க்கவும்"
+    },
+    {
+        "key": "validation_certificates",
+        "en": "Please add at least one certificate",
+        "si": "කරුණාකර අවම වශයෙන් එක් සහතිකයක් එක් කරන්න",
+        "ta": "குறைந்தது ஒரு சான்றிதழைச் சேர்க்கவும்"
+    },
+    {
+        "key": "success_lot_created",
+        "en": "Lot created successfully!",
+        "si": "කණ්ඩායම සාර්ථකව නිර්මාණය කරන ලදී!",
+        "ta": "தொகுதி வெற்றிகரமாக உருவாக்கப்பட்டது!"
+    },
+    {
+        "key": "error_lot_creation",
+        "en": "Failed to create lot",
+        "si": "කණ්ඩායම නිර්මාණය කිරීමට අසමත් විය",
+        "ta": "தொகுதியை உருவாக்க முடியவில்லை"
+    },
+    {
+        "key": "common_take_photo",
+        "en": "Take Photo",
+        "si": "ඡායාරූපයක් ගන්න",
+        "ta": "புகைப்படம் எடுக்கவும்"
+    },
+    {
+        "key": "common_choose_gallery",
+        "en": "Choose from Gallery",
+        "si": "ගැලරියෙන් තෝරන්න",
+        "ta": "கேலரியில் இருந்து தேர்வு செய்யவும்"
+    },
+    {
+        "key": "wallet_import",
+        "en": "Import Wallet",
+        "si": "පසුම්බිය ආයාත කරන්න",
+        "ta": "பணப்பையை இறக்குமதி செய்யுங்கள்"
+    },
+    {
+        "key": "wallet_import_info",
+        "en": "Please import your wallet to register the lot on blockchain",
+        "si": "බ්ලොක්චේන් හි කණ්ඩායම ලියාපදිංචි කිරීමට කරුණාකර ඔබේ පසුම්බිය ආයාත කරන්න",
+        "ta": "பிளாக்செயினில் தொகுதியை பதிவு செய்ய உங்கள் பணப்பையை இறக்குமதி செய்யவும்"
+    },
+    {
+        "key": "wallet_enter_key",
+        "en": "Enter Your Private Key",
+        "si": "ඔබේ පුද්ගලික යතුර ඇතුළත් කරන්න",
+        "ta": "உங்கள் தனிப்பட்ட விசையை உள்ளிடவும்"
+    },
+    {
+        "key": "wallet_lost_key_info",
+        "en": "Never share your private key with anyone. If lost, it cannot be recovered.",
+        "si": "ඔබේ පුද්ගලික යතුර කිසි විටෙකත් කිසිවෙකු සමඟ බෙදා නොගන්න. නැති වුවහොත් එය නැවත ලබා ගත නොහැක.",
+        "ta": "உங்கள் தனிப்பட்ட விசையை யாருடனும் பகிர்ந்து கொள்ள வேண்டாம். தொலைந்தால், அதை மீட்டெடுக்க முடியாது."
+    },
+    {
+        "key": "common_all",
+        "en": "All",
+        "si": "සියල්ල",
+        "ta": "அனைத்தும்"
+    },
+    {
+        "key": "status_pending",
+        "en": "Pending",
+        "si": "நிලுවையில்",
+        "ta": "நிலுவையில்"
+    },
+    {
+        "key": "status_approved",
+        "en": "Approved",
+        "si": "අනුමත",
+        "ta": "அங்கீகரிக்கப்பட்டது"
+    },
+    {
+        "key": "status_rejected",
+        "en": "Rejected",
+        "si": "ප්‍රතික්ෂේප",
+        "ta": "நிராகரிக்கப்பட்டது"
+    },
+    {
+        "key": "status_listed",
+        "en": "Listed",
+        "si": "ලැයිස්තුගත",
+        "ta": "பட்டியலிடப்பட்டுள்ளது"
+    },
+    {
+        "key": "status_sold",
+        "en": "Sold",
+        "si": "විකුණා ඇත",
+        "ta": "விற்கப்பட்டது"
+    },
+    {
+        "key": "error_loading_lots",
+        "en": "Error loading lots",
+        "si": "කණ්ඩායම් පූරණය කිරීමේ දෝෂයකි",
+        "ta": "தொகுதிகளை ஏற்றுவதில் பிழை"
+    },
+    {
+        "key": "empty_no_lots",
+        "en": "No lots available",
+        "si": "කණ්ඩායම් නොමැත",
+        "ta": "தொகுதிகள் இல்லை"
+    },
+    {
+        "key": "lot_lots",
+        "en": "lots",
+        "si": "කණ්ඩායම්",
+        "ta": "தொகுதிகள்"
+    },
+    {
+        "key": "lot_create_first",
+        "en": "Create your first lot to get started",
+        "si": "ආරම්භ කිරීමට ඔබේ පළමු කණ්ඩායම සාදන්න",
+        "ta": "தொடங்க உங்கள் முதல் தொகுதியை உருவாக்கவும்"
+    },
+    {
+        "key": "lot_grade",
+        "en": "Grade",
+        "si": "ශ්‍රේණිය",
+        "ta": "தரம்"
+    },
+    {
+        "key": "auction_in_auction",
+        "en": "In Auction",
+        "si": "වෙන්දේසියේ",
+        "ta": "ஏலத்தில்"
+    },
+    {
+        "key": "auction_view_live",
+        "en": "View Live",
+        "si": "සජීවීව බලන්න",
+        "ta": "நேரலையில் பார்க்கவும்"
+    },
+    {
+        "key": "status_created",
+        "en": "Created",
+        "si": "නිර්මාණය කළා",
+        "ta": "உருவாக்கப்பட்டது"
+    },
+    {
+        "key": "common_quantity",
+        "en": "Quantity",
+        "si": "ප්‍රමාණය",
+        "ta": "அளவு"
+    },
+    {
+        "key": "common_harvest",
+        "en": "Harvest",
+        "si": "අස්වැන්න",
+        "ta": "அறுவடை"
+    },
+    {
+        "key": "common_track",
+        "en": "Track",
+        "si": "හරහා යන්න",
+        "ta": "கண்காணிக்கவும்"
+    },
+    {
+        "key": "common_nft",
+        "en": "NFT",
+        "si": "NFT",
+        "ta": "NFT"
+    },
+    {
+        "key": "message_view_traceability",
+        "en": "View traceability",
+        "si": "සොයා ගත හැකි බව බලන්න",
+        "ta": "கண்காணிப்பு பார்க்கவும்"
+    },
+    {
+        "key": "message_view_nft_passport",
+        "en": "View NFT Passport",
+        "si": "NFT පාස්පෝට් බලන්න",
+        "ta": "NFT பாஸ்போர்ட்டைப் பார்க்கவும்"
+    },
+    {
+        "key": "button_close",
+        "en": "Close",
+        "si": "වසන්න",
+        "ta": "மூடு"
+    },
+    {
+        "key": "button_submit_request",
+        "en": "Submit Request",
+        "si": "ඉල්ලීම ඉදිරිපත් කරන්න",
+        "ta": "கோரிக்கையை சமர்ப்பிக்கவும்"
+    },
+    {
+        "key": "button_retry",
+        "en": "Retry",
+        "si": "නැවත උත්සාහ කරන්න",
+        "ta": "மீண்டும் முயற்சிக்கவும்"
+    },
+    {
+        "key": "button_copy",
+        "en": "Copy",
+        "si": "පිටපත් කරන්න",
+        "ta": "நகலெடுக்கவும்"
+    },
+    {
+        "key": "button_connect_wallet",
+        "en": "Connect Wallet",
+        "si": "පසුම්බිය සම්බන්ධ කරන්න",
+        "ta": "பணப்பையை இணைக்கவும்"
+    },
+    {
+        "key": "button_logout",
+        "en": "Logout",
+        "si": "පිටවන්න",
+        "ta": "வெளியேறு"
+    },
+    {
+        "key": "button_import_wallet",
+        "en": "Import Wallet",
+        "si": "පසුම්බිය ආයාත කරන්න",
+        "ta": "பணப்பையை இறக்குமதி செய்"
+    },
+    {
+        "key": "button_copy_lot_id",
+        "en": "Copy Lot ID",
+        "si": "කණ්ඩායම් හැඳුනුම්පත පිටපත් කරන්න",
+        "ta": "தொகுதி அடையாளத்தை நகலெடுக்கவும்"
+    },
+    {
+        "key": "button_add_certificate",
+        "en": "Add Certificate",
+        "si": "සහතිකය එක් කරන්න",
+        "ta": "சான்றிதழைச் சேர்க்கவும்"
+    },
+    {
+        "key": "button_check_compliance",
+        "en": "Check Compliance",
+        "si": "අනුකූලතාව පරීක්ෂා කරන්න",
+        "ta": "இணக்கத்தை சரிபார்க்கவும்"
+    },
+    {
+        "key": "button_add_processing_stage",
+        "en": "Add Processing Stage",
+        "si": "සැකසුම් අදියර එක් කරන්න",
+        "ta": "செயலாக்க நிலையைச் சேர்க்கவும்"
+    },
+    {
+        "key": "button_create_auction_lot",
+        "en": "Create Auction for This Lot",
+        "si": "මෙම කණ්ඩායම සඳහා වෙන්දේසියක් සාදන්න",
+        "ta": "இந்த தொகுதிக்கு ஏலத்தை உருவாக்கவும்"
+    },
+    {
+        "key": "button_view_details",
+        "en": "View Details",
+        "si": "විස්තර බලන්න",
+        "ta": "விவரங்களைப் பார்க்கவும்"
+    },
+    {
+        "key": "button_full_traceability",
+        "en": "Full Traceability",
+        "si": "සම්පූර්ණ සොයා ගත හැකි බව",
+        "ta": "முழு கண்காணிப்பு"
+    },
+    {
+        "key": "button_quick_info",
+        "en": "Quick Info",
+        "si": "ඉක්මන් තොරතුරු",
+        "ta": "விரைவு தகவல்"
+    },
+    {
+        "key": "button_place_bid",
+        "en": "Place Bid",
+        "si": "ලංසුවක් තබන්න",
+        "ta": "ஏலத்தை வைக்கவும்"
+    },
+    {
+        "key": "button_view_lot_details",
+        "en": "View Full Lot Details",
+        "si": "සම්පූර්ණ කණ්ඩායම් විස්තර බලන්න",
+        "ta": "முழு தொகுதி விவரங்களைப் பார்க்கவும்"
+    },
+    {
+        "key": "button_view_blockchain",
+        "en": "View on Blockchain",
+        "si": "බ්ලොක්චේන් හි බලන්න",
+        "ta": "பிளாக்செயினில் பார்க்கவும்"
+    },
+    {
+        "key": "label_variety",
+        "en": "Variety",
+        "si": "ප්‍රභේදය",
+        "ta": "வகை"
+    },
+    {
+        "key": "label_quality",
+        "en": "Quality",
+        "si": "ගුණාත්මකභාවය",
+        "ta": "தரம்"
+    },
+    {
+        "key": "label_quantity",
+        "en": "Quantity",
+        "si": "ප්‍රමාණය",
+        "ta": "அளவு"
+    },
+    {
+        "key": "unit_kg",
+        "en": "kg",
+        "si": "කි.ග්‍රෑ.",
+        "ta": "கிலோ"
+    },
+    {
+        "key": "label_current_bid",
+        "en": "Current Bid",
+        "si": "වත්මන් ලංසුව",
+        "ta": "தற்போதைய ஏலம்"
+    },
+    {
+        "key": "label_starting_price",
+        "en": "Starting Price",
+        "si": "ආරම්භක මිල",
+        "ta": "தொடக்க விலை"
+    },
+    {
+        "key": "label_bidders",
+        "en": "Bidders",
+        "si": "ලංසු කරන්නන්",
+        "ta": "ஏலதாரர்கள்"
+    },
+    {
+        "key": "label_time_left",
+        "en": "Time Left",
+        "si": "ඉතිරි කාලය",
+        "ta": "மீதமுள்ள நேரம்"
+    },
+    {
+        "key": "label_farmer",
+        "en": "Farmer",
+        "si": "ගොවියා",
+        "ta": "விவசாயி"
+    },
+    {
+        "key": "label_wallet_address",
+        "en": "Wallet Address",
+        "si": "පසුම්බි ලිපිනය",
+        "ta": "பணப்பை முகவரி"
+    },
+    {
+        "key": "label_harvest_date",
+        "en": "Harvest Date",
+        "si": "අස්වැන්න ලබා ගත් දිනය",
+        "ta": "அறுவடை தேதி"
+    },
+    {
+        "key": "label_origin",
+        "en": "Origin",
+        "si": "මූලාරම්භය",
+        "ta": "தோற்றம்"
+    },
+    {
+        "key": "label_farm_location",
+        "en": "Farm Location",
+        "si": "ගොවිපල ස්ථානය",
+        "ta": "பண்ணை இருப்பிடம்"
+    },
+    {
+        "key": "label_organic_certified",
+        "en": "Organic Certified",
+        "si": "කාබනික සහතිකය",
+        "ta": "இயற்கை சான்றளிக்கப்பட்டது"
+    },
+    {
+        "key": "label_yes",
+        "en": "Yes",
+        "si": "ඔව්",
+        "ta": "ஆம்"
+    },
+    {
+        "key": "label_no",
+        "en": "No",
+        "si": "නැත",
+        "ta": "இல்லை"
+    },
+    {
+        "key": "label_not_available",
+        "en": "N/A",
+        "si": "නැත",
+        "ta": "கிடையாது"
+    },
+    {
+        "key": "label_transaction_hash",
+        "en": "Transaction Hash",
+        "si": "ගනුදෙනු හැෂ්",
+        "ta": "பரிவர்த்தனை ஹாஷ்"
+    },
+    {
+        "key": "label_certificate_hash",
+        "en": "Certificate Hash",
+        "si": "සහතික හැෂ්",
+        "ta": "சான்றிதழ் ஹாஷ்"
+    },
+    {
+        "key": "label_status",
+        "en": "Status",
+        "si": "තත්ත්වය",
+        "ta": "நிலை"
+    },
+    {
+        "key": "auction_loading",
+        "en": "Loading Auction...",
+        "si": "වෙන්දේසිය පූරණය කරමින්...",
+        "ta": "ஏலத்தை ஏற்றுகிறது..."
+    },
+    {
+        "key": "auction_not_found_title",
+        "en": "Auction Not Found",
+        "si": "වෙන්දේසිය හමු නොවීය",
+        "ta": "ஏலம் கிடைக்கவில்லை"
+    },
+    {
+        "key": "live_auction_title",
+        "en": "Live Auction",
+        "si": "සජීවී වෙන්දේසිය",
+        "ta": "நேரலை ஏலம்"
+    },
+    {
+        "key": "label_your_pepper_lot",
+        "en": "Your Pepper Lot",
+        "si": "ඔබේ ගම්මිරිස් කණ්ඩායම",
+        "ta": "உங்கள் மிளகுத் தொகுதி"
+    },
+    {
+        "key": "label_auction_timeline",
+        "en": "Auction Timeline",
+        "si": "වෙන්දේසි කාල රේඛාව",
+        "ta": "ஏல காலவரிசை"
+    },
+    {
+        "key": "label_started",
+        "en": "Started",
+        "si": "ආරම්භ විය",
+        "ta": "தொடங்கியது"
+    },
+    {
+        "key": "label_ends",
+        "en": "Ends",
+        "si": "අවසන් වේ",
+        "ta": "முடிவடைகிறது"
+    },
+    {
+        "key": "label_settled",
+        "en": "Settled",
+        "si": "සමථයකට පැමිණ ඇත",
+        "ta": "தீர்வுசெய்யப்பட்டது"
+    },
+    {
+        "key": "label_bidding_activity",
+        "en": "Bidding Activity",
+        "si": "ලංසු ක්‍රියාකාරකම්",
+        "ta": "ஏல நடவடிக்கை"
+    },
+    {
+        "key": "label_leading_bidder",
+        "en": "Leading Bidder",
+        "si": "ප්‍රමුඛ ලංසු කරන්නා",
+        "ta": "முன்னணி ஏலதாரர்"
+    },
+    {
+        "key": "label_anonymous",
+        "en": "Anonymous",
+        "si": "අනාමික",
+        "ta": "அநாமதேயம்"
+    },
+    {
+        "key": "status_ended",
+        "en": "Ended",
+        "si": "අවසන්",
+        "ta": "முடிந்தது"
+    },
+    {
+        "key": "label_request_cancellation",
+        "en": "Request Cancellation",
+        "si": "අවලංගු කිරීම ඉල්ලන්න",
+        "ta": "ரத்து செய்வதற்கான கோரிக்கை"
+    },
+    {
+        "key": "status_live_auction",
+        "en": "LIVE AUCTION",
+        "si": "සජීවී වෙන්දේසිය",
+        "ta": "நேரடி ஏலம்"
+    },
+    {
+        "key": "status_auction_ended",
+        "en": "AUCTION ENDED",
+        "si": "වෙන්දේසිය අවසන්",
+        "ta": "ஏலம் முடிந்தது"
+    },
+    {
+        "key": "status_pending_admin_approval",
+        "en": "PENDING ADMIN APPROVAL",
+        "si": "පරිපාලක අනුමැතිය පොරොත්තුව",
+        "ta": "நிர்வாக ஒப்புதலுக்காக காத்திருக்கிறது"
+    },
+    {
+        "key": "status_starting_soon",
+        "en": "STARTING SOON",
+        "si": "ඉක්මනින් ආරම්භ වේ",
+        "ta": "விரைவில் தொடங்குகிறது"
+    },
+    {
+        "key": "status_pending_start",
+        "en": "PENDING START",
+        "si": "ආරම්භය පොරොත්තුව",
+        "ta": "தொடக்கத்திற்காக காத்திருக்கிறது"
+    },
+    {
+        "key": "status_complete",
+        "en": "Complete",
+        "si": "සම්පූර්ණ",
+        "ta": "முழுமையானது"
+    },
+    {
+        "key": "error_failed_load_auction",
+        "en": "Failed to load auction",
+        "si": "වෙන්දේසිය පූරණය කිරීමට අසමත් විය",
+        "ta": "ஏலத்தை ஏற்ற முடியவில்லை"
+    },
+    {
+        "key": "error_failed_auction_details",
+        "en": "Failed to load auction details",
+        "si": "වෙන්දේසි විස්තර පූරණය කිරීමට අසමත් විය",
+        "ta": "ஏல விவரங்களை ஏற்ற முடியவில்லை"
+    },
+    {
+        "key": "error_failed_submit_request",
+        "en": "Failed to submit request",
+        "si": "ඉල්ලීම ඉදිරිපත් කිරීමට අසමත් විය",
+        "ta": "கோரிக்கையை சமர்ப்பிக்க முடியவில்லை"
+    },
+    {
+        "key": "message_cancellation_submitted",
+        "en": "Cancellation request submitted. Admin will review.",
+        "si": "අවලංගු කිරීමේ ඉල්ලීම ඉදිරිපත් කරන ලදී. පරිපාලකයා සමාලෝචනය කරනු ඇත.",
+        "ta": "ரத்து கோரிக்கை சமர்ப்பிக்கப்பட்டது. நிர்வாகம் மதிப்பாய்வு செய்யும்."
+    },
+    {
+        "key": "message_lot_sold_congrats",
+        "en": "Congratulations! Your lot sold to",
+        "si": "සුබ පැතුම්! ඔබේ කණ්ඩායම විකුණන ලදී",
+        "ta": "வாழ்த்துக்கள்! உங்கள் தொகுதி விற்கப்பட்டது"
+    },
+    {
+        "key": "label_final_price",
+        "en": "Final Price",
+        "si": "අවසාන මිල",
+        "ta": "இறுதி விலை"
+    },
+    {
+        "key": "message_waiting_first_bid",
+        "en": "Waiting for first bid...",
+        "si": "පළමු ලංසුව සඳහා බලා සිටිමින්...",
+        "ta": "முதல் ஏலத்திற்காக காத்திருக்கிறது..."
+    },
+    {
+        "key": "dialog_auction_ended_title",
+        "en": "Auction Ended",
+        "si": "වෙන්දේසිය අවසන්",
+        "ta": "ஏலம் முடிந்தது"
+    },
+    {
+        "key": "dialog_emergency_cancel_title",
+        "en": "Request Emergency Cancellation",
+        "si": "හදිසි අවලංගු කිරීම ඉල්ලන්න",
+        "ta": "அவசர ரத்து கோரிக்கை"
+    },
+    {
+        "key": "dialog_emergency_cancel_warning",
+        "en": "Emergency cancellations require admin approval",
+        "si": "හදිසි අවලංගු කිරීම් සඳහා පරිපාලක අනුමැතිය අවශ්‍යයි",
+        "ta": "அவசர ரத்துகளுக்கு நிர்வாக ஒப்புதல் தேவை"
+    },
+    {
+        "key": "label_reason",
+        "en": "Reason",
+        "si": "හේතුව",
+        "ta": "காரணம்"
+    },
+    {
+        "key": "label_please_specify",
+        "en": "Please specify",
+        "si": "කරුණාකර සඳහන් කරන්න",
+        "ta": "தயவுசெய்து குறிப்பிடவும்"
+    },
+    {
+        "key": "reason_quality_issue",
+        "en": "Quality issue discovered",
+        "si": "ගුණාත්මක ගැටලුවක් සොයා ගන්නා ලදී",
+        "ta": "தர சிக்கல் கண்டுபிடிக்கப்பட்டது"
+    },
+    {
+        "key": "reason_lot_damaged",
+        "en": "Lot damaged or compromised",
+        "si": "කණ්ඩායම හානි වී ඇත හෝ සම්මුතියට පත්ව ඇත",
+        "ta": "தொகுதி சேதமடைந்துள்ளது அல்லது சமரசம் செய்யப்பட்டுள்ளது"
+    },
+    {
+        "key": "reason_error_details",
+        "en": "Error in lot details",
+        "si": "කණ්ඩායම් විස්තරවල දෝෂයකි",
+        "ta": "தொகுதி விவரங்களில் பிழை"
+    },
+    {
+        "key": "reason_force_majeure",
+        "en": "Force majeure (natural disaster, etc.)",
+        "si": "බල මජුර් (ස්වාභාවික විපත් ආදිය)",
+        "ta": "அதிமபலம் (இயற்கை பேரழிவு போன்றவை)"
+    },
+    {
+        "key": "reason_other",
+        "en": "Other",
+        "si": "වෙනත්",
+        "ta": "மற்றவை"
+    },
+    {
+        "key": "account_title",
+        "en": "Account",
+        "si": "ගිණුම",
+        "ta": "கணக்கு"
+    },
+    {
+        "key": "label_user",
+        "en": "User",
+        "si": "පරිශීලක",
+        "ta": "பயனர்"
+    },
+    {
+        "key": "label_verified_account",
+        "en": "Verified Account",
+        "si": "සත්‍යාපිත ගිණුම",
+        "ta": "சரிபார்க்கப்பட்ட கணக்கு"
+    },
+    {
+        "key": "label_auctions",
+        "en": "Auctions",
+        "si": "වෙන්දේසි",
+        "ta": "ஏலங்கள்"
+    },
+    {
+        "key": "label_lots",
+        "en": "Lots",
+        "si": "කණ්ඩායම්",
+        "ta": "தொகுதிகள்"
+    },
+    {
+        "key": "label_lot_details",
+        "en": "Lot Details",
+        "si": "කණ්ඩායම් විස්තර",
+        "ta": "தொகுதி விவரங்கள்"
+    },
+    {
+        "key": "label_bids",
+        "en": "Bids",
+        "si": "ලංසු",
+        "ta": "ஏலங்கள்"
+    },
+    {
+        "key": "title_connect_wallet",
+        "en": "Connect Your Wallet",
+        "si": "ඔබේ පසුම්බිය සම්බන්ධ කරන්න",
+        "ta": "உங்கள் பணப்பையை இணைக்கவும்"
+    },
+    {
+        "key": "menu_edit_profile",
+        "en": "Edit Profile",
+        "si": "පැතිකඩ සංස්කරණය කරන්න",
+        "ta": "சுயவிவரத்தைத் திருத்து"
+    },
+    {
+        "key": "menu_change_password",
+        "en": "Change Password",
+        "si": "මුරපදය වෙනස් කරන්න",
+        "ta": "கடவுச்சொல்லை மாற்று"
+    },
+    {
+        "key": "menu_wallet_settings",
+        "en": "Wallet Settings",
+        "si": "පසුම්බි සැකසුම්",
+        "ta": "பணப்பை அமைப்புகள்"
+    },
+    {
+        "key": "section_account",
+        "en": "ACCOUNT",
+        "si": "ගිණුම",
+        "ta": "கணக்கு"
+    },
+    {
+        "key": "section_preferences",
+        "en": "PREFERENCES",
+        "si": "මනාපයන්",
+        "ta": "விருப்பத்தேர்வுகள்"
+    },
+    {
+        "key": "section_support",
+        "en": "SUPPORT",
+        "si": "සහාය",
+        "ta": "ஆதரவு"
+    },
+    {
+        "key": "lot_details_title",
+        "en": "Lot Details",
+        "si": "කණ්ඩායම් විස්තර",
+        "ta": "தொகுதி விவரங்கள்"
+    },
+    {
+        "key": "label_digital_passport",
+        "en": "Digital Passport",
+        "si": "ඩිජිටල් ග්‍රන්ථය",
+        "ta": "டிஜிட்டல் பாஸ்போர்ட்"
+    },
+    {
+        "key": "label_scan_traceability",
+        "en": "Scan to view complete traceability",
+        "si": "සම්පූර්ණ සොයා ගත හැකි බව බැලීමට ස්කෑන් කරන්න",
+        "ta": "முழு கண்காணிப்பைப் பார்க்க ஸ்கேன் செய்யவும்"
+    },
+    {
+        "key": "label_lot_information",
+        "en": "Lot Information",
+        "si": "කණ්ඩායම් තොරතුරු",
+        "ta": "தொகுதி தகவல்"
+    },
+    {
+        "key": "label_farmer_details",
+        "en": "Farmer Details",
+        "si": "ගොවි විස්තර",
+        "ta": "விவசாயி விவரங்கள்"
+    },
+    {
+        "key": "label_compliance_status",
+        "en": "Compliance Status",
+        "si": "අනුකූලතා තත්ත්වය",
+        "ta": "இணக்க நிலை"
+    },
+    {
+        "key": "label_blockchain_traceability",
+        "en": "Blockchain Traceability",
+        "si": "බ්ලොක්චේන් සොයා ගත හැකි බව",
+        "ta": "பிளாக்செயின் கண்காணிப்பு"
+    },
+    {
+        "key": "label_quality_grade",
+        "en": "Quality Grade",
+        "si": "ගුණාත්මක ශ්‍රේණිය",
+        "ta": "தர வகை"
+    },
+    {
+        "key": "label_created",
+        "en": "Created",
+        "si": "නිර්මාණය කළා",
+        "ta": "உருவாக்கப்பட்டது"
+    },
+    {
+        "key": "label_farmer_name",
+        "en": "Farmer Name",
+        "si": "ගොවියාගේ නම",
+        "ta": "விவசாயி பெயர்"
+    },
+    {
+        "key": "label_certifications_compliance",
+        "en": "Certifications & Compliance",
+        "si": "සහතික සහ අනුකූලතාව",
+        "ta": "சான்றிதழ்கள் மற்றும் இணக்கம்"
+    },
+    {
+        "key": "label_blockchain_verified",
+        "en": "Blockchain Verified",
+        "si": "බ්ලොක්චේන් සත්‍යාපනය",
+        "ta": "பிளாக்செயின் சரிபார்க்கப்பட்டது"
+    },
+    {
+        "key": "label_pending_blockchain",
+        "en": "Pending Blockchain",
+        "si": "බ්ලොක්චේන් පොරොත්තුව",
+        "ta": "பிளாக்செயின் நிலுவையில்"
+    },
+    {
+        "key": "label_immutable_record",
+        "en": "Immutable on-chain record",
+        "si": "වෙනස් කළ නොහැකි දාම මත වාර්තාව",
+        "ta": "மாற்ற முடியாத சங்கிலியில் பதிவு"
+    },
+    {
+        "key": "label_awaiting_blockchain",
+        "en": "Awaiting blockchain confirmation",
+        "si": "බ්ලොක්චේන් තහවුරු කිරීම සඳහා බලා සිටිමින්",
+        "ta": "பிளாக்செயின் உறுதிப்படுத்துதலுக்காக காத்திருக்கிறது"
+    },
+    {
+        "key": "label_ipfs_storage",
+        "en": "IPFS Storage",
+        "si": "IPFS ගබඩාව",
+        "ta": "IPFS சேமிப்பு"
+    },
+    {
+        "key": "label_metadata_uri",
+        "en": "Metadata URI",
+        "si": "පාර දත්ත URI",
+        "ta": "மெட்டாடேட்டா URI"
+    },
+    {
+        "key": "label_certificate_url",
+        "en": "Certificate URL",
+        "si": "සහතික URL",
+        "ta": "சான்றிதழ் URL"
+    },
+    {
+        "key": "label_ipfs_certificate",
+        "en": "IPFS Certificate",
+        "si": "IPFS සහතිකය",
+        "ta": "IPFS சான்றிதழ்"
+    },
+    {
+        "key": "label_origin_information",
+        "en": "Origin Information",
+        "si": "මූලාරම්භ තොරතුරු",
+        "ta": "தோற்ற தகவல்"
+    },
+    {
+        "key": "label_blockchain_network",
+        "en": "Blockchain Network:",
+        "si": "බ්ලොක්චේන් ජාලය:",
+        "ta": "பிளாக்செயின் நெட்வொர்க்:"
+    },
+    {
+        "key": "label_hardhat_network",
+        "en": "Hardhat Local Network",
+        "si": "Hardhat දේශීය ජාලය",
+        "ta": "Hardhat உள்ளூர் நெட்வொர்க்"
+    },
+    {
+        "key": "message_share_coming_soon",
+        "en": "Share functionality coming soon",
+        "si": "හුවමාරු කිරීමේ ක්‍රියාකාරීත්වය ඉක්මනින්",
+        "ta": "பகிர்வு செயல்பாடு விரைவில்"
+    },
+    {
+        "key": "message_lot_id_copied",
+        "en": "Lot ID copied to clipboard",
+        "si": "කණ්ඩායම් හැඳුනුම්පත පසුරු පුවරුවට පිටපත් කරන ලදී",
+        "ta": "தொகுதி அடையாளம் கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது"
+    },
+    {
+        "key": "message_refresh_certifications",
+        "en": "Refresh the page to see updated certifications",
+        "si": "යාවත්කාලීන සහතික බැලීමට පිටුව නැවුම් කරන්න",
+        "ta": "புதுப்பிக்கப்பட்ட சான்றிதழ்களைப் பார்க்க பக்கத்தை புதுப்பிக்கவும்"
+    },
+    {
+        "key": "message_processing_stage_added",
+        "en": "Processing stage added! Refresh to see updates",
+        "si": "සැකසුම් අදියර එක් කරන ලදී! යාවත්කාලීන බැලීමට නැවුම් කරන්න",
+        "ta": "செயலாக்க நிலை சேர்க்கப்பட்டது! புதுப்பிப்புகளைப் பார்க்க புதுப்பிக்கவும்"
+    },
+    {
+        "key": "error_generic",
+        "en": "Error",
+        "si": "දෝෂය",
+        "ta": "பிழை"
+    },
+    {
+        "key": "message_tx_hash_copied",
+        "en": "Transaction hash copied!",
+        "si": "ගනුදෙනු හැෂ් පිටපත් කරන ලදී!",
+        "ta": "பரிவர்த்தனை ஹாஷ் நகலெடுக்கப்பட்டது!"
+    },
+    {
+        "key": "message_blockchain_verified",
+        "en": "This lot is verified on the blockchain",
+        "si": "මෙම කණ්ඩායම බ්ලොක්චේන් හි සත්‍යාපනය කර ඇත",
+        "ta": "இந்த தொகுதி பிளாக்செயினில் சரிபார்க்கப்பட்டுள்ளது"
+    },
+    {
+        "key": "message_tap_view_details",
+        "en": "Tap to view details",
+        "si": "විස්තර බැලීමට තට්ටු කරන්න",
+        "ta": "விவரங்களைப் பார்க்க தட்டவும்"
+    },
+    {
+        "key": "message_blockchain_registered",
+        "en": "This lot is registered on the blockchain for complete traceability.",
+        "si": "සම්පූර්ණ සොයා ගත හැකි බව සඳහා මෙම කණ්ඩායම බ්ලොක්චේන් හි ලියාපදිංචි කර ඇත.",
+        "ta": "இந்த தொகுதி முழு கண்காணிப்புக்காக பிளாக்செயினில் பதிவு செய்யப்பட்டுள்ளது."
+    },
+    {
+        "key": "message_blockchain_immutable",
+        "en": "This transaction is permanently recorded and cannot be altered, ensuring complete transparency.",
+        "si": "මෙම ගනුදෙනුව ස්ථිරවම වාර්තා වී ඇති අතර වෙනස් කළ නොහැකි අතර සම්පූර්ණ පාරදෘශ්‍යතාවය සහතික කෙරේ.",
+        "ta": "இந்த பரிவர்த்தனை நிரந்தரமாக பதிவு செய்யப்பட்டுள்ளது மற்றும் மாற்ற முடியாது, முழு வெளிப்படைத்தன்மையை உறுதி செய்கிறது."
+    },
+    {
+        "key": "message_blockchain_pending_approval",
+        "en": "This lot will be recorded on blockchain once approved",
+        "si": "අනුමත වූ පසු මෙම කණ්ඩායම බ්ලොක්චේන් හි වාර්තා කෙරෙනු ඇත",
+        "ta": "ஒப்புதல் அளிக்கப்பட்டவுடன் இந்த தொகுதி பிளாக்செயினில் பதிவு செய்யப்படும்"
+    },
+    {
+        "key": "status_passed",
+        "en": "PASSED",
+        "si": "සමත්",
+        "ta": "தேர்ச்சி"
+    },
+    {
+        "key": "status_failed",
+        "en": "FAILED",
+        "si": "අසමත්",
+        "ta": "தோல்வி"
+    },
+    {
+        "key": "status_compliance_passed",
+        "en": "All compliance checks passed",
+        "si": "සියලුම අනුකූලතා පරීක්ෂාවන් සමත් විය",
+        "ta": "அனைத்து இணக்க சரிபார்ப்புகளும் தேர்ச்சி பெற்றன"
+    },
+    {
+        "key": "status_compliance_awaiting",
+        "en": "Awaiting compliance verification",
+        "si": "අනුකූලතා සත්‍යාපනය සඳහා බලා සිටිමින්",
+        "ta": "இணக்க சரிபார்ப்புக்காக காத்திருக்கிறது"
+    },
+    {
+        "key": "status_compliance_issues",
+        "en": "Compliance issues detected",
+        "si": "අනුකූලතා ගැටලු හඳුනා ගන්නා ලදී",
+        "ta": "இணக்க சிக்கல்கள் கண்டறியப்பட்டன"
+    },
+    {
+        "key": "status_compliance_partial",
+        "en": "Some compliance checks pending",
+        "si": "සමහර අනුකූලතා පරීක්ෂාවන් පොරොත්තුව",
+        "ta": "சில இணக்க சரிபார்ப்புகள் நிலுவையில்"
+    },
+    {
+        "key": "status_unknown",
+        "en": "Status unknown",
+        "si": "තත්ත්වය නොදනී",
+        "ta": "நிலை தெரியவில்லை"
+    },
+    {
+        "key": "description_certifications_compliance",
+        "en": "Manage certificates and run compliance checks",
+        "si": "සහතික කළමනාකරණය කරන්න සහ අනුකූලතා පරීක්ෂාවන් ධාවනය කරන්න",
+        "ta": "சான்றிதழ்களை நிர்வகிக்கவும் மற்றும் இணக்க சரிபார்ப்புகளை இயக்கவும்"
+    },
+    {
+        "key": "dialog_select_market_title",
+        "en": "Select Destination Market",
+        "si": "ගමනාන්ත වෙළඳපොළ තෝරන්න",
+        "ta": "இலக்கு சந்தையைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "dialog_select_market_description",
+        "en": "Choose the target export market for compliance check:",
+        "si": "අනුකූලතා පරීක්ෂාව සඳහා ඉලක්කගත අපනයන වෙළඳපොළ තෝරන්න:",
+        "ta": "இணக்க சரிபார்ப்புக்காக இலக்கு ஏற்றுமதி சந்தையை தேர்வு செய்யவும்:"
+    },
+    {
+        "key": "market_eu",
+        "en": "European Union (EU)",
+        "si": "යුරෝපීය සංගමය (EU)",
+        "ta": "ஐரோப்பிய ஒன்றியம் (EU)"
+    },
+    {
+        "key": "market_fda",
+        "en": "United States (FDA)",
+        "si": "එක්සත් ජනපදය (FDA)",
+        "ta": "அமெரிக்கா (FDA)"
+    },
+    {
+        "key": "market_middle_east",
+        "en": "Middle East",
+        "si": "මැද පෙරදිග",
+        "ta": "மத்திய கிழக்கு"
+    },
+    {
+        "key": "dialog_running_compliance",
+        "en": "Running compliance check...",
+        "si": "අනුකූලතා පරීක්ෂාව ධාවනය කරමින්...",
+        "ta": "இணக்க சரிபார்ப்பு இயங்குகிறது..."
+    },
+    {
+        "key": "dialog_compliance_passed",
+        "en": "Compliance Passed",
+        "si": "අනුකූලතාව සමත්",
+        "ta": "இணக்கம் தேர்ச்சி"
+    },
+    {
+        "key": "dialog_compliance_failed",
+        "en": "Compliance Failed",
+        "si": "අනුකූලතාව අසමත්",
+        "ta": "இணக்கம் தோல்வி"
+    },
+    {
+        "key": "label_total_checks",
+        "en": "Total Checks",
+        "si": "මුළු පරීක්ෂාව",
+        "ta": "மொத்த சரிபார்ப்புகள்"
+    },
+    {
+        "key": "label_passed_checks",
+        "en": "Passed",
+        "si": "සමත්",
+        "ta": "தேர்ச்சி"
+    },
+    {
+        "key": "label_failed_checks",
+        "en": "Failed",
+        "si": "අසමත්",
+        "ta": "தோல்வி"
+    },
+    {
+        "key": "message_view_traceability_screen",
+        "en": "View full details in the traceability screen.",
+        "si": "සොයා ගත හැකි තිරයේ සම්පූර්ණ විස්තර බලන්න.",
+        "ta": "கண்காணிப்பு திரையில் முழு விவரங்களைப் பார்க்கவும்."
+    },
+    {
+        "key": "time_days_ago",
+        "en": "d ago",
+        "si": "දින කට පෙර",
+        "ta": "நாட்களுக்கு முன்"
+    },
+    {
+        "key": "time_hours_ago",
+        "en": "h ago",
+        "si": "පැය කට පෙර",
+        "ta": "மணி நேரத்திற்கு முன்"
+    },
+    {
+        "key": "time_minutes_ago",
+        "en": "m ago",
+        "si": "මිනිත්තු කට පෙර",
+        "ta": "நிமிடங்களுக்கு முன்"
+    },
+    {
+        "key": "time_just_now",
+        "en": "Just now",
+        "si": "දැන්",
+        "ta": "இப்போது"
+    },
+    {
+        "key": "message_wallet_copied",
+        "en": "Wallet address copied!",
+        "si": "පසුම්බි ලිපිනය පිටපත් කරන ලදී!",
+        "ta": "பணப்பை முகவரி நகலெடுக்கப்பட்டது!"
+    },
+    {
+        "key": "message_address_copied",
+        "en": "Address copied!",
+        "si": "ලිපිනය පිටපත් කරන ලදී!",
+        "ta": "முகவரி நகலெடுக்கப்பட்டது!"
+    },
+    {
+        "key": "message_copied_clipboard",
+        "en": "Copied to clipboard",
+        "si": "පසුරු පුවරුවට පිටපත් කරන ලදී",
+        "ta": "கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது"
+    },
+    {
+        "key": "message_no_wallet",
+        "en": "No wallet connected",
+        "si": "පසුම්බියක් සම්බන්ධ කර නැත",
+        "ta": "பணப்பை இணைக்கப்படவில்லை"
+    },
+    {
+        "key": "label_current_highest_bid",
+        "en": "Current Highest Bid",
+        "si": "වත්මන් ඉහළම ලංසුව",
+        "ta": "தற்போதைய அதிகபட்ச ஏலம்"
+    },
+    {
+        "key": "label_no_bids_yet",
+        "en": "Starting Price - No bids yet",
+        "si": "ආරම්භක මිල - තවම ලංසු නැත",
+        "ta": "தொடக்க விலை - இன்னும் ஏலங்கள் இல்லை"
+    },
+    {
+        "key": "label_starting_bid_prefix",
+        "en": "Starting Bid:",
+        "si": "ආරම්භක ලංසුව:",
+        "ta": "தொடக்க ஏலம்:"
+    },
+    {
+        "key": "label_highest_bidder",
+        "en": "Highest Bidder",
+        "si": "ඉහළම ලංසු කරන්නා",
+        "ta": "அதிகபட்ச ஏலதாரர்"
+    },
+    {
+        "key": "label_auction_details",
+        "en": "Auction Details",
+        "si": "වෙන්දේසි විස්තර",
+        "ta": "ஏல விவரங்கள்"
+    },
+    {
+        "key": "label_start_time",
+        "en": "Start Time",
+        "si": "ආරම්භක කාලය",
+        "ta": "தொடக்க நேரம்"
+    },
+    {
+        "key": "label_end_time",
+        "en": "End Time",
+        "si": "අවසාන කාලය",
+        "ta": "முடிவு நேரம்"
+    },
+    {
+        "key": "label_auction_id",
+        "en": "Auction ID",
+        "si": "වෙන්දේසි හැඳුනුම්පත",
+        "ta": "ஏல அடையாளம்"
+    },
+    {
+        "key": "label_lot_id",
+        "en": "Lot ID",
+        "si": "කණ්ඩායම් හැඳුනුම්පත",
+        "ta": "தொகுதி அடையாளம்"
+    },
+    {
+        "key": "label_token_id",
+        "en": "Token ID",
+        "si": "ටෝකන් හැඳුනුම්පත",
+        "ta": "டோக்கன் அடையாளம்"
+    },
+    {
+        "key": "label_verified_farmer",
+        "en": "Verified Farmer",
+        "si": "සත්‍යාපිත ගොවියා",
+        "ta": "சரிபார்க்கப்பட்ட விவசாயி"
+    },
+    {
+        "key": "label_bid_history",
+        "en": "Bid History",
+        "si": "ලංසු ඉතිහාසය",
+        "ta": "ஏல வரலாறு"
+    },
+    {
+        "key": "label_bids_count",
+        "en": "bids",
+        "si": "ලංසු",
+        "ta": "ஏலங்கள்"
+    },
+    {
+        "key": "label_blockchain_verification",
+        "en": "Blockchain Verification",
+        "si": "බ්ලොක්චේන් සත්‍යාපනය",
+        "ta": "பிளாக்செயின் சரிபார்ப்பு"
+    },
+    {
+        "key": "label_realtime_updates",
+        "en": "Real-time Updates",
+        "si": "තත්‍ය කාලීන යාවත්කාලීන",
+        "ta": "நிகழ்நேர புதுப்பிப்புகள்"
+    },
+    {
+        "key": "label_smart_contract_enforced",
+        "en": "Smart Contract Enforced",
+        "si": "ස්මාර්ට් කොන්ත්‍රාත් බලාත්මක කරන ලදී",
+        "ta": "ஸ்மார்ட் ஒப்பந்தம் செயல்படுத்தப்பட்டது"
+    },
+    {
+        "key": "placeholder_enter_bid",
+        "en": "Enter your bid",
+        "si": "ඔබේ ලංසුව ඇතුළත් කරන්න",
+        "ta": "உங்கள் ஏலத்தை உள்ளிடவும்"
+    },
+    {
+        "key": "message_no_bids_first",
+        "en": "No bids yet. Be the first!",
+        "si": "තවම ලංසු නැත. පළමුවැන්නා වන්න!",
+        "ta": "இன்னும் ஏலங்கள் இல்லை. முதலில் இருங்கள்!"
+    },
+    {
+        "key": "error_bid_too_low",
+        "en": "Bid must be higher than current bid",
+        "si": "ලංසුව වත්මන් ලංසුවට වඩා වැඩි විය යුතුය",
+        "ta": "ஏலம் தற்போதைய ஏலத்தை விட அதிகமாக இருக்க வேண்டும்"
+    },
+    {
+        "key": "error_wallet_not_found",
+        "en": "Wallet address not found. Please update your profile.",
+        "si": "පසුම්බි ලිපිනය හමු නොවීය. කරුණාකර ඔබේ පැතිකඩ යාවත්කාලීන කරන්න.",
+        "ta": "பணப்பை முகவரி கிடைக்கவில்லை. தயவுசெய்து உங்கள் சுயவிவரத்தை புதுப்பிக்கவும்."
+    },
+    {
+        "key": "message_bid_success",
+        "en": "Bid placed successfully!",
+        "si": "ලංසුව සාර්ථකව තබන ලදී!",
+        "ta": "ஏலம் வெற்றிகரமாக வைக்கப்பட்டது!"
+    },
+    {
+        "key": "error_bid_failed",
+        "en": "Failed to place bid. Please try again.",
+        "si": "ලංසුව තැබීමට අසමත් විය. කරුණාකර නැවත උත්සාහ කරන්න.",
+        "ta": "ஏலத்தை வைக்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்."
+    },
+    {
+        "key": "status_upcoming",
+        "en": "UPCOMING",
+        "si": "එළඹෙන",
+        "ta": "வரவிருக்கும்"
+    },
+    {
+        "key": "label_ends_in",
+        "en": "Ends In",
+        "si": "අවසන් වන්නේ",
+        "ta": "முடிவடைகிறது"
+    },
+    {
+        "key": "label_starts_in",
+        "en": "Starts In",
+        "si": "ආරම්භ වන්නේ",
+        "ta": "தொடங்குகிறது"
+    },
+    {
+        "key": "status_pending_approval",
+        "en": "Pending Approval",
+        "si": "අනුමැතිය පොරොත්තුව",
+        "ta": "ஒப்புதலுக்காக காத்திருக்கிறது"
+    },
+    {
+        "key": "status_listed_auction",
+        "en": "Listed for Auction",
+        "si": "වෙන්දේසිය සඳහා ලැයිස්තුගත කර ඇත",
+        "ta": "ஏலத்திற்காக பட்டியலிடப்பட்டுள்ளது"
+    },
+    {
+        "key": "error_loading_lot_details",
+        "en": "Error loading lot details",
+        "si": "කණ්ඩායම් විස්තර පූරණය කිරීමේ දෝෂය",
+        "ta": "தொகுதி விவரங்களை ஏற்றுவதில் பிழை"
+    },
+    {
+        "key": "error_no_lot_data",
+        "en": "No lot data available",
+        "si": "කණ්ඩායම් දත්ත නොමැත",
+        "ta": "தொகுதி தரவு இல்லை"
+    },
+    {
+        "key": "label_ready_auction",
+        "en": "Ready for Auction",
+        "si": "වෙන්දේසිය සඳහා සූදානම්",
+        "ta": "ஏலத்திற்கு தயார்"
+    },
+    {
+        "key": "description_eligible_auction",
+        "en": "This lot is eligible for auction. Create an auction to start receiving bids from buyers.",
+        "si": "මෙම කණ්ඩායම වෙන්දේසිය සඳහා සුදුසුයි. ගැනුම්කරුවන්ගෙන් ලංසු ලබා ගැනීම ආරම්භ කිරීමට වෙන්දේසියක් සාදන්න.",
+        "ta": "இந்த தொகுதி ஏலத்திற்கு தகுதியானது. வாங்குபவர்களிடமிருந்து ஏலங்களைப் பெறத் தொடங்க ஏலத்தை உருவாக்கவும்."
+    },
+    {
+        "key": "subtitle_lot_eligible_auction",
+        "en": "This lot is eligible for auction. Create an auction to start receiving bids from buyers.",
+        "si": "මෙම කණ්ඩායම වෙන්දේසිය සඳහා සුදුසුයි. ගැනුම්කරුවන්ගෙන් ලංසු ලබා ගැනීම ආරම්භ කිරීමට වෙන්දේසියක් සාදන්න.",
+        "ta": "இந்த தொகுதி ஏலத்திற்கு தகுதியானது. வாங்குபவர்களிடமிருந்து ஏலங்களைப் பெறத் தொடங்க ஏலத்தை உருவாக்கவும்."
+    },
+    {
+        "key": "message_select_lot_auction",
+        "en": "Select lot {lotId} to create an auction",
+        "si": "වෙන්දේසියක් සෑදීමට {lotId} කණ්ඩායම තෝරන්න",
+        "ta": "ஏலத்தை உருவாக்க {lotId} தொகுதியைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "label_my_auctions",
+        "en": "My Auctions",
+        "si": "මගේ වෙන්දේසි",
+        "ta": "எனது ஏலங்கள்"
+    },
+    {
+        "key": "label_auctions",
+        "en": "Auctions",
+        "si": "වෙන්දේසි",
+        "ta": "ஏலங்கள்"
+    },
+    {
+        "key": "message_search_functionality",
+        "en": "Search functionality",
+        "si": "සෙවුම් විශේෂාංගය",
+        "ta": "தேடல் செயல்பாடு"
+    },
+    {
+        "key": "tab_active",
+        "en": "Active",
+        "si": "සක්‍රිය",
+        "ta": "செயலில்"
+    },
+    {
+        "key": "tab_upcoming",
+        "en": "Upcoming",
+        "si": "ඉදිරියට එන",
+        "ta": "வரவிருக்கும்"
+    },
+    {
+        "key": "tab_completed",
+        "en": "Completed",
+        "si": "සම්පූර්ණ",
+        "ta": "நிறைவு"
+    },
+    {
+        "key": "button_create_auction",
+        "en": "Create Auction",
+        "si": "වෙන්දේසිය සාදන්න",
+        "ta": "ஏலத்தை உருவாக்கு"
+    },
+    {
+        "key": "error_loading_auctions",
+        "en": "Error loading auctions",
+        "si": "වෙන්දේසි පූරණය වීමේ දෝෂයකි",
+        "ta": "ஏலங்களை ஏற்றுவதில் பிழை"
+    },
+    {
+        "key": "button_retry",
+        "en": "Retry",
+        "si": "නැවත උත්සාහ කරන්න",
+        "ta": "மீண்டும் முயற்சிக்கவும்"
+    },
+    {
+        "key": "message_no_auctions_farmer",
+        "en": "No {status} auctions yet\nCreate your first auction to get started!",
+        "si": "{status} වෙන්දේසි තවම නැත\nඔබගේ පළමු වෙන්දේසිය සාදන්න!",
+        "ta": "{status} ஏலங்கள் இன்னும் இல்லை\nஉங்கள் முதல் ஏலத்தை உருவாக்கவும்!"
+    },
+    {
+        "key": "message_no_auctions",
+        "en": "No {status} auctions",
+        "si": "{status} වෙන්දේසි නැත",
+        "ta": "{status} ஏலங்கள் இல்லை"
+    },
+    {
+        "key": "label_ending_soon",
+        "en": "Ending soon",
+        "si": "ඉක්මනින් අවසන් වේ",
+        "ta": "விரைவில் முடிவடையும்"
+    },
+    {
+        "key": "label_starts_in_days",
+        "en": "Starts in {days}d",
+        "si": "දින {days} කින් ආරම්භ වේ",
+        "ta": "{days} நாட்களில் தொடங்கும்"
+    },
+    {
+        "key": "label_starts_in_hours",
+        "en": "Starts in {hours}h",
+        "si": "පැය {hours} කින් ආරම්භ වේ",
+        "ta": "{hours} மணி நேரத்தில் தொடங்கும்"
+    },
+    {
+        "key": "label_ended",
+        "en": "Ended",
+        "si": "අවසන්",
+        "ta": "முடிந்தது"
+    },
+    {
+        "key": "label_black_pepper",
+        "en": "Black Pepper",
+        "si": "කළු ගම්මිරිස්",
+        "ta": "கருப்பு மிளகு"
+    },
+    {
+        "key": "label_na",
+        "en": "N/A",
+        "si": "නැත",
+        "ta": "கிடையாது"
+    },
+    {
+        "key": "label_current_bid",
+        "en": "Current Bid",
+        "si": "වත්මන් ලංසුව",
+        "ta": "தற்போதைய ஏலம்"
+    },
+    {
+        "key": "label_starting_price",
+        "en": "Starting Price",
+        "si": "ආරම්භක මිල",
+        "ta": "தொடக்க விலை"
+    },
+    {
+        "key": "label_lot_prefix",
+        "en": "Lot:",
+        "si": "කණ්ඩායම:",
+        "ta": "தொகுதி:"
+    },
+    {
+        "key": "button_place_bid",
+        "en": "Place Bid",
+        "si": "ලංසුව තබන්න",
+        "ta": "ஏலத்தை வைக்கவும்"
+    },
+    {
+        "key": "dialog_filter_auctions",
+        "en": "Filter Auctions",
+        "si": "වෙන්දේසි පෙරීම",
+        "ta": "ஏலங்களை வடிகட்டு"
+    },
+    {
+        "key": "label_all_varieties",
+        "en": "All Varieties",
+        "si": "සියලුම ප්‍රභේද",
+        "ta": "அனைத்து வகைகள்"
+    },
+    {
+        "key": "label_white_pepper",
+        "en": "White Pepper",
+        "si": "සුදු ගම්මිරිස්",
+        "ta": "வெள்ளை மிளகு"
+    },
+    {
+        "key": "button_cancel",
+        "en": "Cancel",
+        "si": "අවලංගු කරන්න",
+        "ta": "ரத்து செய்"
+    },
+    {
+        "key": "message_filter_applied",
+        "en": "Filter applied",
+        "si": "පෙරීම යෙදිණි",
+        "ta": "வடிகட்டி பயன்படுத்தப்பட்டது"
+    },
+    {
+        "key": "button_apply",
+        "en": "Apply",
+        "si": "යොදන්න",
+        "ta": "விண்ணப்பிக்கவும்"
+    },
+    {
+        "key": "message_create_first_auction",
+        "en": "Create your first auction to get started!",
+        "si": "ආරම්භ කිරීමට ඔබේ පළමු වෙන්දේසිය සාදන්න!",
+        "ta": "தொடங்க உங்கள் முதல் ஏலத்தை உருவாக்கவும்!"
+    },
+    {
+        "key": "message_select_lot",
+        "en": "Select lot",
+        "si": "කණ්ඩායම තෝරන්න",
+        "ta": "தொகுதியைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "label_connect_wallet_title",
+        "en": "Connect Your Wallet",
+        "si": "ඔබේ පසුම්බිය සම්බන්ධ කරන්න",
+        "ta": "உங்கள் பணப்பையை இணைக்கவும்"
+    },
+    {
+        "key": "subtitle_connect_wallet_description",
+        "en": "Connect your blockchain wallet to participate in auctions and manage pepper lots.",
+        "si": "වෙන්දේසිවලට සහභාගී වීමට සහ ගම්මිරිස් කණ්ඩායම් කළමනාකරණය කිරීමට ඔබේ බ්ලොක්චේන් පසුම්බිය සම්බන්ධ කරන්න.",
+        "ta": "ஏலங்களில் பங்கேற்கவும் மிளகு தொகுதிகளை நிர்வகிக்கவும் உங்கள் blockchain பணப்பையை இணைக்கவும்."
+    },
+    {
+        "key": "button_connect_wallet",
+        "en": "Connect Wallet",
+        "si": "පසුම්බිය සම්බන්ධ කරන්න",
+        "ta": "பணப்பையை இணைக்கவும்"
+    },
+    {
+        "key": "dialog_logout_confirmation",
+        "en": "Are you sure you want to logout?",
+        "si": "ඔබට ඇත්තටම ඉවත් වීමට අවශ්‍යද?",
+        "ta": "நீங்கள் நிச்சயமாக வெளியேற விரும்புகிறீர்களா?"
+    },
+    {
+        "key": "message_logged_out",
+        "en": "Successfully logged out",
+        "si": "සාර්ථකව ඉවත් විය",
+        "ta": "வெற்றிகரமாக வெளியேறியது"
+    },
+    {
+        "key": "message_no_wallet_connected",
+        "en": "No wallet connected",
+        "si": "පසුම්බිය සම්බන්ධ කර නැත",
+        "ta": "பணப்பை இணைக்கப்படவில்லை"
+    },
+    {
+        "key": "label_private_key",
+        "en": "Private Key",
+        "si": "පුද්ගලික යතුර",
+        "ta": "தனிப்பட்ட விசை"
+    },
+    {
+        "key": "message_private_key_copied",
+        "en": "Private key copied to clipboard",
+        "si": "පුද්ගලික යතුර පසුරු පුවරුවට පිටපත් කෙරිණි",
+        "ta": "தனிப்பட்ட key clipboard க்கு நகலெடுக்கப்பட்டது"
+    },
+    {
+        "key": "warning_private_key",
+        "en": "Keep your private key secure. Never share it with anyone.",
+        "si": "ඔබේ පුද්ගලික යතුර ආරක්ෂිතව තබා ගන්න. එය කිසිවෙකු සමඟ බෙදා නොගන්න.",
+        "ta": "உங்கள் தனிப்பட்ட விசையை பாதுகாப்பாக வைத்திருங்கள். அதை யாருடனும் பகிர்ந்து கொள்ளாதீர்கள்."
+    },
+    {
+        "key": "message_no_private_key",
+        "en": "No private key available",
+        "si": "පුද්ගලික යතුරක් නොමැත",
+        "ta": "தனிப்பட்ட விசை கிடைக்கவில்லை"
+    },
+    {
+        "key": "message_import_wallet_prompt",
+        "en": "Import your wallet to view private key",
+        "si": "පුද්ගලික යතුර බැලීමට ඔබේ පසුම්බිය ආයාත කරන්න",
+        "ta": "தனிப்பட்ட விசையைக் காண உங்கள் பணப்பையை இறக்குமதி செய்யவும்"
+    },
+    {
+        "key": "subtitle_manage_certificates",
+        "en": "Manage certifications and track compliance",
+        "si": "සහතික කළමනාකරණය කරන්න සහ අනුකූලතාව නිරීක්ෂණය කරන්න",
+        "ta": "சான்றிதழ்களை நிர்வகிக்கவும் மற்றும் இணக்கத்தை கண்காணிக்கவும்"
+    },
+    {
+        "key": "dialog_select_destination_market",
+        "en": "Select Destination Market",
+        "si": "ගමනාන්ත වෙළඳපොළ තෝරන්න",
+        "ta": "இலக்கு சந்தையைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "subtitle_choose_export_market",
+        "en": "Choose the export market for compliance check",
+        "si": "අනුකූලතා පරීක්ෂාව සඳහා අපනයන වෙළඳපොළ තෝරන්න",
+        "ta": "இணக்கச் சரிபார்ப்புக்கு ஏற்றுமதி சந்தையைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "market_us_fda",
+        "en": "USA (FDA)",
+        "si": "ඇමරිකා එක්සත් ජනපදය (FDA)",
+        "ta": "அமெரிக்கா (FDA)"
+    },
+    {
+        "key": "button_copy_lot_id",
+        "en": "Copy Lot ID",
+        "si": "කණ්ඩායම් ID පිටපත් කරන්න",
+        "ta": "தொகுதி ID ஐ நகலெடுக்கவும்"
+    },
+    {
+        "key": "message_running_compliance_check",
+        "en": "Running compliance check...",
+        "si": "අනුකූලතා පරීක්ෂාව ක්‍රියාත්මක වේ...",
+        "ta": "இணக்க சரிபார்ப்பு இயங்குகிறது..."
+    },
+    {
+        "key": "label_total_checks",
+        "en": "Total Checks:",
+        "si": "මුළු පරීක්ෂා:",
+        "ta": "மொத்த சரிபார்ப்புகள்:"
+    },
+    {
+        "key": "label_passed",
+        "en": "Passed:",
+        "si": "සමත්:",
+        "ta": "தேர்ச்சி:"
+    },
+    {
+        "key": "label_failed",
+        "en": "Failed:",
+        "si": "අසමත්:",
+        "ta": "தோல்வி:"
+    },
+    {
+        "key": "label_error",
+        "en": "Error:",
+        "si": "දෝෂය:",
+        "ta": "பிழை:"
+    },
+    {
+        "key": "label_ipfs",
+        "en": "IPFS:",
+        "si": "IPFS:",
+        "ta": "IPFS:"
+    },
+    {
+        "key": "button_full_traceability",
+        "en": "Full Traceability",
+        "si": "සම්පූර්ණ ප්‍රතිනිෂ්පාදනය",
+        "ta": "முழு கண்காணிப்பு"
+    },
+    {
+        "key": "label_blockchain_traceability",
+        "en": "Blockchain Traceability",
+        "si": "බ්ලොක්චේන් ප්‍රතිනිෂ්පාදනය",
+        "ta": "Blockchain கண்காணிப்பு"
+    },
+    {
+        "key": "button_quick_info",
+        "en": "Quick Info",
+        "si": "ඉක්මන් තොරතුරු",
+        "ta": "விரைவு தகவல்"
+    },
+    {
+        "key": "message_view_full_traceability",
+        "en": "View full details in the traceability screen.",
+        "si": "ප්‍රතිනිෂ්පාදන තිරයේ සම්පූර්ණ විස්තර බලන්න.",
+        "ta": "கண்காணிப்புத் திரையில் முழு விவரங்களைப் பார்க்கவும்."
+    },
+    {
+        "key": "message_blockchain_registered",
+        "en": "This lot is registered on the blockchain for complete traceability.",
+        "si": "සම්පූර්ණ ප්‍රතිනිෂ්පාදනය සඳහා මෙම කණ්ඩායම බ්ලොක්චේන් මත ලියාපදිංචි කර ඇත.",
+        "ta": "முழுமையான கண்காணிப்புக்காக இந்த தொகுதி blockchain இல் பதிவு செய்யப்பட்டுள்ளது."
+    },
+    {
+        "key": "label_account",
+        "en": "Account",
+        "si": "ගිණුම",
+        "ta": "கணக்கு"
+    },
+    {
+        "key": "subtitle_edit_profile",
+        "en": "Update your personal information",
+        "si": "ඔබේ පුද්ගලික තොරතුරු යාවත්කාලීන කරන්න",
+        "ta": "உங்கள் தனிப்பட்ட தகவலைப் புதுப்பிக்கவும்"
+    },
+    {
+        "key": "subtitle_change_password",
+        "en": "Change your account password",
+        "si": "ඔබේ ගිණුම් මුරපදය වෙනස් කරන්න",
+        "ta": "உங்கள் கணக்கு கடவுச்சொல்லை மாற்றவும்"
+    },
+    {
+        "key": "subtitle_wallet_settings",
+        "en": "Manage your blockchain wallet",
+        "si": "ඔබේ බ්ලොක්චේන් මුදල් පසුම්බිය කළමනාකරණය කරන්න",
+        "ta": "உங்கள் blockchain பணப்பையை நிர்வகிக்கவும்"
+    },
+    {
+        "key": "subtitle_notifications",
+        "en": "Manage notification preferences",
+        "si": "දැනුම්දීම් මනාපයන් කළමනාකරණය කරන්න",
+        "ta": "அறிவிப்பு விருப்பங்களை நிர்வகிக்கவும்"
+    },
+    {
+        "key": "menu_dark_mode",
+        "en": "Dark Mode",
+        "si": "අඳුරු මාදිලිය",
+        "ta": "இருண்ட பயன்முறை"
+    },
+    {
+        "key": "subtitle_dark_mode",
+        "en": "Enable dark theme",
+        "si": "අඳුරු තේමාව සබල කරන්න",
+        "ta": "இருண்ட தீம் இயக்கவும்"
+    },
+    {
+        "key": "message_dark_mode_toggled",
+        "en": "Dark mode toggled",
+        "si": "අඳුරු මාදිලිය ටොගල් විය",
+        "ta": "இருண்ட பயன்முறை மாற்றப்பட்டது"
+    },
+    {
+        "key": "menu_help_support",
+        "en": "Help & Support",
+        "si": "උදව් සහ සහාය",
+        "ta": "உதவி & ஆதரவு"
+    },
+    {
+        "key": "subtitle_help_support",
+        "en": "Get help and contact support",
+        "si": "උදව් ලබාගෙන සහාය අමතන්න",
+        "ta": "உதவி பெறவும் மற்றும் ஆதரவைத் தொடர்பு கொள்ளவும்"
+    },
+    {
+        "key": "menu_terms_conditions",
+        "en": "Terms & Conditions",
+        "si": "නියමයන් සහ කොන්දේසි",
+        "ta": "விதிமுறைகள் & நிபந்தனைகள்"
+    },
+    {
+        "key": "subtitle_terms_conditions",
+        "en": "Read our terms of service",
+        "si": "අපගේ සේවා කොන්දේසි කියවන්න",
+        "ta": "எங்கள் சேவை விதிமுறைகளைப் படிக்கவும்"
+    },
+    {
+        "key": "menu_privacy_policy",
+        "en": "Privacy Policy",
+        "si": "රහස්‍යතා ප්‍රතිපත්තිය",
+        "ta": "தனியுரிமைக் கொள்கை"
+    },
+    {
+        "key": "subtitle_privacy_policy",
+        "en": "Learn how we protect your data",
+        "si": "අපි ඔබේ දත්ත ආරක්ෂා කරන ආකාරය ඉගෙන ගන්න",
+        "ta": "உங்கள் தரவை நாங்கள் எவ்வாறு பாதுகாக்கிறோம் என்பதை அறியவும்"
+    },
+    {
+        "key": "menu_about",
+        "en": "About",
+        "si": "පිළිබඳව",
+        "ta": "பற்றி"
+    },
+    {
+        "key": "subtitle_logout",
+        "en": "Sign out from your account",
+        "si": "ඔබේ ගිණුමෙන් නික්මෙන්න",
+        "ta": "உங்கள் கணக்கிலிருந்து வெளியேறவும்"
+    }
+]

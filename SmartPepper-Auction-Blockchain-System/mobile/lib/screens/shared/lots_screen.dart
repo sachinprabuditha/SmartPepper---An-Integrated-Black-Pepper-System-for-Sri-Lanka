@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/lot_provider.dart';
 import '../../config/theme.dart';
 import '../farmer/create_lot_screen.dart';
-import '../farmer/lot_details_screen.dart';
+import '../../localization/app_localizations.dart';
 
 class LotsScreen extends StatefulWidget {
   const LotsScreen({super.key});
@@ -46,9 +47,9 @@ class _LotsScreenState extends State<LotsScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.forestGreen,
         elevation: 0,
-        title: const Text(
-          'Pepper Lots',
-          style: TextStyle(
+        title: Text(
+          context.tr('lot_all_lots'),
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -57,9 +58,7 @@ class _LotsScreenState extends State<LotsScreen> {
           IconButton(
             icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Scan QR Code')),
-              );
+              context.push('/qrScanner');
             },
           ),
         ],
@@ -74,15 +73,15 @@ class _LotsScreenState extends State<LotsScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildFilterChip('All', 'all'),
+                  _buildFilterChip(context.tr('common_all'), 'all'),
                   const SizedBox(width: 8),
-                  _buildFilterChip('Created', 'created'),
+                  _buildFilterChip(context.tr('status_created'), 'created'),
                   const SizedBox(width: 8),
-                  _buildFilterChip('Approved', 'approved'),
+                  _buildFilterChip(context.tr('status_approved'), 'approved'),
                   const SizedBox(width: 8),
-                  _buildFilterChip('In Auction', 'auction'),
+                  _buildFilterChip(context.tr('auction_in_auction'), 'auction'),
                   const SizedBox(width: 8),
-                  _buildFilterChip('Sold', 'sold'),
+                  _buildFilterChip(context.tr('status_sold'), 'sold'),
                 ],
               ),
             ),
@@ -106,7 +105,7 @@ class _LotsScreenState extends State<LotsScreen> {
               },
               backgroundColor: AppTheme.forestGreen,
               icon: const Icon(Icons.add),
-              label: const Text('Create Lot'),
+              label: Text(context.tr('lot_create')),
             )
           : null,
     );
@@ -157,13 +156,13 @@ class _LotsScreenState extends State<LotsScreen> {
             const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              'Error loading lots',
+              context.tr('error_loading_lots'),
               style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => _loadLots(),
-              child: const Text('Retry'),
+              child: Text(context.tr('common_retry')),
             ),
           ],
         ),
@@ -183,8 +182,8 @@ class _LotsScreenState extends State<LotsScreen> {
             const SizedBox(height: 16),
             Text(
               _selectedFilter == 'all'
-                  ? 'No lots available'
-                  : 'No $_selectedFilter lots',
+                  ? context.tr('empty_no_lots')
+                  : '${context.tr('common_no')} $_selectedFilter ${context.tr('lot_lots')}',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[600],
@@ -227,12 +226,7 @@ class _LotsScreenState extends State<LotsScreen> {
       ),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LotDetailsScreen(lot: lot),
-            ),
-          );
+          context.push('/lot/${lot.lotId}');
         },
         borderRadius: BorderRadius.circular(16),
         child: Padding(
@@ -331,14 +325,14 @@ class _LotsScreenState extends State<LotsScreen> {
                   Expanded(
                     child: _buildDetailItem(
                       icon: Icons.scale,
-                      label: 'Quantity',
+                      label: context.tr('common_quantity'),
                       value: '${lot.quantity.toStringAsFixed(0)} kg',
                     ),
                   ),
                   Expanded(
                     child: _buildDetailItem(
                       icon: Icons.calendar_today,
-                      label: 'Harvest',
+                      label: context.tr('common_harvest'),
                       value: harvestDate,
                     ),
                   ),
@@ -354,11 +348,13 @@ class _LotsScreenState extends State<LotsScreen> {
                     child: OutlinedButton.icon(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('View traceability')),
+                          SnackBar(
+                              content: Text(
+                                  context.tr('message_view_traceability'))),
                         );
                       },
                       icon: const Icon(Icons.track_changes, size: 16),
-                      label: const Text('Track'),
+                      label: Text(context.tr('common_track')),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppTheme.forestGreen,
                         side: const BorderSide(color: AppTheme.forestGreen),
@@ -373,11 +369,13 @@ class _LotsScreenState extends State<LotsScreen> {
                     child: OutlinedButton.icon(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('View NFT Passport')),
+                          SnackBar(
+                              content: Text(
+                                  context.tr('message_view_nft_passport'))),
                         );
                       },
                       icon: const Icon(Icons.verified, size: 16),
-                      label: const Text('NFT'),
+                      label: Text(context.tr('common_nft')),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppTheme.pepperGold,
                         side: const BorderSide(color: AppTheme.pepperGold),

@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/lot_provider.dart';
 import '../../services/api_service.dart';
 import '../../config/theme.dart';
+import '../../localization/app_localizations.dart';
 
 class CreateAuctionScreen extends StatefulWidget {
   final Lot? preselectedLot;
@@ -252,7 +253,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
               Navigator.pop(context); // Close dialog
               Navigator.pop(context); // Go back to previous screen
             },
-            child: const Text('Go Back'),
+            child: Text(context.tr('common_go_back')),
           ),
           ElevatedButton(
             onPressed: () {
@@ -262,7 +263,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.forestGreen,
             ),
-            child: const Text('Retry Check'),
+            child: Text(context.tr('common_retry')),
           ),
         ],
       ),
@@ -302,10 +303,10 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Are you sure you want to create this auction?'),
+            Text(context.tr('auction_create_confirm')),
             const SizedBox(height: 16),
-            const Text('Summary:',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(context.tr('common_summary'),
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text('Lot: ${_selectedLot!.lotId}'),
             Text('Reserve Price: ${_reservePriceController.text} LKR'),
@@ -343,14 +344,14 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(context.tr('common_cancel')),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.forestGreen,
             ),
-            child: const Text('Confirm'),
+            child: Text(context.tr('auction_confirm')),
           ),
         ],
       ),

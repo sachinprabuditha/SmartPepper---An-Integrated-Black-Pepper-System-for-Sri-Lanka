@@ -51,6 +51,16 @@ void main() async {
   await offlineSyncService.initialize();
   await blockchainService.initialize(); // Initialize blockchain contracts
 
+  // Connect WebSocket for real-time auction updates immediately
+  print('🚀 Initializing WebSocket connection...');
+  socketService.connect().then((_) {
+    print('🚀 WebSocket initialization complete');
+  }).catchError((error) {
+    print('❌ WebSocket initialization error: $error');
+  });
+
+  print('🚀 App initialization complete');
+
   runApp(
     MultiProvider(
       providers: [
@@ -133,14 +143,14 @@ class SmartPepperApp extends StatelessWidget {
               // Material/Cupertino will fallback to English automatically
               return locale;
             }
-            
+
             // For other locales, check if supported
             for (var supportedLocale in supportedLocales) {
               if (supportedLocale.languageCode == locale?.languageCode) {
                 return supportedLocale;
               }
             }
-            
+
             // Default fallback to English
             return const Locale('en', 'US');
           },

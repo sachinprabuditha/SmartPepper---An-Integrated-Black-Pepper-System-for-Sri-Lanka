@@ -19,13 +19,17 @@ class AppLocalizations {
 
   // Load JSON file from assets
   Future<bool> load() async {
-    String jsonString = await rootBundle
-        .loadString('assets/translations/${locale.languageCode}.json');
-    Map<String, dynamic> jsonMap = json.decode(jsonString);
+    String jsonString =
+        await rootBundle.loadString('assets/translations/translations.json');
+    List<dynamic> jsonList = json.decode(jsonString);
 
-    _localizedStrings = jsonMap.map((key, value) {
-      return MapEntry(key, value.toString());
-    });
+    _localizedStrings = {};
+
+    for (var item in jsonList) {
+      String key = item['key'];
+      String translation = item[locale.languageCode] ?? item['en'] ?? key;
+      _localizedStrings[key] = translation;
+    }
 
     return true;
   }

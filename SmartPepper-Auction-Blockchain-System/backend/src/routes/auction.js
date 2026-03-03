@@ -1083,7 +1083,8 @@ router.get('/bids/user/:userId', async (req, res) => {
       return res.json({
         success: true,
         count: 0,
-        auctions: []
+        auctions: [],
+        message: 'No wallet address connected. Please connect your wallet to place bids and view bid history.'
       });
     }
 
@@ -1615,6 +1616,112 @@ router.post('/:id/cancel', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to cancel auction'
+    });
+  }
+});
+
+/**
+ * POST /api/auctions/:id/finalize
+ * Manually trigger auction finalization (admin only)
+ */
+router.post('/:id/finalize', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const auctionFinalizationService = require('../services/auctionFinalizationService');
+
+    logger.info('Manual finalization requested for auction:', id);
+
+    const result = await auctionFinalizationService.finalizeEndedAuctions([id]);
+
+    res.json({
+      success: true,
+      message: 'Finalization triggered',
+      result
+    });
+  } catch (error) {
+    logger.error('Error finalizing auction:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to finalize auction',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/auctions/:id/settle
+ * Manually trigger auction settlement (after escrow received)
+ */
+router.post('/:id/settle', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const auctionFinalizationService = require('../services/auctionFinalizationService');
+
+    logger.info('Manual settlement requested for auction:', id);
+
+    await auctionFinalizationService.settleAuction(id);
+
+    res.json({
+      success: true,
+      message: 'Settlement completed'
+    });
+  } catch (error) {
+    logger.error('Error settling auction:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to settle auction',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/auctions/:id/settlement-status
+ * Get detailed settlement status for an auction
+ */
+router.get('/:id/settlement-status', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const auctionDoc = await firestore.collection('auctions').doc(id).get();
+
+    if (!auctionDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Auction not found'
+      });
+    }
+
+    const auction = auctionDoc.data();
+
+    const status = {
+      auctionId: id,
+      status: auction.status,
+      finalized: auction.finalized || false,
+      finalizedAt: auction.finalized_at,
+      settlementStatus: auction.settlement_status || 'not_started',
+      blockchainFinalized: auction.blockchain_finalized || false,
+      blockchainFinalizationTx: auction.blockchain_finalization_tx,
+      escrowTxHash: auction.escrow_tx_hash,
+      settlementTxHash: auction.settlement_tx_hash,
+      settledAt: auction.settled_at,
+      winner: auction.winner_address || auction.current_bidder,
+      finalPrice: {
+        eth: auction.final_price || auction.current_bid,
+        lkr: auction.final_price_lkr || auction.current_bid_lkr
+      },
+      errors: auction.blockchain_error
+    };
+
+    res.json({
+      success: true,
+      settlement: status
+    });
+  } catch (error) {
+    logger.error('Error getting settlement status:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get settlement status'
     });
   }
 });

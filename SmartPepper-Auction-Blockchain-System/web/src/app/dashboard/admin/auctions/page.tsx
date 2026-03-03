@@ -30,6 +30,7 @@ export default function ManageAuctionsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [finalizingAuction, setFinalizingAuction] = useState<number | null>(null);
 
   useEffect(() => {
     if (!authLoading && (!user || user.role !== 'admin')) {
@@ -58,6 +59,35 @@ export default function ManageAuctionsPage() {
       console.error('Error fetching auctions:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFinalizeAuction = async (auctionId: number) => {
+    if (!confirm(`Are you sure you want to manually finalize auction #${auctionId}?`)) {
+      return;
+    }
+
+    try {
+      setFinalizingAuction(auctionId);
+      const response = await fetch(`http://localhost:3002/api/auction/${auctionId}/finalize`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to finalize auction');
+      }
+
+      const result = await response.json();
+      alert(`Auction finalized successfully! ${result.settled ? 'Blockchain settlement completed.' : 'Awaiting blockchain settlement.'}`);
+      
+      // Refresh auctions
+      await fetchAuctions();
+    } catch (error) {
+      console.error('Error finalizing auction:', error);
+      alert(`Failed to finalize auction: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setFinalizingAuction(null);
     }
   };
 
@@ -307,12 +337,25 @@ export default function ManageAuctionsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <button
-                          onClick={() => router.push(`/auctions/${auction.auction_id}`)}
-                          className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
-                        >
-                          View Details
-                        </button>
+                        <div className="flex flex-col space-y-2">
+                          <button
+                            onClick={() => router.push(`/auctions/${auction.auction_id}`)}
+                            className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+                          >
+                            View Details
+                          </button>
+                          {auction.status === 'ended' && (
+                            <button
+                              onClick={() => handleFinalizeAuction(auction.auction_id)}
+                              disabled={finalizingAuction === auction.auction_id}
+                              className={`text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 ${
+                                finalizingAuction === auction.auction_id ? 'opacity-50 cursor-not-allowed' : ''
+                              }`}
+                            >
+                              {finalizingAuction === auction.auction_id ? 'Finalizing...' : '⚡ Finalize'}
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../localization/app_localizations.dart';
 
 class LiveAuctionScreen extends StatelessWidget {
   final String auctionId;
@@ -8,9 +9,10 @@ class LiveAuctionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Live Auction')),
+      appBar: AppBar(title: Text(context.tr('auction_live'))),
       body: Center(
-        child: Text('Live Auction: $auctionId - Implementation Pending'),
+        child: Text(
+            '${context.tr('auction_live')}: $auctionId - Implementation Pending'),
       ),
     );
   }

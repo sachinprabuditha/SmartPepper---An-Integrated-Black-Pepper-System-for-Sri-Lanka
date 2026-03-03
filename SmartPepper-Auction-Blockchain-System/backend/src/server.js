@@ -140,6 +140,15 @@ async function initialize() {
       logger.warn('Blockchain service initialization failed (continuing without blockchain):', blockchainError.message);
     }
 
+    // Initialize auction finalization service
+    try {
+      const auctionFinalizationService = require('./services/auctionFinalizationService');
+      await auctionFinalizationService.initialize();
+      logger.info('✅ Auction Finalization Service initialized');
+    } catch (finalizationError) {
+      logger.warn('⚠️ Auction Finalization Service initialization failed:', finalizationError.message);
+    }
+
     // Start auction status monitor if database is connected
     if (dbConnected && !db.isMock) {
       startAuctionStatusMonitor();
@@ -154,16 +163,20 @@ async function initialize() {
       }
     });
     
-    // Make io available to routes
+    // Make io available to routes and services
     app.set('io', io);
+    global.io = io; // Make available to finalization service
+    
+    // Initialize WebSocket (works with or without Redis)
+    const auctionSocket = new AuctionWebSocket(io, redisClient);
+    auctionSocket.initialize();
+    app.set('auctionSocket', auctionSocket); // Make available to routes
     
     if (redisClient) {
-      const auctionSocket = new AuctionWebSocket(io, redisClient);
-      auctionSocket.initialize();
-      app.set('auctionSocket', auctionSocket); // Make available to routes
-      logger.info('✅ WebSocket server initialized for real-time auction updates');
+      logger.info('✅ WebSocket server initialized with Redis caching');
     } else {
-      logger.info('ℹ️  WebSocket real-time updates disabled (requires Redis)');
+      logger.info('✅ WebSocket server initialized (without Redis caching)');
+      logger.info('💡 For Redis caching, set REDIS_HOST and REDIS_PORT in .env');
     }
 
     // Start server

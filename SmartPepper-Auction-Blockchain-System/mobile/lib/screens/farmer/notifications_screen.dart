@@ -269,6 +269,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         icon = Icons.emoji_events;
         color = Colors.amber;
         break;
+      case 'auction_won':
+        icon = Icons.emoji_events;
+        color = Colors.green;
+        break;
+      case 'auction_sold':
+        icon = Icons.attach_money;
+        color = Colors.green;
+        break;
+      case 'auction_no_sale':
+        icon = Icons.cancel_outlined;
+        color = Colors.orange;
+        break;
+      case 'auction_settled':
+        icon = Icons.check_circle;
+        color = Colors.green;
+        break;
       case 'bid_update':
         icon = Icons.trending_up;
         color = Colors.green;
@@ -282,6 +298,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             : Colors.red;
         break;
       case 'payment':
+      case 'payment_received':
         icon = Icons.payments;
         color = Colors.green;
         break;

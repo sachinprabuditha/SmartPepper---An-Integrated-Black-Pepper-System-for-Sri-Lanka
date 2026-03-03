@@ -473,6 +473,62 @@ class BlockchainService {
       throw error;
     }
   }
+
+  /**
+   * End an auction on blockchain
+   * @param {number} auctionId - The blockchain auction ID
+   * @returns {string} Transaction hash
+   */
+  async endAuction(auctionId) {
+    try {
+      const nonce = await this.getNextNonce();
+      
+      logger.info('Ending auction on blockchain...', { auctionId, nonce });
+      
+      const tx = await this.contract.endAuction(auctionId, { nonce });
+      const receipt = await tx.wait();
+      
+      logger.info('Auction ended on blockchain', {
+        auctionId,
+        txHash: receipt.hash,
+        gasUsed: receipt.gasUsed.toString()
+      });
+      
+      return receipt.hash;
+    } catch (error) {
+      logger.error('Failed to end auction on blockchain:', error);
+      this.resetNonce();
+      throw error;
+    }
+  }
+
+  /**
+   * Settle an auction on blockchain (distribute funds)
+   * @param {number} auctionId - The blockchain auction ID
+   * @returns {string} Transaction hash
+   */
+  async settleAuction(auctionId) {
+    try {
+      const nonce = await this.getNextNonce();
+      
+      logger.info('Settling auction on blockchain...', { auctionId, nonce });
+      
+      const tx = await this.contract.settleAuction(auctionId, { nonce });
+      const receipt = await tx.wait();
+      
+      logger.info('Auction settled on blockchain', {
+        auctionId,
+        txHash: receipt.hash,
+        gasUsed: receipt.gasUsed.toString()
+      });
+      
+      return receipt.hash;
+    } catch (error) {
+      logger.error('Failed to settle auction on blockchain:', error);
+      this.resetNonce();
+      throw error;
+    }
+  }
 }
 
 module.exports = BlockchainService;

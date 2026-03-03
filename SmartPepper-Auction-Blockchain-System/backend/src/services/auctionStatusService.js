@@ -1,11 +1,13 @@
 const db = require('../db/database');
 const admin = require('firebase-admin');
 const logger = require('../utils/logger');
+const auctionFinalizationService = require('./auctionFinalizationService');
 
 /**
  * Updates auction statuses based on current time
  * - Changes 'created' to 'active' if start_time has passed
  * - Changes 'active' to 'ended' if end_time has passed
+ * - Triggers finalization for newly ended auctions
  */
 async function updateAuctionStatuses() {
   // Skip if not using Firebase
@@ -55,7 +57,7 @@ async function updateAuctionStatuses() {
           updated_at: admin.firestore.FieldValue.serverTimestamp()
         });
         endedCount++;
-        endedAuctions.push(auction.auction_id || doc.id);
+        endedAuctions.push(doc.id); // Use document ID for finalization
       }
     }
 
@@ -70,6 +72,14 @@ async function updateAuctionStatuses() {
 
     if (endedCount > 0) {
       logger.info(`⏰ Ended ${endedCount} auction(s): ${endedAuctions.join(', ')}`);
+      
+      // Trigger finalization for ended auctions
+      try {
+        const result = await auctionFinalizationService.finalizeEndedAuctions(endedAuctions);
+        logger.info(`🎯 Finalization complete: ${result.success} succeeded, ${result.failed} failed`);
+      } catch (finalizationError) {
+        logger.error('❌ Auction finalization error:', finalizationError);
+      }
     }
 
     return {

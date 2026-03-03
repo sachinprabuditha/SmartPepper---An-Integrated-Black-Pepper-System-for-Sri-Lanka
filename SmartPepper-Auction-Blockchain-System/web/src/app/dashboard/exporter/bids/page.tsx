@@ -36,12 +36,37 @@ interface AuctionWithBids {
   myBids: Bid[];
 }
 
+// Helper function to safely format date with distance
+function safeFormatDistanceToNow(dateValue: any): string {
+  if (!dateValue) return 'Date not available';
+  try {
+    const date = new Date(dateValue);
+    if (isNaN(date.getTime())) return 'Invalid date';
+    return formatDistanceToNow(date, { addSuffix: true });
+  } catch (error) {
+    return 'Date error';
+  }
+}
+
+// Helper function to safely format date as locale string
+function safeToLocaleString(dateValue: any): string {
+  if (!dateValue) return 'Date not available';
+  try {
+    const date = new Date(dateValue);
+    if (isNaN(date.getTime())) return 'Invalid date';
+    return date.toLocaleString();
+  } catch (error) {
+    return 'Date error';
+  }
+}
+
 export default function MyBidsPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [bids, setBids] = useState<AuctionWithBids[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'active' | 'won' | 'lost'>('all');
+  const [noWalletMessage, setNoWalletMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'exporter')) {
@@ -70,6 +95,11 @@ export default function MyBidsPage() {
       
       const auctionsWithBids = response.data?.auctions || [];
       setBids(auctionsWithBids);
+      
+      // Check for no wallet message
+      if (response.data?.message) {
+        setNoWalletMessage(response.data.message);
+      }
     } catch (error: any) {
       console.error('Failed to load bids:', error);
       console.error('Error details:', error.response?.data || error.message);
@@ -83,7 +113,7 @@ export default function MyBidsPage() {
       case 'active':
         return bids.filter(b => b.status === 'active');
       case 'won':
-        return bids.filter(b => b.status === 'ended' && b.isLeading);
+        return bids.filter(b => (b.status === 'ended' || b.status === 'settled') && b.isLeading);
       case 'lost':
         return bids.filter(b => b.status === 'ended' && !b.isLeading);
       default:
@@ -108,6 +138,14 @@ export default function MyBidsPage() {
           💰 Active
         </span>
       );
+    }
+
+    if (auction.status === 'settled') {
+      return auction.isLeading ? (
+        <span className="px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+          ✅ Settled
+        </span>
+      ) : null;
     }
     
     if (auction.status === 'ended') {
@@ -146,9 +184,9 @@ export default function MyBidsPage() {
 
   const filteredBids = getFilteredBids();
   const activeBidsCount = bids.filter(b => b.status === 'active').length;
-  const wonAuctionsCount = bids.filter(b => b.status === 'ended' && b.isLeading).length;
+  const wonAuctionsCount = bids.filter(b => (b.status === 'ended' || b.status === 'settled') && b.isLeading).length;
   const totalSpent = bids
-    .filter(b => b.status === 'ended' && b.isLeading)
+    .filter(b => (b.status === 'ended' || b.status === 'settled') && b.isLeading)
     .reduce((sum, b) => sum + parseFloat(formatAmount(b.currentBid)), 0);
 
   return (
@@ -237,7 +275,26 @@ export default function MyBidsPage() {
         </div>
 
         {/* Bids List */}
-        {filteredBids.length === 0 ? (
+        {noWalletMessage ? (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
+            <div className="text-6xl mb-4">👛</div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Wallet Not Connected</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              {noWalletMessage}
+            </p>
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Connect your MetaMask wallet or add your wallet address to your profile to start bidding.
+              </p>
+              <Link
+                href="/profile"
+                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+              >
+                ⚙️ Go to Profile Settings
+              </Link>
+            </div>
+          </div>
+        ) : filteredBids.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
             <div className="text-6xl mb-4">📭</div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No bids found</h3>
@@ -311,9 +368,7 @@ export default function MyBidsPage() {
                         {auction.status === 'active' ? 'Ends' : 'Ended'}
                       </div>
                       <div className="text-lg font-bold text-gray-900 dark:text-white">
-                        {auction.status === 'active' 
-                          ? formatDistanceToNow(new Date(auction.endTime), { addSuffix: true })
-                          : formatDistanceToNow(new Date(auction.endTime), { addSuffix: true })}
+                        {safeFormatDistanceToNow(auction.endTime)}
                       </div>
                     </div>
                   </div>
@@ -340,10 +395,10 @@ export default function MyBidsPage() {
                           </div>
                           <div className="text-right">
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                              {formatDistanceToNow(new Date(bid.placedAt), { addSuffix: true })}
+                              {safeFormatDistanceToNow(bid.placedAt)}
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-500">
-                              {new Date(bid.placedAt).toLocaleString()}
+                            <div className="text-xs text-gray-500 mt-1">
+                              {safeToLocaleString(bid.placedAt)}
                             </div>
                           </div>
                         </div>

@@ -177,6 +177,9 @@
   
   "notification_new_bid": "ඔබේ වෙන්දේසියට නව ලංසුවක් තැබූවා",
   "notification_auction_won": "සුභපැතුම්! ඔබ වෙන්දේසිය ජයගත්තා",
+  "notification_auction_sold": "වෙන්දේසිය සාර්ථකව නිම කෙරුණා",
+  "notification_auction_no_sale": "වෙන්දේසිය විකිණීමකින් තොරව අවසන් විය",
+  "notification_auction_settled": "වෙන්දේසි පියවීම සම්පූර්ණයි",
   "notification_auction_lost": "වෙන්දේසිය අවසන්. ඔබ අභිබවා ගියා",
   "notification_auction_ending": "වෙන්දේසිය ඉක්මනින් අවසන්",
   "notification_payment_received": "ගෙවීම ලැබිණි",

@@ -10,6 +10,7 @@ import '../../services/ipfs_service.dart';
 import '../../services/qr_nfc_service.dart';
 import '../../services/storage_service.dart';
 import '../../config/theme.dart';
+import '../../localization/app_localizations.dart';
 
 class CreateLotScreen extends StatefulWidget {
   const CreateLotScreen({super.key});
@@ -108,7 +109,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_camera),
-              title: const Text('Take Photo'),
+              title: Text(context.tr('common_take_photo')),
               onTap: () async {
                 Navigator.pop(context);
                 final XFile? image = await picker.pickImage(
@@ -124,7 +125,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choose from Gallery'),
+              title: Text(context.tr('common_choose_gallery')),
               onTap: () async {
                 Navigator.pop(context);
                 final List<XFile> images = await picker.pickMultiImage(
@@ -153,7 +154,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_camera),
-              title: const Text('Take Photo'),
+              title: Text(context.tr('common_take_photo')),
               onTap: () async {
                 Navigator.pop(context);
                 final XFile? image = await picker.pickImage(
@@ -169,7 +170,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choose from Gallery'),
+              title: Text(context.tr('common_choose_gallery')),
               onTap: () async {
                 Navigator.pop(context);
                 final List<XFile> images = await picker.pickMultiImage(
@@ -207,8 +208,8 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
 
     if (_selectedHarvestDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select harvest date'),
+        SnackBar(
+          content: Text(context.tr('validation_harvest_date')),
           backgroundColor: Colors.red,
         ),
       );
@@ -218,11 +219,10 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
     // Validate lot pictures (mandatory)
     if (_lotPictures.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-              Text('Please add at least one lot picture for quality matching'),
+        SnackBar(
+          content: Text(context.tr('validation_lot_pictures')),
           backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
+          duration: const Duration(seconds: 3),
         ),
       );
       return;
@@ -231,11 +231,10 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
     // Validate certificates (mandatory)
     if (_certificateImages.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-              Text('Please add at least one certificate for quality matching'),
+        SnackBar(
+          content: Text(context.tr('validation_certificates')),
           backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
+          duration: const Duration(seconds: 3),
         ),
       );
       return;
@@ -511,7 +510,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text('Lot created successfully!'),
+                      Text(context.tr('success_lot_created')),
                       Text(
                         'Blockchain TX: ${blockchainResult['txHash'].toString().substring(0, 10)}...',
                         style: const TextStyle(fontSize: 12),
@@ -527,7 +526,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
         );
         Navigator.pop(context);
       } else if (mounted) {
-        throw Exception('Failed to create lot');
+        throw Exception(context.tr('error_lot_creation'));
       }
     } catch (e) {
       if (mounted) {
@@ -538,8 +537,8 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Error creating lot',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(context.tr('error_lot_creation'),
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 Text(e.toString(), style: const TextStyle(fontSize: 12)),
               ],
@@ -565,9 +564,9 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.forestGreen,
         elevation: 0,
-        title: const Text(
-          'Register New Lot',
-          style: TextStyle(
+        title: Text(
+          context.tr('lot_register_new'),
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -606,7 +605,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Register your pepper lot with complete details for blockchain traceability',
+                              context.tr('lot_register_info'),
                               style: TextStyle(
                                 color: AppTheme.forestGreen,
                                 fontSize: 13,
@@ -620,9 +619,9 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                     const SizedBox(height: 24),
 
                     // Farmer Name (Auto-fetched, Read-only)
-                    const Text(
-                      'Farmer Name',
-                      style: TextStyle(
+                    Text(
+                      context.tr('auth_farmer_name'),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.forestGreen,
@@ -646,9 +645,9 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                     const SizedBox(height: 20),
 
                     // Farm Address
-                    const Text(
-                      'Farm/Harvest Location Address *',
-                      style: TextStyle(
+                    Text(
+                      context.tr('lot_farm_address'),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.forestGreen,
@@ -660,7 +659,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                       maxLines: 2,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: 'Enter farm or harvest location address',
+                        hintText: context.tr('lot_farm_address_hint'),
                         prefixIcon: const Icon(Icons.location_on),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -670,7 +669,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Please enter farm address';
+                          return context.tr('validation_farm_address');
                         }
                         return null;
                       },
@@ -679,9 +678,9 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                     const SizedBox(height: 20),
 
                     // Variety Selection
-                    const Text(
-                      'Pepper Variety *',
-                      style: TextStyle(
+                    Text(
+                      context.tr('lot_variety'),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.forestGreen,
@@ -693,7 +692,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                           ? null
                           : _varietyController.text,
                       decoration: InputDecoration(
-                        hintText: 'Select variety',
+                        hintText: context.tr('lot_variety_hint'),
                         prefixIcon: const Icon(Icons.grass),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -714,7 +713,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                       },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please select a variety';
+                          return context.tr('validation_variety');
                         }
                         return null;
                       },
@@ -723,9 +722,9 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                     const SizedBox(height: 20),
 
                     // Quantity Input
-                    const Text(
-                      'Quantity (kg) *',
-                      style: TextStyle(
+                    Text(
+                      context.tr('lot_quantity'),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.forestGreen,
@@ -741,7 +740,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                             RegExp(r'^\d+\.?\d{0,2}')),
                       ],
                       decoration: InputDecoration(
-                        hintText: 'Enter quantity in kg',
+                        hintText: context.tr('lot_quantity_hint'),
                         prefixIcon: const Icon(Icons.scale),
                         suffixText: 'kg',
                         iconColor: AppTheme.forestGreen,
@@ -753,11 +752,11 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter quantity';
+                          return context.tr('validation_quantity');
                         }
                         final quantity = double.tryParse(value);
                         if (quantity == null || quantity <= 0) {
-                          return 'Please enter a valid quantity';
+                          return context.tr('validation_invalid_quantity');
                         }
                         return null;
                       },
@@ -766,9 +765,9 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                     const SizedBox(height: 20),
 
                     // Quality Grade
-                    const Text(
-                      'Quality Grade *',
-                      style: TextStyle(
+                    Text(
+                      context.tr('lot_quality'),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.forestGreen,
@@ -802,9 +801,9 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                     const SizedBox(height: 20),
 
                     // Harvest Date
-                    const Text(
-                      'Harvest Date *',
-                      style: TextStyle(
+                    Text(
+                      context.tr('lot_harvest_date'),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.forestGreen,
@@ -816,7 +815,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                       readOnly: true,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: 'Select harvest date',
+                        hintText: context.tr('lot_harvest_date_hint'),
                         prefixIcon: const Icon(Icons.calendar_today),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -827,7 +826,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                       onTap: _selectHarvestDate,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please select harvest date';
+                          return context.tr('validation_harvest_date');
                         }
                         return null;
                       },
@@ -836,9 +835,9 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                     const SizedBox(height: 20),
 
                     // Description
-                    const Text(
-                      'Description (Optional)',
-                      style: TextStyle(
+                    Text(
+                      context.tr('common_description_optional'),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.forestGreen,
@@ -850,7 +849,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                       maxLines: 3,
                       style: const TextStyle(color: Colors.black87),
                       decoration: InputDecoration(
-                        hintText: 'Add additional notes about this lot',
+                        hintText: context.tr('lot_description_hint'),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -865,9 +864,9 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Lot Pictures *',
-                          style: TextStyle(
+                        Text(
+                          context.tr('lot_pictures'),
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.forestGreen,
@@ -876,7 +875,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                         TextButton.icon(
                           onPressed: _pickLotPictures,
                           icon: const Icon(Icons.add_photo_alternate),
-                          label: const Text('Add'),
+                          label: Text(context.tr('common_add')),
                         ),
                       ],
                     ),
@@ -903,12 +902,12 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'No lot pictures added yet',
+                                context.tr('empty_no_pictures'),
                                 style: TextStyle(color: Colors.grey[600]),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Required for quality matching',
+                                context.tr('lot_required_quality'),
                                 style: TextStyle(
                                   color: Colors.red[400],
                                   fontSize: 12,
@@ -971,9 +970,9 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Certificates *',
-                          style: TextStyle(
+                        Text(
+                          context.tr('lot_certificates'),
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.forestGreen,
@@ -982,7 +981,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                         TextButton.icon(
                           onPressed: _pickCertificateImage,
                           icon: const Icon(Icons.add_photo_alternate),
-                          label: const Text('Add'),
+                          label: Text(context.tr('common_add')),
                         ),
                       ],
                     ),
@@ -1009,12 +1008,12 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'No certificates added yet',
+                                context.tr('empty_no_certificates'),
                                 style: TextStyle(color: Colors.grey[600]),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Required for quality matching',
+                                context.tr('lot_required_quality'),
                                 style: TextStyle(
                                   color: Colors.red[400],
                                   fontSize: 12,
@@ -1095,9 +1094,9 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text(
-                                'Register Lot',
-                                style: TextStyle(
+                            : Text(
+                                context.tr('lot_register_button'),
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -1121,25 +1120,25 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.wallet, color: Colors.orange),
-              SizedBox(width: 8),
-              Text('Import Wallet'),
+              const Icon(Icons.wallet, color: Colors.orange),
+              const SizedBox(width: 8),
+              Text(context.tr('wallet_import')),
             ],
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Your wallet private key is required to create lots on the blockchain.',
-                style: TextStyle(fontSize: 14),
+              Text(
+                context.tr('wallet_import_info'),
+                style: const TextStyle(fontSize: 14),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Enter your private key:',
-                style: TextStyle(
+              Text(
+                context.tr('wallet_enter_key'),
+                style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
@@ -1165,14 +1164,16 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.orange.shade200),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.info_outline, size: 20, color: Colors.orange),
-                    SizedBox(width: 8),
+                    const Icon(Icons.info_outline,
+                        size: 20, color: Colors.orange),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'This was provided when you registered. If you lost it, contact support.',
-                        style: TextStyle(fontSize: 11, color: Colors.orange),
+                        context.tr('wallet_lost_key_info'),
+                        style:
+                            const TextStyle(fontSize: 11, color: Colors.orange),
                       ),
                     ),
                   ],
@@ -1183,7 +1184,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(null),
-              child: const Text('Cancel'),
+              child: Text(context.tr('common_cancel')),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1195,7 +1196,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2E7D32),
               ),
-              child: const Text('Import'),
+              child: Text(context.tr('wallet_import')),
             ),
           ],
         );

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/theme.dart';
+import '../../localization/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -46,8 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
         // Show error from auth provider
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(authProvider.error ??
-                'Login failed. Please check your credentials.'),
+            content:
+                Text(authProvider.error ?? context.tr('error_authentication')),
             backgroundColor: AppTheme.errorColor,
           ),
         );
@@ -56,7 +57,8 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Login failed: ${e.toString()}'),
+          content: Text(
+              '${context.tr('auth_login')} ${context.tr('error_server')}: ${e.toString()}'),
           backgroundColor: AppTheme.errorColor,
         ),
       );
@@ -104,10 +106,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 24),
 
                 // Title
-                const Text(
-                  'smartPepper',
+                Text(
+                  context.tr('app_name'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -116,10 +118,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 8),
 
-                const Text(
-                  'Welcome Back',
+                Text(
+                  context.tr('auth_welcome_back'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: AppTheme.pepperGold,
                   ),
@@ -132,18 +134,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    labelStyle: TextStyle(color: Colors.white70),
-                    prefixIcon:
-                        Icon(Icons.email_outlined, color: AppTheme.pepperGold),
+                  decoration: InputDecoration(
+                    labelText: context.tr('auth_email'),
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    prefixIcon: const Icon(Icons.email_outlined,
+                        color: AppTheme.pepperGold),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return context.tr('error_invalid_input');
                     }
                     if (!value.contains('@')) {
-                      return 'Please enter a valid email';
+                      return context.tr('error_invalid_input');
                     }
                     return null;
                   },
@@ -157,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   obscureText: _obscurePassword,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    labelText: 'Password',
+                    labelText: context.tr('auth_password'),
                     labelStyle: const TextStyle(color: Colors.white70),
                     prefixIcon: const Icon(Icons.lock_outline,
                         color: AppTheme.pepperGold),
@@ -175,10 +177,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
+                      return context.tr('error_invalid_input');
                     }
                     if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return context.tr('error_invalid_input');
                     }
                     return null;
                   },
@@ -193,14 +195,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       // TODO: Implement forgot password
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content:
-                                Text('Forgot password feature coming soon')),
+                        SnackBar(
+                            content: Text(context.tr('auth_forgot_password'))),
                       );
                     },
-                    child: const Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: AppTheme.pepperGold),
+                    child: Text(
+                      context.tr('auth_forgot_password'),
+                      style: const TextStyle(color: AppTheme.pepperGold),
                     ),
                   ),
                 ),
@@ -222,9 +223,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   AppTheme.forestGreen),
                             ),
                           )
-                        : const Text(
-                            'Login',
-                            style: TextStyle(
+                        : Text(
+                            context.tr('auth_login'),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -257,8 +258,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Text(
+                      context.tr('auth_dont_have_account'),
+                      style: const TextStyle(color: Colors.white70),
+                    ),
                     const Text(
-                      "Don't have an account? ",
+                      " ",
                       style: TextStyle(color: Colors.white70),
                     ),
                     TextButton(
@@ -268,9 +273,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         minimumSize: const Size(0, 0),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(
+                      child: Text(
+                        context.tr('auth_sign_up'),
+                        style: const TextStyle(
                           color: AppTheme.pepperGold,
                           fontWeight: FontWeight.bold,
                         ),

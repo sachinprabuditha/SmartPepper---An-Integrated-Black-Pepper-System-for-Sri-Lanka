@@ -177,6 +177,9 @@
   
   "notification_new_bid": "உங்கள் ஏலத்தில் புதிய ஏலம் வைக்கப்பட்டுள்ளது",
   "notification_auction_won": "வாழ்த்துக்கள்! நீங்கள் ஏலத்தை வென்றீர்கள்",
+  "notification_auction_sold": "ஏலம் வெற்றிகரமாக முடிந்தது",
+  "notification_auction_no_sale": "ஏலம் விற்பனை இல்லாமல் முடிந்தது",
+  "notification_auction_settled": "ஏல தீர்வு முடிந்தது",
   "notification_auction_lost": "ஏலம் முடிவடைந்தது. நீங்கள் தோற்கடிக்கப்பட்டீர்கள்",
   "notification_auction_ending": "ஏலம் விரைவில் முடிவடைகிறது",
   "notification_payment_received": "கொடுப்பனவு பெறப்பட்டது",

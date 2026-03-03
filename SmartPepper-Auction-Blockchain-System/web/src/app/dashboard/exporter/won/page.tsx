@@ -35,11 +35,36 @@ interface WonAuction {
   myBids: Bid[];
 }
 
+// Helper function to safely format date with distance
+function safeFormatDistanceToNow(dateValue: any): string {
+  if (!dateValue) return 'Date not available';
+  try {
+    const date = new Date(dateValue);
+    if (isNaN(date.getTime())) return 'Invalid date';
+    return formatDistanceToNow(date, { addSuffix: true });
+  } catch (error) {
+    return 'Date error';
+  }
+}
+
+// Helper function to safely format date as locale string
+function safeToLocaleString(dateValue: any): string {
+  if (!dateValue) return 'Date not available';
+  try {
+    const date = new Date(dateValue);
+    if (isNaN(date.getTime())) return 'Invalid date';
+    return date.toLocaleString();
+  } catch (error) {
+    return 'Date error';
+  }
+}
+
 export default function WonAuctionsPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [wonAuctions, setWonAuctions] = useState<WonAuction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [noWalletMessage, setNoWalletMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'exporter')) {
@@ -66,13 +91,18 @@ export default function WonAuctionsPage() {
       const response = await auctionApi.getUserBids(user.id);
       console.log('User bids response:', response.data);
       
-      // Filter only won auctions (status = 'ended' and isLeading = true)
+      // Filter won auctions (status = 'ended' or 'settled' and isLeading = true)
       const auctionsWithBids = response.data?.auctions || [];
       const won = auctionsWithBids.filter((auction: WonAuction) => 
-        auction.status === 'ended' && auction.isLeading
+        (auction.status === 'ended' || auction.status === 'settled') && auction.isLeading
       );
       
       setWonAuctions(won);
+      
+      // Check for no wallet message
+      if (response.data?.message) {
+        setNoWalletMessage(response.data.message);
+      }
     } catch (error: any) {
       console.error('Failed to load won auctions:', error);
     } finally {
@@ -154,7 +184,26 @@ export default function WonAuctionsPage() {
 
         {/* Won Auctions List */}
         <div className="space-y-4">
-          {wonAuctions.length === 0 ? (
+          {noWalletMessage ? (
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
+              <div className="text-4xl mb-4">👛</div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                Wallet Not Connected
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                {noWalletMessage}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Connect your MetaMask wallet or add your wallet address to place bids and win auctions.
+              </p>
+              <Link
+                href="/profile"
+                className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                ⚙️ Go to Profile Settings
+              </Link>
+            </div>
+          ) : wonAuctions.length === 0 ? (
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
               <div className="text-4xl mb-4">🎯</div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -183,8 +232,12 @@ export default function WonAuctionsPage() {
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                           {auction.variety || 'Pepper Lot'}
                         </h3>
-                        <span className="px-3 py-1 text-sm font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-                          ✅ Won
+                        <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
+                          auction.status === 'settled' 
+                            ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' 
+                            : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
+                        }`}>
+                          {auction.status === 'settled' ? '✅ Settled' : '✅ Won'}
                         </span>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
@@ -225,10 +278,10 @@ export default function WonAuctionsPage() {
                       <div>
                         <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Auction Ended</div>
                         <div className="text-lg font-bold text-gray-900 dark:text-white">
-                          {formatDistanceToNow(new Date(auction.endTime), { addSuffix: true })}
+                          {safeFormatDistanceToNow(auction.endTime)}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {new Date(auction.endTime).toLocaleString()}
+                          {safeToLocaleString(auction.endTime)}
                         </div>
                       </div>
                     </div>
@@ -236,30 +289,58 @@ export default function WonAuctionsPage() {
 
                   {/* Payment & Delivery Status */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div className="border border-orange-200 dark:border-orange-800 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-2xl">💳</span>
-                        <span className="font-semibold text-gray-900 dark:text-white">Escrow Status</span>
-                      </div>
-                      <span className="px-3 py-1 text-sm font-semibold rounded-full bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">
-                        Escrow Required
-                      </span>
-                      <Link
-                        href={`/dashboard/exporter/won/${auction.auctionId}/escrow`}
-                        className="mt-3 block w-full text-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition"
-                      >
-                        💰 Deposit Escrow
-                      </Link>
-                    </div>
-                    <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-2xl">🚚</span>
-                        <span className="font-semibold text-gray-900 dark:text-white">Delivery Status</span>
-                      </div>
-                      <span className="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                        Awaiting Escrow
-                      </span>
-                    </div>
+                    {auction.status === 'settled' ? (
+                      <>
+                        <div className="border border-green-200 dark:border-green-800 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl">✅</span>
+                            <span className="font-semibold text-gray-900 dark:text-white">Settlement Status</span>
+                          </div>
+                          <span className="px-3 py-1 text-sm font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                            ✅ Settled on Blockchain
+                          </span>
+                          <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                            Payment completed and transferred to farmer
+                          </p>
+                        </div>
+                        <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl">🚚</span>
+                            <span className="font-semibold text-gray-900 dark:text-white">Delivery Status</span>
+                          </div>
+                          <span className="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                            Ready for Shipment
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="border border-orange-200 dark:border-orange-800 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl">💳</span>
+                            <span className="font-semibold text-gray-900 dark:text-white">Escrow Status</span>
+                          </div>
+                          <span className="px-3 py-1 text-sm font-semibold rounded-full bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">
+                            Escrow Required
+                          </span>
+                          <Link
+                            href={`/dashboard/exporter/won/${auction.auctionId}/escrow`}
+                            className="mt-3 block w-full text-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition"
+                          >
+                            💰 Deposit Escrow
+                          </Link>
+                        </div>
+                        <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl">🚚</span>
+                            <span className="font-semibold text-gray-900 dark:text-white">Delivery Status</span>
+                          </div>
+                          <span className="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                            Awaiting Escrow
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Farmer Info */}

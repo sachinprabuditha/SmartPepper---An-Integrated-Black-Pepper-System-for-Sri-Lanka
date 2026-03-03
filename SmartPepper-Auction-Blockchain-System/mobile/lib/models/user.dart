@@ -27,7 +27,8 @@ class User {
       email: json['email'] as String,
       name: json['name'] as String,
       role: json['role'] as String,
-      walletAddress: json['walletAddress'] as String?,
+      walletAddress:
+          (json['walletAddress'] ?? json['wallet_address']) as String?,
       phone: json['phone'] as String?,
       verified: json['verified'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),

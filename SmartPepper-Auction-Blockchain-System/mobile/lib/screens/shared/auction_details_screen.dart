@@ -35,6 +35,17 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
   }
 
   void _initializeAuction() {
+    print(
+        '🎬 AuctionDetailsScreen: Initializing with auction.id = "${widget.auction.id}"');
+    print('   Initial auction status from widget: ${widget.auction.status}');
+    if (widget.auction.id.isEmpty) {
+      print(
+          '⚠️ WARNING: Trying to initialize AuctionDetailsScreen with EMPTY auction.id!');
+      print('   Auction status: ${widget.auction.status}');
+      print('   Auction lotId: ${widget.auction.lotId}');
+      return;
+    }
+
     final auctionProvider = context.read<AuctionProvider>();
     auctionProvider.joinAuction(widget.auction.id);
   }
@@ -105,11 +116,26 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
       return;
     }
 
+    // Get user's wallet address
+    final authProvider = context.read<AuthProvider>();
+    final walletAddress = authProvider.user?.walletAddress;
+
+    if (walletAddress == null || walletAddress.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content:
+              Text('Wallet address not found. Please update your profile.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isPlacingBid = true);
 
     final auctionProvider = context.read<AuctionProvider>();
-    final success =
-        await auctionProvider.placeBid(widget.auction.id, bidAmount);
+    final success = await auctionProvider.placeBid(
+        widget.auction.id, bidAmount, walletAddress);
 
     setState(() => _isPlacingBid = false);
 
