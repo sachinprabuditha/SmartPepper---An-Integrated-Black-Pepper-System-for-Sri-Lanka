@@ -18,11 +18,11 @@ export const createSeason = async (farmId, userId, seasonData) => {
     const newSeason = {
         id: docRef.id,
         farmId: farmId,
-        seasonName: seasonData.seasonName,
-        startMonth: seasonData.startMonth,
-        startYear: seasonData.startYear,
-        endMonth: seasonData.endMonth,
-        endYear: seasonData.endYear,
+        seasonName: seasonData.seasonName || 'New Season',
+        startMonth: seasonData.startMonth || new Date().getMonth() + 1,
+        startYear: seasonData.startYear || new Date().getFullYear(),
+        endMonth: seasonData.endMonth || null,
+        endYear: seasonData.endYear || null,
         createdBy: userId,
         status: 'Active', // Default status
         createdAt: new Date()
@@ -42,30 +42,60 @@ export const getSeasons = async (farmId) => {
 };
 
 export const getSeasonsByUser = async (userId) => {
-    // Collection Group Query
-    // Requires index on 'createdBy'
-    const snapshot = await db.collectionGroup('seasons')
-        .where('createdBy', '==', userId)
-        .orderBy('startYear', 'desc')
-        .orderBy('startMonth', 'desc')
+    // Get all farms for user to avoid collectionGroup index requirement
+    const farmsSnapshot = await db.collection('farms')
+        .where('userId', '==', userId)
         .get();
 
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    if (farmsSnapshot.empty) {
+        return [];
+    }
+
+    const seasons = [];
+
+    // Fetch seasons for each farm
+    const checkPromises = farmsSnapshot.docs.map(async (farmDoc) => {
+        const seasonsSnap = await farmDoc.ref.collection('seasons').get();
+        seasonsSnap.forEach(doc => {
+            seasons.push({ id: doc.id, ...doc.data() });
+        });
+    });
+
+    await Promise.all(checkPromises);
+
+    // Sort descending by startYear, then startMonth
+    seasons.sort((a, b) => {
+        if (a.startYear !== b.startYear) return (b.startYear || 0) - (a.startYear || 0);
+        return (b.startMonth || 0) - (a.startMonth || 0);
+    });
+
+    return seasons;
 };
 
-const findSeasonDoc = async (seasonId) => {
-    const snapshot = await db.collectionGroup('seasons').where('id', '==', seasonId).limit(1).get();
-    if (snapshot.empty) throw new Error('Season not found');
-    return snapshot.docs[0];
+const findSeasonInUserFarms = async (userId, seasonId) => {
+    const farmsSnapshot = await db.collection('farms').where('userId', '==', userId).get();
+    if (farmsSnapshot.empty) return null;
+
+    const checkPromises = farmsSnapshot.docs.map(async (farmDoc) => {
+        const seasonDocRef = farmDoc.ref.collection('seasons').doc(seasonId);
+        const seasonSnap = await seasonDocRef.get();
+        return seasonSnap.exists ? seasonSnap : null;
+    });
+
+    const results = await Promise.all(checkPromises);
+    const found = results.find(snap => snap !== null);
+
+    if (!found) throw new Error('Season not found');
+    return found;
 };
 
-export const getSeasonById = async (seasonId) => {
-    const doc = await findSeasonDoc(seasonId);
+export const getSeasonById = async (seasonId, userId) => {
+    const doc = await findSeasonInUserFarms(userId, seasonId);
     return { id: doc.id, ...doc.data() };
 };
 
-export const createSession = async (seasonId, sessionData) => {
-    const seasonDoc = await findSeasonDoc(seasonId);
+export const createSession = async (seasonId, userId, sessionData) => {
+    const seasonDoc = await findSeasonInUserFarms(userId, seasonId);
 
     const sessionsRef = seasonDoc.ref.collection('sessions');
     const docRef = sessionsRef.doc();
@@ -73,11 +103,11 @@ export const createSession = async (seasonId, sessionData) => {
     const newSession = {
         id: docRef.id,
         seasonId: seasonId,
-        sessionName: sessionData.sessionName,
-        date: new Date(sessionData.date),
-        yieldKg: sessionData.yieldKg,
-        areaHarvested: sessionData.areaHarvested,
-        notes: sessionData.notes,
+        sessionName: sessionData.sessionName || 'New Session',
+        date: sessionData.date ? new Date(sessionData.date) : new Date(),
+        yieldKg: sessionData.yieldKg || 0,
+        areaHarvested: sessionData.areaHarvested || 0,
+        notes: sessionData.notes || '',
         createdAt: new Date()
     };
 
@@ -85,8 +115,8 @@ export const createSession = async (seasonId, sessionData) => {
     return newSession;
 };
 
-export const getSessions = async (seasonId) => {
-    const seasonDoc = await findSeasonDoc(seasonId);
+export const getSessions = async (seasonId, userId) => {
+    const seasonDoc = await findSeasonInUserFarms(userId, seasonId);
 
     const snapshot = await seasonDoc.ref.collection('sessions')
         .orderBy('date', 'desc')
@@ -103,7 +133,7 @@ export const getSessions = async (seasonId) => {
 };
 
 export const endSeason = async (seasonId, userId) => {
-    const seasonDoc = await findSeasonDoc(seasonId);
+    const seasonDoc = await findSeasonInUserFarms(userId, seasonId);
     const data = seasonDoc.data();
 
     if (data.createdBy !== userId) {
@@ -122,7 +152,7 @@ export const endSeason = async (seasonId, userId) => {
 };
 
 export const updateSeason = async (seasonId, userId, updateData) => {
-    const seasonDoc = await findSeasonDoc(seasonId);
+    const seasonDoc = await findSeasonInUserFarms(userId, seasonId);
     const data = seasonDoc.data();
 
     if (data.createdBy !== userId) {
@@ -133,14 +163,32 @@ export const updateSeason = async (seasonId, userId, updateData) => {
     return { ...data, ...updateData };
 };
 
-const findSessionDoc = async (sessionId) => {
-    const snapshot = await db.collectionGroup('sessions').where('id', '==', sessionId).limit(1).get();
-    if (snapshot.empty) throw new Error('Session not found');
-    return snapshot.docs[0];
+const findSessionInUserFarms = async (userId, sessionId) => {
+    const farmsSnapshot = await db.collection('farms').where('userId', '==', userId).get();
+    if (farmsSnapshot.empty) return null;
+
+    const checkPromises = farmsSnapshot.docs.map(async (farmDoc) => {
+        const seasonsSnap = await farmDoc.ref.collection('seasons').get();
+
+        const sessionPromises = seasonsSnap.docs.map(async (seasonDoc) => {
+            const sessionDocRef = seasonDoc.ref.collection('sessions').doc(sessionId);
+            const sessionSnap = await sessionDocRef.get();
+            return sessionSnap.exists ? sessionSnap : null;
+        });
+
+        const sessionResults = await Promise.all(sessionPromises);
+        return sessionResults.find(snap => snap !== null) || null;
+    });
+
+    const results = await Promise.all(checkPromises);
+    const found = results.find(snap => snap !== null);
+
+    if (!found) throw new Error('Session not found');
+    return found;
 };
 
-export const getSessionById = async (sessionId) => {
-    const doc = await findSessionDoc(sessionId);
+export const getSessionById = async (sessionId, userId) => {
+    const doc = await findSessionInUserFarms(userId, sessionId);
     const data = doc.data();
     return {
         id: doc.id,
@@ -149,8 +197,8 @@ export const getSessionById = async (sessionId) => {
     };
 };
 
-export const updateSession = async (sessionId, updateData) => {
-    const sessionDoc = await findSessionDoc(sessionId);
+export const updateSession = async (sessionId, userId, updateData) => {
+    const sessionDoc = await findSessionInUserFarms(userId, sessionId);
     // TODO: Add ownership check by traversing up to season->farm if needed. 
     // Skipping for now as strict parity with old code (which didn't check user explicitly in updateSession service, 
     // though controller might not have passed user).
@@ -159,8 +207,20 @@ export const updateSession = async (sessionId, updateData) => {
     return { ...sessionDoc.data(), ...updateData };
 };
 
-export const deleteSession = async (sessionId) => {
-    const sessionDoc = await findSessionDoc(sessionId);
+export const deleteSession = async (sessionId, userId) => {
+    const sessionDoc = await findSessionInUserFarms(userId, sessionId);
     await sessionDoc.ref.delete();
+    return true;
+};
+export const deleteSeason = async (seasonId, userId) => {
+    const seasonDoc = await findSeasonInUserFarms(userId, seasonId);
+    
+    // 1. Delete all sessions within this season first
+    const sessionsSnap = await seasonDoc.ref.collection('sessions').get();
+    const deletePromises = sessionsSnap.docs.map(doc => doc.ref.delete());
+    await Promise.all(deletePromises);
+
+    // 2. Delete the season document
+    await seasonDoc.ref.delete();
     return true;
 };

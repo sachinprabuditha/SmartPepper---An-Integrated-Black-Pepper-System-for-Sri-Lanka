@@ -31,6 +31,11 @@ class _PredictionPageState extends ConsumerState<PredictionPage> {
   PredictionOutput? _result;
   String? _errorMessage;
 
+  // Yield Valuation state
+  bool _showValuation = false;
+  final TextEditingController _amountController = TextEditingController();
+  double? _calculatedBaseValue;
+
   // Constants
   final List<String> _locations = [
     'Colombo', 'Galle', 'Hambantota', 'Kandy', 'Kegalle', 
@@ -52,6 +57,7 @@ class _PredictionPageState extends ConsumerState<PredictionPage> {
     _tempController.dispose();
     _precipController.dispose();
     _dateController.dispose();
+    _amountController.dispose();
     super.dispose();
   }
 
@@ -77,6 +83,10 @@ class _PredictionPageState extends ConsumerState<PredictionPage> {
       _isLoading = true;
       _errorMessage = null;
       _result = null;
+      // Reset valuation state
+      _showValuation = false;
+      _amountController.clear();
+      _calculatedBaseValue = null;
     });
 
     try {
@@ -269,6 +279,124 @@ class _PredictionPageState extends ConsumerState<PredictionPage> {
                     ),
                   ),
                 ),
+
+              if (_result != null && !_isLoading) ...[
+                const SizedBox(height: 16),
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _showValuation = !_showValuation;
+                      });
+                    },
+                    icon: const Icon(Icons.calculate),
+                    label: const Text('Valuate Yield'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueGrey,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                  ),
+                ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  child: _showValuation
+                      ? Card(
+                          margin: const EdgeInsets.only(top: 16),
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: Colors.blueGrey.shade100),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  'Valuate Your Yield',
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  controller: _amountController,
+                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Amount (kg)',
+                                    hintText: 'e.g. 50.5',
+                                    border: OutlineInputBorder(),
+                                    prefixIcon: Icon(Icons.inventory_2_outlined),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Amount is required';
+                                    }
+                                    final amount = double.tryParse(value);
+                                    if (amount == null) {
+                                      return 'Please enter a valid number';
+                                    }
+                                    if (amount < 0) {
+                                      return 'Amount cannot be negative';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        final amount = double.parse(_amountController.text);
+                                        setState(() {
+                                          // Round price to 2 decimal places to match UI display before calculation
+                                          final roundedPrice = double.parse(_result!.averagePrice.toStringAsFixed(2));
+                                          _calculatedBaseValue = roundedPrice * amount;
+                                        });
+                                      }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppTheme.primaryGreen,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  child: const Text('Calculate'),
+                                ),
+                                if (_calculatedBaseValue != null) ...[
+                                  const SizedBox(height: 20),
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.shade50,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.green.shade200),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        const Text(
+                                          'Estimated Total Value',
+                                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Rs. ${NumberFormat('#,##0.00').format(_calculatedBaseValue)}',
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green.shade700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
             ],
           ),
         ),

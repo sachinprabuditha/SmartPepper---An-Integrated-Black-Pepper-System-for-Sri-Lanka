@@ -7,14 +7,30 @@ const client = new QdrantClient({
 });
 
 async function setup() {
+
+    // delete old collection if exists (safe reset)
+    try {
+        await client.deleteCollection("pepper_knowledge");
+        console.log("🧹 Old collection removed");
+    } catch (e) {
+        console.log("No previous collection found");
+    }
+
+    // ✅ HYBRID COLLECTION
     await client.createCollection("pepper_knowledge", {
         vectors: {
-            size: 1536,
-            distance: "Cosine",
+            dense: {
+                size: 1536,          // OpenAI embedding size
+                distance: "Cosine",
+            },
+        },
+
+        sparse_vectors: {
+            sparse: {},              // enables keyword search
         },
     });
 
-    console.log("✅ pepper_knowledge collection created!");
+    console.log("✅ Hybrid collection created!");
 }
 
 setup();

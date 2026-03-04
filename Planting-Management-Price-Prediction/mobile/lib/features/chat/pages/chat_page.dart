@@ -93,6 +93,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
               isUser: false,
               timestamp: DateTime.now(),
               sources: response.sources,
+              suggestions: response.suggestions,
             ),
           );
     } catch (e) {
@@ -287,6 +288,26 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                       ),
                     )
                   ],
+                ),
+              ),
+
+            /// SUGGESTIONS
+            if (!isUser && msg.suggestions.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: msg.suggestions.map((s) {
+                    return ActionChip(
+                      label: Text(s, style: const TextStyle(fontSize: 12)),
+                      backgroundColor: Colors.white,
+                      onPressed: () {
+                        _controller.text = s;
+                        _sendMessage();
+                      },
+                    );
+                  }).toList(),
                 ),
               ),
           ],

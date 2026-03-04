@@ -36,8 +36,9 @@ export const getSeasonsByUser = async (req, res) => {
 
 export const createSession = async (req, res) => {
     try {
+        const userId = req.user.nameid;
         const { seasonId } = req.body;
-        const result = await harvestService.createSession(seasonId, req.body);
+        const result = await harvestService.createSession(seasonId, userId, req.body);
         res.status(201).json({ success: true, message: 'Harvest session recorded', data: result });
     } catch (error) {
         console.error('Create session error:', error);
@@ -47,8 +48,9 @@ export const createSession = async (req, res) => {
 
 export const getSessions = async (req, res) => {
     try {
+        const userId = req.user.nameid;
         const { seasonId } = req.params;
-        const result = await harvestService.getSessions(seasonId);
+        const result = await harvestService.getSessions(seasonId, userId);
         res.status(200).json({ success: true, message: 'Sessions retrieved successfully', data: result });
     } catch (error) {
         console.error('Get sessions error:', error);
@@ -58,8 +60,9 @@ export const getSessions = async (req, res) => {
 
 export const getSeasonById = async (req, res) => {
     try {
+        const userId = req.user.nameid;
         const { id } = req.params;
-        const result = await harvestService.getSeasonById(id);
+        const result = await harvestService.getSeasonById(id, userId);
         res.status(200).json({ success: true, message: 'Season retrieved successfully', data: result });
     } catch (error) {
         if (error.message === 'Season not found') {
@@ -108,8 +111,9 @@ export const updateSeason = async (req, res) => {
 
 export const getSessionById = async (req, res) => {
     try {
+        const userId = req.user.nameid;
         const { id } = req.params;
-        const result = await harvestService.getSessionById(id);
+        const result = await harvestService.getSessionById(id, userId);
         res.status(200).json({ success: true, message: 'Session retrieved successfully', data: result });
     } catch (error) {
         if (error.message === 'Session not found') {
@@ -122,8 +126,9 @@ export const getSessionById = async (req, res) => {
 
 export const updateSession = async (req, res) => {
     try {
+        const userId = req.user.nameid;
         const { id } = req.params;
-        const result = await harvestService.updateSession(id, req.body);
+        const result = await harvestService.updateSession(id, userId, req.body);
         res.status(200).json({ success: true, message: 'Session updated successfully', data: result });
     } catch (error) {
         if (error.message === 'Session not found') {
@@ -136,8 +141,9 @@ export const updateSession = async (req, res) => {
 
 export const deleteSession = async (req, res) => {
     try {
+        const userId = req.user.nameid;
         const { id } = req.params;
-        await harvestService.deleteSession(id);
+        await harvestService.deleteSession(id, userId);
         res.status(200).json({ success: true, message: 'Session deleted successfully' });
     } catch (error) {
         if (error.message === 'Session not found') {
@@ -145,5 +151,19 @@ export const deleteSession = async (req, res) => {
         }
         console.error('Delete session error:', error);
         res.status(500).json({ success: false, message: 'Failed to delete session' });
+    }
+};
+export const deleteSeason = async (req, res) => {
+    try {
+        const userId = req.user.nameid;
+        const { id } = req.params;
+        await harvestService.deleteSeason(id, userId);
+        res.status(200).json({ success: true, message: 'Season deleted successfully' });
+    } catch (error) {
+        if (error.message === 'Season not found') {
+            return res.status(404).json({ success: false, message: error.message });
+        }
+        console.error('Delete season error:', error);
+        res.status(500).json({ success: false, message: 'Failed to delete season' });
     }
 };
