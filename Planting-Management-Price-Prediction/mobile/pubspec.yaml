@@ -26,6 +26,7 @@ dependencies:
   
   # UI
   intl: ^0.20.2
+  fl_chart: ^0.68.0
   
   # Utils
   uuid: ^4.2.1

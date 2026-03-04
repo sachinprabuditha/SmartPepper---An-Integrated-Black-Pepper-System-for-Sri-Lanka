@@ -13,6 +13,7 @@ router.get('/seasons/user/:userId', harvestController.getSeasonsByUser); // Path
 router.get('/seasons/:id', harvestController.getSeasonById);
 router.post('/seasons/:id/end', harvestController.endSeason);
 router.put('/seasons/:id', harvestController.updateSeason);
+router.delete('/seasons/:id', harvestController.deleteSeason);
 
 // Session Routes
 router.post('/sessions', harvestController.createSession);

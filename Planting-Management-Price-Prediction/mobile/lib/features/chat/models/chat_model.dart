@@ -4,6 +4,7 @@ class ChatMessage {
   final DateTime timestamp;
   final List<String>? sources;
   final bool isLoading;
+  final List<String> suggestions;
 
   ChatMessage({
     required this.text,
@@ -11,6 +12,7 @@ class ChatMessage {
     required this.timestamp,
     this.sources,
     this.isLoading = false,
+    this.suggestions = const [],
   });
 }
 
@@ -33,11 +35,13 @@ class RagChatResponse {
   final String reply;
   final List<String> sources;
   final String conversationId;
+  final List<String> suggestions;
 
   RagChatResponse({
     required this.reply,
     required this.sources,
     required this.conversationId,
+    this.suggestions = const [],
   });
 
   factory RagChatResponse.fromJson(Map<String, dynamic> json) {
@@ -48,6 +52,9 @@ class RagChatResponse {
               .toList() ??
           [],
       conversationId: json['conversationId'] ?? '',
+      suggestions: List<String>.from(
+        json['suggestions'] ?? [],
+      ),
     );
   }
 }

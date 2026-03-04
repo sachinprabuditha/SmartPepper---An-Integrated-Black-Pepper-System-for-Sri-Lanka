@@ -12,6 +12,7 @@ import '../../../../core/theme/app_theme.dart';
 import 'dart:developer' as developer;
 
 import '../../chat/pages/chat_page.dart';
+import '../../yield_analytics/yield_analytics_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -42,6 +43,12 @@ class _HomePageState extends State<HomePage> {
       icon: Icons.calendar_today,
       color: Colors.orange,
       route: (context) => const SeasonsListPage(),
+    ),
+    ActionCard(
+      title: 'Yield Analytics',
+      icon: Icons.analytics,
+      color: Colors.blueAccent,
+      route: (context) => const YieldAnalyticsPage(),
     ),
     ActionCard(
       title: 'Price Prediction',

@@ -2,9 +2,14 @@
 
 import { askPepperRAG } from './rag.service.js';
 import * as chatRepo from '../repositories/chat.repository.js';
+import { summarizeConversation } from './memory.service.js';
+
+import { extractMemory } from './memory.extractor.js';
+import { saveMemory } from '../repositories/memory.vector.repository.js';
+import { searchRelevantMemories } from './memory.search.service.js';
 
 /**
- * Generate conversation title from first message
+ * Generate conversation title
  */
 const generateTitle = (message) => {
 
@@ -12,30 +17,20 @@ const generateTitle = (message) => {
 
     let title = message.trim();
 
-    // avoid useless titles
     const lowValueMessages = [
-        "hi",
-        "hello",
-        "thanks",
-        "ok",
-        "okay",
-        "yes",
-        "no"
+        "hi", "hello", "thanks", "ok", "okay", "yes", "no"
     ];
 
     if (lowValueMessages.includes(title.toLowerCase())) {
         return "Pepper Farming Advice";
     }
 
-    // limit length
     if (title.length > 60) {
         title = title.substring(0, 57) + "...";
     }
 
-    // clean trailing punctuation (optional NICE TOUCH)
     title = title.replace(/[?!.]+$/, '');
 
-    // capitalize
     title =
         title.charAt(0).toUpperCase() +
         title.slice(1);
@@ -43,9 +38,11 @@ const generateTitle = (message) => {
     return title;
 };
 
+
 /**
- * SIMPLE RAG CHAT SERVICE
- * Backend owns conversation history
+ * =============================
+ * MAIN CHAT PROCESSOR
+ * =============================
  */
 export const processMessage = async (
     userId,
@@ -53,15 +50,17 @@ export const processMessage = async (
     conversationId
 ) => {
 
-    // create conversation if needed
-    let isNewConversation = false;
-
+    // =============================
+    // 1️⃣ Create conversation
+    // =============================
     if (!conversationId || conversationId.trim() === "") {
-        conversationId = await chatRepo.createConversation(userId);
-        isNewConversation = true;
+        conversationId =
+            await chatRepo.createConversation(userId);
     }
 
-    // save user message
+    // =============================
+    // 2️⃣ Save user message
+    // =============================
     await chatRepo.addMessage(
         userId,
         conversationId,
@@ -69,12 +68,19 @@ export const processMessage = async (
         message
     );
 
-    // set title (Idempotent + Smart guard)
-    const conversation = await chatRepo.getConversation(userId, conversationId);
-    if (conversation && (conversation.title === "New Chat" || conversation.title === "Pepper Farming Advice")) {
+    // =============================
+    // 3️⃣ Auto title update
+    // =============================
+    const conversation =
+        await chatRepo.getConversation(userId, conversationId);
+
+    if (
+        conversation &&
+        (conversation.title === "New Chat" ||
+            conversation.title === "Pepper Farming Advice")
+    ) {
         const title = generateTitle(message);
 
-        // only update if new title is more meaningful than current one
         if (title !== conversation.title) {
             await chatRepo.updateConversationTitle(
                 userId,
@@ -84,12 +90,50 @@ export const processMessage = async (
         }
     }
 
-    // run RAG
+    // =============================
+    // 4️⃣ Load memory + history
+    // =============================
+    const memory =
+        await chatRepo.getConversationMemory(
+            userId,
+            conversationId
+        );
+
+    const history =
+        await chatRepo.getRecentMessages(
+            userId,
+            conversationId,
+            6
+        );
+
+    // =============================
+    // ⭐ Semantic Memory Retrieval
+    // =============================
+    let semanticMemories = [];
+
+    try {
+        semanticMemories =
+            await searchRelevantMemories(
+                userId,
+                message
+            );
+    } catch (err) {
+        console.warn("Semantic retrieval skipped");
+    }
+
+    // =============================
+    // 5️⃣ RAG
+    // =============================
     const ragResult = await askPepperRAG({
-        question: message
+        question: message,
+        history,
+        memory,
+        semanticMemories
     });
 
-    // save assistant reply
+    // =============================
+    // 6️⃣ Save assistant reply
+    // =============================
     await chatRepo.addMessage(
         userId,
         conversationId,
@@ -98,22 +142,70 @@ export const processMessage = async (
         ragResult.sources
     );
 
+    // =============================
+    // 7️⃣ Memory Compression (Firestore)
+    // =============================
+    const compressionBatch =
+        await chatRepo.getRecentMessages(
+            userId,
+            conversationId,
+            10
+        );
+
+    if (compressionBatch.length >= 10) {
+
+        try {
+            const newMemory =
+                await summarizeConversation(
+                    memory,
+                    compressionBatch
+                );
+
+            await chatRepo.updateConversationMemory(
+                userId,
+                conversationId,
+                newMemory
+            );
+        } catch (err) {
+            console.warn("Memory compression skipped");
+        }
+    }
+
+    // =============================
+    // ⭐ Store Semantic Memory
+    // =============================
+    try {
+
+        const extracted =
+            await extractMemory(message);
+
+        if (extracted) {
+            await saveMemory(userId, extracted);
+        }
+
+    } catch (err) {
+        console.warn("Semantic memory save skipped");
+    }
+
     return {
         conversationId,
         reply: ragResult.reply,
         sources: ragResult.sources,
+        suggestions: ragResult.suggestions || []
     };
 };
 
+
 /**
- *  NEW: Get conversation list for sidebar
+ * Conversation List
  */
 export const getConversations = async (userId) => {
     return await chatRepo.getUserConversations(userId);
 };
 
+
 /**
- * Get messages of a conversation
+ * Messages Loader
  */
 export const getMessages = async (
     userId,

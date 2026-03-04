@@ -34,6 +34,7 @@ class ChatService {
       reply: data['reply'],
       sources: List<String>.from(data['sources']),
       conversationId: data['conversationId'],
+      suggestions: List<String>.from(data['suggestions'] ?? []),
     );
   }
 }

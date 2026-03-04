@@ -2,9 +2,12 @@ import { db, FieldValue } from '../config/firebase.js';
 import { randomUUID } from 'crypto';
 
 /**
- * Create new conversation
+ * =============================
+ * Create Conversation
+ * =============================
  */
 export const createConversation = async (userId) => {
+
     const conversationId = randomUUID();
 
     await db
@@ -14,6 +17,7 @@ export const createConversation = async (userId) => {
         .doc(conversationId)
         .set({
             title: 'New Chat',
+            memory: "", // ⭐ long-term memory
             createdAt: FieldValue.serverTimestamp(),
             updatedAt: FieldValue.serverTimestamp(),
         });
@@ -23,7 +27,9 @@ export const createConversation = async (userId) => {
 
 
 /**
- * Add message to conversation
+ * =============================
+ * Add Message
+ * =============================
  */
 export const addMessage = async (
     userId,
@@ -33,36 +39,37 @@ export const addMessage = async (
     sources = []
 ) => {
 
-    // ✅ Firestore safety guard
     if (!content) {
         console.warn("⚠️ Empty message prevented from saving");
         content = "No response generated.";
     }
 
-    const messagesRef = db
+    const conversationRef = db
         .collection('users')
         .doc(userId)
         .collection('conversations')
-        .doc(conversationId)
-        .collection('messages');
+        .doc(conversationId);
+
+    const messagesRef = conversationRef.collection('messages');
 
     await messagesRef.add({
         role,
         content,
-        sources: sources || [],
+        sources,
         timestamp: FieldValue.serverTimestamp(),
     });
 
-    await db
-        .collection('users')
-        .doc(userId)
-        .collection('conversations')
-        .doc(conversationId)
-        .update({
-            updatedAt: FieldValue.serverTimestamp(),
-        });
+    await conversationRef.update({
+        updatedAt: FieldValue.serverTimestamp(),
+    });
 };
 
+
+/**
+ * =============================
+ * Conversation List
+ * =============================
+ */
 export const getUserConversations = async (userId) => {
 
     const snapshot = await db
@@ -84,8 +91,11 @@ export const getUserConversations = async (userId) => {
     });
 };
 
+
 /**
- * Get messages for a conversation
+ * =============================
+ * Get Messages
+ * =============================
  */
 export const getConversationMessages = async (
     userId,
@@ -114,8 +124,39 @@ export const getConversationMessages = async (
     });
 };
 
+
 /**
- * Update conversation title
+ * =============================
+ * Get Conversation
+ * =============================
+ */
+export const getConversation = async (userId, conversationId) => {
+
+    const doc = await db
+        .collection('users')
+        .doc(userId)
+        .collection('conversations')
+        .doc(conversationId)
+        .get();
+
+    if (!doc.exists) return null;
+
+    const data = doc.data();
+
+    return {
+        id: doc.id,
+        title: data.title,
+        memory: data.memory || "",
+        createdAt: data.createdAt?.toDate?.() || null,
+        updatedAt: data.updatedAt?.toDate?.() || null,
+    };
+};
+
+
+/**
+ * =============================
+ * Update Title
+ * =============================
  */
 export const updateConversationTitle = async (
     userId,
@@ -134,24 +175,74 @@ export const updateConversationTitle = async (
         });
 };
 
+
 /**
- * Get single conversation
+ * =============================
+ * MEMORY FUNCTIONS
+ * =============================
  */
-export const getConversation = async (userId, conversationId) => {
-    const doc = await db
+
+/**
+ * Get stored memory
+ */
+export const getConversationMemory = async (
+    userId,
+    conversationId
+) => {
+
+    const conversation = await getConversation(
+        userId,
+        conversationId
+    );
+
+    return conversation?.memory || "";
+};
+
+
+/**
+ * Update compressed memory
+ */
+export const updateConversationMemory = async (
+    userId,
+    conversationId,
+    memory
+) => {
+
+    await db
         .collection('users')
         .doc(userId)
         .collection('conversations')
         .doc(conversationId)
+        .update({
+            memory: memory || "",
+            updatedAt: FieldValue.serverTimestamp(),
+        });
+};
+
+
+/**
+ * =============================
+ * Recent Messages (Compression)
+ * =============================
+ */
+export const getRecentMessages = async (
+    userId,
+    conversationId,
+    limit = 8
+) => {
+
+    const snapshot = await db
+        .collection('users')
+        .doc(userId)
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('messages')
+        .orderBy('timestamp', 'desc')
+        .limit(limit)
         .get();
 
-    if (!doc.exists) return null;
-
-    const data = doc.data();
-    return {
-        id: doc.id,
-        title: data.title,
-        createdAt: data.createdAt?.toDate?.() || null,
-        updatedAt: data.updatedAt?.toDate?.() || null,
-    };
+    // return oldest → newest
+    return snapshot.docs
+        .map(doc => doc.data())
+        .reverse();
 };
