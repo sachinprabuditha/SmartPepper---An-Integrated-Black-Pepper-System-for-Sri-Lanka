@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/theme.dart';
+import '../../localization/app_localizations.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -67,8 +68,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         // Show error from auth provider
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                result['error'] ?? 'Registration failed. Please try again.'),
+            content: Text(result['error'] ?? context.tr('error_server')),
             backgroundColor: AppTheme.errorColor,
           ),
         );
@@ -77,7 +77,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Registration failed: ${e.toString()}'),
+          content: Text(
+              '${context.tr('auth_register')} ${context.tr('error_server')}: ${e.toString()}'),
           backgroundColor: AppTheme.errorColor,
         ),
       );
@@ -109,10 +110,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Title
-                const Text(
-                  'Create Account',
+                Text(
+                  context.tr('auth_register'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -121,10 +122,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 const SizedBox(height: 8),
 
-                const Text(
-                  'Join SmartPepper Today',
+                Text(
+                  context.tr('auth_welcome'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: AppTheme.pepperGold,
                   ),
@@ -142,12 +143,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Row(
                     children: [
                       Expanded(
-                        child: _buildRoleButton(
-                            'farmer', 'Farmer', Icons.agriculture),
+                        child: _buildRoleButton('farmer',
+                            context.tr('auth_farmer'), Icons.agriculture),
                       ),
                       Expanded(
-                        child: _buildRoleButton(
-                            'exporter', 'Exporter', Icons.business),
+                        child: _buildRoleButton('exporter',
+                            context.tr('auth_exporter'), Icons.business),
                       ),
                     ],
                   ),
@@ -159,15 +160,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _nameController,
                   style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Full Name',
-                    labelStyle: TextStyle(color: Colors.white70),
-                    prefixIcon:
-                        Icon(Icons.person_outline, color: AppTheme.pepperGold),
+                  decoration: InputDecoration(
+                    labelText: context.tr('auth_full_name'),
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    prefixIcon: const Icon(Icons.person_outline,
+                        color: AppTheme.pepperGold),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your name';
+                      return context.tr('error_invalid_input');
                     }
                     return null;
                   },
@@ -180,18 +181,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    labelStyle: TextStyle(color: Colors.white70),
-                    prefixIcon:
-                        Icon(Icons.email_outlined, color: AppTheme.pepperGold),
+                  decoration: InputDecoration(
+                    labelText: context.tr('auth_email'),
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    prefixIcon: const Icon(Icons.email_outlined,
+                        color: AppTheme.pepperGold),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return context.tr('error_invalid_input');
                     }
                     if (!value.contains('@')) {
-                      return 'Please enter a valid email';
+                      return context.tr('error_invalid_input');
                     }
                     return null;
                   },
@@ -204,15 +205,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Phone Number',
-                    labelStyle: TextStyle(color: Colors.white70),
-                    prefixIcon:
-                        Icon(Icons.phone_outlined, color: AppTheme.pepperGold),
+                  decoration: InputDecoration(
+                    labelText: context.tr('auth_phone_number'),
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    prefixIcon: const Icon(Icons.phone_outlined,
+                        color: AppTheme.pepperGold),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your phone number';
+                      return context.tr('error_invalid_input');
                     }
                     return null;
                   },
@@ -226,7 +227,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscureText: _obscurePassword,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    labelText: 'Password',
+                    labelText: context.tr('auth_password'),
                     labelStyle: const TextStyle(color: Colors.white70),
                     prefixIcon: const Icon(Icons.lock_outline,
                         color: AppTheme.pepperGold),
@@ -244,10 +245,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a password';
+                      return context.tr('error_invalid_input');
                     }
                     if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return context.tr('error_invalid_input');
                     }
                     return null;
                   },
@@ -261,7 +262,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscureText: _obscureConfirmPassword,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    labelText: 'Confirm Password',
+                    labelText: context.tr('auth_confirm_password'),
                     labelStyle: const TextStyle(color: Colors.white70),
                     prefixIcon: const Icon(Icons.lock_outline,
                         color: AppTheme.pepperGold),
@@ -280,10 +281,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please confirm your password';
+                      return context.tr('error_invalid_input');
                     }
                     if (value != _passwordController.text) {
-                      return 'Passwords do not match';
+                      return context.tr('error_invalid_input');
                     }
                     return null;
                   },
@@ -306,9 +307,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   AppTheme.forestGreen),
                             ),
                           )
-                        : const Text(
-                            'Sign Up',
-                            style: TextStyle(
+                        : Text(
+                            context.tr('auth_sign_up'),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -322,8 +323,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Text(
+                      context.tr('auth_already_have_account'),
+                      style: const TextStyle(color: Colors.white70),
+                    ),
                     const Text(
-                      'Already have an account? ',
+                      " ",
                       style: TextStyle(color: Colors.white70),
                     ),
                     TextButton(
@@ -333,9 +338,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         minimumSize: const Size(0, 0),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
+                      child: Text(
+                        context.tr('auth_login'),
+                        style: const TextStyle(
                           color: AppTheme.pepperGold,
                           fontWeight: FontWeight.bold,
                         ),

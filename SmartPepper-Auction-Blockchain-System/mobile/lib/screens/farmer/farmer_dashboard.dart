@@ -7,6 +7,7 @@ import '../../services/notification_service.dart';
 import '../../services/offline_sync_service.dart';
 import '../../services/api_service.dart';
 import '../../models/lot.dart';
+import '../../localization/app_localizations.dart';
 
 class FarmerDashboard extends StatefulWidget {
   const FarmerDashboard({super.key});
@@ -103,7 +104,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Sync failed: $e'),
+            content: Text('${context.tr('error_server')}: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -130,9 +131,9 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
             // Handle menu/drawer
           },
         ),
-        title: const Text(
-          'SmartPepper',
-          style: TextStyle(
+        title: Text(
+          context.tr('app_name'),
+          style: const TextStyle(
             color: AppTheme.pepperGold,
             fontWeight: FontWeight.bold,
           ),
@@ -185,7 +186,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
             children: [
               // Welcome Section
               Text(
-                'Welcome back,',
+                context.tr('dashboard_welcome'),
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white.withOpacity(0.8),
@@ -193,7 +194,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
               ),
               const SizedBox(height: 4),
               Text(
-                authProvider.user?.name ?? 'Farmer',
+                authProvider.user?.name ?? context.tr('auth_farmer'),
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -253,7 +254,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text('Sync'),
+                            : Text(context.tr('common_retry')),
                       ),
                     ],
                   ),
@@ -265,7 +266,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                   Expanded(
                     child: _buildActionCard(
                       icon: Icons.add_circle_outline,
-                      label: 'Create Lot',
+                      label: context.tr('lot_create'),
                       color: AppTheme.pepperGold,
                       onTap: () => context.push('/farmer/create-lot'),
                     ),
@@ -274,7 +275,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                   Expanded(
                     child: _buildActionCard(
                       icon: Icons.inventory_outlined,
-                      label: 'My Lots',
+                      label: context.tr('lot_my_lots'),
                       color: AppTheme.sriLankanLeaf,
                       onTap: () => context.push('/farmer/my-lots'),
                     ),
@@ -289,7 +290,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                   Expanded(
                     child: _buildActionCard(
                       icon: Icons.gavel,
-                      label: 'Live Auctions',
+                      label: context.tr('auction_live'),
                       color: Colors.blue,
                       onTap: () => context.push('/shared/auctions'),
                     ),
@@ -298,7 +299,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                   Expanded(
                     child: _buildActionCard(
                       icon: Icons.qr_code,
-                      label: 'Scan QR',
+                      label: context.tr('lot_scan_qr'),
                       color: Colors.purple,
                       onTap: () => context.push('/shared/qr-scanner'),
                     ),
@@ -309,9 +310,9 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
               const SizedBox(height: 24),
 
               // Stats Overview
-              const Text(
-                'Overview',
-                style: TextStyle(
+              Text(
+                context.tr('dashboard_statistics'),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -333,7 +334,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                         Expanded(
                           child: _buildStatCard(
                             icon: Icons.eco,
-                            label: 'Active Lots',
+                            label: context.tr('dashboard_active_auctions'),
                             value: '$_activeLots',
                             color: AppTheme.sriLankanLeaf,
                           ),
@@ -342,7 +343,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                         Expanded(
                           child: _buildStatCard(
                             icon: Icons.trending_up,
-                            label: 'In Auction',
+                            label: context.tr('lot_in_auction'),
                             value: '$_inAuction',
                             color: AppTheme.pepperGold,
                           ),
@@ -355,7 +356,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                         Expanded(
                           child: _buildStatCard(
                             icon: Icons.check_circle,
-                            label: 'Sold',
+                            label: context.tr('lot_sold'),
                             value: '$_soldLots',
                             color: AppTheme.sriLankanLeaf,
                           ),
@@ -364,7 +365,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                         Expanded(
                           child: _buildStatCard(
                             icon: Icons.attach_money,
-                            label: 'Revenue',
+                            label: context.tr('dashboard_total_earnings'),
                             value:
                                 '\$${(_totalRevenue / 1000).toStringAsFixed(1)}K',
                             color: AppTheme.pepperGold,
@@ -382,9 +383,9 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Recent Activity',
-                    style: TextStyle(
+                  Text(
+                    context.tr('dashboard_recent_activity'),
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -392,9 +393,9 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                   ),
                   TextButton(
                     onPressed: () => context.push('/farmer/activity'),
-                    child: const Text(
-                      'View All',
-                      style: TextStyle(color: AppTheme.pepperGold),
+                    child: Text(
+                      context.tr('common_view'),
+                      style: const TextStyle(color: AppTheme.pepperGold),
                     ),
                   ),
                 ],

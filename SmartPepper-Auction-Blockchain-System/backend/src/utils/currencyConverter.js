@@ -1,4 +1,4 @@
-const db = require('../db/database');
+const admin = require('firebase-admin');
 const logger = require('./logger');
 
 /**
@@ -19,25 +19,29 @@ class CurrencyConverter {
   }
 
   /**
-   * Load exchange rates from database
+   * Load exchange rates from Firebase
    */
   async loadRates() {
     try {
-      const result = await db.query(`
-        SELECT from_currency, to_currency, rate 
-        FROM exchange_rates 
-        WHERE is_active = true
-      `);
+      const firestore = admin.firestore();
+      const snapshot = await firestore.collection('exchange_rates')
+        .where('is_active', '==', true)
+        .get();
 
-      result.rows.forEach(row => {
-        const key = `${row.from_currency}_TO_${row.to_currency}`;
-        this.rates[key] = parseFloat(row.rate);
-      });
+      if (!snapshot.empty) {
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const key = `${data.from_currency}_TO_${data.to_currency}`;
+          this.rates[key] = parseFloat(data.rate);
+        });
 
-      this.lastUpdate = new Date();
-      logger.info('Exchange rates loaded', { rates: this.rates });
+        this.lastUpdate = new Date();
+        logger.info('Exchange rates loaded from Firebase', { count: snapshot.size });
+      } else {
+        logger.info('No exchange rates in Firebase, using default rates');
+      }
     } catch (error) {
-      logger.error('Failed to load exchange rates', error);
+      logger.warn('Failed to load exchange rates from Firebase, using defaults:', error.message);
       // Continue with default rates
     }
   }
@@ -86,27 +90,29 @@ class CurrencyConverter {
   }
 
   /**
-   * Update exchange rate in database
+   * Update exchange rate in Firebase
    */
   async updateRate(from, to, rate) {
     try {
-      await db.query(`
-        INSERT INTO exchange_rates (from_currency, to_currency, rate, updated_at)
-        VALUES ($1, $2, $3, NOW())
-        ON CONFLICT (from_currency, to_currency, is_active)
-        DO UPDATE SET 
-          rate = $3,
-          updated_at = NOW()
-      `, [from, to, rate]);
+      const firestore = admin.firestore();
+      const rateId = `${from}_${to}`;
+      
+      await firestore.collection('exchange_rates').doc(rateId).set({
+        from_currency: from,
+        to_currency: to,
+        rate: parseFloat(rate),
+        is_active: true,
+        updated_at: admin.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
 
       // Update in-memory rate
       const key = `${from}_TO_${to}`;
       this.rates[key] = parseFloat(rate);
 
-      logger.info('Exchange rate updated', { from, to, rate });
+      logger.info('Exchange rate updated in Firebase', { from, to, rate });
       return true;
     } catch (error) {
-      logger.error('Failed to update exchange rate', error);
+      logger.error('Failed to update exchange rate:', error.message);
       return false;
     }
   }

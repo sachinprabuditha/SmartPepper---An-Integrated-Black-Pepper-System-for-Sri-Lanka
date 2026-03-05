@@ -8,6 +8,7 @@ import '../../services/socket_service.dart';
 import '../../services/api_service.dart';
 import '../../config/theme.dart';
 import 'package:go_router/go_router.dart';
+import '../../localization/app_localizations.dart';
 
 /// Auction monitoring screen for farmers to track their lots in auctions
 /// Farmers can see live bid updates, bidder count, and time remaining
@@ -86,7 +87,7 @@ class _FarmerAuctionMonitorScreenState
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load auction: $e'),
+            content: Text('${context.tr('error_failed_load_auction')}: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -237,7 +238,7 @@ class _FarmerAuctionMonitorScreenState
               Navigator.pop(context);
               Navigator.pop(context); // Go back to auctions list
             },
-            child: const Text('Close'),
+            child: Text(context.tr('button_close')),
           ),
         ],
       ),
@@ -286,7 +287,7 @@ class _FarmerAuctionMonitorScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to submit request: $e'),
+            content: Text('${context.tr('error_failed_submit_request')}: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -301,7 +302,7 @@ class _FarmerAuctionMonitorScreenState
         backgroundColor: Colors.grey[50],
         appBar: AppBar(
           backgroundColor: AppTheme.forestGreen,
-          title: const Text('Loading Auction...'),
+          title: Text(context.tr('auction_loading')),
         ),
         body: const Center(child: CircularProgressIndicator()),
       );
@@ -312,10 +313,10 @@ class _FarmerAuctionMonitorScreenState
         backgroundColor: Colors.grey[50],
         appBar: AppBar(
           backgroundColor: AppTheme.forestGreen,
-          title: const Text('Auction Not Found'),
+          title: Text(context.tr('auction_not_found_title')),
         ),
-        body: const Center(
-          child: Text('Failed to load auction details'),
+        body: Center(
+          child: Text(context.tr('error_failed_auction_details')),
         ),
       );
     }
@@ -325,9 +326,9 @@ class _FarmerAuctionMonitorScreenState
       appBar: AppBar(
         backgroundColor: AppTheme.forestGreen,
         elevation: 0,
-        title: const Text(
-          'Live Auction',
-          style: TextStyle(
+        title: Text(
+          context.tr('live_auction_title'),
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -341,7 +342,7 @@ class _FarmerAuctionMonitorScreenState
           if (_auction!.status == 'created' || _auction!.status == 'active')
             IconButton(
               icon: const Icon(Icons.cancel_outlined, color: Colors.white),
-              tooltip: 'Request Cancellation',
+              tooltip: context.tr('label_request_cancellation'),
               onPressed: _requestEmergencyCancellation,
             ),
         ],
@@ -387,15 +388,15 @@ class _FarmerAuctionMonitorScreenState
     if (_auction!.status == 'active') {
       backgroundColor = Colors.green;
       icon = Icons.circle;
-      text = 'LIVE AUCTION';
+      text = context.tr('status_live_auction');
     } else if (_auction!.status == 'ended') {
       backgroundColor = Colors.orange;
       icon = Icons.timer_off;
-      text = 'AUCTION ENDED';
+      text = context.tr('status_auction_ended');
     } else if (_auction!.status == 'pending_approval') {
       backgroundColor = Colors.orange;
       icon = Icons.hourglass_empty;
-      text = 'PENDING ADMIN APPROVAL';
+      text = context.tr('status_pending_admin_approval');
     } else if (_auction!.status == 'created') {
       // Calculate time until start
       final timeUntilStart = _auction!.startTime.difference(DateTime.now());
@@ -412,7 +413,7 @@ class _FarmerAuctionMonitorScreenState
     } else {
       backgroundColor = Colors.blue;
       icon = Icons.schedule;
-      text = 'PENDING START';
+      text = context.tr('status_pending_start');
     }
 
     return Container(
@@ -812,7 +813,7 @@ class __EmergencyCancellationDialogState
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Request Emergency Cancellation'),
+      title: Text(context.tr('dialog_emergency_cancel_title')),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -859,7 +860,7 @@ class __EmergencyCancellationDialogState
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(context.tr('button_cancel')),
         ),
         ElevatedButton(
           onPressed: _selectedReason.isEmpty
@@ -875,7 +876,7 @@ class __EmergencyCancellationDialogState
             backgroundColor: Colors.red,
             disabledBackgroundColor: Colors.grey,
           ),
-          child: const Text('Submit Request'),
+          child: Text(context.tr('button_submit_request')),
         ),
       ],
     );

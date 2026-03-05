@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/auction_provider.dart';
 import '../../providers/lot_provider.dart';
 import '../../config/theme.dart';
+import '../../localization/app_localizations.dart';
 import '../farmer/create_lot_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -56,9 +57,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.forestGreen,
         elevation: 0,
-        title: const Text(
-          'SmartPepper',
-          style: TextStyle(
+        title: Text(
+          context.tr('app_name'),
+          style: const TextStyle(
             color: AppTheme.pepperGold,
             fontWeight: FontWeight.bold,
             fontSize: 24,
@@ -99,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Welcome back,',
+                      context.tr('dashboard_welcome'),
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white.withOpacity(0.8),
@@ -172,9 +173,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 24),
 
                       // Quick Actions
-                      const Text(
-                        'Quick Actions',
-                        style: TextStyle(
+                      Text(
+                        context.tr('dashboard_quick_actions'),
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: AppTheme.forestGreen,
@@ -186,9 +187,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 24),
 
                       // Recent Activity
-                      const Text(
-                        'Recent Activity',
-                        style: TextStyle(
+                      Text(
+                        context.tr('dashboard_recent_activity'),
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: AppTheme.forestGreen,
@@ -228,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Expanded(
           child: _buildStatCard(
             icon: Icons.gavel,
-            label: 'Active Auctions',
+            label: context.tr('dashboard_active_auctions'),
             value: activeAuctions.toString(),
             color: AppTheme.forestGreen,
           ),
@@ -237,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Expanded(
           child: _buildStatCard(
             icon: Icons.inventory_2,
-            label: 'Total Lots',
+            label: context.tr('dashboard_total_lots'),
             value: totalLots.toString(),
             color: AppTheme.pepperGold,
           ),

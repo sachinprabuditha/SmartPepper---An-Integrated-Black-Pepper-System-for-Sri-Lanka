@@ -83,7 +83,7 @@ class IpfsService {
       print('Uploading JSON to IPFS');
       final jsonData = jsonEncode(data);
       final bytes = utf8.encode(jsonData);
-
+ 
       final request = http.MultipartRequest(
         'POST',
         Uri.parse('$_ipfsApiUrl/api/v0/add'),

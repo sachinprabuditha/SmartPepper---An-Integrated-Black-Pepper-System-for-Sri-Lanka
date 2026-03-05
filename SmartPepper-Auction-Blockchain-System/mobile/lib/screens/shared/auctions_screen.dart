@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/auction_provider.dart';
 import '../../config/theme.dart';
+import '../../localization/app_localizations.dart';
 import 'auction_details_screen.dart';
 import '../farmer/create_auction_screen.dart';
 import '../farmer/auction_monitor_screen.dart';
@@ -50,7 +51,9 @@ class _AuctionsScreenState extends State<AuctionsScreen>
         backgroundColor: AppTheme.forestGreen,
         elevation: 0,
         title: Text(
-          isFarmer ? 'My Auctions' : 'Auctions',
+          isFarmer
+              ? context.tr('label_my_auctions')
+              : context.tr('label_auctions'),
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -67,7 +70,8 @@ class _AuctionsScreenState extends State<AuctionsScreen>
             icon: const Icon(Icons.search, color: Colors.white),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Search functionality')),
+                SnackBar(
+                    content: Text(context.tr('message_search_functionality'))),
               );
             },
           ),
@@ -77,10 +81,10 @@ class _AuctionsScreenState extends State<AuctionsScreen>
           indicatorColor: AppTheme.pepperGold,
           labelColor: AppTheme.pepperGold,
           unselectedLabelColor: Colors.white70,
-          tabs: const [
-            Tab(text: 'Active'),
-            Tab(text: 'Upcoming'),
-            Tab(text: 'Completed'),
+          tabs: [
+            Tab(text: context.tr('tab_active')),
+            Tab(text: context.tr('tab_upcoming')),
+            Tab(text: context.tr('tab_completed')),
           ],
         ),
       ),
@@ -105,7 +109,7 @@ class _AuctionsScreenState extends State<AuctionsScreen>
               },
               backgroundColor: AppTheme.forestGreen,
               icon: const Icon(Icons.add),
-              label: const Text('Create Auction'),
+              label: Text(context.tr('button_create_auction')),
             )
           : null,
     );
@@ -145,14 +149,14 @@ class _AuctionsScreenState extends State<AuctionsScreen>
             const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              'Error loading auctions',
+              context.tr('error_loading_auctions'),
               style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () =>
                   auctionProvider.fetchAuctions(farmerAddress: farmerAddress),
-              child: const Text('Retry'),
+              child: Text(context.tr('button_retry')),
             ),
           ],
         ),
@@ -172,8 +176,8 @@ class _AuctionsScreenState extends State<AuctionsScreen>
             const SizedBox(height: 16),
             Text(
               isFarmer
-                  ? 'No $status auctions yet\nCreate your first auction to get started!'
-                  : 'No $status auctions',
+                  ? '${context.tr('common_no')} $status ${context.tr('label_auctions')}\n${context.tr('message_create_first_auction')}'
+                  : '${context.tr('common_no')} $status ${context.tr('label_auctions')}',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -214,7 +218,7 @@ class _AuctionsScreenState extends State<AuctionsScreen>
     if (status == 'active') {
       final duration = auction.endTime.difference(now);
       if (duration.isNegative) {
-        timeRemaining = 'Ending soon';
+        timeRemaining = context.tr('label_ending_soon');
       } else if (duration.inDays > 0) {
         timeRemaining = '${duration.inDays}d ${duration.inHours % 24}h';
       } else if (duration.inHours > 0) {
@@ -225,12 +229,12 @@ class _AuctionsScreenState extends State<AuctionsScreen>
     } else if (status == 'upcoming') {
       final duration = auction.startTime.difference(now);
       if (duration.inDays > 0) {
-        timeRemaining = 'Starts in ${duration.inDays}d';
+        timeRemaining = '${context.tr('label_starts_in')} ${duration.inDays}d';
       } else {
-        timeRemaining = 'Starts in ${duration.inHours}h';
+        timeRemaining = '${context.tr('label_starts_in')} ${duration.inHours}h';
       }
     } else {
-      timeRemaining = 'Ended';
+      timeRemaining = context.tr('label_ended');
     }
 
     return Card(
@@ -297,7 +301,7 @@ class _AuctionsScreenState extends State<AuctionsScreen>
 
               // Variety and Quantity
               Text(
-                auction.variety ?? 'Black Pepper',
+                auction.variety ?? context.tr('label_black_pepper'),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -310,7 +314,7 @@ class _AuctionsScreenState extends State<AuctionsScreen>
                   Icon(Icons.scale, size: 14, color: Colors.grey[600]),
                   const SizedBox(width: 4),
                   Text(
-                    '${auction.quantity?.toStringAsFixed(0) ?? 'N/A'} kg',
+                    '${auction.quantity?.toStringAsFixed(0) ?? context.tr('label_na')} kg',
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 14,
@@ -330,8 +334,8 @@ class _AuctionsScreenState extends State<AuctionsScreen>
                     children: [
                       Text(
                         auction.currentBid > 0
-                            ? 'Current Bid'
-                            : 'Starting Price',
+                            ? context.tr('label_current_bid')
+                            : context.tr('label_starting_price'),
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 12,
@@ -378,7 +382,7 @@ class _AuctionsScreenState extends State<AuctionsScreen>
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Lot: ${auction.lotId}',
+                            '${context.tr('label_lot_prefix')} ${auction.lotId}',
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 12,
@@ -419,9 +423,9 @@ class _AuctionsScreenState extends State<AuctionsScreen>
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'Place Bid',
-                      style: TextStyle(
+                    child: Text(
+                      context.tr('button_place_bid'),
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -439,20 +443,20 @@ class _AuctionsScreenState extends State<AuctionsScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Filter Auctions'),
+        title: Text(context.tr('dialog_filter_auctions')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: const Text('All Varieties'),
+              title: Text(context.tr('label_all_varieties')),
               leading: Radio(value: 0, groupValue: 0, onChanged: (_) {}),
             ),
             ListTile(
-              title: const Text('Black Pepper'),
+              title: Text(context.tr('label_black_pepper')),
               leading: Radio(value: 1, groupValue: 0, onChanged: (_) {}),
             ),
             ListTile(
-              title: const Text('White Pepper'),
+              title: Text(context.tr('label_white_pepper')),
               leading: Radio(value: 2, groupValue: 0, onChanged: (_) {}),
             ),
           ],
@@ -460,16 +464,16 @@ class _AuctionsScreenState extends State<AuctionsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(context.tr('button_cancel')),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Filter applied')),
+                SnackBar(content: Text(context.tr('message_filter_applied'))),
               );
             },
-            child: const Text('Apply'),
+            child: Text(context.tr('button_apply')),
           ),
         ],
       ),

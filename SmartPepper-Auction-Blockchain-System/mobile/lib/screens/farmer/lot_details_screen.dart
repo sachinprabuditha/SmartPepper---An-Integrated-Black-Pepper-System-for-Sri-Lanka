@@ -7,6 +7,7 @@ import '../../providers/lot_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/theme.dart';
 import '../../services/api_service.dart';
+import '../../localization/app_localizations.dart';
 import 'add_certification_screen.dart';
 import 'add_processing_stage_screen.dart';
 import 'create_auction_screen.dart';
@@ -23,9 +24,9 @@ class LotDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppTheme.forestGreen,
         elevation: 0,
-        title: const Text(
-          'Lot Details',
-          style: TextStyle(
+        title: Text(
+          context.tr('label_lot_details'),
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -39,8 +40,8 @@ class LotDetailsScreen extends StatelessWidget {
             icon: const Icon(Icons.share, color: Colors.white),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text('Share functionality coming soon')),
+                SnackBar(
+                    content: Text(context.tr('message_share_coming_soon'))),
               );
             },
           ),
@@ -135,9 +136,9 @@ class LotDetailsScreen extends StatelessWidget {
                         size: 28,
                       ),
                       const SizedBox(width: 12),
-                      const Text(
-                        'Digital Passport',
-                        style: TextStyle(
+                      Text(
+                        context.tr('label_digital_passport'),
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: AppTheme.forestGreen,
@@ -184,14 +185,14 @@ class LotDetailsScreen extends StatelessWidget {
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: lot.lotId));
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Lot ID copied to clipboard'),
-                          duration: Duration(seconds: 2),
+                        SnackBar(
+                          content: Text(context.tr('message_lot_id_copied')),
+                          duration: const Duration(seconds: 2),
                         ),
                       );
                     },
                     icon: const Icon(Icons.copy, size: 16),
-                    label: const Text('Copy Lot ID'),
+                    label: Text(context.tr('button_copy_lot_id')),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppTheme.forestGreen,
                       side: BorderSide(color: AppTheme.forestGreen),
@@ -207,9 +208,9 @@ class LotDetailsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Lot Information',
-                    style: TextStyle(
+                  Text(
+                    context.tr('label_lot_information'),
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.forestGreen,
@@ -218,9 +219,9 @@ class LotDetailsScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildInfoCard(context),
                   const SizedBox(height: 20),
-                  const Text(
-                    'Farmer Details',
-                    style: TextStyle(
+                  Text(
+                    context.tr('label_farmer_details'),
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.forestGreen,
@@ -229,9 +230,9 @@ class LotDetailsScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFarmerCard(context),
                   const SizedBox(height: 20),
-                  const Text(
-                    'Compliance Status',
-                    style: TextStyle(
+                  Text(
+                    context.tr('label_compliance_status'),
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.forestGreen,
@@ -240,9 +241,9 @@ class LotDetailsScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildComplianceCard(context),
                   const SizedBox(height: 20),
-                  const Text(
-                    'Blockchain Traceability',
-                    style: TextStyle(
+                  Text(
+                    context.tr('label_blockchain_traceability'),
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.forestGreen,
@@ -322,25 +323,25 @@ class LotDetailsScreen extends StatelessWidget {
         children: [
           _buildDetailRow(
             Icons.scale,
-            'Quantity',
+            context.tr('label_quantity'),
             '${lot.quantity.toStringAsFixed(0)} kg',
           ),
           const Divider(height: 24),
           _buildDetailRow(
             Icons.star,
-            'Quality Grade',
+            context.tr('label_quality_grade'),
             lot.quality ?? 'N/A',
           ),
           const Divider(height: 24),
           _buildDetailRow(
             Icons.calendar_today,
-            'Harvest Date',
+            context.tr('label_harvest_date'),
             harvestDate,
           ),
           const Divider(height: 24),
           _buildDetailRow(
             Icons.access_time,
-            'Created',
+            context.tr('label_created'),
             _getTimeAgo(lot.createdAt ?? DateTime.now()),
           ),
         ],
@@ -366,13 +367,13 @@ class LotDetailsScreen extends StatelessWidget {
         children: [
           _buildDetailRow(
             Icons.person,
-            'Farmer Name',
+            context.tr('label_farmer_name'),
             lot.farmerName,
           ),
           const Divider(height: 24),
           _buildDetailRow(
             Icons.account_balance_wallet,
-            'Wallet Address',
+            context.tr('label_wallet_address'),
             lot.farmerAddress.length > 18
                 ? '${lot.farmerAddress.substring(0, 10)}...${lot.farmerAddress.substring(lot.farmerAddress.length - 8)}'
                 : lot.farmerAddress,
@@ -487,21 +488,21 @@ class LotDetailsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Certifications & Compliance',
-                        style: TextStyle(
+                        context.tr('label_certifications_compliance'),
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        'Manage certificates and run compliance checks',
-                        style: TextStyle(
+                        context.tr('subtitle_manage_certificates'),
+                        style: const TextStyle(
                           fontSize: 13,
                           color: Colors.grey,
                         ),
@@ -528,17 +529,17 @@ class LotDetailsScreen extends StatelessWidget {
                       );
                       if (result == true && context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text(
-                                'Refresh the page to see updated certifications',
-                                style: TextStyle(color: Colors.white)),
+                                context.tr('message_refresh_certifications'),
+                                style: const TextStyle(color: Colors.white)),
                             backgroundColor: AppTheme.forestGreen,
                           ),
                         );
                       }
                     },
                     icon: const Icon(Icons.add_circle_outline),
-                    label: const Text('Add Certificate'),
+                    label: Text(context.tr('button_add_certificate')),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.blue,
                       side: const BorderSide(color: Colors.blue),
@@ -551,7 +552,7 @@ class LotDetailsScreen extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () => _runComplianceCheck(context),
                     icon: const Icon(Icons.fact_check),
-                    label: const Text('Check Compliance'),
+                    label: Text(context.tr('button_check_compliance')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.forestGreen,
                       foregroundColor: Colors.white,
@@ -575,16 +576,17 @@ class LotDetailsScreen extends StatelessWidget {
                   );
                   if (result == true && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
-                            'Processing stage added! Refresh to see updates', style: TextStyle(color: Colors.white)),
+                            context.tr('message_processing_stage_added'),
+                            style: const TextStyle(color: Colors.white)),
                         backgroundColor: AppTheme.forestGreen,
                       ),
                     );
                   }
                 },
                 icon: const Icon(Icons.factory),
-                label: const Text('Add Processing Stage'),
+                label: Text(context.tr('button_add_processing_stage')),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppTheme.forestGreen,
                   side: const BorderSide(color: AppTheme.forestGreen),
@@ -633,7 +635,7 @@ class LotDetailsScreen extends StatelessWidget {
             );
           },
           icon: const Icon(Icons.gavel),
-          label: const Text('Create Auction for This Lot'),
+          label: Text(context.tr('button_create_auction_lot')),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppTheme.pepperGold,
             foregroundColor: AppTheme.forestGreen,
@@ -650,25 +652,25 @@ class LotDetailsScreen extends StatelessWidget {
     final destination = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Select Destination Market'),
+        title: Text(context.tr('dialog_select_destination_market')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Choose the target export market for compliance check:'),
+            Text(context.tr('subtitle_choose_export_market')),
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.public, color: Colors.blue),
-              title: const Text('European Union (EU)'),
+              title: Text(context.tr('market_eu')),
               onTap: () => Navigator.pop(context, 'EU'),
             ),
             ListTile(
               leading: const Icon(Icons.flag, color: Colors.red),
-              title: const Text('United States (FDA)'),
+              title: Text(context.tr('market_us_fda')),
               onTap: () => Navigator.pop(context, 'FDA'),
             ),
             ListTile(
               leading: const Icon(Icons.landscape, color: Colors.orange),
-              title: const Text('Middle East'),
+              title: Text(context.tr('market_middle_east')),
               onTap: () => Navigator.pop(context, 'MIDDLE_EAST'),
             ),
           ],
@@ -676,7 +678,7 @@ class LotDetailsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(context.tr('button_cancel')),
           ),
         ],
       ),
@@ -688,16 +690,16 @@ class LotDetailsScreen extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
+      builder: (context) => Center(
         child: Card(
           child: Padding(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Running compliance check...'),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(context.tr('message_running_compliance_check')),
               ],
             ),
           ),
@@ -739,22 +741,22 @@ class LotDetailsScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Total Checks: $totalCount'),
-                  Text('Passed: $passedCount',
+                  Text('${context.tr('label_total_checks')} $totalCount'),
+                  Text('${context.tr('label_passed')} $passedCount',
                       style: const TextStyle(color: Colors.green)),
-                  Text('Failed: $failedCount',
+                  Text('${context.tr('label_failed')} $failedCount',
                       style: const TextStyle(color: Colors.red)),
                   const SizedBox(height: 12),
-                  const Text(
-                    'View full details in the traceability screen.',
-                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  Text(
+                    context.tr('message_view_full_traceability'),
+                    style: const TextStyle(fontSize: 13, color: Colors.grey),
                   ),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Close'),
+                  child: Text(context.tr('button_close')),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -764,7 +766,7 @@ class LotDetailsScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.forestGreen,
                   ),
-                  child: const Text('View Details'),
+                  child: Text(context.tr('button_view_details')),
                 ),
               ],
             ),
@@ -778,7 +780,7 @@ class LotDetailsScreen extends StatelessWidget {
         Navigator.pop(context); // Close loading dialog
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text('${context.tr('label_error')} ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -859,7 +861,7 @@ class LotDetailsScreen extends StatelessWidget {
             // Transaction Hash
             _buildTraceabilityRow(
               icon: Icons.receipt_long,
-              label: 'Transaction Hash',
+              label: context.tr('label_transaction_hash'),
               value: lot.blockchainTxHash!.length > 20
                   ? '${lot.blockchainTxHash!.substring(0, 10)}...${lot.blockchainTxHash!.substring(lot.blockchainTxHash!.length - 8)}'
                   : lot.blockchainTxHash!,
@@ -891,9 +893,10 @@ class LotDetailsScreen extends StatelessWidget {
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('IPFS: ${lot.certificateIpfsUrl}'),
+                      content: Text(
+                          '${context.tr('label_ipfs')} ${lot.certificateIpfsUrl}'),
                       action: SnackBarAction(
-                        label: 'Copy',
+                        label: context.tr('button_copy'),
                         onPressed: () {
                           Clipboard.setData(
                               ClipboardData(text: lot.certificateIpfsUrl!));
@@ -1023,7 +1026,7 @@ class LotDetailsScreen extends StatelessWidget {
                         context.push('/traceability/${lot.lotId}');
                       },
                       icon: const Icon(Icons.timeline, size: 20),
-                      label: const Text('Full Traceability'),
+                      label: Text(context.tr('button_full_traceability')),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.forestGreen,
                         foregroundColor: Colors.white,
@@ -1042,11 +1045,13 @@ class LotDetailsScreen extends StatelessWidget {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: const Row(
+                              title: Row(
                                 children: [
-                                  Icon(Icons.link, color: AppTheme.forestGreen),
-                                  SizedBox(width: 8),
-                                  Text('Blockchain Traceability'),
+                                  const Icon(Icons.link,
+                                      color: AppTheme.forestGreen),
+                                  const SizedBox(width: 8),
+                                  Text(context
+                                      .tr('label_blockchain_traceability')),
                                 ],
                               ),
                               content: SingleChildScrollView(
@@ -1054,9 +1059,10 @@ class LotDetailsScreen extends StatelessWidget {
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'This lot is registered on the blockchain for complete traceability.',
-                                      style: TextStyle(fontSize: 14),
+                                    Text(
+                                      context
+                                          .tr('message_blockchain_registered'),
+                                      style: const TextStyle(fontSize: 14),
                                     ),
                                     const SizedBox(height: 16),
                                     const Text(
@@ -1194,7 +1200,7 @@ class LotDetailsScreen extends StatelessWidget {
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
-                                  child: const Text('Close'),
+                                  child: Text(context.tr('button_close')),
                                 ),
                               ],
                             );
@@ -1202,7 +1208,7 @@ class LotDetailsScreen extends StatelessWidget {
                         );
                       },
                       icon: const Icon(Icons.open_in_new, size: 20),
-                      label: const Text('Quick Info'),
+                      label: Text(context.tr('button_quick_info')),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppTheme.forestGreen,
                         side: const BorderSide(color: AppTheme.forestGreen),

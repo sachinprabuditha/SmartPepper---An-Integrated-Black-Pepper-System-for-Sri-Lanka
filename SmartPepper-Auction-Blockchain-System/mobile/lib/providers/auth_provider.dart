@@ -9,6 +9,10 @@ class User {
   final String name;
   final String role;
   final String? walletAddress;
+  final String? phone;
+  final String? address;
+  final String? city;
+  final String? language;
   final bool verified;
 
   User({
@@ -17,6 +21,10 @@ class User {
     required this.name,
     required this.role,
     this.walletAddress,
+    this.phone,
+    this.address,
+    this.city,
+    this.language,
     this.verified = false,
   });
 
@@ -27,6 +35,10 @@ class User {
       name: json['name'] ?? '',
       role: json['role'] ?? '',
       walletAddress: json['walletAddress'],
+      phone: json['phone'],
+      address: json['address'],
+      city: json['city'],
+      language: json['language'],
       verified: json['verified'] ?? false,
     );
   }
@@ -182,10 +194,32 @@ class AuthProvider with ChangeNotifier {
           name: _user!.name,
           role: _user!.role,
           walletAddress: walletAddress,
+          phone: _user!.phone,
+          address: _user!.address,
+          city: _user!.city,
+          language: _user!.language,
           verified: _user!.verified,
         );
         await storageService.saveWalletAddress(walletAddress);
       }
+
+      _loading = false;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      _loading = false;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<void> refreshUserData() async {
+    try {
+      _loading = true;
+      notifyListeners();
+
+      final userData = await apiService.getCurrentUser();
+      _user = User.fromJson(userData);
 
       _loading = false;
       notifyListeners();

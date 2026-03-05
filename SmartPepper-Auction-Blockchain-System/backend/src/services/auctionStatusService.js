@@ -1,63 +1,95 @@
 const db = require('../db/database');
+const admin = require('firebase-admin');
+const logger = require('../utils/logger');
+const auctionFinalizationService = require('./auctionFinalizationService');
 
 /**
  * Updates auction statuses based on current time
  * - Changes 'created' to 'active' if start_time has passed
  * - Changes 'active' to 'ended' if end_time has passed
+ * - Triggers finalization for newly ended auctions
  */
 async function updateAuctionStatuses() {
-  // Skip if using mock database
-  if (db.isMock || !db.pool) {
+  // Skip if not using Firebase
+  if (!db.isFirebase) {
     return { activated: 0, ended: 0 };
   }
 
-  const client = await db.pool.connect();
-  
   try {
-    await client.query('BEGIN');
+    const firestore = db.getDb();
+    const now = admin.firestore.Timestamp.now();
+    const batch = firestore.batch();
+    let activatedCount = 0;
+    let endedCount = 0;
+    const activatedAuctions = [];
+    const endedAuctions = [];
 
     // Activate auctions that have passed their start time
-    const activatedResult = await client.query(`
-      UPDATE auctions 
-      SET status = 'active' 
-      WHERE status = 'created' 
-        AND start_time <= NOW()
-        AND admin_approved = true
-      RETURNING auction_id, lot_id
-    `);
+    const toActivateSnap = await firestore.collection('auctions')
+      .where('status', '==', 'created')
+      .where('admin_approved', '==', true)
+      .get();
 
-    // End auctions that have passed their end time
-    const endedResult = await client.query(`
-      UPDATE auctions 
-      SET status = 'ended' 
-      WHERE status = 'active' 
-        AND end_time <= NOW()
-      RETURNING auction_id, lot_id, current_bid, current_bidder
-    `);
-
-    await client.query('COMMIT');
-
-    if (activatedResult.rows.length > 0) {
-      console.log(`✅ Activated ${activatedResult.rows.length} auction(s):`, 
-        activatedResult.rows.map(r => r.auction_id).join(', '));
+    for (const doc of toActivateSnap.docs) {
+      const auction = doc.data();
+      // Check if start_time has passed
+      if (auction.start_time && auction.start_time.toMillis() <= now.toMillis()) {
+        batch.update(doc.ref, { 
+          status: 'active',
+          updated_at: admin.firestore.FieldValue.serverTimestamp()
+        });
+        activatedCount++;
+        activatedAuctions.push(auction.auction_id || doc.id);
+      }
     }
 
-    if (endedResult.rows.length > 0) {
-      console.log(`⏰ Ended ${endedResult.rows.length} auction(s):`, 
-        endedResult.rows.map(r => r.auction_id).join(', '));
+    // End auctions that have passed their end time
+    const toEndSnap = await firestore.collection('auctions')
+      .where('status', '==', 'active')
+      .get();
+
+    for (const doc of toEndSnap.docs) {
+      const auction = doc.data();
+      // Check if end_time has passed
+      if (auction.end_time && auction.end_time.toMillis() <= now.toMillis()) {
+        batch.update(doc.ref, { 
+          status: 'ended',
+          updated_at: admin.firestore.FieldValue.serverTimestamp()
+        });
+        endedCount++;
+        endedAuctions.push(doc.id); // Use document ID for finalization
+      }
+    }
+
+    // Commit all updates
+    if (activatedCount > 0 || endedCount > 0) {
+      await batch.commit();
+    }
+
+    if (activatedCount > 0) {
+      logger.info(`✅ Activated ${activatedCount} auction(s): ${activatedAuctions.join(', ')}`);
+    }
+
+    if (endedCount > 0) {
+      logger.info(`⏰ Ended ${endedCount} auction(s): ${endedAuctions.join(', ')}`);
+      
+      // Trigger finalization for ended auctions
+      try {
+        const result = await auctionFinalizationService.finalizeEndedAuctions(endedAuctions);
+        logger.info(`🎯 Finalization complete: ${result.success} succeeded, ${result.failed} failed`);
+      } catch (finalizationError) {
+        logger.error('❌ Auction finalization error:', finalizationError);
+      }
     }
 
     return {
-      activated: activatedResult.rows.length,
-      ended: endedResult.rows.length
+      activated: activatedCount,
+      ended: endedCount
     };
 
   } catch (error) {
-    await client.query('ROLLBACK');
-    console.error('❌ Error updating auction statuses:', error);
+    logger.error('❌ Error updating auction statuses:', error);
     throw error;
-  } finally {
-    client.release();
   }
 }
 

@@ -5,6 +5,7 @@ import '../../config/theme.dart';
 import '../../services/api_service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/lot_provider.dart' show Lot;
+import '../../localization/app_localizations.dart';
 import 'lot_details_screen.dart';
 
 class MyLotsScreen extends StatefulWidget {
@@ -87,7 +88,7 @@ class _MyLotsScreenState extends State<MyLotsScreen> {
     return Scaffold(
       backgroundColor: AppTheme.forestGreen,
       appBar: AppBar(
-        title: const Text('My Lots'),
+        title: Text(context.tr('lot_my_lots')),
         backgroundColor: AppTheme.forestGreen,
         actions: [
           IconButton(
@@ -106,17 +107,17 @@ class _MyLotsScreenState extends State<MyLotsScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildFilterChip('All', 'all'),
+                  _buildFilterChip(context.tr('common_all'), 'all'),
                   const SizedBox(width: 8),
-                  _buildFilterChip('Pending', 'pending'),
+                  _buildFilterChip(context.tr('status_pending'), 'pending'),
                   const SizedBox(width: 8),
-                  _buildFilterChip('Approved', 'approved'),
+                  _buildFilterChip(context.tr('status_approved'), 'approved'),
                   const SizedBox(width: 8),
-                  _buildFilterChip('Rejected', 'rejected'),
+                  _buildFilterChip(context.tr('status_rejected'), 'rejected'),
                   const SizedBox(width: 8),
-                  _buildFilterChip('Listed', 'listed'),
+                  _buildFilterChip(context.tr('status_listed'), 'listed'),
                   const SizedBox(width: 8),
-                  _buildFilterChip('Sold', 'sold'),
+                  _buildFilterChip(context.tr('status_sold'), 'sold'),
                 ],
               ),
             ),
@@ -135,7 +136,7 @@ class _MyLotsScreenState extends State<MyLotsScreen> {
                                 size: 64, color: Colors.red.shade300),
                             const SizedBox(height: 16),
                             Text(
-                              'Error loading lots',
+                              context.tr('error_loading_lots'),
                               style: TextStyle(
                                   fontSize: 18, color: Colors.red.shade300),
                             ),
@@ -148,7 +149,7 @@ class _MyLotsScreenState extends State<MyLotsScreen> {
                             const SizedBox(height: 16),
                             ElevatedButton(
                               onPressed: _loadLots,
-                              child: const Text('Retry'),
+                              child: Text(context.tr('common_retry')),
                             ),
                           ],
                         ),
@@ -163,22 +164,22 @@ class _MyLotsScreenState extends State<MyLotsScreen> {
                                 const SizedBox(height: 16),
                                 Text(
                                   _filterStatus == 'all'
-                                      ? 'No lots created yet'
-                                      : 'No $_filterStatus lots',
+                                      ? context.tr('empty_no_lots')
+                                      : '${context.tr('common_no')} $_filterStatus ${context.tr('lot_lots')}',
                                   style: const TextStyle(
                                       fontSize: 18, color: Colors.white70),
                                 ),
                                 const SizedBox(height: 8),
-                                const Text(
-                                  'Create your first lot to get started',
-                                  style: TextStyle(color: Colors.white60),
+                                Text(
+                                  context.tr('lot_create_first'),
+                                  style: const TextStyle(color: Colors.white60),
                                 ),
                                 const SizedBox(height: 24),
                                 ElevatedButton.icon(
                                   onPressed: () =>
                                       context.push('/farmer/create-lot'),
                                   icon: const Icon(Icons.add),
-                                  label: const Text('Create Lot'),
+                                  label: Text(context.tr('lot_create')),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppTheme.pepperGold,
                                     foregroundColor: AppTheme.forestGreen,
@@ -339,7 +340,7 @@ class _MyLotsScreenState extends State<MyLotsScreen> {
                   Icon(Icons.star, size: 16, color: AppTheme.pepperGold),
                   const SizedBox(width: 4),
                   Text(
-                    'Grade: ${lot.quality}',
+                    '${context.tr('lot_grade')}: ${lot.quality}',
                     style: const TextStyle(color: AppTheme.pepperGold),
                   ),
                   if (lot.currentBid != null) ...[
@@ -367,15 +368,15 @@ class _MyLotsScreenState extends State<MyLotsScreen> {
                     children: [
                       Icon(Icons.gavel, size: 16, color: Colors.blue),
                       const SizedBox(width: 8),
-                      const Text(
-                        'In Auction',
-                        style: TextStyle(color: Colors.blue),
+                      Text(
+                        context.tr('auction_in_auction'),
+                        style: const TextStyle(color: Colors.blue),
                       ),
                       const Spacer(),
                       TextButton(
                         onPressed: () =>
                             context.push('/farmer/auction/${lot.auctionId}'),
-                        child: const Text('View Live'),
+                        child: Text(context.tr('auction_view_live')),
                       ),
                     ],
                   ),

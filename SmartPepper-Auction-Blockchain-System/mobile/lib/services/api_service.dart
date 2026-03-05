@@ -116,11 +116,15 @@ class ApiService {
   }
 
   // Lot endpoints
-  Future<List<dynamic>> getLots({String? farmerAddress}) async {
+  Future<List<dynamic>> getLots({String? farmerAddress, String? status}) async {
     try {
+      final queryParams = <String, dynamic>{};
+      if (farmerAddress != null) queryParams['farmer'] = farmerAddress;
+      if (status != null) queryParams['status'] = status;
+
       final response = await _dio.get(
         '/lots',
-        queryParameters: {if (farmerAddress != null) 'farmer': farmerAddress},
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
       );
       return response.data['lots'] ?? [];
     } catch (e) {
@@ -198,6 +202,41 @@ class ApiService {
   ) async {
     try {
       final response = await _dio.post('/auctions/$auctionId/bid', data: data);
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get user's bids
+  Future<Map<String, dynamic>> getUserBids(String userId) async {
+    try {
+      final response = await _dio.get('/auctions/bids/user/$userId');
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Update user profile
+  Future<Map<String, dynamic>> updateProfile({
+    String? name,
+    String? phone,
+    String? address,
+    String? city,
+    String? language,
+    String? walletAddress,
+  }) async {
+    try {
+      final data = <String, dynamic>{};
+      if (name != null) data['name'] = name;
+      if (phone != null) data['phone'] = phone;
+      if (address != null) data['address'] = address;
+      if (city != null) data['city'] = city;
+      if (language != null) data['language'] = language;
+      if (walletAddress != null) data['walletAddress'] = walletAddress;
+
+      final response = await _dio.put('/auth/profile', data: data);
       return response.data;
     } catch (e) {
       rethrow;

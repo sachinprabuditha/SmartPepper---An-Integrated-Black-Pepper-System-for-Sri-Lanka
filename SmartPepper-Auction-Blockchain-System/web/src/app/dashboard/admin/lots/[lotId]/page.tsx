@@ -43,7 +43,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
   const [showCertificateModal, setShowCertificateModal] = useState(false);
   const [certificateUrl, setCertificateUrl] = useState<string>('');
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.116:3002';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.116:3002' || 'http://192.168.8.116:3002';
   // Use public IPFS gateway with fallback to local
   const IPFS_GATEWAY = process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://ipfs.io/ipfs';
 
@@ -256,8 +256,8 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                 <h1 className="text-3xl font-bold text-white mb-2">{lot.variety}</h1>
                 <p className="text-purple-100">Lot ID: {lot.lot_id}</p>
               </div>
-              <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(lot.compliance_status)}`}>
-                {lot.compliance_status.toUpperCase()}
+              <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(lot.compliance_status || lot.status)}`}>
+                {(lot.compliance_status || lot.status || 'pending').toUpperCase()}
               </span>
             </div>
           </div>

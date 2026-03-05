@@ -52,21 +52,27 @@ class NFTPassportService {
         logger.warn('PASSPORT_CONTRACT_ADDRESS not set - NFT features disabled');
       }
 
-      // Try to initialize IPFS client
+      // Try to initialize IPFS client (using dynamic import for ESM module)
       try {
-        const { create } = require('ipfs-http-client');
-        this.ipfsClient = create({
-          host: process.env.IPFS_HOST || 'localhost',
-          port: process.env.IPFS_PORT || 5001,
-          protocol: process.env.IPFS_PROTOCOL || 'http'
-        });
-        logger.info('IPFS client initialized for NFT metadata');
+        const ipfsModule = await import('ipfs-http-client');
+        const create = ipfsModule.create || ipfsModule.default?.create;
+        
+        if (create) {
+          this.ipfsClient = create({
+            host: process.env.IPFS_HOST || 'localhost',
+            port: parseInt(process.env.IPFS_PORT) || 5001,
+            protocol: process.env.IPFS_PROTOCOL || 'http'
+          });
+          logger.info('✅ IPFS client initialized for NFT metadata');
+        } else {
+          throw new Error('IPFS create function not found');
+        }
       } catch (ipfsError) {
-        logger.warn('IPFS not available - metadata will be generated locally', ipfsError.message);
+        logger.info('ℹ️  IPFS not configured - NFT metadata will be stored locally (this is optional)');
       }
 
     } catch (error) {
-      logger.error('Failed to initialize NFT Passport service:', error);
+      logger.warn('NFT Passport service initialization issue:', error?.message || 'Unknown error');
       // Don't re-throw - allow service to continue in limited mode
     }
   }
@@ -134,7 +140,7 @@ class NFTPassportService {
       // Return local JSON string if IPFS not available
       const metadataString = JSON.stringify(metadata, null, 2);
       const hash = crypto.createHash('sha256').update(metadataString).digest('hex');
-      logger.warn('IPFS not available, using local metadata with hash:', hash);
+      logger.info(`NFT metadata stored locally (hash: ${hash.substring(0, 8)}...)`);
       return `local://${hash}`;
     }
 

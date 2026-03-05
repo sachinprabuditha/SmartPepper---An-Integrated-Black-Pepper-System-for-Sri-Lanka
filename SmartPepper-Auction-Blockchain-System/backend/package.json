@@ -7,8 +7,9 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "jest --coverage",
-    "migrate": "node src/db/migrate.js",
-    "seed": "node src/db/seed.js"
+    "migrate:firebase": "node migrate-to-firebase.js",
+    "seed": "node src/db/seed.js",
+    "init:exchange-rates": "node init-exchange-rates.js"
   },
   "keywords": [
     "auction",
@@ -27,7 +28,10 @@
     "ethers": "^6.9.0",
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
+    "firebase": "^10.7.1",
+    "firebase-admin": "^12.0.0",
     "helmet": "^7.1.0",
+    "ipfs-http-client": "^60.0.1",
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",

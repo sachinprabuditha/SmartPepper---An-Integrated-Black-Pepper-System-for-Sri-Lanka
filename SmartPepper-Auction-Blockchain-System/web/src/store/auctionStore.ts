@@ -100,20 +100,29 @@ export const useAuctionStore = create<AuctionState>((set, get) => ({
 
   connectWebSocket: (url) => {
     const socket = io(`${url}/auction`, {
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'], // Try both transports for compatibility
       reconnection: true,
       reconnectionDelay: 1000,
-      reconnectionAttempts: 5,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 10,
+      timeout: 10000,
     });
 
     socket.on('connect', () => {
-      console.log('WebSocket connected');
+      console.log('✅ WebSocket connected to auction namespace');
+      console.log('   Socket ID:', socket.id);
       set({ connected: true });
     });
 
-    socket.on('disconnect', () => {
-      console.log('WebSocket disconnected');
+    socket.on('disconnect', (reason) => {
+      console.log('❌ WebSocket disconnected. Reason:', reason);
       set({ connected: false });
+    });
+    
+    socket.on('connect_error', (error) => {
+      console.error('❌ WebSocket connection error:', error.message);
+      console.log('   URL:', `${url}/auction`);
+      console.log('   Check if backend server is running on port 3002');
     });
 
     socket.on('new_bid', (data) => {

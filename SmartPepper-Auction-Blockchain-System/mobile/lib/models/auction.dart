@@ -50,39 +50,63 @@ class Auction {
   });
 
   factory Auction.fromJson(Map<String, dynamic> json) {
+    // Debug logging to trace ID extraction
+    final extractedId = (json['id'] ?? json['auction_id'] ?? '') as String;
+    if (extractedId.isEmpty) {
+      print(
+          '⚠️ WARNING: Auction ID is empty! Raw JSON keys: ${json.keys.toList()}');
+      print('   json["id"]: ${json['id']}');
+      print('   json["auction_id"]: ${json['auction_id']}');
+    } else {
+      print('✅ Extracted auction ID: $extractedId from json');
+    }
+
     return Auction(
-      id: json['id'] as String,
-      lotId: json['lotId'] as String,
-      farmerId: json['farmerId'] as String,
-      startingPrice: (json['startingPrice'] as num).toDouble(),
-      currentBid: json['currentBid'] != null
-          ? (json['currentBid'] as num).toDouble()
+      id: extractedId,
+      lotId: (json['lotId'] ?? json['lot_id'] ?? '') as String,
+      farmerId: (json['farmerId'] ?? json['farmer_id'] ?? '') as String,
+      startingPrice: ((json['startingPrice'] ??
+              json['starting_price'] ??
+              json['start_price'] ??
+              0) as num)
+          .toDouble(),
+      currentBid: json['currentBid'] != null || json['current_bid'] != null
+          ? ((json['currentBid'] ?? json['current_bid']) as num).toDouble()
           : null,
-      reservePrice: json['reservePrice'] != null
-          ? (json['reservePrice'] as num).toDouble()
+      reservePrice: json['reservePrice'] != null ||
+              json['reserve_price'] != null
+          ? ((json['reservePrice'] ?? json['reserve_price']) as num).toDouble()
           : null,
-      currentBidder: json['currentBidder'] as String?,
-      currentBidderName: json['currentBidderName'] as String?,
-      bidderCount: json['bidderCount'] as int? ?? 0,
-      startTime: DateTime.parse(json['startTime'] as String),
-      endTime: DateTime.parse(json['endTime'] as String),
-      status: json['status'] as String? ?? 'pending',
-      winnerAddress: json['winnerAddress'] as String?,
-      winnerName: json['winnerName'] as String?,
-      finalPrice: json['finalPrice'] != null
-          ? (json['finalPrice'] as num).toDouble()
+      currentBidder:
+          (json['currentBidder'] ?? json['current_bidder']) as String?,
+      currentBidderName:
+          (json['currentBidderName'] ?? json['current_bidder_name']) as String?,
+      bidderCount: (json['bidderCount'] ?? json['bidder_count'] ?? 0) as int,
+      startTime:
+          DateTime.parse((json['startTime'] ?? json['start_time']) as String),
+      endTime: DateTime.parse((json['endTime'] ?? json['end_time']) as String),
+      status: (json['status'] ?? 'pending') as String,
+      winnerAddress:
+          (json['winnerAddress'] ?? json['winner_address']) as String?,
+      winnerName: (json['winnerName'] ?? json['winner_name']) as String?,
+      finalPrice: json['finalPrice'] != null || json['final_price'] != null
+          ? ((json['finalPrice'] ?? json['final_price']) as num).toDouble()
           : null,
-      escrowLocked: json['escrowLocked'] as bool? ?? false,
-      paymentReleased: json['paymentReleased'] as bool? ?? false,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
+      escrowLocked:
+          (json['escrowLocked'] ?? json['escrow_locked'] ?? false) as bool,
+      paymentReleased: (json['paymentReleased'] ??
+          json['payment_released'] ??
+          false) as bool,
+      createdAt:
+          DateTime.parse((json['createdAt'] ?? json['created_at']) as String),
+      updatedAt: json['updatedAt'] != null || json['updated_at'] != null
+          ? DateTime.parse((json['updatedAt'] ?? json['updated_at']) as String)
           : null,
-      lotVariety: json['lotVariety'] as String?,
-      lotQuantity: json['lotQuantity'] != null
-          ? (json['lotQuantity'] as num).toDouble()
+      lotVariety: (json['lotVariety'] ?? json['variety']) as String?,
+      lotQuantity: json['lotQuantity'] != null || json['quantity'] != null
+          ? ((json['lotQuantity'] ?? json['quantity']) as num).toDouble()
           : null,
-      lotQuality: json['lotQuality'] as String?,
+      lotQuality: (json['lotQuality'] ?? json['quality']) as String?,
     );
   }
 

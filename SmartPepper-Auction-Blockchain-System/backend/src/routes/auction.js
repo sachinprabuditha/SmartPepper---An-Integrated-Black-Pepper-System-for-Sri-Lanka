@@ -1,18 +1,52 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/database');
+const admin = require('firebase-admin');
 const BlockchainService = require('../services/blockchainService');
 const ComplianceService = require('../services/complianceService');
 const currencyConverter = require('../utils/currencyConverter');
 const logger = require('../utils/logger');
 const { v4: uuidv4 } = require('uuid');
 
+const firestore = admin.firestore();
 const blockchainService = new BlockchainService();
 const complianceService = new ComplianceService();
 
 // Initialize services
 blockchainService.initialize().catch(err => logger.error('Blockchain init failed:', err));
 complianceService.initialize().catch(err => logger.error('Compliance init failed:', err));
+
+/**
+ * Helper function to convert Firestore Timestamps to ISO strings
+ */
+const convertTimestamps = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  
+  const converted = Array.isArray(obj) ? [] : {};
+  
+  for (const key in obj) {
+    const value = obj[key];
+    
+    // Check if it's a Firestore Timestamp
+    if (value && typeof value === 'object' && '_seconds' in value && '_nanoseconds' in value) {
+      // Convert to ISO string
+      const date = new Date(value._seconds * 1000 + value._nanoseconds / 1000000);
+      converted[key] = date.toISOString();
+    } else if (value && typeof value.toDate === 'function') {
+      // Firestore Timestamp object with toDate method
+      converted[key] = value.toDate().toISOString();
+    } else if (Array.isArray(value)) {
+      // Recursively convert arrays
+      converted[key] = value.map(item => convertTimestamps(item));
+    } else if (value && typeof value === 'object') {
+      // Recursively convert nested objects
+      converted[key] = convertTimestamps(value);
+    } else {
+      converted[key] = value;
+    }
+  }
+  
+  return converted;
+};
 
 /**
  * GET /api/auctions
@@ -22,49 +56,78 @@ router.get('/', async (req, res) => {
   try {
     const { status, farmer, limit = 50, offset = 0 } = req.query;
     
-    let query = `
-      SELECT 
-        a.*,
-        p.variety,
-        p.quantity,
-        p.quality,
-        p.origin
-      FROM auctions a
-      LEFT JOIN pepper_lots p ON a.lot_id = p.lot_id
-      WHERE 1=1
-    `;
-    let countQuery = 'SELECT COUNT(*) FROM auctions WHERE 1=1';
-    const params = [];
-    const countParams = [];
-    let paramIndex = 1;
-    let countParamIndex = 1;
-
+    let auctionsQuery = firestore.collection('auctions');
+    
     if (status) {
-      query += ` AND a.status = $${paramIndex++}`;
-      countQuery += ` AND status = $${countParamIndex++}`;
-      params.push(status);
-      countParams.push(status);
+      auctionsQuery = auctionsQuery.where('status', '==', status);
     }
-
+    
     if (farmer) {
-      query += ` AND LOWER(a.farmer_address) = LOWER($${paramIndex++})`;
-      countQuery += ` AND LOWER(farmer_address) = LOWER($${countParamIndex++})`;
-      params.push(farmer);
-      countParams.push(farmer);
+      // Check if farmer is a wallet address (starts with 0x) or a user ID
+      if (farmer.startsWith('0x')) {
+        auctionsQuery = auctionsQuery.where('farmer_address_lower', '==', farmer.toLowerCase());
+      } else {
+        // Filter by farmer_id field
+        auctionsQuery = auctionsQuery.where('farmer_id', '==', farmer);
+      }
     }
-
-    query += ` ORDER BY a.created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
-    params.push(limit, offset);
-
-    const [result, countResult] = await Promise.all([
-      db.query(query, params),
-      db.query(countQuery, countParams)
-    ]);
+    
+    // Only add orderBy if we have filtering, otherwise it requires composite index
+    if (status || farmer) {
+      auctionsQuery = auctionsQuery.limit(parseInt(limit));
+      if (parseInt(offset) > 0) {
+        auctionsQuery = auctionsQuery.offset(parseInt(offset));
+      }
+    } else {
+      auctionsQuery = auctionsQuery.orderBy('created_at', 'desc')
+                                   .limit(parseInt(limit))
+                                   .offset(parseInt(offset));
+    }
+    
+    const auctionsSnapshot = await auctionsQuery.get();
+    
+    // Count total matching documents
+    let countQuery = firestore.collection('auctions');
+    if (status) {
+      countQuery = countQuery.where('status', '==', status);
+    }
+    if (farmer) {
+      if (farmer.startsWith('0x')) {
+        countQuery = countQuery.where('farmer_address_lower', '==', farmer.toLowerCase());
+      } else {
+        countQuery = countQuery.where('farmer_id', '==', farmer);
+      }
+    }
+    const countSnapshot = await countQuery.count().get();
+    
+    const auctions = [];
+    
+    // Fetch lot details for each auction
+    for (const doc of auctionsSnapshot.docs) {
+      const auctionData = { auction_id: doc.id, ...doc.data() };
+      
+      // Fetch associated lot by lot_id field
+      if (auctionData.lot_id) {
+        const lotSnapshot = await firestore.collection('pepper_lots')
+          .where('lot_id', '==', auctionData.lot_id)
+          .limit(1)
+          .get();
+        if (!lotSnapshot.empty) {
+          const lotData = lotSnapshot.docs[0].data();
+          auctionData.variety = lotData.variety;
+          auctionData.quantity = lotData.quantity;
+          auctionData.quality = lotData.quality;
+          auctionData.origin = lotData.origin;
+        }
+      }
+      
+      auctions.push(convertTimestamps(auctionData));
+    }
 
     res.json({
       success: true,
-      count: parseInt(countResult.rows[0].count),
-      auctions: result.rows
+      count: countSnapshot.data().count,
+      auctions
     });
   } catch (error) {
     logger.error('Error fetching auctions:', error);
@@ -83,28 +146,29 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
-    const result = await db.query(
-      'SELECT * FROM auctions WHERE auction_id = $1',
-      [id]
-    );
+    const auctionDoc = await firestore.collection('auctions').doc(id).get();
 
-    if (result.rows.length === 0) {
+    if (!auctionDoc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Auction not found'
       });
     }
 
+    const auctionData = { auction_id: auctionDoc.id, ...auctionDoc.data() };
+
     // Get bids
-    const bidsResult = await db.query(
-      'SELECT * FROM bids WHERE auction_id = $1 ORDER BY placed_at DESC',
-      [id]
-    );
+    const bidsSnapshot = await firestore.collection('bids')
+      .where('auction_id', '==', id)
+      .orderBy('placed_at', 'desc')
+      .get();
+
+    const bids = bidsSnapshot.docs.map(doc => convertTimestamps({ id: doc.id, ...doc.data() }));
 
     res.json({
       success: true,
-      auction: result.rows[0],
-      bids: bidsResult.rows
+      auction: convertTimestamps(auctionData),
+      bids
     });
   } catch (error) {
     logger.error('Error fetching auction:', error);
@@ -126,19 +190,19 @@ router.get('/check-eligibility/:lotId', async (req, res) => {
     const reasons = [];
     let eligible = true;
 
-    // 1. Check if lot exists
-    const lotResult = await db.query(
-      'SELECT * FROM pepper_lots WHERE lot_id = $1',
-      [lotId]
-    );
+    // 1. Check if lot exists - Query by lot_id field, not document ID
+    const lotSnapshot = await firestore.collection('pepper_lots')
+      .where('lot_id', '==', lotId)
+      .limit(1)
+      .get();
 
-    if (lotResult.rows.length === 0) {
+    if (lotSnapshot.empty) {
       eligible = false;
       reasons.push('Pepper lot does not exist in the system');
       return res.json({ eligible, reasons });
     }
 
-    const lot = lotResult.rows[0];
+    const lot = lotSnapshot.docs[0].data();
 
     // 2. Check if lot is approved/available
     if (lot.status !== 'approved' && lot.status !== 'available') {
@@ -147,65 +211,53 @@ router.get('/check-eligibility/:lotId', async (req, res) => {
     }
 
     // 3. Check if lot already has an active auction
-    const activeAuctionResult = await db.query(
-      `SELECT * FROM auctions 
-       WHERE lot_id = $1 
-       AND status IN ('created', 'active', 'pending')
-       LIMIT 1`,
-      [lotId]
-    );
+    const activeAuctionSnapshot = await firestore.collection('auctions')
+      .where('lot_id', '==', lotId)
+      .where('status', 'in', ['created', 'active', 'pending'])
+      .limit(1)
+      .get();
 
-    if (activeAuctionResult.rows.length > 0) {
+    if (!activeAuctionSnapshot.empty) {
       eligible = false;
       reasons.push('This lot already has an active auction');
     }
 
     // 4. Check if required certificates are uploaded
-    const certsResult = await db.query(
-      `SELECT COUNT(*) as cert_count 
-       FROM certifications 
-       WHERE lot_id = $1`,
-      [lotId]
-    );
+    const certsSnapshot = await firestore.collection('certifications')
+      .where('lot_id', '==', lotId)
+      .get();
 
-    const certCount = parseInt(certsResult.rows[0].cert_count);
+    const certCount = certsSnapshot.size;
     if (certCount < 3) {
       eligible = false;
       reasons.push(`Insufficient certificates uploaded. Found ${certCount}, minimum 3 required.`);
     }
 
     // 5. Check compliance status
-    const complianceResult = await db.query(
-      `SELECT passed, rule_name, rule_type, details, checked_at
-       FROM compliance_checks
-       WHERE lot_id = $1
-       ORDER BY checked_at DESC
-       LIMIT 1`,
-      [lotId]
-    );
+    const complianceSnapshot = await firestore.collection('compliance_checks')
+      .where('lot_id', '==', lotId)
+      .orderBy('checked_at', 'desc')
+      .limit(1)
+      .get();
 
-    if (complianceResult.rows.length === 0) {
+    if (complianceSnapshot.empty) {
       eligible = false;
       reasons.push('No compliance checks have been performed for this lot');
     } else {
-      const compliance = complianceResult.rows[0];
+      const compliance = complianceSnapshot.docs[0].data();
       
       if (!compliance.passed) {
-        const details = compliance.details || {};
         eligible = false;
         reasons.push(`Compliance check "${compliance.rule_name}" failed. Rule type: ${compliance.rule_type}`);
       }
     }
 
     // 6. Check if lot has processing stages (traceability)
-    const stagesResult = await db.query(
-      `SELECT COUNT(*) as stage_count 
-       FROM processing_stages 
-       WHERE lot_id = $1`,
-      [lotId]
-    );
+    const stagesSnapshot = await firestore.collection('processing_stages')
+      .where('lot_id', '==', lotId)
+      .get();
 
-    const stageCount = parseInt(stagesResult.rows[0].stage_count);
+    const stageCount = stagesSnapshot.size;
     if (stageCount < 2) {
       eligible = false;
       reasons.push(`Insufficient processing stages. Found ${stageCount}, minimum 2 required for traceability.`);
@@ -221,7 +273,7 @@ router.get('/check-eligibility/:lotId', async (req, res) => {
       eligible,
       reasons: eligible ? [] : reasons,
       lot: {
-        lotId: lot.lot_id,
+        lotId: lotId,
         variety: lot.variety,
         quantity: lot.quantity,
         status: lot.status,
@@ -259,14 +311,14 @@ router.post('/', async (req, res) => {
       lotId,
       farmerAddress,
       reservePrice,
-      currency = 'ETH', // NEW - currency field (LKR or ETH)
-      reservePriceEth, // NEW - pre-converted ETH value from mobile
+      currency = 'ETH',
+      reservePriceEth,
       quantity,
-      duration, // in days
+      duration,
       startTime,
       endTime,
       preferredDestinations = [],
-      templateId // NEW - Governance template
+      templateId
     } = req.body;
 
     // === STEP 1: Validate Required Inputs ===
@@ -278,32 +330,54 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Load exchange rates for conversion
-    await currencyConverter.loadRates();
+    // === GOVERNANCE VALIDATION - Get exchange rates from settings ===
+    // Fetch governance settings early to get exchange rates
+    const settingsSnapshot = await firestore.collection('governance_settings').limit(1).get();
+    
+    if (settingsSnapshot.empty) {
+      return res.status(500).json({
+        success: false,
+        error: 'Governance settings not configured'
+      });
+    }
+
+    const settings = settingsSnapshot.docs[0].data();
+    const lkrToEthRate = parseFloat(settings.lkr_to_eth_rate || 0.0000031);
+    const usdToEthRate = parseFloat(settings.usd_to_eth_rate || 0.00032);
 
     // Validate numeric inputs
     const reservePriceNum = parseFloat(reservePrice);
     
-    // Handle currency conversion
+    // Handle currency conversion using governance settings rates
     let reservePriceInEth;
     let reservePriceInLkr;
     
     if (currency === 'LKR') {
-      // If farmer provided LKR, use their pre-converted ETH or convert here
       reservePriceInLkr = reservePriceNum;
       reservePriceInEth = reservePriceEth 
         ? parseFloat(reservePriceEth) 
-        : currencyConverter.lkrToEth(reservePriceNum);
+        : reservePriceNum * lkrToEthRate;
       
       logger.info('LKR auction', { 
         lkr: reservePriceInLkr, 
         eth: reservePriceInEth,
-        preConverted: !!reservePriceEth 
+        preConverted: !!reservePriceEth,
+        rate: lkrToEthRate
+      });
+    } else if (currency === 'USD') {
+      const reservePriceInUsd = reservePriceNum;
+      reservePriceInEth = reservePriceNum * usdToEthRate;
+      reservePriceInLkr = reservePriceNum * 320; // Approx USD to LKR
+      
+      logger.info('USD auction', { 
+        usd: reservePriceInUsd, 
+        eth: reservePriceInEth,
+        lkr: reservePriceInLkr,
+        rate: usdToEthRate
       });
     } else {
-      // If exporter/web provided ETH
       reservePriceInEth = reservePriceNum;
-      reservePriceInLkr = currencyConverter.ethToLkr(reservePriceNum);
+      reservePriceInLkr = reservePriceNum / lkrToEthRate;
       
       logger.info('ETH auction', { 
         eth: reservePriceInEth, 
@@ -334,19 +408,7 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // === GOVERNANCE VALIDATION ===
-    // Fetch governance settings
-    const settingsResult = await db.query('SELECT * FROM governance_settings LIMIT 1');
-    const settings = settingsResult.rows[0];
-
-    if (!settings) {
-      return res.status(500).json({
-        success: false,
-        error: 'Governance settings not configured'
-      });
-    }
-
-    // Convert duration to hours for validation
+    // Convert duration to hours for validation (settings already fetched above)
     const durationHours = durationNum * 24;
 
     // Validate against global settings
@@ -382,19 +444,18 @@ router.post('/', async (req, res) => {
     let minBidIncrement = parseFloat(settings.default_bid_increment);
 
     if (templateId) {
-      const templateResult = await db.query(
-        'SELECT * FROM auction_rule_templates WHERE template_id = $1 AND active = true',
-        [templateId]
-      );
+      const templateDoc = await firestore.collection('auction_rule_templates')
+        .doc(templateId)
+        .get();
 
-      if (templateResult.rows.length === 0) {
+      if (!templateDoc.exists || !templateDoc.data().active) {
         return res.status(400).json({
           success: false,
           error: 'Invalid or inactive template'
         });
       }
 
-      template = templateResult.rows[0];
+      template = templateDoc.data();
 
       // Validate against template rules
       if (durationHours < template.min_duration_hours) {
@@ -423,19 +484,21 @@ router.post('/', async (req, res) => {
     }
 
     // === STEP 2: Check Eligibility (All Preconditions) ===
-    const lotResult = await db.query(
-      'SELECT * FROM pepper_lots WHERE lot_id = $1',
-      [lotId]
-    );
+    // Query lot by lot_id field, not document ID
+    const lotSnapshot = await firestore.collection('pepper_lots')
+      .where('lot_id', '==', lotId)
+      .limit(1)
+      .get();
 
-    if (lotResult.rows.length === 0) {
+    if (lotSnapshot.empty) {
       return res.status(404).json({
         success: false,
         error: 'Lot not found'
       });
     }
 
-    const lot = lotResult.rows[0];
+    const lot = lotSnapshot.docs[0].data();
+    const lotDocRef = lotSnapshot.docs[0].ref;
 
     // Verify farmer ownership
     if (lot.farmer_address.toLowerCase() !== farmerAddress.toLowerCase()) {
@@ -464,45 +527,39 @@ router.post('/', async (req, res) => {
     }
 
     // Check for active auctions
-    const activeAuctionResult = await db.query(
-      `SELECT * FROM auctions 
-       WHERE lot_id = $1 
-       AND status IN ('created', 'active', 'pending', 'scheduled')
-       LIMIT 1`,
-      [lotId]
-    );
+    const activeAuctionSnapshot = await firestore.collection('auctions')
+      .where('lot_id', '==', lotId)
+      .where('status', 'in', ['created', 'active', 'pending', 'scheduled'])
+      .limit(1)
+      .get();
 
-    if (activeAuctionResult.rows.length > 0) {
+    if (!activeAuctionSnapshot.empty) {
       eligible = false;
       eligibilityReasons.push('This lot already has an active or scheduled auction');
     }
 
     // Check certificates (minimum 3)
-    const certsResult = await db.query(
-      `SELECT COUNT(*) as cert_count FROM certifications WHERE lot_id = $1`,
-      [lotId]
-    );
-    const certCount = parseInt(certsResult.rows[0].cert_count);
+    const certsSnapshot = await firestore.collection('certifications')
+      .where('lot_id', '==', lotId)
+      .get();
+    const certCount = certsSnapshot.size;
     if (certCount < 3) {
       eligible = false;
       eligibilityReasons.push(`Minimum 3 certificates required (found ${certCount})`);
     }
 
     // Check compliance status
-    const complianceResult = await db.query(
-      `SELECT passed, rule_name, rule_type, details
-       FROM compliance_checks
-       WHERE lot_id = $1
-       ORDER BY checked_at DESC
-       LIMIT 1`,
-      [lotId]
-    );
+    const complianceSnapshot = await firestore.collection('compliance_checks')
+      .where('lot_id', '==', lotId)
+      .orderBy('checked_at', 'desc')
+      .limit(1)
+      .get();
 
-    if (complianceResult.rows.length === 0) {
+    if (complianceSnapshot.empty) {
       eligible = false;
       eligibilityReasons.push('No compliance checks performed');
     } else {
-      const compliance = complianceResult.rows[0];
+      const compliance = complianceSnapshot.docs[0].data();
       if (!compliance.passed) {
         eligible = false;
         eligibilityReasons.push(`Compliance check "${compliance.rule_name}" failed (rule type: ${compliance.rule_type})`);
@@ -510,11 +567,10 @@ router.post('/', async (req, res) => {
     }
 
     // Check processing stages (minimum 2)
-    const stagesResult = await db.query(
-      `SELECT COUNT(*) as stage_count FROM processing_stages WHERE lot_id = $1`,
-      [lotId]
-    );
-    const stageCount = parseInt(stagesResult.rows[0].stage_count);
+    const stagesSnapshot = await firestore.collection('processing_stages')
+      .where('lot_id', '==', lotId)
+      .get();
+    const stageCount = stagesSnapshot.size;
     if (stageCount < 2) {
       eligible = false;
       eligibilityReasons.push(`Minimum 2 processing stages required for traceability (found ${stageCount})`);
@@ -535,7 +591,7 @@ router.post('/', async (req, res) => {
     }
 
     // === STEP 3: Calculate Timestamps ===
-    const calculatedStartTime = startTime ? new Date(startTime) : new Date(Date.now() + 3600000); // 1 hour from now
+    const calculatedStartTime = startTime ? new Date(startTime) : new Date(Date.now() + 3600000);
     const calculatedEndTime = endTime 
       ? new Date(endTime) 
       : new Date(calculatedStartTime.getTime() + (durationNum * 24 * 3600000));
@@ -560,14 +616,11 @@ router.post('/', async (req, res) => {
     const blockchainResult = await blockchainService.createAuction({
       lotId,
       farmer: farmerAddress,
-      startPrice: reservePriceNum, // Starting price = reserve price in this model
+      startPrice: reservePriceNum,
       reservePrice: reservePriceNum,
       duration: durationSeconds
     });
 
-    // Always use timestamp-based auction ID for database
-    // Blockchain IDs start from 0 and are sequential, which can cause conflicts
-    // with existing database records. Timestamp ensures uniqueness.
     const blockchainAuctionId = blockchainResult.auctionId ? parseInt(blockchainResult.auctionId) : null;
     const auctionIdNum = Math.floor(Date.now() / 1000);
 
@@ -578,46 +631,37 @@ router.post('/', async (req, res) => {
     });
 
     // === STEP 5: Store Off-Chain Data (Volatile + UI preferences) ===
-    // Determine initial status based on approval requirement
     const initialStatus = requiresApproval 
       ? 'pending_approval' 
       : (calculatedStartTime > new Date() ? 'created' : 'active');
 
-    const insertResult = await db.query(
-      `INSERT INTO auctions (
-        auction_id, lot_id, farmer_address,
-        start_price, reserve_price, start_time, end_time,
-        status, compliance_passed, blockchain_tx_hash,
-        template_id, min_bid_increment, admin_approved,
-        currency, price_lkr
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-      RETURNING *`,
-      [
-        auctionIdNum,
-        lotId,
-        farmerAddress,
-        reservePriceInEth, // start_price in ETH (for blockchain)
-        reservePriceInEth, // reserve_price in ETH
-        calculatedStartTime,
-        calculatedEndTime,
-        initialStatus,
-        true, // compliance_passed - lot is eligible if we reach this point
-        blockchainResult.txHash,
-        templateId || null,
-        minBidIncrement,
-        !requiresApproval, // admin_approved = true if no approval needed
-        currency, // Store original currency
-        reservePriceInLkr // Store LKR equivalent
-      ]
-    );
+    const auctionData = {
+      lot_id: lotId,
+      farmer_address: farmerAddress,
+      farmer_address_lower: farmerAddress.toLowerCase(),
+      start_price: reservePriceInEth,
+      reserve_price: reservePriceInEth,
+      start_time: admin.firestore.Timestamp.fromDate(calculatedStartTime),
+      end_time: admin.firestore.Timestamp.fromDate(calculatedEndTime),
+      status: initialStatus,
+      compliance_passed: true,
+      blockchain_tx_hash: blockchainResult.txHash,
+      template_id: templateId || null,
+      min_bid_increment: minBidIncrement,
+      admin_approved: !requiresApproval,
+      currency: currency,
+      price_lkr: reservePriceInLkr,
+      created_at: admin.firestore.FieldValue.serverTimestamp(),
+      bid_count: 0
+    };
 
-    const auction = insertResult.rows[0];
+    await firestore.collection('auctions').doc(auctionIdNum.toString()).set(auctionData);
 
     logger.info('Auction stored in database', {
-      auctionId: auction.auction_id,
-      status: auction.status,
-      startTime: auction.start_time,
-      endTime: auction.end_time
+      auctionId: auctionIdNum,
+      status: auctionData.status,
+      startTime: calculatedStartTime,
+      endTime: calculatedEndTime
     });
 
     // === STEP 6: Return Success Response ===
@@ -625,15 +669,15 @@ router.post('/', async (req, res) => {
       success: true,
       message: 'Auction created successfully',
       auction: {
-        auctionId: auction.auction_id,
-        lotId: auction.lot_id,
-        farmerAddress: auction.farmer_address,
-        reservePrice: auction.reserve_price,
+        auctionId: auctionIdNum,
+        lotId: lotId,
+        farmerAddress: farmerAddress,
+        reservePrice: reservePriceInEth,
         quantity: quantityNum,
-        startTime: auction.start_time,
-        endTime: auction.end_time,
-        status: auction.status,
-        blockchainTxHash: auction.blockchain_tx_hash,
+        startTime: calculatedStartTime,
+        endTime: calculatedEndTime,
+        status: initialStatus,
+        blockchainTxHash: blockchainResult.txHash,
         preferredDestinations,
         onChainData: {
           immutable: true,
@@ -701,12 +745,9 @@ router.post('/:id/bid', async (req, res) => {
     await currencyConverter.loadRates();
 
     // Get auction details
-    const auctionResult = await db.query(
-      'SELECT * FROM auctions WHERE auction_id = $1',
-      [parseInt(id)]
-    );
+    const auctionDoc = await firestore.collection('auctions').doc(id).get();
 
-    if (auctionResult.rows.length === 0) {
+    if (!auctionDoc.exists) {
       logger.warn('Auction not found', { auctionId: id });
       return res.status(404).json({
         success: false,
@@ -715,7 +756,7 @@ router.post('/:id/bid', async (req, res) => {
       });
     }
 
-    const auction = auctionResult.rows[0];
+    const auction = auctionDoc.data();
     
     // Convert bid to both currencies
     let bidInEth, bidInLkr;
@@ -750,7 +791,7 @@ router.post('/:id/bid', async (req, res) => {
 
     // Check auction not ended
     const now = new Date();
-    const endTime = new Date(auction.end_time);
+    const endTime = auction.end_time.toDate();
     if (now >= endTime) {
       logger.warn('Auction has ended', { now, endTime });
       return res.status(400).json({
@@ -771,7 +812,7 @@ router.post('/:id/bid', async (req, res) => {
 
     // Calculate minimum bid (5% above current bid) - always compare in ETH
     const currentBidEth = parseFloat(auction.current_bid) || parseFloat(auction.start_price) || 0;
-    const minIncrementPercent = 0.05; // 5%
+    const minIncrementPercent = 0.05;
     const minBidEth = currentBidEth > 0 ? currentBidEth * (1 + minIncrementPercent) : parseFloat(auction.start_price) || 0;
 
     logger.info('Bid validation', {
@@ -782,7 +823,6 @@ router.post('/:id/bid', async (req, res) => {
     });
 
     if (bidInEth < minBidEth) {
-      // Return error in both currencies for clarity
       const minBidLkr = currencyConverter.ethToLkr(minBidEth);
       const currentBidLkr = currencyConverter.ethToLkr(currentBidEth);
       
@@ -807,23 +847,27 @@ router.post('/:id/bid', async (req, res) => {
     }
 
     // Insert bid into database with both currencies
-    const bidResult = await db.query(
-      `INSERT INTO bids (
-        auction_id, bidder_address, bidder_name, amount, currency, amount_lkr, status, placed_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
-      RETURNING *`,
-      [parseInt(id), bidderAddress, bidderName || null, bidInEth.toString(), currency, bidInLkr.toString(), 'pending']
-    );
+    const bidData = {
+      auction_id: id,
+      bidder_address: bidderAddress,
+      bidder_address_lower: bidderAddress.toLowerCase(),
+      bidder_name: bidderName || null,
+      amount: bidInEth.toString(),
+      currency: currency,
+      amount_lkr: bidInLkr.toString(),
+      status: 'pending',
+      placed_at: admin.firestore.FieldValue.serverTimestamp()
+    };
 
-    const newBid = bidResult.rows[0];
+    const bidRef = await firestore.collection('bids').add(bidData);
 
     // Update auction current bid (in both currencies)
-    await db.query(
-      `UPDATE auctions 
-       SET current_bid = $1, current_bid_lkr = $2, current_bidder = $3, bid_count = COALESCE(bid_count, 0) + 1
-       WHERE auction_id = $4`,
-      [bidInEth.toString(), bidInLkr.toString(), bidderAddress, parseInt(id)]
-    );
+    await firestore.collection('auctions').doc(id).update({
+      current_bid: bidInEth.toString(),
+      current_bid_lkr: bidInLkr.toString(),
+      current_bidder: bidderAddress,
+      bid_count: admin.firestore.FieldValue.increment(1)
+    });
 
     logger.info('Bid placed successfully', {
       auctionId: id,
@@ -835,17 +879,16 @@ router.post('/:id/bid', async (req, res) => {
     // Broadcast bid via WebSocket (include both currencies)
     const io = req.app.get('io');
     if (io) {
-      // Emit to /auction namespace and use underscore in room name
       const auctionNamespace = io.of('/auction');
       auctionNamespace.to(`auction_${id}`).emit('new_bid', {
-        auctionId: parseInt(id),
+        auctionId: id,
         bidder: bidderAddress,
         bidderName: bidderName || 'Anonymous',
         amount: bidInEth.toString(),
         amountLkr: bidInLkr.toString(),
         currency: currency,
         timestamp: new Date().toISOString(),
-        bidCount: auction.bid_count + 1
+        bidCount: (auction.bid_count || 0) + 1
       });
       logger.info('WebSocket broadcast sent', {
         room: `auction_${id}`,
@@ -858,15 +901,15 @@ router.post('/:id/bid', async (req, res) => {
       success: true,
       message: 'Bid placed successfully',
       bid: {
-        id: newBid.id,
-        auctionId: parseInt(id),
+        id: bidRef.id,
+        auctionId: id,
         bidderAddress,
         amount: {
           eth: bidInEth.toFixed(4),
           lkr: bidInLkr.toFixed(2)
         },
         currency: currency,
-        placedAt: newBid.placed_at
+        placedAt: new Date()
       }
     });
   } catch (error) {
@@ -895,19 +938,16 @@ router.post('/request-cancellation', async (req, res) => {
     }
 
     // Verify auction exists and belongs to farmer
-    const auctionResult = await db.query(
-      'SELECT * FROM auctions WHERE auction_id = $1',
-      [auctionId]
-    );
+    const auctionDoc = await firestore.collection('auctions').doc(auctionId).get();
 
-    if (auctionResult.rows.length === 0) {
+    if (!auctionDoc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Auction not found'
       });
     }
 
-    const auction = auctionResult.rows[0];
+    const auction = auctionDoc.data();
 
     if (auction.farmer_address.toLowerCase() !== farmerAddress.toLowerCase()) {
       return res.status(403).json({
@@ -925,13 +965,12 @@ router.post('/request-cancellation', async (req, res) => {
     }
 
     // Check if cancellation request already exists
-    const existingRequest = await db.query(
-      `SELECT * FROM cancellation_requests 
-       WHERE auction_id = $1 AND status = 'pending'`,
-      [auctionId]
-    );
+    const existingRequestSnapshot = await firestore.collection('cancellation_requests')
+      .where('auction_id', '==', auctionId)
+      .where('status', '==', 'pending')
+      .get();
 
-    if (existingRequest.rows.length > 0) {
+    if (!existingRequestSnapshot.empty) {
       return res.status(400).json({
         success: false,
         error: 'A cancellation request for this auction is already pending'
@@ -939,16 +978,19 @@ router.post('/request-cancellation', async (req, res) => {
     }
 
     // Create cancellation request
-    const requestResult = await db.query(
-      `INSERT INTO cancellation_requests 
-       (auction_id, lot_id, requested_by, reason, status)
-       VALUES ($1, $2, $3, $4, 'pending')
-       RETURNING *`,
-      [auctionId, auction.lot_id, farmerAddress, reason]
-    );
+    const requestData = {
+      auction_id: auctionId,
+      lot_id: auction.lot_id,
+      requested_by: farmerAddress,
+      reason: reason,
+      status: 'pending',
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    const requestRef = await firestore.collection('cancellation_requests').add(requestData);
 
     logger.info('Cancellation request created', {
-      requestId: requestResult.rows[0].id,
+      requestId: requestRef.id,
       auctionId,
       reason
     });
@@ -957,12 +999,12 @@ router.post('/request-cancellation', async (req, res) => {
       success: true,
       message: 'Cancellation request submitted successfully. Admin will review.',
       request: {
-        id: requestResult.rows[0].id,
-        auctionId: requestResult.rows[0].auction_id,
-        lotId: requestResult.rows[0].lot_id,
-        reason: requestResult.rows[0].reason,
-        status: requestResult.rows[0].status,
-        createdAt: requestResult.rows[0].created_at
+        id: requestRef.id,
+        auctionId: auctionId,
+        lotId: auction.lot_id,
+        reason: reason,
+        status: 'pending',
+        createdAt: new Date()
       }
     });
   } catch (error) {
@@ -982,30 +1024,26 @@ router.post('/:id/end', async (req, res) => {
   try {
     const { id } = req.params;
 
-    const result = await db.query(
-      'SELECT * FROM auctions WHERE auction_id = $1',
-      [parseInt(id)]
-    );
+    const auctionDoc = await firestore.collection('auctions').doc(id).get();
 
-    if (result.rows.length === 0) {
+    if (!auctionDoc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Auction not found'
       });
     }
 
-    const auction = result.rows[0];
+    const auction = auctionDoc.data();
 
     // Update status
-    await db.query(
-      'UPDATE auctions SET status = $1 WHERE auction_id = $2',
-      ['ended', parseInt(id)]
-    );
+    await firestore.collection('auctions').doc(id).update({
+      status: 'ended'
+    });
 
     res.json({
       success: true,
       message: 'Auction ended successfully',
-      auction: { ...auction, status: 'ended' }
+      auction: { ...auction, auction_id: id, status: 'ended' }
     });
   } catch (error) {
     logger.error('Error ending auction:', error);
@@ -1028,86 +1066,82 @@ router.get('/bids/user/:userId', async (req, res) => {
     logger.info(`Fetching bids for user ID: ${userId}`);
 
     // First, get the user's wallet address
-    const userResult = await db.query(
-      'SELECT wallet_address, name FROM users WHERE id = $1',
-      [userId]
-    );
+    const userDoc = await firestore.collection('users').doc(userId).get();
 
-    if (userResult.rows.length === 0) {
+    if (!userDoc.exists) {
       return res.status(404).json({
         success: false,
         error: 'User not found'
       });
     }
 
-    const { wallet_address, name } = userResult.rows[0];
+    const userData = userDoc.data();
+    const { wallet_address, name } = userData;
 
     if (!wallet_address) {
       logger.warn(`User ${userId} has no wallet address`);
       return res.json({
         success: true,
         count: 0,
-        auctions: []
+        auctions: [],
+        message: 'No wallet address connected. Please connect your wallet to place bids and view bid history.'
       });
     }
 
     logger.info(`Found wallet address for user ${userId}: ${wallet_address}`);
 
     // Fetch all bids by this user with auction details
-    const bidsResult = await db.query(
-      `SELECT 
-        b.*,
-        a.auction_id,
-        a.lot_id,
-        a.status as auction_status,
-        a.current_bid as auction_current_bid,
-        a.start_time,
-        a.end_time,
-        a.farmer_address,
-        a.reserve_price,
-        a.bid_count,
-        p.variety,
-        p.quantity,
-        p.quality
-       FROM bids b
-       JOIN auctions a ON b.auction_id = a.auction_id
-       LEFT JOIN pepper_lots p ON a.lot_id = p.lot_id
-       WHERE LOWER(b.bidder_address) = LOWER($1)
-       ORDER BY b.placed_at DESC
-       LIMIT $2 OFFSET $3`,
-      [wallet_address, limit, offset]
-    );
+    const bidsSnapshot = await firestore.collection('bids')
+      .where('bidder_address_lower', '==', wallet_address.toLowerCase())
+      .orderBy('placed_at', 'desc')
+      .limit(parseInt(limit))
+      .offset(parseInt(offset))
+      .get();
 
-    const countResult = await db.query(
-      `SELECT COUNT(*) FROM bids WHERE LOWER(bidder_address) = LOWER($1)`,
-      [wallet_address]
-    );
+    const countSnapshot = await firestore.collection('bids')
+      .where('bidder_address_lower', '==', wallet_address.toLowerCase())
+      .count()
+      .get();
 
     // Group bids by auction
     const auctionMap = new Map();
 
-    for (const bid of bidsResult.rows) {
+    for (const bidDoc of bidsSnapshot.docs) {
+      const bid = bidDoc.data();
       const auctionId = bid.auction_id;
 
       if (!auctionMap.has(auctionId)) {
-        // Determine if user is leading this auction by comparing their bid with current_bid
-        // For active auctions, user is leading if their bid equals current_bid
-        // For ended auctions, we'll check after collecting all bids
-        const isLeading = bid.auction_current_bid === bid.amount;
+        // Fetch auction details
+        const auctionDoc = await firestore.collection('auctions').doc(auctionId).get();
+        const auction = auctionDoc.exists ? auctionDoc.data() : {};
+
+        // Fetch lot details by lot_id field
+        let lotData = {};
+        if (auction.lot_id) {
+          const lotSnapshot = await firestore.collection('pepper_lots')
+            .where('lot_id', '==', auction.lot_id)
+            .limit(1)
+            .get();
+          if (!lotSnapshot.empty) {
+            lotData = lotSnapshot.docs[0].data();
+          }
+        }
+
+        const isLeading = auction.current_bid === bid.amount;
 
         auctionMap.set(auctionId, {
           auctionId,
-          lotId: bid.lot_id,
-          status: bid.auction_status,
-          currentBid: bid.auction_current_bid,
-          startTime: bid.start_time,
-          endTime: bid.end_time,
-          farmerAddress: bid.farmer_address,
-          reservePrice: bid.reserve_price,
-          bidCount: bid.bid_count,
-          variety: bid.variety,
-          quantity: bid.quantity,
-          quality: bid.quality,
+          lotId: auction.lot_id,
+          status: auction.status,
+          currentBid: auction.current_bid,
+          startTime: auction.start_time,
+          endTime: auction.end_time,
+          farmerAddress: auction.farmer_address,
+          reservePrice: auction.reserve_price,
+          bidCount: auction.bid_count,
+          variety: lotData.variety,
+          quantity: lotData.quantity,
+          quality: lotData.quality,
           isLeading,
           myHighestBid: bid.amount,
           myHighestBidLkr: bid.amount_lkr,
@@ -1123,7 +1157,7 @@ router.get('/bids/user/:userId', async (req, res) => {
       }
 
       auction.myBids.push({
-        id: bid.id,
+        id: bidDoc.id,
         amount: bid.amount,
         amountLkr: bid.amount_lkr,
         currency: bid.currency || 'ETH',
@@ -1136,7 +1170,7 @@ router.get('/bids/user/:userId', async (req, res) => {
 
     res.json({
       success: true,
-      count: parseInt(countResult.rows[0].count),
+      count: countSnapshot.data().count,
       auctions: Array.from(auctionMap.values())
     });
   } catch (error) {
@@ -1158,23 +1192,24 @@ router.get('/:id/bids', async (req, res) => {
     const { id } = req.params;
     const { limit = 50, offset = 0 } = req.query;
 
-    const result = await db.query(
-      `SELECT * FROM bids 
-       WHERE auction_id = $1 
-       ORDER BY amount DESC, placed_at DESC 
-       LIMIT $2 OFFSET $3`,
-      [parseInt(id), limit, offset]
-    );
+    const bidsSnapshot = await firestore.collection('bids')
+      .where('auction_id', '==', id)
+      .orderBy('amount', 'desc')
+      .limit(parseInt(limit))
+      .offset(parseInt(offset))
+      .get();
 
-    const countResult = await db.query(
-      'SELECT COUNT(*) FROM bids WHERE auction_id = $1',
-      [parseInt(id)]
-    );
+    const countSnapshot = await firestore.collection('bids')
+      .where('auction_id', '==', id)
+      .count()
+      .get();
+
+    const bids = bidsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     res.json({
       success: true,
-      count: parseInt(countResult.rows[0].count),
-      bids: result.rows
+      count: countSnapshot.data().count,
+      bids
     });
   } catch (error) {
     logger.error('Error fetching bids:', error);
@@ -1202,19 +1237,16 @@ router.post('/:id/escrow/lock', async (req, res) => {
     }
 
     // Get auction
-    const auctionResult = await db.query(
-      'SELECT * FROM auctions WHERE auction_id = $1',
-      [parseInt(id)]
-    );
+    const auctionDoc = await firestore.collection('auctions').doc(id).get();
 
-    if (auctionResult.rows.length === 0) {
+    if (!auctionDoc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Auction not found'
       });
     }
 
-    const auction = auctionResult.rows[0];
+    const auction = auctionDoc.data();
 
     // Verify auction ended
     if (auction.status !== 'ended') {
@@ -1233,12 +1265,11 @@ router.post('/:id/escrow/lock', async (req, res) => {
     }
 
     // Check if escrow already locked
-    const escrowResult = await db.query(
-      'SELECT * FROM escrow_deposits WHERE auction_id = $1',
-      [parseInt(id)]
-    );
+    const escrowSnapshot = await firestore.collection('escrow_deposits')
+      .where('auction_id', '==', id)
+      .get();
 
-    if (escrowResult.rows.length > 0) {
+    if (!escrowSnapshot.empty) {
       return res.status(400).json({
         success: false,
         error: 'Escrow already locked for this auction'
@@ -1246,20 +1277,24 @@ router.post('/:id/escrow/lock', async (req, res) => {
     }
 
     // Create escrow record
-    await db.query(
-      `INSERT INTO escrow_deposits 
-       (auction_id, depositor_address, amount, transaction_hash, status, deposited_at) 
-       VALUES ($1, $2, $3, $4, $5, NOW())`,
-      [parseInt(id), exporterAddress, auction.current_price, transactionHash, 'locked']
-    );
+    const escrowData = {
+      auction_id: id,
+      depositor_address: exporterAddress,
+      depositor_address_lower: exporterAddress.toLowerCase(),
+      amount: auction.current_price,
+      transaction_hash: transactionHash,
+      status: 'locked',
+      deposited_at: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    await firestore.collection('escrow_deposits').add(escrowData);
 
     // Update auction status
-    await db.query(
-      `UPDATE auctions 
-       SET status = $1, escrow_locked = true, escrow_tx_hash = $2 
-       WHERE auction_id = $3`,
-      ['escrow_locked', transactionHash, parseInt(id)]
-    );
+    await firestore.collection('auctions').doc(id).update({
+      status: 'escrow_locked',
+      escrow_locked: true,
+      escrow_tx_hash: transactionHash
+    });
 
     logger.info('Escrow locked', {
       auctionId: id,
@@ -1296,19 +1331,16 @@ router.post('/:id/settle', async (req, res) => {
     } = req.body;
 
     // Get auction details
-    const result = await db.query(
-      'SELECT * FROM auctions WHERE auction_id = $1',
-      [parseInt(id)]
-    );
+    const auctionDoc = await firestore.collection('auctions').doc(id).get();
 
-    if (result.rows.length === 0) {
+    if (!auctionDoc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Auction not found'
       });
     }
 
-    const auction = result.rows[0];
+    const auction = auctionDoc.data();
 
     // Verify auction is in correct state
     if (auction.status !== 'ended' && auction.status !== 'escrow_locked') {
@@ -1320,19 +1352,19 @@ router.post('/:id/settle', async (req, res) => {
     }
 
     // Verify escrow is locked
-    const escrowResult = await db.query(
-      'SELECT * FROM escrow_deposits WHERE auction_id = $1 AND status = $2',
-      [parseInt(id), 'locked']
-    );
+    const escrowSnapshot = await firestore.collection('escrow_deposits')
+      .where('auction_id', '==', id)
+      .where('status', '==', 'locked')
+      .get();
 
-    if (escrowResult.rows.length === 0) {
+    if (escrowSnapshot.empty) {
       return res.status(400).json({
         success: false,
         error: 'Escrow must be locked before settlement'
       });
     }
 
-    const escrow = escrowResult.rows[0];
+    const escrow = escrowSnapshot.docs[0].data();
 
     // Verify all preconditions
     if (!complianceApproved) {
@@ -1358,60 +1390,63 @@ router.post('/:id/settle', async (req, res) => {
 
     // Calculate amounts
     const finalAmount = parseFloat(escrow.amount);
-    const platformFeePercent = 2.0; // 2%
+    const platformFeePercent = 2.0;
     const platformFee = finalAmount * (platformFeePercent / 100);
     const farmerPayout = finalAmount - platformFee;
 
     // Create settlement record
-    await db.query(
-      `INSERT INTO auction_settlements 
-       (auction_id, farmer_address, buyer_address, final_amount, platform_fee, 
-        farmer_payout, settlement_tx_hash, compliance_approved, shipment_confirmed, 
-        delivery_confirmed, status) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-      [
-        parseInt(id),
-        auction.farmer_address,
-        escrow.depositor_address,
-        finalAmount,
-        platformFee,
-        farmerPayout,
-        settlementTxHash,
-        complianceApproved,
-        shipmentConfirmed,
-        deliveryConfirmed,
-        'completed'
-      ]
-    );
+    const settlementData = {
+      auction_id: id,
+      farmer_address: auction.farmer_address,
+      farmer_address_lower: auction.farmer_address.toLowerCase(),
+      buyer_address: escrow.depositor_address,
+      buyer_address_lower: escrow.depositor_address.toLowerCase(),
+      final_amount: finalAmount,
+      platform_fee: platformFee,
+      farmer_payout: farmerPayout,
+      settlement_tx_hash: settlementTxHash,
+      compliance_approved: complianceApproved,
+      shipment_confirmed: shipmentConfirmed,
+      delivery_confirmed: deliveryConfirmed,
+      status: 'completed',
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    await firestore.collection('auction_settlements').add(settlementData);
 
     // Update escrow status
-    await db.query(
-      `UPDATE escrow_deposits 
-       SET status = $1, released_at = NOW(), released_to = $2, release_tx_hash = $3 
-       WHERE auction_id = $4`,
-      ['released', auction.farmer_address, settlementTxHash, parseInt(id)]
-    );
+    await firestore.collection('escrow_deposits').doc(escrowSnapshot.docs[0].id).update({
+      status: 'released',
+      released_at: admin.firestore.FieldValue.serverTimestamp(),
+      released_to: auction.farmer_address,
+      release_tx_hash: settlementTxHash
+    });
 
     // Update auction status
-    await db.query(
-      'UPDATE auctions SET status = $1, settlement_tx_hash = $2 WHERE auction_id = $3',
-      ['settled', settlementTxHash, parseInt(id)]
-    );
+    await firestore.collection('auctions').doc(id).update({
+      status: 'settled',
+      settlement_tx_hash: settlementTxHash
+    });
 
     // Update winning bid status
-    await db.query(
-      `UPDATE bids 
-       SET status = $1, transaction_hash = $2 
-       WHERE auction_id = $3 AND bidder_address = $4 
-       ORDER BY amount DESC LIMIT 1`,
-      ['won', settlementTxHash, parseInt(id), auction.highest_bidder]
-    );
+    const winningBidSnapshot = await firestore.collection('bids')
+      .where('auction_id', '==', id)
+      .where('bidder_address_lower', '==', auction.highest_bidder?.toLowerCase())
+      .orderBy('amount', 'desc')
+      .limit(1)
+      .get();
+
+    if (!winningBidSnapshot.empty) {
+      await firestore.collection('bids').doc(winningBidSnapshot.docs[0].id).update({
+        status: 'won',
+        transaction_hash: settlementTxHash
+      });
+    }
 
     // Update lot status
-    await db.query(
-      'UPDATE pepper_lots SET status = $1 WHERE lot_id = $2',
-      ['sold', auction.lot_id]
-    );
+    await firestore.collection('pepper_lots').doc(auction.lot_id).update({
+      status: 'sold'
+    });
 
     logger.info('Auction settled successfully', {
       auctionId: id,
@@ -1426,7 +1461,7 @@ router.post('/:id/settle', async (req, res) => {
     const io = req.app.get('io');
     if (io) {
       io.to(`auction-${id}`).emit('auction-settled', {
-        auctionId: parseInt(id),
+        auctionId: id,
         status: 'settled',
         finalAmount,
         winner: escrow.depositor_address
@@ -1489,74 +1524,65 @@ router.post('/:id/cancel', async (req, res) => {
     }
 
     // Get auction
-    const auctionResult = await db.query(
-      'SELECT * FROM auctions WHERE auction_id = $1',
-      [parseInt(id)]
-    );
+    const auctionDoc = await firestore.collection('auctions').doc(id).get();
 
-    if (auctionResult.rows.length === 0) {
+    if (!auctionDoc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Auction not found'
       });
     }
 
-    const auction = auctionResult.rows[0];
+    const auction = auctionDoc.data();
 
     // Check if escrow exists
-    const escrowResult = await db.query(
-      'SELECT * FROM escrow_deposits WHERE auction_id = $1',
-      [parseInt(id)]
-    );
+    const escrowSnapshot = await firestore.collection('escrow_deposits')
+      .where('auction_id', '==', id)
+      .get();
 
     let refundTxHash = null;
     let escrowRefunded = false;
 
     // Handle escrow refund if needed
-    if (escrowResult.rows.length > 0 && refundExporter) {
-      const escrow = escrowResult.rows[0];
+    if (!escrowSnapshot.empty && refundExporter) {
+      const escrow = escrowSnapshot.docs[0].data();
       
       // Update escrow status
-      await db.query(
-        `UPDATE escrow_deposits 
-         SET status = $1, released_at = NOW(), released_to = $2 
-         WHERE auction_id = $3`,
-        ['refunded', escrow.depositor_address, parseInt(id)]
-      );
+      await firestore.collection('escrow_deposits').doc(escrowSnapshot.docs[0].id).update({
+        status: 'refunded',
+        released_at: admin.firestore.FieldValue.serverTimestamp(),
+        released_to: escrow.depositor_address
+      });
 
       escrowRefunded = true;
       refundTxHash = req.body.refundTxHash || null;
     }
 
     // Create cancellation record
-    await db.query(
-      `INSERT INTO auction_cancellations 
-       (auction_id, cancelled_by, cancellation_reason, detailed_reason, 
-        escrow_refunded, refund_tx_hash, resolved) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [
-        parseInt(id),
-        cancelledBy,
-        reason,
-        detailedReason,
-        escrowRefunded,
-        refundTxHash,
-        false
-      ]
-    );
+    const cancellationData = {
+      auction_id: id,
+      cancelled_by: cancelledBy,
+      cancelled_by_lower: cancelledBy.toLowerCase(),
+      cancellation_reason: reason,
+      detailed_reason: detailedReason,
+      escrow_refunded: escrowRefunded,
+      refund_tx_hash: refundTxHash,
+      resolved: false,
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    await firestore.collection('auction_cancellations').add(cancellationData);
 
     // Update auction status
-    await db.query(
-      'UPDATE auctions SET status = $1 WHERE auction_id = $2',
-      ['cancelled', parseInt(id)]
-    );
+    await firestore.collection('auctions').doc(id).update({
+      status: 'cancelled'
+    });
 
     // Return lot to available if no escrow
     if (!escrowRefunded) {
-      await db.query(
-        'UPDATE pepper_lots SET status = $1 WHERE lot_id = $2',
-        ['available', auction.lot_id]
-      );
+      await firestore.collection('pepper_lots').doc(auction.lot_id).update({
+        status: 'available'
+      });
     }
 
     logger.info('Auction cancelled', {
@@ -1570,7 +1596,7 @@ router.post('/:id/cancel', async (req, res) => {
     const io = req.app.get('io');
     if (io) {
       io.to(`auction-${id}`).emit('auction-cancelled', {
-        auctionId: parseInt(id),
+        auctionId: id,
         reason,
         escrowRefunded
       });
@@ -1590,6 +1616,112 @@ router.post('/:id/cancel', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to cancel auction'
+    });
+  }
+});
+
+/**
+ * POST /api/auctions/:id/finalize
+ * Manually trigger auction finalization (admin only)
+ */
+router.post('/:id/finalize', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const auctionFinalizationService = require('../services/auctionFinalizationService');
+
+    logger.info('Manual finalization requested for auction:', id);
+
+    const result = await auctionFinalizationService.finalizeEndedAuctions([id]);
+
+    res.json({
+      success: true,
+      message: 'Finalization triggered',
+      result
+    });
+  } catch (error) {
+    logger.error('Error finalizing auction:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to finalize auction',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/auctions/:id/settle
+ * Manually trigger auction settlement (after escrow received)
+ */
+router.post('/:id/settle', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const auctionFinalizationService = require('../services/auctionFinalizationService');
+
+    logger.info('Manual settlement requested for auction:', id);
+
+    await auctionFinalizationService.settleAuction(id);
+
+    res.json({
+      success: true,
+      message: 'Settlement completed'
+    });
+  } catch (error) {
+    logger.error('Error settling auction:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to settle auction',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/auctions/:id/settlement-status
+ * Get detailed settlement status for an auction
+ */
+router.get('/:id/settlement-status', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const auctionDoc = await firestore.collection('auctions').doc(id).get();
+
+    if (!auctionDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Auction not found'
+      });
+    }
+
+    const auction = auctionDoc.data();
+
+    const status = {
+      auctionId: id,
+      status: auction.status,
+      finalized: auction.finalized || false,
+      finalizedAt: auction.finalized_at,
+      settlementStatus: auction.settlement_status || 'not_started',
+      blockchainFinalized: auction.blockchain_finalized || false,
+      blockchainFinalizationTx: auction.blockchain_finalization_tx,
+      escrowTxHash: auction.escrow_tx_hash,
+      settlementTxHash: auction.settlement_tx_hash,
+      settledAt: auction.settled_at,
+      winner: auction.winner_address || auction.current_bidder,
+      finalPrice: {
+        eth: auction.final_price || auction.current_bid,
+        lkr: auction.final_price_lkr || auction.current_bid_lkr
+      },
+      errors: auction.blockchain_error
+    };
+
+    res.json({
+      success: true,
+      settlement: status
+    });
+  } catch (error) {
+    logger.error('Error getting settlement status:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get settlement status'
     });
   }
 });

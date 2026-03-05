@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'config/routes.dart';
 import 'config/theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/auction_provider.dart';
 import 'providers/lot_provider.dart';
+import 'providers/language_provider.dart';
 import 'services/api_service.dart';
 import 'services/blockchain_service.dart';
 import 'services/socket_service.dart';
@@ -15,6 +17,7 @@ import 'services/storage_service.dart';
 import 'services/notification_service.dart';
 import 'services/offline_sync_service.dart';
 import 'services/ipfs_service.dart';
+import 'localization/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +51,16 @@ void main() async {
   await offlineSyncService.initialize();
   await blockchainService.initialize(); // Initialize blockchain contracts
 
+  // Connect WebSocket for real-time auction updates immediately
+  print('🚀 Initializing WebSocket connection...');
+  socketService.connect().then((_) {
+    print('🚀 WebSocket initialization complete');
+  }).catchError((error) {
+    print('❌ WebSocket initialization error: $error');
+  });
+
+  print('🚀 App initialization complete');
+
   runApp(
     MultiProvider(
       providers: [
@@ -59,6 +72,11 @@ void main() async {
         Provider<NotificationService>.value(value: notificationService),
         Provider<OfflineSyncService>.value(value: offlineSyncService),
         Provider<IpfsService>.value(value: ipfsService),
+
+        // Language Provider
+        ChangeNotifierProvider(
+          create: (_) => LanguageProvider(),
+        ),
 
         // Provide state management providers
         ChangeNotifierProvider(
@@ -99,13 +117,45 @@ class SmartPepperApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'SmartPepper',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      routerConfig: AppRouter.router,
+    return Consumer<LanguageProvider>(
+      builder: (context, languageProvider, child) {
+        return MaterialApp.router(
+          title: 'SmartPepper',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.system,
+          routerConfig: AppRouter.router,
+          // Localization configuration
+          locale: languageProvider.locale,
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          localeResolutionCallback: (locale, supportedLocales) {
+            // For Sinhala and Tamil, use English as base locale for Material/Cupertino widgets
+            // but keep the app translations in the selected language
+            if (locale?.languageCode == 'si' || locale?.languageCode == 'ta') {
+              // Return the requested locale - AppLocalizations handles it
+              // Material/Cupertino will fallback to English automatically
+              return locale;
+            }
+
+            // For other locales, check if supported
+            for (var supportedLocale in supportedLocales) {
+              if (supportedLocale.languageCode == locale?.languageCode) {
+                return supportedLocale;
+              }
+            }
+
+            // Default fallback to English
+            return const Locale('en', 'US');
+          },
+        );
+      },
     );
   }
 }

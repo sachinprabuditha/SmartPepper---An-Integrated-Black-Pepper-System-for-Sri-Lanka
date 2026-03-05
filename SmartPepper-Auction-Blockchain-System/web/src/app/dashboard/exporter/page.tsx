@@ -6,6 +6,18 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { auctionApi } from '@/lib/api';
 
+// Helper function to safely format date as locale string
+function safeToLocaleString(dateValue: any): string {
+  if (!dateValue) return 'Date not available';
+  try {
+    const date = new Date(dateValue);
+    if (isNaN(date.getTime())) return 'Invalid date';
+    return date.toLocaleString();
+  } catch (error) {
+    return 'Date error';
+  }
+}
+
 export default function ExporterDashboard() {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
@@ -247,7 +259,7 @@ export default function ExporterDashboard() {
                           ≈ LKR {parseFloat(activity.amountLkr || '0').toLocaleString()}
                         </span>
                         <span className="text-xs">
-                          {new Date(activity.timestamp).toLocaleString()}
+                          {safeToLocaleString(activity.timestamp)}
                         </span>
                       </div>
                     </div>

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smartpepper_mobile/screens/shared/language_settings_screen.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/language_provider.dart';
 import '../../services/storage_service.dart';
 import '../../config/theme.dart';
+import '../../localization/app_localizations.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -12,6 +15,7 @@ class AccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    final languageProvider = context.watch<LanguageProvider>();
     final user = authProvider.user;
 
     return Scaffold(
@@ -19,9 +23,9 @@ class AccountScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppTheme.forestGreen,
         elevation: 0,
-        title: const Text(
-          'Account',
-          style: TextStyle(
+        title: Text(
+          context.tr('label_account'),
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -31,7 +35,7 @@ class AccountScreen extends StatelessWidget {
             icon: const Icon(Icons.edit, color: Colors.white),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Edit profile')),
+                SnackBar(content: Text(context.tr('profile_edit'))),
               );
             },
           ),
@@ -80,7 +84,7 @@ class AccountScreen extends StatelessWidget {
 
                   // Name
                   Text(
-                    user?.name ?? 'User',
+                    user?.name ?? context.tr('label_user'),
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -146,7 +150,7 @@ class AccountScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Verified Account',
+                          context.tr('label_verified_account'),
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.8),
                             fontSize: 12,
@@ -169,7 +173,7 @@ class AccountScreen extends StatelessWidget {
                   Expanded(
                     child: _buildStatCard(
                       icon: Icons.gavel,
-                      label: 'Auctions',
+                      label: context.tr('label_auctions'),
                       value: '12',
                       color: AppTheme.forestGreen,
                     ),
@@ -178,7 +182,7 @@ class AccountScreen extends StatelessWidget {
                   Expanded(
                     child: _buildStatCard(
                       icon: Icons.inventory_2,
-                      label: 'Lots',
+                      label: context.tr('label_lots'),
                       value: '8',
                       color: AppTheme.pepperGold,
                     ),
@@ -187,7 +191,7 @@ class AccountScreen extends StatelessWidget {
                   Expanded(
                     child: _buildStatCard(
                       icon: Icons.monetization_on,
-                      label: 'Bids',
+                      label: context.tr('label_bids'),
                       value: '24',
                       color: AppTheme.forestGreen,
                     ),
@@ -233,9 +237,9 @@ class AccountScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Wallet Address',
-                                  style: TextStyle(
+                                Text(
+                                  context.tr('label_wallet_address'),
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
                                   ),
@@ -255,9 +259,10 @@ class AccountScreen extends StatelessWidget {
                             icon: const Icon(Icons.copy, size: 20),
                             onPressed: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Wallet address copied!'),
-                                  duration: Duration(seconds: 2),
+                                SnackBar(
+                                  content:
+                                      Text(context.tr('message_wallet_copied')),
+                                  duration: const Duration(seconds: 2),
                                 ),
                               );
                             },
@@ -296,10 +301,10 @@ class AccountScreen extends StatelessWidget {
                                 size: 32,
                               ),
                               const SizedBox(width: 12),
-                              const Expanded(
+                              Expanded(
                                 child: Text(
-                                  'Connect Your Wallet',
-                                  style: TextStyle(
+                                  context.tr('label_connect_wallet_title'),
+                                  style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -309,9 +314,9 @@ class AccountScreen extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          const Text(
-                            'Connect your blockchain wallet to participate in auctions and manage pepper lots.',
-                            style: TextStyle(
+                          Text(
+                            context.tr('subtitle_connect_wallet_description'),
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.white70,
                             ),
@@ -331,9 +336,9 @@ class AccountScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              child: const Text(
-                                'Connect Wallet',
-                                style: TextStyle(
+                              child: Text(
+                                context.tr('button_connect_wallet'),
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -353,35 +358,38 @@ class AccountScreen extends StatelessWidget {
               child: Column(
                 children: [
                   _buildMenuSection(
-                    title: 'ACCOUNT',
+                    title: context.tr('section_account'),
                     items: [
                       _buildMenuItem(
                         context,
                         icon: Icons.person,
-                        title: 'Edit Profile',
-                        subtitle: 'Update your personal information',
+                        title: context.tr('menu_edit_profile'),
+                        subtitle: context.tr('subtitle_edit_profile'),
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Edit profile')),
+                            SnackBar(
+                                content: Text(context.tr('menu_edit_profile'))),
                           );
                         },
                       ),
                       _buildMenuItem(
                         context,
                         icon: Icons.lock,
-                        title: 'Change Password',
-                        subtitle: 'Update your password',
+                        title: context.tr('menu_change_password'),
+                        subtitle: context.tr('subtitle_change_password'),
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Change password')),
+                            SnackBar(
+                                content:
+                                    Text(context.tr('menu_change_password'))),
                           );
                         },
                       ),
                       _buildMenuItem(
                         context,
                         icon: Icons.account_balance_wallet,
-                        title: 'Wallet Settings',
-                        subtitle: 'View & export your private key',
+                        title: context.tr('menu_wallet_settings'),
+                        subtitle: context.tr('subtitle_wallet_settings'),
                         onTap: () => _showWalletSettings(context),
                       ),
                     ],
@@ -390,41 +398,48 @@ class AccountScreen extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   _buildMenuSection(
-                    title: 'PREFERENCES',
+                    title: context.tr('section_preferences'),
                     items: [
                       _buildMenuItem(
                         context,
                         icon: Icons.notifications,
-                        title: 'Notifications',
-                        subtitle: 'Manage notification preferences',
+                        title: context.tr('settings_notifications'),
+                        subtitle: context.tr('subtitle_notifications'),
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Notifications')),
+                            SnackBar(
+                                content:
+                                    Text(context.tr('settings_notifications'))),
                           );
                         },
                       ),
                       _buildMenuItem(
                         context,
                         icon: Icons.language,
-                        title: 'Language',
-                        subtitle: 'English',
+                        title: context.tr('settings_language'),
+                        subtitle: languageProvider.currentLanguageName,
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Language settings')),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const LanguageSettingsScreen(),
+                            ),
                           );
                         },
                       ),
                       _buildMenuItem(
                         context,
                         icon: Icons.dark_mode,
-                        title: 'Dark Mode',
-                        subtitle: 'Toggle dark theme',
+                        title: context.tr('menu_dark_mode'),
+                        subtitle: context.tr('subtitle_dark_mode'),
                         trailing: Switch(
                           value: false,
                           onChanged: (value) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Dark mode toggled')),
+                              SnackBar(
+                                  content: Text(
+                                      context.tr('message_dark_mode_toggled'))),
                             );
                           },
                           activeColor: AppTheme.forestGreen,
@@ -436,46 +451,51 @@ class AccountScreen extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   _buildMenuSection(
-                    title: 'SUPPORT',
+                    title: context.tr('section_support'),
                     items: [
                       _buildMenuItem(
                         context,
                         icon: Icons.help,
-                        title: 'Help & Support',
-                        subtitle: 'Get help with SmartPepper',
+                        title: context.tr('menu_help_support'),
+                        subtitle: context.tr('subtitle_help_support'),
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Help & Support')),
+                            SnackBar(
+                                content: Text(context.tr('menu_help_support'))),
                           );
                         },
                       ),
                       _buildMenuItem(
                         context,
                         icon: Icons.description,
-                        title: 'Terms & Conditions',
-                        subtitle: 'Read our terms',
+                        title: context.tr('menu_terms_conditions'),
+                        subtitle: context.tr('subtitle_terms_conditions'),
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Terms & Conditions')),
+                            SnackBar(
+                                content:
+                                    Text(context.tr('menu_terms_conditions'))),
                           );
                         },
                       ),
                       _buildMenuItem(
                         context,
                         icon: Icons.privacy_tip,
-                        title: 'Privacy Policy',
-                        subtitle: 'Read our privacy policy',
+                        title: context.tr('menu_privacy_policy'),
+                        subtitle: context.tr('subtitle_privacy_policy'),
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Privacy Policy')),
+                            SnackBar(
+                                content:
+                                    Text(context.tr('menu_privacy_policy'))),
                           );
                         },
                       ),
                       _buildMenuItem(
                         context,
                         icon: Icons.info,
-                        title: 'About',
-                        subtitle: 'Version 1.0.0',
+                        title: context.tr('menu_about'),
+                        subtitle: context.tr('label_version'),
                         onTap: () {
                           _showAboutDialog(context);
                         },
@@ -516,22 +536,22 @@ class AccountScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 16),
-                          const Expanded(
+                          Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Logout',
-                                  style: TextStyle(
+                                  context.tr('button_logout'),
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.red,
                                   ),
                                 ),
-                                SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
-                                  'Sign out of your account',
-                                  style: TextStyle(
+                                  context.tr('subtitle_logout'),
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
                                   ),
@@ -742,18 +762,18 @@ class AccountScreen extends StatelessWidget {
               child: const Icon(Icons.logout, color: Colors.red),
             ),
             const SizedBox(width: 12),
-            const Text('Logout'),
+            Text(context.tr('button_logout')),
           ],
         ),
-        content: const Text(
-          'Are you sure you want to logout from your account?',
-          style: TextStyle(fontSize: 15),
+        content: Text(
+          context.tr('dialog_logout_confirmation'),
+          style: const TextStyle(fontSize: 15),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Cancel',
+              context.tr('button_cancel'),
               style: TextStyle(color: Colors.grey[600]),
             ),
           ),
@@ -782,8 +802,8 @@ class AccountScreen extends StatelessWidget {
 
                 // Show success message
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Logged out successfully'),
+                  SnackBar(
+                    content: Text(context.tr('message_logged_out')),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -796,7 +816,7 @@ class AccountScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Logout'),
+            child: Text(context.tr('button_logout')),
           ),
         ],
       ),
@@ -850,7 +870,7 @@ class AccountScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(context.tr('button_close')),
           ),
         ],
       ),
@@ -870,11 +890,12 @@ class AccountScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.account_balance_wallet, color: AppTheme.forestGreen),
-              SizedBox(width: 8),
-              Text('Wallet Settings'),
+              const Icon(Icons.account_balance_wallet,
+                  color: AppTheme.forestGreen),
+              const SizedBox(width: 8),
+              Text(context.tr('menu_wallet_settings')),
             ],
           ),
           content: SingleChildScrollView(
@@ -883,9 +904,9 @@ class AccountScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Wallet Address Section
-                const Text(
-                  'Wallet Address',
-                  style: TextStyle(
+                Text(
+                  context.tr('label_wallet_address'),
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
@@ -901,7 +922,8 @@ class AccountScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          user?.walletAddress ?? 'No wallet connected',
+                          user?.walletAddress ??
+                              context.tr('message_no_wallet_connected'),
                           style: const TextStyle(
                             fontSize: 11,
                             fontFamily: 'monospace',
@@ -915,9 +937,10 @@ class AccountScreen extends StatelessWidget {
                             Clipboard.setData(
                                 ClipboardData(text: user!.walletAddress!));
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Address copied!'),
-                                duration: Duration(seconds: 1),
+                              SnackBar(
+                                content:
+                                    Text(context.tr('message_address_copied')),
+                                duration: const Duration(seconds: 1),
                               ),
                             );
                           },
@@ -928,9 +951,9 @@ class AccountScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Private Key Section
-                const Text(
-                  'Private Key',
-                  style: TextStyle(
+                Text(
+                  context.tr('label_private_key'),
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                     color: Colors.red,
@@ -962,9 +985,10 @@ class AccountScreen extends StatelessWidget {
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: privateKey));
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('⚠️ Private key copied!'),
-                                duration: Duration(seconds: 2),
+                              SnackBar(
+                                content: Text(
+                                    context.tr('message_private_key_copied')),
+                                duration: const Duration(seconds: 2),
                                 backgroundColor: Colors.red,
                               ),
                             );
@@ -981,15 +1005,16 @@ class AccountScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.orange.shade200),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.warning, color: Colors.orange, size: 20),
-                        SizedBox(width: 8),
+                        const Icon(Icons.warning,
+                            color: Colors.orange, size: 20),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Never share your private key! Anyone with this key can control your wallet.',
-                            style:
-                                TextStyle(fontSize: 11, color: Colors.orange),
+                            context.tr('warning_private_key'),
+                            style: const TextStyle(
+                                fontSize: 11, color: Colors.orange),
                           ),
                         ),
                       ],
@@ -1002,22 +1027,23 @@ class AccountScreen extends StatelessWidget {
                       color: Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Column(
+                    child: Column(
                       children: [
-                        Icon(Icons.key_off, size: 40, color: Colors.grey),
-                        SizedBox(height: 8),
+                        const Icon(Icons.key_off, size: 40, color: Colors.grey),
+                        const SizedBox(height: 8),
                         Text(
-                          'No private key stored',
-                          style: TextStyle(
+                          context.tr('message_no_private_key'),
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.grey,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          'Import your wallet to store the private key securely on this device.',
+                          context.tr('message_import_wallet_prompt'),
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                          style:
+                              const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -1035,11 +1061,11 @@ class AccountScreen extends StatelessWidget {
                   context.push('/create-lot');
                 },
                 icon: const Icon(Icons.import_export),
-                label: const Text('Import Wallet'),
+                label: Text(context.tr('button_import_wallet')),
               ),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
+              child: Text(context.tr('button_close')),
             ),
           ],
         );

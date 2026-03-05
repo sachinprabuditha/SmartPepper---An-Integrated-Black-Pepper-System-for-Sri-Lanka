@@ -5,6 +5,7 @@ import '../../config/theme.dart';
 import '../../services/api_service.dart';
 import '../../models/lot.dart';
 import '../../providers/auth_provider.dart';
+import '../../localization/app_localizations.dart';
 import '../farmer/create_auction_screen.dart';
 
 class LotDetailsScreen extends StatefulWidget {
@@ -61,7 +62,7 @@ class _LotDetailsScreenState extends State<LotDetailsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF1A2F23),
       appBar: AppBar(
-        title: const Text('Lot Details'),
+        title: Text(context.tr('label_lot_details')),
         backgroundColor: AppTheme.forestGreen,
         actions: [
           IconButton(
@@ -81,7 +82,7 @@ class _LotDetailsScreenState extends State<LotDetailsScreen> {
                           size: 64, color: Colors.red.shade300),
                       const SizedBox(height: 16),
                       Text(
-                        'Error loading lot details',
+                        context.tr('error_loading_lot'),
                         style:
                             TextStyle(fontSize: 18, color: Colors.red.shade300),
                       ),
@@ -94,13 +95,13 @@ class _LotDetailsScreenState extends State<LotDetailsScreen> {
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _loadLotDetails,
-                        child: const Text('Retry'),
+                        child: Text(context.tr('button_retry')),
                       ),
                     ],
                   ),
                 )
               : _lot == null
-                  ? const Center(child: Text('No lot data available'))
+                  ? Center(child: Text(context.tr('message_no_lot_data')))
                   : SingleChildScrollView(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -242,28 +243,31 @@ class _LotDetailsScreenState extends State<LotDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Lot Information',
-              style: TextStyle(
+            Text(
+              context.tr('label_lot_information'),
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
             const Divider(color: Colors.white24, height: 24),
+            _buildDetailRow(context.tr('label_harvest_date'),
+                dateFormat.format(_lot!.harvestDate)),
+            _buildDetailRow(context.tr('label_origin'), _lot!.origin),
             _buildDetailRow(
-                'Harvest Date', dateFormat.format(_lot!.harvestDate)),
-            _buildDetailRow('Origin', _lot!.origin),
-            _buildDetailRow('Farm Location', _lot!.farmLocation),
-            _buildDetailRow('Farmer', _lot!.farmerName),
+                context.tr('label_farm_location'), _lot!.farmLocation),
+            _buildDetailRow(context.tr('label_farmer_name'), _lot!.farmerName),
             if (_lot!.farmerAddress != null)
               _buildDetailRow(
-                'Wallet Address',
+                context.tr('label_wallet_address'),
                 '${_lot!.farmerAddress!.substring(0, 10)}...${_lot!.farmerAddress!.substring(_lot!.farmerAddress!.length - 8)}',
               ),
             _buildDetailRow(
-              'Organic Certified',
-              _lot!.organicCertified ? 'Yes' : 'No',
+              context.tr('label_organic_certified'),
+              _lot!.organicCertified
+                  ? context.tr('label_yes')
+                  : context.tr('label_no'),
             ),
           ],
         ),
@@ -283,9 +287,9 @@ class _LotDetailsScreenState extends State<LotDetailsScreen> {
               children: [
                 const Icon(Icons.link, color: AppTheme.pepperGold),
                 const SizedBox(width: 8),
-                const Text(
-                  'Blockchain Information',
-                  style: TextStyle(
+                Text(
+                  context.tr('label_blockchain_information'),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -341,9 +345,9 @@ class _LotDetailsScreenState extends State<LotDetailsScreen> {
               children: [
                 const Icon(Icons.storage, color: AppTheme.pepperGold),
                 const SizedBox(width: 8),
-                const Text(
-                  'IPFS Storage',
-                  style: TextStyle(
+                Text(
+                  context.tr('label_ipfs_storage'),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -372,27 +376,27 @@ class _LotDetailsScreenState extends State<LotDetailsScreen> {
       case 'pending':
         statusColor = Colors.orange;
         statusIcon = Icons.pending;
-        statusText = 'Pending Approval';
+        statusText = context.tr('status_pending_approval');
         break;
       case 'approved':
         statusColor = AppTheme.sriLankanLeaf;
         statusIcon = Icons.check_circle;
-        statusText = 'Approved';
+        statusText = context.tr('status_approved');
         break;
       case 'rejected':
         statusColor = Colors.red;
         statusIcon = Icons.cancel;
-        statusText = 'Rejected';
+        statusText = context.tr('status_rejected');
         break;
       case 'listed':
         statusColor = Colors.blue;
         statusIcon = Icons.storefront;
-        statusText = 'Listed for Auction';
+        statusText = context.tr('status_listed_auction');
         break;
       case 'sold':
         statusColor = AppTheme.pepperGold;
         statusIcon = Icons.sell;
-        statusText = 'Sold';
+        statusText = context.tr('status_sold');
         break;
       default:
         statusColor = Colors.grey;
@@ -413,7 +417,7 @@ class _LotDetailsScreenState extends State<LotDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Status',
+                    context.tr('label_status'),
                     style: TextStyle(
                       fontSize: 14,
                       color: statusColor.withOpacity(0.8),
@@ -478,9 +482,9 @@ class _LotDetailsScreenState extends State<LotDetailsScreen> {
               children: [
                 const Icon(Icons.gavel, color: AppTheme.pepperGold),
                 const SizedBox(width: 8),
-                const Text(
-                  'Ready for Auction',
-                  style: TextStyle(
+                Text(
+                  context.tr('label_ready_auction'),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -489,9 +493,9 @@ class _LotDetailsScreenState extends State<LotDetailsScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            const Text(
-              'This lot is eligible for auction. Create an auction to start receiving bids from buyers.',
-              style: TextStyle(
+            Text(
+              context.tr('subtitle_lot_eligible_auction'),
+              style: const TextStyle(
                 fontSize: 14,
                 color: Colors.white70,
               ),
@@ -515,14 +519,14 @@ class _LotDetailsScreenState extends State<LotDetailsScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                            'Select lot ${_lot!.lotId} to create an auction'),
+                            '${context.tr('message_select_lot')} ${_lot!.lotId}'),
                         backgroundColor: AppTheme.forestGreen,
                       ),
                     );
                   });
                 },
                 icon: const Icon(Icons.gavel),
-                label: const Text('Create Auction for This Lot'),
+                label: Text(context.tr('button_create_auction_lot')),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.pepperGold,
                   foregroundColor: AppTheme.forestGreen,

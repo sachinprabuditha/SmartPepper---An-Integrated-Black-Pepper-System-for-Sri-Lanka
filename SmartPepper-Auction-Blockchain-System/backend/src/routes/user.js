@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/database');
 const logger = require('../utils/logger');
+const admin = require('firebase-admin');
 
 /**
  * GET /api/users
@@ -9,24 +10,29 @@ const logger = require('../utils/logger');
  */
 router.get('/', async (req, res) => {
   try {
-    const result = await db.query(
-      `SELECT 
-        id,
-        wallet_address as "walletAddress",
-        user_type as role,
-        name,
-        email,
-        phone,
-        verified,
-        created_at as "createdAt",
-        updated_at as "updatedAt"
-      FROM users
-      ORDER BY created_at DESC`
-    );
+    const firestore = db.getDb();
+    const usersSnap = await firestore.collection('users')
+      .orderBy('created_at', 'desc')
+      .get();
+
+    const users = usersSnap.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        walletAddress: data.wallet_address,
+        role: data.user_type || data.role,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        verified: data.verified,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at
+      };
+    });
 
     res.json({
       success: true,
-      users: result.rows
+      users
     });
   } catch (error) {
     logger.error('Error fetching all users:', error);
@@ -45,21 +51,25 @@ router.get('/:address', async (req, res) => {
   try {
     const { address } = req.params;
     
-    const result = await db.query(
-      'SELECT * FROM users WHERE wallet_address = $1',
-      [address]
-    );
+    const firestore = db.getDb();
+    const usersSnap = await firestore.collection('users')
+      .where('wallet_address', '==', address)
+      .limit(1)
+      .get();
 
-    if (result.rows.length === 0) {
+    if (usersSnap.empty) {
       return res.status(404).json({
         success: false,
         error: 'User not found'
       });
     }
 
+    const userDoc = usersSnap.docs[0];
+    const user = { id: userDoc.id, ...userDoc.data() };
+
     res.json({
       success: true,
-      user: result.rows[0]
+      user
     });
   } catch (error) {
     logger.error('Error fetching user:', error);
@@ -92,26 +102,42 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Upsert user
-    const result = await db.query(
-      `INSERT INTO users (
-        wallet_address, user_type, name, email, phone, location
-      ) VALUES ($1, $2, $3, $4, $5, $6)
-      ON CONFLICT (wallet_address) 
-      DO UPDATE SET
-        user_type = EXCLUDED.user_type,
-        name = EXCLUDED.name,
-        email = EXCLUDED.email,
-        phone = EXCLUDED.phone,
-        location = EXCLUDED.location,
-        updated_at = NOW()
-      RETURNING *`,
-      [walletAddress, userType, name, email, phone, JSON.stringify(location)]
-    );
+    const firestore = db.getDb();
+    
+    // Check if user exists
+    const existingUserSnap = await firestore.collection('users')
+      .where('wallet_address', '==', walletAddress)
+      .limit(1)
+      .get();
+
+    let userData = {
+      wallet_address: walletAddress,
+      user_type: userType,
+      name: name || null,
+      email: email || null,
+      phone: phone || null,
+      location: location || null,
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    let user;
+    if (existingUserSnap.empty) {
+      // Create new user
+      userData.created_at = admin.firestore.FieldValue.serverTimestamp();
+      const userRef = await firestore.collection('users').add(userData);
+      const userDoc = await userRef.get();
+      user = { id: userDoc.id, ...userDoc.data() };
+    } else {
+      // Update existing user
+      const userDoc = existingUserSnap.docs[0];
+      await userDoc.ref.update(userData);
+      const updatedDoc = await userDoc.ref.get();
+      user = { id: updatedDoc.id, ...updatedDoc.data() };
+    }
 
     res.status(201).json({
       success: true,
-      user: result.rows[0]
+      user
     });
   } catch (error) {
     logger.error('Error creating/updating user:', error);
@@ -131,61 +157,40 @@ router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { name, email, phone, role, verified } = req.body;
 
-    const updates = [];
-    const values = [];
-    let paramCount = 1;
+    const updates = {};
+    if (name !== undefined) updates.name = name;
+    if (email !== undefined) updates.email = email;
+    if (phone !== undefined) updates.phone = phone;
+    if (role !== undefined) updates.user_type = role;
+    if (verified !== undefined) updates.verified = verified;
 
-    if (name !== undefined) {
-      updates.push(`name = $${paramCount}`);
-      values.push(name);
-      paramCount++;
-    }
-    if (email !== undefined) {
-      updates.push(`email = $${paramCount}`);
-      values.push(email);
-      paramCount++;
-    }
-    if (phone !== undefined) {
-      updates.push(`phone = $${paramCount}`);
-      values.push(phone);
-      paramCount++;
-    }
-    if (role !== undefined) {
-      updates.push(`user_type = $${paramCount}`);
-      values.push(role);
-      paramCount++;
-    }
-    if (verified !== undefined) {
-      updates.push(`verified = $${paramCount}`);
-      values.push(verified);
-      paramCount++;
-    }
-
-    if (updates.length === 0) {
+    if (Object.keys(updates).length === 0) {
       return res.status(400).json({
         success: false,
         error: 'No fields to update'
       });
     }
 
-    updates.push(`updated_at = NOW()`);
-    values.push(id);
+    updates.updated_at = admin.firestore.FieldValue.serverTimestamp();
 
-    const result = await db.query(
-      `UPDATE users SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
-      values
-    );
+    const firestore = db.getDb();
+    const userRef = firestore.collection('users').doc(id);
+    const userDoc = await userRef.get();
 
-    if (result.rows.length === 0) {
+    if (!userDoc.exists) {
       return res.status(404).json({
         success: false,
         error: 'User not found'
       });
     }
 
+    await userRef.update(updates);
+    const updatedDoc = await userRef.get();
+    const user = { id: updatedDoc.id, ...updatedDoc.data() };
+
     res.json({
       success: true,
-      user: result.rows[0]
+      user
     });
   } catch (error) {
     logger.error('Error updating user:', error);
@@ -203,17 +208,18 @@ router.put('/:id', async (req, res) => {
 router.get('/:id/blockchain', async (req, res) => {
   try {
     const { id } = req.params;
+    const firestore = db.getDb();
 
     // Get user
-    const userResult = await db.query('SELECT * FROM users WHERE id = $1', [id]);
-    if (userResult.rows.length === 0) {
+    const userDoc = await firestore.collection('users').doc(id).get();
+    if (!userDoc.exists) {
       return res.status(404).json({
         success: false,
         error: 'User not found'
       });
     }
 
-    const user = userResult.rows[0];
+    const user = userDoc.data();
     const walletAddress = user.wallet_address || user.walletAddress;
 
     if (!walletAddress) {
@@ -230,30 +236,27 @@ router.get('/:id/blockchain', async (req, res) => {
     }
 
     // Get auctions created by user (if farmer)
-    const auctionsResult = await db.query(
-      'SELECT COUNT(*) as count FROM auctions WHERE farmer_address = $1',
-      [walletAddress]
-    );
+    const auctionsSnap = await firestore.collection('auctions')
+      .where('farmer_address', '==', walletAddress)
+      .get();
 
     // Get bids placed by user (if exporter)
-    const bidsResult = await db.query(
-      'SELECT COUNT(*) as count FROM bids WHERE bidder_address = $1',
-      [walletAddress]
-    );
+    const bidsSnap = await firestore.collection('bids')
+      .where('bidder_address', '==', walletAddress)
+      .get();
 
     // Get NFT passports
-    const passportsResult = await db.query(
-      'SELECT COUNT(*) as count FROM nft_passports WHERE owner_address = $1',
-      [walletAddress]
-    );
+    const passportsSnap = await firestore.collection('nft_passports')
+      .where('owner_address', '==', walletAddress)
+      .get();
 
     res.json({
       success: true,
       data: {
         walletAddress,
-        auctionsCreated: parseInt(auctionsResult.rows[0]?.count || 0),
-        bidsPlaced: parseInt(bidsResult.rows[0]?.count || 0),
-        nftPassports: parseInt(passportsResult.rows[0]?.count || 0)
+        auctionsCreated: auctionsSnap.size,
+        bidsPlaced: bidsSnap.size,
+        nftPassports: passportsSnap.size
       }
     });
   } catch (error) {

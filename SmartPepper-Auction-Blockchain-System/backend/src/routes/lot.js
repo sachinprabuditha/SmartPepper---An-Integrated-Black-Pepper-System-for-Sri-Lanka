@@ -2,6 +2,40 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/database');
 const logger = require('../utils/logger');
+const admin = require('firebase-admin');
+
+/**
+ * Helper function to convert Firestore Timestamps to ISO strings
+ */
+const convertTimestamps = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  
+  const converted = Array.isArray(obj) ? [] : {};
+  
+  for (const key in obj) {
+    const value = obj[key];
+    
+    // Check if it's a Firestore Timestamp
+    if (value && typeof value === 'object' && '_seconds' in value && '_nanoseconds' in value) {
+      // Convert to ISO string
+      const date = new Date(value._seconds * 1000 + value._nanoseconds / 1000000);
+      converted[key] = date.toISOString();
+    } else if (value && typeof value.toDate === 'function') {
+      // Firestore Timestamp object with toDate method
+      converted[key] = value.toDate().toISOString();
+    } else if (Array.isArray(value)) {
+      // Recursively convert arrays
+      converted[key] = value.map(item => convertTimestamps(item));
+    } else if (value && typeof value === 'object') {
+      // Recursively convert nested objects
+      converted[key] = convertTimestamps(value);
+    } else {
+      converted[key] = value;
+    }
+  }
+  
+  return converted;
+};
 
 /**
  * GET /api/lots
@@ -11,48 +45,57 @@ router.get('/', async (req, res) => {
   try {
     const { status, farmer, limit = 50, offset = 0 } = req.query;
     
-    let query = 'SELECT * FROM pepper_lots WHERE 1=1';
-    let countQuery = 'SELECT COUNT(*) FROM pepper_lots WHERE 1=1';
-    const params = [];
-    const countParams = [];
-    let paramIndex = 1;
-    let countParamIndex = 1;
+    const firestore = db.getDb();
+    let query = firestore.collection('pepper_lots');
+    let countQuery = firestore.collection('pepper_lots');
 
+    // Apply filters
     if (status) {
-      query += ` AND status = $${paramIndex++}`;
-      countQuery += ` AND status = $${countParamIndex++}`;
-      params.push(status);
-      countParams.push(status);
+      query = query.where('status', '==', status);
+      countQuery = countQuery.where('status', '==', status);
     }
 
     if (farmer) {
-      query += ` AND LOWER(farmer_address) = LOWER($${paramIndex++})`;
-      countQuery += ` AND LOWER(farmer_address) = LOWER($${countParamIndex++})`;
-      params.push(farmer);
-      countParams.push(farmer);
-      logger.info('Filtering lots by farmer:', { farmer, farmerLower: farmer.toLowerCase() });
+      // Check if farmer is a wallet address (starts with 0x) or a user ID
+      if (farmer.startsWith('0x')) {
+        // Filter by wallet address
+        const farmerLower = farmer.toLowerCase();
+        query = query.where('farmer_address_lower', '==', farmerLower);
+        countQuery = countQuery.where('farmer_address_lower', '==', farmerLower);
+        logger.info('Filtering lots by wallet address:', { farmer, farmerLower });
+      } else {
+        // Filter by user ID (farmer_id)
+        query = query.where('farmer_id', '==', farmer);
+        countQuery = countQuery.where('farmer_id', '==', farmer);
+        logger.info('Filtering lots by farmer ID:', { farmer });
+      }
     }
 
-    query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
-    params.push(limit, offset);
+    // Get count
+    const countSnap = await countQuery.get();
+    const count = countSnap.size;
 
-    logger.info('Executing lot query:', { query, params });
+    // Get paginated results
+    query = query.orderBy('created_at', 'desc')
+      .limit(parseInt(limit))
+      .offset(parseInt(offset));
     
-    const [result, countResult] = await Promise.all([
-      db.query(query, params),
-      db.query(countQuery, countParams)
-    ]);
+    const lotsSnap = await query.get();
+    const lots = lotsSnap.docs.map(doc => {
+      const data = doc.data();
+      return convertTimestamps({ id: doc.id, ...data });
+    });
 
     logger.info('Query results:', { 
-      count: parseInt(countResult.rows[0].count),
-      lotsReturned: result.rows.length,
-      firstLot: result.rows[0] ? { lot_id: result.rows[0].lot_id, farmer: result.rows[0].farmer_address } : null
+      count,
+      lotsReturned: lots.length,
+      firstLot: lots[0] ? { lot_id: lots[0].lot_id, farmer: lots[0].farmer_address } : null
     });
 
     res.json({
       success: true,
-      count: parseInt(countResult.rows[0].count),
-      lots: result.rows
+      count,
+      lots
     });
   } catch (error) {
     logger.error('Error fetching lots:', error);
@@ -71,21 +114,25 @@ router.get('/:lotId', async (req, res) => {
   try {
     const { lotId } = req.params;
     
-    const result = await db.query(
-      'SELECT * FROM pepper_lots WHERE lot_id = $1',
-      [lotId]
-    );
+    const firestore = db.getDb();
+    const lotsSnap = await firestore.collection('pepper_lots')
+      .where('lot_id', '==', lotId)
+      .limit(1)
+      .get();
 
-    if (result.rows.length === 0) {
+    if (lotsSnap.empty) {
       return res.status(404).json({
         success: false,
         error: 'Lot not found'
       });
     }
 
+    const lotDoc = lotsSnap.docs[0];
+    const lot = convertTimestamps({ id: lotDoc.id, ...lotDoc.data() });
+
     res.json({
       success: true,
-      lot: result.rows[0]
+      lot
     });
   } catch (error) {
     logger.error('Error fetching lot:', error);
@@ -105,6 +152,9 @@ router.post('/', async (req, res) => {
     const {
       lotId,
       farmerAddress,
+      farmerName,
+      farmerEmail,
+      farmerPhone,
       variety,
       quantity,
       quality,
@@ -130,7 +180,10 @@ router.post('/', async (req, res) => {
 
     logger.info('Creating new lot:', { 
       lotId, 
-      farmerAddress, 
+      farmerAddress,
+      farmerName,
+      farmerEmail,
+      farmerPhone,
       variety, 
       quantity,
       origin,
@@ -139,69 +192,98 @@ router.post('/', async (req, res) => {
       certificateImages: certificateImages ? certificateImages.length : 0
     });
 
+    const firestore = db.getDb();
+    const farmerLower = farmerAddress.toLowerCase();
+
     // Get or create farmer (case-insensitive lookup)
-    let farmerResult = await db.query(
-      'SELECT id FROM users WHERE LOWER(wallet_address) = LOWER($1)',
-      [farmerAddress]
-    );
+    const farmerSnap = await firestore.collection('users')
+      .where('wallet_address_lower', '==', farmerLower)
+      .limit(1)
+      .get();
 
     let farmerId;
-    if (farmerResult.rows.length === 0) {
-      // Create new farmer user
-      logger.info('Creating new farmer user:', { farmerAddress });
-      const newFarmer = await db.query(
-        `INSERT INTO users (wallet_address, user_type)
-         VALUES ($1, $2)
-         RETURNING id`,
-        [farmerAddress, 'farmer']
-      );
-      farmerId = newFarmer.rows[0].id;
+    if (farmerSnap.empty) {
+      // Create new farmer user with provided details
+      logger.info('Creating new farmer user:', { farmerAddress, farmerName, farmerEmail, farmerPhone });
+      const newFarmerData = {
+        name: farmerName || 'Unknown Farmer',
+        wallet_address: farmerAddress,
+        wallet_address_lower: farmerLower,
+        user_type: 'farmer',
+        created_at: admin.firestore.FieldValue.serverTimestamp(),
+        updated_at: admin.firestore.FieldValue.serverTimestamp()
+      };
+      
+      // Add optional fields if provided
+      if (farmerEmail) newFarmerData.email = farmerEmail;
+      if (farmerPhone) newFarmerData.phone = farmerPhone;
+      
+      const newFarmerRef = await firestore.collection('users').add(newFarmerData);
+      farmerId = newFarmerRef.id;
       logger.info('New farmer created with ID:', farmerId);
     } else {
-      farmerId = farmerResult.rows[0].id;
+      farmerId = farmerSnap.docs[0].id;
       logger.info('Found existing farmer with ID:', farmerId);
+      
+      // Update farmer details if provided and different
+      const existingFarmer = farmerSnap.docs[0].data();
+      const updates = {};
+      
+      if (farmerName && existingFarmer.name !== farmerName) {
+        updates.name = farmerName;
+      }
+      if (farmerEmail && existingFarmer.email !== farmerEmail) {
+        updates.email = farmerEmail;
+      }
+      if (farmerPhone && existingFarmer.phone !== farmerPhone) {
+        updates.phone = farmerPhone;
+      }
+      
+      if (Object.keys(updates).length > 0) {
+        updates.updated_at = admin.firestore.FieldValue.serverTimestamp();
+        await firestore.collection('users').doc(farmerId).update(updates);
+        logger.info('Updated farmer details:', { farmerId, updates });
+      }
     }
 
     // Insert lot
-    const result = await db.query(
-      `INSERT INTO pepper_lots (
-        lot_id, farmer_id, farmer_address, variety, quantity,
-        quality, harvest_date, origin, farm_location, organic_certified,
-        metadata_uri, certificate_hash, certificate_ipfs_url,
-        lot_pictures, certificate_images, blockchain_tx_hash, status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-      RETURNING *`,
-      [
-        lotId,
-        farmerId,
-        farmerAddress,
-        variety,
-        quantity,
-        quality,
-        harvestDate,
-        origin,
-        farmLocation,
-        organicCertified || false,
-        metadataURI,
-        certificateHash,
-        certificateIpfsUrl,
-        lotPictures ? JSON.stringify(lotPictures) : '[]',
-        certificateImages ? JSON.stringify(certificateImages) : '[]',
-        txHash,
-        'available'
-      ]
-    );
+    const lotData = {
+      lot_id: lotId,
+      farmer_id: farmerId,
+      farmer_address: farmerAddress,
+      farmer_address_lower: farmerLower,
+      variety,
+      quantity,
+      quality: quality || null,
+      harvest_date: harvestDate || null,
+      origin: origin || null,
+      farm_location: farmLocation || null,
+      organic_certified: organicCertified || false,
+      metadata_uri: metadataURI || null,
+      certificate_hash: certificateHash || null,
+      certificate_ipfs_url: certificateIpfsUrl || null,
+      lot_pictures: lotPictures || [],
+      certificate_images: certificateImages || [],
+      blockchain_tx_hash: txHash || null,
+      status: 'available',
+      created_at: admin.firestore.FieldValue.serverTimestamp(),
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    const lotRef = await firestore.collection('pepper_lots').add(lotData);
+    const lotDoc = await lotRef.get();
+    const lot = { id: lotDoc.id, ...lotDoc.data() };
 
     logger.info('✅ Lot created successfully:', { 
       lotId, 
       farmerAddress, 
       farmer_id: farmerId,
-      lot_db_id: result.rows[0].id 
+      lot_db_id: lot.id 
     });
 
     res.status(201).json({
       success: true,
-      lot: result.rows[0],
+      lot,
       message: 'Lot created successfully'
     });
   } catch (error) {
@@ -223,21 +305,23 @@ router.get('/farmer/:address', async (req, res) => {
     const { address } = req.params;
     const { compliance_status } = req.query;
     
-    let query = 'SELECT * FROM pepper_lots WHERE LOWER(farmer_address) = LOWER($1)';
-    const params = [address];
+    const firestore = db.getDb();
+    const addressLower = address.toLowerCase();
+    let query = firestore.collection('pepper_lots')
+      .where('farmer_address_lower', '==', addressLower);
     
     if (compliance_status) {
-      query += ' AND compliance_status = $2';
-      params.push(compliance_status);
+      query = query.where('compliance_status', '==', compliance_status);
     }
     
-    query += ' ORDER BY created_at DESC';
+    query = query.orderBy('created_at', 'desc');
     
-    const result = await db.query(query, params);
+    const lotsSnap = await query.get();
+    const lots = lotsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     
     res.json({
       success: true,
-      lots: result.rows
+      lots
     });
   } catch (error) {
     logger.error('Error fetching farmer lots:', error);

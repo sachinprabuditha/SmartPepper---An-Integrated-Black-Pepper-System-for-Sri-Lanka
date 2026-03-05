@@ -18,6 +18,7 @@ const certificationsRoutes = require('./routes/certifications');
 const adminRoutes = require('./routes/admin');
 const governanceRoutes = require('./routes/governance');
 const escrowRoutes = require('./routes/escrow');
+const notificationsRoutes = require('./routes/notifications');
 const { startAuctionStatusMonitor } = require('./services/auctionStatusService');
 
 // Load NFT routes with error handling
@@ -64,6 +65,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/auctions', auctionRoutes);
 app.use('/api/lots', lotRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/notifications', notificationsRoutes);
 app.use('/api/compliance', complianceRoutes);
 app.use('/api/processing', processingRoutes);
 app.use('/api/certifications', certificationsRoutes);
@@ -105,9 +107,11 @@ async function initialize() {
       dbConnected = true;
       if (db.isMock) {
         logger.info('✅ Database: Using MOCK in-memory database (test data available)');
-        logger.info('💡 To use PostgreSQL, set DB_PASSWORD in .env file');
+        logger.info('💡 To use Firebase, set FIREBASE_PROJECT_ID or FIREBASE_SERVICE_ACCOUNT in .env file');
+      } else if (db.isFirebase) {
+        logger.info('✅ Database: Firebase Firestore connected');
       } else {
-        logger.info('✅ Database: PostgreSQL connected');
+        logger.info('✅ Database: Connected');
       }
     } catch (dbError) {
       logger.warn('Database connection failed (continuing without DB):', dbError.message);
@@ -121,9 +125,9 @@ async function initialize() {
       });
       
       await redisClient.connect();
-      logger.info('Redis connected');
+      logger.info('✅ Redis connected - Real-time WebSocket features enabled');
     } catch (redisError) {
-      logger.warn('Redis connection failed (continuing without Redis):', redisError.message);
+      logger.info('ℹ️  Redis not configured - WebSocket real-time updates disabled (optional)');
       redisClient = null;
     }
 
@@ -134,6 +138,15 @@ async function initialize() {
       logger.info('Blockchain service initialized');
     } catch (blockchainError) {
       logger.warn('Blockchain service initialization failed (continuing without blockchain):', blockchainError.message);
+    }
+
+    // Initialize auction finalization service
+    try {
+      const auctionFinalizationService = require('./services/auctionFinalizationService');
+      await auctionFinalizationService.initialize();
+      logger.info('✅ Auction Finalization Service initialized');
+    } catch (finalizationError) {
+      logger.warn('⚠️ Auction Finalization Service initialization failed:', finalizationError.message);
     }
 
     // Start auction status monitor if database is connected
@@ -150,16 +163,20 @@ async function initialize() {
       }
     });
     
-    // Make io available to routes
+    // Make io available to routes and services
     app.set('io', io);
+    global.io = io; // Make available to finalization service
+    
+    // Initialize WebSocket (works with or without Redis)
+    const auctionSocket = new AuctionWebSocket(io, redisClient);
+    auctionSocket.initialize();
+    app.set('auctionSocket', auctionSocket); // Make available to routes
     
     if (redisClient) {
-      const auctionSocket = new AuctionWebSocket(io, redisClient);
-      auctionSocket.initialize();
-      app.set('auctionSocket', auctionSocket); // Make available to routes
-      logger.info('WebSocket server initialized');
+      logger.info('✅ WebSocket server initialized with Redis caching');
     } else {
-      logger.warn('WebSocket not initialized (Redis unavailable)');
+      logger.info('✅ WebSocket server initialized (without Redis caching)');
+      logger.info('💡 For Redis caching, set REDIS_HOST and REDIS_PORT in .env');
     }
 
     // Start server
@@ -168,7 +185,7 @@ async function initialize() {
       logger.info(`🚀 Server running on port ${PORT}`);
       logger.info(`🌍 Environment: ${process.env.NODE_ENV}`);
       logger.info('📊 Services status:', {
-        database: dbConnected ? (db.isMock ? 'MOCK (in-memory)' : 'PostgreSQL') : 'disabled',
+        database: dbConnected ? (db.isMock ? 'MOCK (in-memory)' : (db.isFirebase ? 'Firebase Firestore' : 'Connected')) : 'disabled',
         redis: redisClient !== null ? 'connected' : 'disabled',
         websocket: redisClient !== null ? 'enabled' : 'disabled'
       });
