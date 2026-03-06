@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/season_model.dart';
 import '../../plantation/controllers/plantation_controller.dart';
-import '../../plantation/models/farm_record_model.dart';
+import '../../agronomy/providers/language_provider.dart';
 
 class SeasonCard extends ConsumerWidget {
   final SeasonModel season;
@@ -16,6 +16,7 @@ class SeasonCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(languageProvider);
     final farmAsync = ref.watch(farmProvider(season.farmId));
 
     return Card(
@@ -219,7 +220,7 @@ class SeasonCard extends ConsumerWidget {
                           context,
                           Icons.location_on,
                           'District',
-                          farm.district,
+                          farm.district.get(lang),
                           Colors.blue,
                         ),
                       ),

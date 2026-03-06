@@ -6,30 +6,199 @@
         "steps": [
             {
                 "stepNumber": 1,
-                "title": "Support Establishment",
-                "details": "Plant Gliricidia sepium supports 12 months before pepper planting."
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
             },
             {
                 "stepNumber": 2,
-                "title": "Pit Preparation",
-                "details": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure."
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
             }
         ]
     },
-    "kandy_clay_loam_var_iw_5": {
+    "kandy_loamy_var_gk_49": {
         "districtId": "kandy",
-        "soilTypeId": "clay_loam",
-        "varietyId": "var_iw_5",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
         "steps": [
             {
                 "stepNumber": 1,
-                "title": "Drainage Management",
-                "details": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils."
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
             },
             {
                 "stepNumber": 2,
-                "title": "Soil Amendment",
-                "details": "Mix sand and organic matter into the pit to improve aeration."
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kandy_loamy_var_dingi_rala": {
+        "districtId": "kandy",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kandy_loamy_var_bootawe_rala": {
+        "districtId": "kandy",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kandy_loamy_var_kohukumbure_rala": {
+        "districtId": "kandy",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kandy_clay_loam_var_gk_49": {
+        "districtId": "kandy",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Drainage Management",
+                    "si": "ජල පද්ධති කළමනාකරණය"
+                },
+                "details": {
+                    "en": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils.",
+                    "si": "මැටි පසවල ජලය රැඳීම වැළැක්වීමට නිසි ජල පාවහන් නාලිකා සකස් කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Soil Amendment",
+                    "si": "පස සංශෝධනය"
+                },
+                "details": {
+                    "en": "Mix sand and organic matter into the pit to improve aeration.",
+                    "si": "පසට වායු ගමන් වැඩි කිරීමට වැලි සහ ජෛව ද්‍රව්‍ය වළට මිශ්‍ර කරන්න."
+                }
+            }
+        ]
+    },
+    "kandy_clay_loam_var_bootawe_rala": {
+        "districtId": "kandy",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Drainage Management",
+                    "si": "ජල පද්ධති කළමනාකරණය"
+                },
+                "details": {
+                    "en": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils.",
+                    "si": "මැටි පසවල ජලය රැඳීම වැළැක්වීමට නිසි ජල පාවහන් නාලිකා සකස් කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Soil Amendment",
+                    "si": "පස සංශෝධනය"
+                },
+                "details": {
+                    "en": "Mix sand and organic matter into the pit to improve aeration.",
+                    "si": "පසට වායු ගමන් වැඩි කිරීමට වැලි සහ ජෛව ද්‍රව්‍ය වළට මිශ්‍ර කරන්න."
+                }
             }
         ]
     },
@@ -40,13 +209,2403 @@
         "steps": [
             {
                 "stepNumber": 1,
-                "title": "Soil Enrichment",
-                "details": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils."
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
             },
             {
                 "stepNumber": 2,
-                "title": "Planting",
-                "details": "Plant cuttings with high orthotropic vigor."
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "kandy_red_yellow_podzolic_var_dingi_rala": {
+        "districtId": "kandy",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "kandy_red_yellow_podzolic_var_bootawe_rala": {
+        "districtId": "kandy",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "kandy_red_yellow_podzolic_var_kohukumbure_rala": {
+        "districtId": "kandy",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "matale_loamy_var_panniyur_1": {
+        "districtId": "matale",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "matale_loamy_var_gk_49": {
+        "districtId": "matale",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "matale_loamy_var_dingi_rala": {
+        "districtId": "matale",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "matale_loamy_var_bootawe_rala": {
+        "districtId": "matale",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "matale_loamy_var_kohukumbure_rala": {
+        "districtId": "matale",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "matale_clay_loam_var_gk_49": {
+        "districtId": "matale",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Drainage Management",
+                    "si": "ජල පද්ධති කළමනාකරණය"
+                },
+                "details": {
+                    "en": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils.",
+                    "si": "මැටි පසවල ජලය රැඳීම වැළැක්වීමට නිසි ජල පාවහන් නාලිකා සකස් කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Soil Amendment",
+                    "si": "පස සංශෝධනය"
+                },
+                "details": {
+                    "en": "Mix sand and organic matter into the pit to improve aeration.",
+                    "si": "පසට වායු ගමන් වැඩි කිරීමට වැලි සහ ජෛව ද්‍රව්‍ය වළට මිශ්‍ර කරන්න."
+                }
+            }
+        ]
+    },
+    "matale_clay_loam_var_bootawe_rala": {
+        "districtId": "matale",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Drainage Management",
+                    "si": "ජල පද්ධති කළමනාකරණය"
+                },
+                "details": {
+                    "en": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils.",
+                    "si": "මැටි පසවල ජලය රැඳීම වැළැක්වීමට නිසි ජල පාවහන් නාලිකා සකස් කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Soil Amendment",
+                    "si": "පස සංශෝධනය"
+                },
+                "details": {
+                    "en": "Mix sand and organic matter into the pit to improve aeration.",
+                    "si": "පසට වායු ගමන් වැඩි කිරීමට වැලි සහ ජෛව ද්‍රව්‍ය වළට මිශ්‍ර කරන්න."
+                }
+            }
+        ]
+    },
+    "matale_red_yellow_podzolic_var_gk_49": {
+        "districtId": "matale",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "matale_red_yellow_podzolic_var_dingi_rala": {
+        "districtId": "matale",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "matale_red_yellow_podzolic_var_bootawe_rala": {
+        "districtId": "matale",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "matale_red_yellow_podzolic_var_kohukumbure_rala": {
+        "districtId": "matale",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "ratnapura_loamy_var_panniyur_1": {
+        "districtId": "ratnapura",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "ratnapura_loamy_var_gk_49": {
+        "districtId": "ratnapura",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "ratnapura_loamy_var_dingi_rala": {
+        "districtId": "ratnapura",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "ratnapura_loamy_var_bootawe_rala": {
+        "districtId": "ratnapura",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "ratnapura_loamy_var_kohukumbure_rala": {
+        "districtId": "ratnapura",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "ratnapura_clay_loam_var_gk_49": {
+        "districtId": "ratnapura",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Drainage Management",
+                    "si": "ජල පද්ධති කළමනාකරණය"
+                },
+                "details": {
+                    "en": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils.",
+                    "si": "මැටි පසවල ජලය රැඳීම වැළැක්වීමට නිසි ජල පාවහන් නාලිකා සකස් කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Soil Amendment",
+                    "si": "පස සංශෝධනය"
+                },
+                "details": {
+                    "en": "Mix sand and organic matter into the pit to improve aeration.",
+                    "si": "පසට වායු ගමන් වැඩි කිරීමට වැලි සහ ජෛව ද්‍රව්‍ය වළට මිශ්‍ර කරන්න."
+                }
+            }
+        ]
+    },
+    "ratnapura_clay_loam_var_bootawe_rala": {
+        "districtId": "ratnapura",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Drainage Management",
+                    "si": "ජල පද්ධති කළමනාකරණය"
+                },
+                "details": {
+                    "en": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils.",
+                    "si": "මැටි පසවල ජලය රැඳීම වැළැක්වීමට නිසි ජල පාවහන් නාලිකා සකස් කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Soil Amendment",
+                    "si": "පස සංශෝධනය"
+                },
+                "details": {
+                    "en": "Mix sand and organic matter into the pit to improve aeration.",
+                    "si": "පසට වායු ගමන් වැඩි කිරීමට වැලි සහ ජෛව ද්‍රව්‍ය වළට මිශ්‍ර කරන්න."
+                }
+            }
+        ]
+    },
+    "ratnapura_red_yellow_podzolic_var_gk_49": {
+        "districtId": "ratnapura",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "ratnapura_red_yellow_podzolic_var_dingi_rala": {
+        "districtId": "ratnapura",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "ratnapura_red_yellow_podzolic_var_bootawe_rala": {
+        "districtId": "ratnapura",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "ratnapura_red_yellow_podzolic_var_kohukumbure_rala": {
+        "districtId": "ratnapura",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "kegalle_loamy_var_panniyur_1": {
+        "districtId": "kegalle",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kegalle_loamy_var_gk_49": {
+        "districtId": "kegalle",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kegalle_loamy_var_dingi_rala": {
+        "districtId": "kegalle",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kegalle_loamy_var_bootawe_rala": {
+        "districtId": "kegalle",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kegalle_loamy_var_kohukumbure_rala": {
+        "districtId": "kegalle",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kegalle_clay_loam_var_gk_49": {
+        "districtId": "kegalle",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Drainage Management",
+                    "si": "ජල පද්ධති කළමනාකරණය"
+                },
+                "details": {
+                    "en": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils.",
+                    "si": "මැටි පසවල ජලය රැඳීම වැළැක්වීමට නිසි ජල පාවහන් නාලිකා සකස් කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Soil Amendment",
+                    "si": "පස සංශෝධනය"
+                },
+                "details": {
+                    "en": "Mix sand and organic matter into the pit to improve aeration.",
+                    "si": "පසට වායු ගමන් වැඩි කිරීමට වැලි සහ ජෛව ද්‍රව්‍ය වළට මිශ්‍ර කරන්න."
+                }
+            }
+        ]
+    },
+    "kegalle_clay_loam_var_bootawe_rala": {
+        "districtId": "kegalle",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Drainage Management",
+                    "si": "ජල පද්ධති කළමනාකරණය"
+                },
+                "details": {
+                    "en": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils.",
+                    "si": "මැටි පසවල ජලය රැඳීම වැළැක්වීමට නිසි ජල පාවහන් නාලිකා සකස් කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Soil Amendment",
+                    "si": "පස සංශෝධනය"
+                },
+                "details": {
+                    "en": "Mix sand and organic matter into the pit to improve aeration.",
+                    "si": "පසට වායු ගමන් වැඩි කිරීමට වැලි සහ ජෛව ද්‍රව්‍ය වළට මිශ්‍ර කරන්න."
+                }
+            }
+        ]
+    },
+    "kegalle_red_yellow_podzolic_var_gk_49": {
+        "districtId": "kegalle",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "kegalle_red_yellow_podzolic_var_dingi_rala": {
+        "districtId": "kegalle",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "kegalle_red_yellow_podzolic_var_bootawe_rala": {
+        "districtId": "kegalle",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "kegalle_red_yellow_podzolic_var_kohukumbure_rala": {
+        "districtId": "kegalle",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "nuwara_eliya_loamy_var_panniyur_1": {
+        "districtId": "nuwara_eliya",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "nuwara_eliya_loamy_var_gk_49": {
+        "districtId": "nuwara_eliya",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "nuwara_eliya_loamy_var_dingi_rala": {
+        "districtId": "nuwara_eliya",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "nuwara_eliya_loamy_var_bootawe_rala": {
+        "districtId": "nuwara_eliya",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "nuwara_eliya_loamy_var_kohukumbure_rala": {
+        "districtId": "nuwara_eliya",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "nuwara_eliya_clay_loam_var_gk_49": {
+        "districtId": "nuwara_eliya",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Drainage Management",
+                    "si": "ජල පද්ධති කළමනාකරණය"
+                },
+                "details": {
+                    "en": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils.",
+                    "si": "මැටි පසවල ජලය රැඳීම වැළැක්වීමට නිසි ජල පාවහන් නාලිකා සකස් කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Soil Amendment",
+                    "si": "පස සංශෝධනය"
+                },
+                "details": {
+                    "en": "Mix sand and organic matter into the pit to improve aeration.",
+                    "si": "පසට වායු ගමන් වැඩි කිරීමට වැලි සහ ජෛව ද්‍රව්‍ය වළට මිශ්‍ර කරන්න."
+                }
+            }
+        ]
+    },
+    "nuwara_eliya_clay_loam_var_bootawe_rala": {
+        "districtId": "nuwara_eliya",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Drainage Management",
+                    "si": "ජල පද්ධති කළමනාකරණය"
+                },
+                "details": {
+                    "en": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils.",
+                    "si": "මැටි පසවල ජලය රැඳීම වැළැක්වීමට නිසි ජල පාවහන් නාලිකා සකස් කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Soil Amendment",
+                    "si": "පස සංශෝධනය"
+                },
+                "details": {
+                    "en": "Mix sand and organic matter into the pit to improve aeration.",
+                    "si": "පසට වායු ගමන් වැඩි කිරීමට වැලි සහ ජෛව ද්‍රව්‍ය වළට මිශ්‍ර කරන්න."
+                }
+            }
+        ]
+    },
+    "nuwara_eliya_red_yellow_podzolic_var_gk_49": {
+        "districtId": "nuwara_eliya",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "nuwara_eliya_red_yellow_podzolic_var_dingi_rala": {
+        "districtId": "nuwara_eliya",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "nuwara_eliya_red_yellow_podzolic_var_bootawe_rala": {
+        "districtId": "nuwara_eliya",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "nuwara_eliya_red_yellow_podzolic_var_kohukumbure_rala": {
+        "districtId": "nuwara_eliya",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "badulla_loamy_var_panniyur_1": {
+        "districtId": "badulla",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "badulla_loamy_var_gk_49": {
+        "districtId": "badulla",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "badulla_loamy_var_dingi_rala": {
+        "districtId": "badulla",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "badulla_loamy_var_bootawe_rala": {
+        "districtId": "badulla",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "badulla_loamy_var_kohukumbure_rala": {
+        "districtId": "badulla",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "badulla_clay_loam_var_gk_49": {
+        "districtId": "badulla",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Drainage Management",
+                    "si": "ජල පද්ධති කළමනාකරණය"
+                },
+                "details": {
+                    "en": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils.",
+                    "si": "මැටි පසවල ජලය රැඳීම වැළැක්වීමට නිසි ජල පාවහන් නාලිකා සකස් කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Soil Amendment",
+                    "si": "පස සංශෝධනය"
+                },
+                "details": {
+                    "en": "Mix sand and organic matter into the pit to improve aeration.",
+                    "si": "පසට වායු ගමන් වැඩි කිරීමට වැලි සහ ජෛව ද්‍රව්‍ය වළට මිශ්‍ර කරන්න."
+                }
+            }
+        ]
+    },
+    "badulla_clay_loam_var_bootawe_rala": {
+        "districtId": "badulla",
+        "soilTypeId": "clay_loam",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Drainage Management",
+                    "si": "ජල පද්ධති කළමනාකරණය"
+                },
+                "details": {
+                    "en": "Ensure proper drainage channels are cut to prevent waterlogging in clay soils.",
+                    "si": "මැටි පසවල ජලය රැඳීම වැළැක්වීමට නිසි ජල පාවහන් නාලිකා සකස් කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Soil Amendment",
+                    "si": "පස සංශෝධනය"
+                },
+                "details": {
+                    "en": "Mix sand and organic matter into the pit to improve aeration.",
+                    "si": "පසට වායු ගමන් වැඩි කිරීමට වැලි සහ ජෛව ද්‍රව්‍ය වළට මිශ්‍ර කරන්න."
+                }
+            }
+        ]
+    },
+    "badulla_red_yellow_podzolic_var_gk_49": {
+        "districtId": "badulla",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "badulla_red_yellow_podzolic_var_dingi_rala": {
+        "districtId": "badulla",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "badulla_red_yellow_podzolic_var_bootawe_rala": {
+        "districtId": "badulla",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "badulla_red_yellow_podzolic_var_kohukumbure_rala": {
+        "districtId": "badulla",
+        "soilTypeId": "red_yellow_podzolic",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Soil Enrichment",
+                    "si": "පස පෝෂණය"
+                },
+                "details": {
+                    "en": "Apply Dolomite (500g/pit) to correct acidity common in Red-Yellow soils.",
+                    "si": "රතු-කහ පසවල අම්ලතාව සකස් කිරීමට වළකට 500g ඩොලොමයිට් යෙදිය යුතුය."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Planting",
+                    "si": "පැළ සිටුවීම"
+                },
+                "details": {
+                    "en": "Plant cuttings with high orthotropic vigor.",
+                    "si": "ශක්තිමත් වර්ධනයක් ඇති කැපුම් පැළ සිටුවන්න."
+                }
+            }
+        ]
+    },
+    "badulla_gravelly_var_kuching": {
+        "districtId": "badulla",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
+            }
+        ]
+    },
+    "colombo_loamy_var_panniyur_1": {
+        "districtId": "colombo",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "colombo_loamy_var_gk_49": {
+        "districtId": "colombo",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "colombo_loamy_var_dingi_rala": {
+        "districtId": "colombo",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "colombo_loamy_var_bootawe_rala": {
+        "districtId": "colombo",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "colombo_loamy_var_kohukumbure_rala": {
+        "districtId": "colombo",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "colombo_sandy_var_kuching": {
+        "districtId": "colombo",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "gampaha_loamy_var_panniyur_1": {
+        "districtId": "gampaha",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "gampaha_loamy_var_gk_49": {
+        "districtId": "gampaha",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "gampaha_loamy_var_dingi_rala": {
+        "districtId": "gampaha",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "gampaha_loamy_var_bootawe_rala": {
+        "districtId": "gampaha",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "gampaha_loamy_var_kohukumbure_rala": {
+        "districtId": "gampaha",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "gampaha_sandy_var_kuching": {
+        "districtId": "gampaha",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "kalutara_loamy_var_panniyur_1": {
+        "districtId": "kalutara",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kalutara_loamy_var_gk_49": {
+        "districtId": "kalutara",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kalutara_loamy_var_dingi_rala": {
+        "districtId": "kalutara",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kalutara_loamy_var_bootawe_rala": {
+        "districtId": "kalutara",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kalutara_loamy_var_kohukumbure_rala": {
+        "districtId": "kalutara",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kalutara_sandy_var_kuching": {
+        "districtId": "kalutara",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "galle_loamy_var_panniyur_1": {
+        "districtId": "galle",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "galle_loamy_var_gk_49": {
+        "districtId": "galle",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "galle_loamy_var_dingi_rala": {
+        "districtId": "galle",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "galle_loamy_var_bootawe_rala": {
+        "districtId": "galle",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "galle_loamy_var_kohukumbure_rala": {
+        "districtId": "galle",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
             }
         ]
     },
@@ -57,13 +2616,199 @@
         "steps": [
             {
                 "stepNumber": 1,
-                "title": "Moisture Conservation",
-                "details": "Sandy coastal soils dry fast; use coconut husk burial around the base."
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
             },
             {
                 "stepNumber": 2,
-                "title": "Irrigation",
-                "details": "Water frequently (every 2-3 days) during dry spells."
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "matara_loamy_var_panniyur_1": {
+        "districtId": "matara",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "matara_loamy_var_gk_49": {
+        "districtId": "matara",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "matara_loamy_var_dingi_rala": {
+        "districtId": "matara",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "matara_loamy_var_bootawe_rala": {
+        "districtId": "matara",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "matara_loamy_var_kohukumbure_rala": {
+        "districtId": "matara",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "matara_sandy_var_kuching": {
+        "districtId": "matara",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
             }
         ]
     },
@@ -74,64 +2819,344 @@
         "steps": [
             {
                 "stepNumber": 1,
-                "title": "Pit Filling",
-                "details": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung."
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
             },
             {
                 "stepNumber": 2,
-                "title": "Water Retention",
-                "details": "Create a basin around the plant to catch rainwater."
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
             }
         ]
     },
-    "hambantota_sandy_var_kuching": {
-        "districtId": "hambantota",
-        "soilTypeId": "sandy",
-        "varietyId": "var_kuching",
+    "kurunegala_loamy_var_panniyur_1": {
+        "districtId": "kurunegala",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
         "steps": [
             {
                 "stepNumber": 1,
-                "title": "Irrigation Planning",
-                "details": "Critical: Apply 50L water per vine every 10 days."
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
             },
             {
                 "stepNumber": 2,
-                "title": "Soil Amendment",
-                "details": "Add large quantities of compost to improve water holding capacity."
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
             }
         ]
     },
-    "hambantota_gravelly_var_kuching": {
-        "districtId": "hambantota",
-        "soilTypeId": "gravelly",
-        "varietyId": "var_kuching",
-        "steps": [
-            {
-                "stepNumber": 1,
-                "title": "Hardpan Management",
-                "details": "Break up any hard subsoil layers before planting."
-            },
-            {
-                "stepNumber": 2,
-                "title": "Drought Protection",
-                "details": "Heavy mulching is mandatory."
-            }
-        ]
-    },
-    "anuradhapura_loamy_var_gk_49": {
-        "districtId": "anuradhapura",
+    "kurunegala_loamy_var_gk_49": {
+        "districtId": "kurunegala",
         "soilTypeId": "loamy",
         "varietyId": "var_gk_49",
         "steps": [
             {
                 "stepNumber": 1,
-                "title": "Shade Management",
-                "details": "Maintain 50% shade levels using Gliricidia."
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
             },
             {
                 "stepNumber": 2,
-                "title": "Mulching",
-                "details": "Apply thick mulch before the onset of dry season."
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kurunegala_loamy_var_dingi_rala": {
+        "districtId": "kurunegala",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kurunegala_loamy_var_bootawe_rala": {
+        "districtId": "kurunegala",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "kurunegala_loamy_var_kohukumbure_rala": {
+        "districtId": "kurunegala",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "monaragala_gravelly_var_kuching": {
+        "districtId": "monaragala",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
+            }
+        ]
+    },
+    "monaragala_loamy_var_panniyur_1": {
+        "districtId": "monaragala",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "monaragala_loamy_var_gk_49": {
+        "districtId": "monaragala",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "monaragala_loamy_var_dingi_rala": {
+        "districtId": "monaragala",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "monaragala_loamy_var_bootawe_rala": {
+        "districtId": "monaragala",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "monaragala_loamy_var_kohukumbure_rala": {
+        "districtId": "monaragala",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
             }
         ]
     },
@@ -142,13 +3167,663 @@
         "steps": [
             {
                 "stepNumber": 1,
-                "title": "Pit Filling",
-                "details": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung."
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
             },
             {
                 "stepNumber": 2,
-                "title": "Water Retention",
-                "details": "Create a basin around the plant to catch rainwater."
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
+            }
+        ]
+    },
+    "anuradhapura_loamy_var_panniyur_1": {
+        "districtId": "anuradhapura",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "anuradhapura_loamy_var_gk_49": {
+        "districtId": "anuradhapura",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "anuradhapura_loamy_var_dingi_rala": {
+        "districtId": "anuradhapura",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "anuradhapura_loamy_var_bootawe_rala": {
+        "districtId": "anuradhapura",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "anuradhapura_loamy_var_kohukumbure_rala": {
+        "districtId": "anuradhapura",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "polonnaruwa_gravelly_var_kuching": {
+        "districtId": "polonnaruwa",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
+            }
+        ]
+    },
+    "polonnaruwa_loamy_var_panniyur_1": {
+        "districtId": "polonnaruwa",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "polonnaruwa_loamy_var_gk_49": {
+        "districtId": "polonnaruwa",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "polonnaruwa_loamy_var_dingi_rala": {
+        "districtId": "polonnaruwa",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "polonnaruwa_loamy_var_bootawe_rala": {
+        "districtId": "polonnaruwa",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "polonnaruwa_loamy_var_kohukumbure_rala": {
+        "districtId": "polonnaruwa",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "hambantota_loamy_var_bootawe_rala": {
+        "districtId": "hambantota",
+        "soilTypeId": "loamy",
+        "varietyId": "var_bootawe_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "hambantota_loamy_var_gk_49": {
+        "districtId": "hambantota",
+        "soilTypeId": "loamy",
+        "varietyId": "var_gk_49",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "hambantota_loamy_var_panniyur_1": {
+        "districtId": "hambantota",
+        "soilTypeId": "loamy",
+        "varietyId": "var_panniyur_1",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "hambantota_loamy_var_kohukumbure_rala": {
+        "districtId": "hambantota",
+        "soilTypeId": "loamy",
+        "varietyId": "var_kohukumbure_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "hambantota_loamy_var_dingi_rala": {
+        "districtId": "hambantota",
+        "soilTypeId": "loamy",
+        "varietyId": "var_dingi_rala",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Support Establishment",
+                    "si": "ආධාර පැළ ස්ථාපනය"
+                },
+                "details": {
+                    "en": "Plant Gliricidia sepium supports 12 months before pepper planting.",
+                    "si": "මිරිස් වගා කිරීමට මාස 12කට පෙර Gliricidia sepium ආධාර පැළ සිටුවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Pit Preparation",
+                    "si": "වළ සකස් කිරීම"
+                },
+                "details": {
+                    "en": "Dig pits of 60cm x 60cm x 60cm and fill with topsoil and organic manure.",
+                    "si": "60cm × 60cm × 60cm වළක් කැණී ඉහළ පස හා ජෛව පොහොර මිශ්‍ර කර පුරවන්න."
+                }
+            }
+        ]
+    },
+    "hambantota_sandy_var_kuching": {
+        "districtId": "hambantota",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "hambantota_gravelly_var_kuching": {
+        "districtId": "hambantota",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
+            }
+        ]
+    },
+    "puttalam_sandy_var_kuching": {
+        "districtId": "puttalam",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "puttalam_gravelly_var_kuching": {
+        "districtId": "puttalam",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
+            }
+        ]
+    },
+    "mannar_sandy_var_kuching": {
+        "districtId": "mannar",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "mannar_gravelly_var_kuching": {
+        "districtId": "mannar",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
             }
         ]
     },
@@ -159,13 +3834,25 @@
         "steps": [
             {
                 "stepNumber": 1,
-                "title": "Irrigation Planning",
-                "details": "Critical: Apply 50L water per vine every 10 days."
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
             },
             {
                 "stepNumber": 2,
-                "title": "Soil Amendment",
-                "details": "Add large quantities of compost to improve water holding capacity."
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
             }
         ]
     },
@@ -176,13 +3863,373 @@
         "steps": [
             {
                 "stepNumber": 1,
-                "title": "Hardpan Management",
-                "details": "Break up any hard subsoil layers before planting."
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
             },
             {
                 "stepNumber": 2,
-                "title": "Drought Protection",
-                "details": "Heavy mulching is mandatory."
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
+            }
+        ]
+    },
+    "kilinochchi_sandy_var_kuching": {
+        "districtId": "kilinochchi",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "kilinochchi_gravelly_var_kuching": {
+        "districtId": "kilinochchi",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
+            }
+        ]
+    },
+    "mullaitivu_sandy_var_kuching": {
+        "districtId": "mullaitivu",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "mullaitivu_gravelly_var_kuching": {
+        "districtId": "mullaitivu",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
+            }
+        ]
+    },
+    "vavuniya_sandy_var_kuching": {
+        "districtId": "vavuniya",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "vavuniya_gravelly_var_kuching": {
+        "districtId": "vavuniya",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
+            }
+        ]
+    },
+    "trincomalee_sandy_var_kuching": {
+        "districtId": "trincomalee",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "trincomalee_gravelly_var_kuching": {
+        "districtId": "trincomalee",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
+            }
+        ]
+    },
+    "batticaloa_sandy_var_kuching": {
+        "districtId": "batticaloa",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "batticaloa_gravelly_var_kuching": {
+        "districtId": "batticaloa",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
+            }
+        ]
+    },
+    "ampara_sandy_var_kuching": {
+        "districtId": "ampara",
+        "soilTypeId": "sandy",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Moisture Conservation",
+                    "si": "ආර්ද්‍රතාව සංරක්ෂණය"
+                },
+                "details": {
+                    "en": "Sandy coastal soils dry fast; use coconut husk burial around the base.",
+                    "si": "වැලි පස වේගයෙන් වියළෙයි; පැළ වටා පොල් කොහු භාවිතා කරන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Irrigation",
+                    "si": "ජලසැපයුම"
+                },
+                "details": {
+                    "en": "Water frequently (every 2-3 days) during dry spells.",
+                    "si": "වියළි කාලයේදී දින 2–3කට වරක් වතුර දිය යුතුය."
+                }
+            }
+        ]
+    },
+    "ampara_gravelly_var_kuching": {
+        "districtId": "ampara",
+        "soilTypeId": "gravelly",
+        "varietyId": "var_kuching",
+        "steps": [
+            {
+                "stepNumber": 1,
+                "title": {
+                    "en": "Pit Filling",
+                    "si": "වළ පුරවීම"
+                },
+                "details": {
+                    "en": "Gravelly soil is poor; replace 50% of pit volume with good topsoil and cow dung.",
+                    "si": "ගල් පස පෝෂණයෙන් දුර්වල බැවින් වළ ප්‍රමාණයේ 50% ක් හොඳ ඉහළ පස හා ගොම පොහොර සමඟ පුරවන්න."
+                }
+            },
+            {
+                "stepNumber": 2,
+                "title": {
+                    "en": "Water Retention",
+                    "si": "ජල රඳවාගැනීම"
+                },
+                "details": {
+                    "en": "Create a basin around the plant to catch rainwater.",
+                    "si": "වැසි ජලය රඳවාගැනීමට පැළ වටා වළල්ලක් (basin) සකස් කරන්න."
+                }
             }
         ]
     }

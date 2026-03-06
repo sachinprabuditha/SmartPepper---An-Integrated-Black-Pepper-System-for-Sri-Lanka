@@ -1,6 +1,8 @@
+import 'localized_string.dart';
+
 class District {
   final String id;
-  final String name;
+  final LocalizedString name;
 
   District({
     required this.id,
@@ -10,14 +12,14 @@ class District {
   factory District.fromJson(Map<String, dynamic> json) {
     return District(
       id: json['id'].toString(), // Handle both string and int input safely
-      name: json['name'] as String,
+      name: LocalizedString.fromJson(json['name']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
+      'name': name.toJson(),
     };
   }
 

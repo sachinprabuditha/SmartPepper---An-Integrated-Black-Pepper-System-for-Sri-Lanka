@@ -8,6 +8,7 @@ import '../../../../core/widgets/empty_state.dart';
 import 'task_completion_page.dart';
 import 'edit_farm_page.dart';
 import 'manual_task_dialog.dart';
+import '../../agronomy/providers/language_provider.dart';
 
 class FarmDetailsPage extends ConsumerWidget {
   final String farmId;
@@ -16,6 +17,7 @@ class FarmDetailsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(languageProvider);
     final farmAsync = ref.watch(farmProvider(farmId));
     final tasksAsync = ref.watch(farmTasksProvider(farmId));
 
@@ -23,23 +25,23 @@ class FarmDetailsPage extends ConsumerWidget {
       appBar: AppBar(
         title: farmAsync.when(
           data: (farm) => Text(farm.farmName),
-          loading: () => const Text('Farm Details'),
-          error: (_, __) => const Text('Farm Details'),
+          loading: () => Text(lang == 'en' ? 'Farm Details' : 'ගොවිපළේ විස්තර'),
+          error: (_, __) => Text(lang == 'en' ? 'Farm Details' : 'ගොවිපළේ විස්තර'),
         ),
         actions: [
           // Add Manual Task Button in AppBar
           IconButton(
             icon: const Icon(Icons.add_task),
-            tooltip: 'Add Manual Task',
+            tooltip: lang == 'en' ? 'Add Manual Task' : 'කාර්යයක් එක් කරන්න',
             onPressed: () {
               if (farmAsync.hasValue) {
-                _showManualTaskDialog(context, ref, farmAsync.value!);
+                _showManualTaskDialog(context, ref, farmAsync.value!, lang);
               }
             },
           ),
           IconButton(
             icon: const Icon(Icons.edit),
-            tooltip: 'Edit Farm',
+            tooltip: lang == 'en' ? 'Edit Farm' : 'ගොවිපළ සංස්කරණය කරන්න',
             onPressed: () async {
               if (farmAsync.hasValue) {
                 final farm = farmAsync.value!;
@@ -60,24 +62,25 @@ class FarmDetailsPage extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.delete),
-            tooltip: 'Delete Farm',
+            tooltip: lang == 'en' ? 'Delete Farm' : 'ගොවිපළ මකන්න',
             onPressed: () async {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('Delete Farm'),
-                  content: const Text(
-                      'Are you sure you want to delete this farm? All related tasks will be removed.'),
+                  title: Text(lang == 'en' ? 'Delete Farm' : 'ගොවිපළ මකන්න'),
+                  content: Text(lang == 'en' 
+                      ? 'Are you sure you want to delete this farm? All related tasks will be removed.'
+                      : 'මෙම ගොවිපළ මකා දැමීමට ඔබට විශ්වාසද? සියලුම අදාළ කාර්යයන් ඉවත් කරනු ලැබේ.'),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, false),
-                      child: const Text('Cancel'),
+                      child: Text(lang == 'en' ? 'Cancel' : 'අවලංගු කරන්න'),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, true),
-                      child: const Text(
-                        'Delete',
-                        style: TextStyle(color: Colors.red),
+                      child: Text(
+                        lang == 'en' ? 'Delete' : 'මකන්න',
+                        style: const TextStyle(color: Colors.red),
                       ),
                     ),
                   ],
@@ -90,8 +93,8 @@ class FarmDetailsPage extends ConsumerWidget {
                       .deleteFarm(farmId);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Farm deleted'),
+                      SnackBar(
+                        content: Text(lang == 'en' ? 'Farm deleted' : 'ගොවිපළ මකා දමන ලදී'),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -139,13 +142,13 @@ class FarmDetailsPage extends ConsumerWidget {
                                 ),
                           ),
                           const SizedBox(height: 16),
-                          _buildInfoRow(context, 'District', farm.district),
-                          _buildInfoRow(context, 'Variety', farm.chosenVariety),
-                          _buildInfoRow(context, 'Area', '${farm.areaHectares} hectares'),
-                          _buildInfoRow(context, 'Total Vines', '${farm.totalVines}'),
+                          _buildInfoRow(context, lang == 'en' ? 'District' : 'දිස්ත්‍රික්කය', farm.district.get(lang)),
+                          _buildInfoRow(context, lang == 'en' ? 'Variety' : 'ප්‍රභේදය', farm.chosenVariety.get(lang)),
+                          _buildInfoRow(context, lang == 'en' ? 'Area' : 'වපසරිය', '${farm.areaHectares} ${lang == 'en' ? 'hectares' : 'හෙක්ටයාර'}'),
+                          _buildInfoRow(context, lang == 'en' ? 'Total Vines' : 'මුළු වැල් ගණන', '${farm.totalVines}'),
                           _buildInfoRow(
                             context,
-                            'Farm Start Date',
+                            lang == 'en' ? 'Farm Start Date' : 'ගොවිපළ ආරම්භ කළ දිනය',
                             '${farm.farmStartDate.day}/${farm.farmStartDate.month}/${farm.farmStartDate.year}',
                           ),
                         ],
@@ -155,7 +158,7 @@ class FarmDetailsPage extends ConsumerWidget {
                   const SizedBox(height: 24),
                   // Tasks Lifecycle Journey
                   Text(
-                    'Farm Task Journey',
+                    lang == 'en' ? 'Farm Task Journey' : 'වගාවේ කාර්යයන් ගමන',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -164,8 +167,8 @@ class FarmDetailsPage extends ConsumerWidget {
                   tasksAsync.when(
                     data: (tasks) {
                       if (tasks.isEmpty) {
-                        return const EmptyState(
-                          message: 'No tasks scheduled yet.',
+                        return EmptyState(
+                          message: lang == 'en' ? 'No tasks scheduled yet.' : 'තවම කාර්යයන් සැලසුම් කර නොමැත.',
                           icon: Icons.task_alt,
                         );
                       }
@@ -173,20 +176,20 @@ class FarmDetailsPage extends ConsumerWidget {
                       // Debug: Log all tasks
                       debugPrint('Total tasks received: ${tasks.length}');
                       for (var task in tasks) {
-                        debugPrint('Task: ${task.taskName}, Phase: ${task.phase}, Status: ${task.status}');
+                        debugPrint('Task: ${task.taskName.get(lang)}, Phase: ${task.phase}, Status: ${task.status}');
                       }
 
-                      return _buildPhaseStepper(context, ref, farm, tasks);
+                      return _buildPhaseStepper(context, ref, farm, tasks, lang);
                     },
-                    loading: () => const LoadingSpinner(message: 'Loading tasks...'),
+                    loading: () => LoadingSpinner(message: lang == 'en' ? 'Loading tasks...' : 'කාර්යයන් පටවමින්...'),
                     error: (error, stack) => EmptyState(
-                      message: 'Error loading tasks: ${error.toString()}',
+                      message: lang == 'en' ? 'Error loading tasks: ${error.toString()}' : 'කාර්යයන් පැටවීමේ දෝෂයකි: ${error.toString()}',
                       icon: Icons.error_outline,
                       action: ElevatedButton(
                         onPressed: () {
                           ref.invalidate(farmTasksProvider(farmId));
                         },
-                        child: const Text('Retry'),
+                        child: Text(lang == 'en' ? 'Retry' : 'නැවත උත්සාහ කරන්න'),
                       ),
                     ),
                   ),
@@ -195,15 +198,15 @@ class FarmDetailsPage extends ConsumerWidget {
             ),
           );
         },
-        loading: () => const LoadingSpinner(message: 'Loading farm details...'),
+        loading: () => LoadingSpinner(message: lang == 'en' ? 'Loading farm details...' : 'ගොවිපළේ විස්තර පටවමින්...'),
         error: (error, stack) => EmptyState(
-          message: 'Error loading farm: ${error.toString()}',
+          message: lang == 'en' ? 'Error loading farm: ${error.toString()}' : 'ගොවිපළ පැටවීමේ දෝෂයකි: ${error.toString()}',
           icon: Icons.error_outline,
           action: ElevatedButton(
             onPressed: () {
               ref.invalidate(farmProvider(farmId));
             },
-            child: const Text('Retry'),
+            child: Text(lang == 'en' ? 'Retry' : 'නැවත උත්සාහ කරන්න'),
           ),
         ),
       ),
@@ -214,6 +217,7 @@ class FarmDetailsPage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     FarmRecord farm,
+    String lang,
   ) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
@@ -236,8 +240,8 @@ class FarmDetailsPage extends ConsumerWidget {
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Manual task created successfully!'),
+            SnackBar(
+              content: Text(lang == 'en' ? 'Manual task created successfully!' : 'අතින් සැකසූ කාර්යය සාර්ථකව නිර්මාණය කරන ලදී!'),
               backgroundColor: Colors.green,
             ),
           );
@@ -334,8 +338,9 @@ class FarmDetailsPage extends ConsumerWidget {
     WidgetRef ref,
     FarmRecord farm,
     List<FarmTask> tasks,
+    String lang,
   ) {
-    final phases = _groupTasksByPhase(farm, tasks);
+    final phases = _groupTasksByPhase(farm, tasks, lang);
 
     // Use ExpansionTile instead of Stepper for better control and visibility
     return Column(
@@ -344,40 +349,44 @@ class FarmDetailsPage extends ConsumerWidget {
           context,
           ref,
           farm,
-          'Phase 1: Landscaping & Prep',
+          lang == 'en' ? 'Phase 1: Landscaping & Prep' : 'අදියර 1: ඉඩම් සකස් කිරීම',
           phases[1]!,
           Icons.landscape,
           Colors.green,
+          lang,
         ),
         const SizedBox(height: 8),
         _buildPhaseSection(
           context,
           ref,
           farm,
-          'Phase 2: Planting Day',
+          lang == 'en' ? 'Phase 2: Planting Day' : 'අදියර 2: පැළ සිටුවීම',
           phases[2]!,
           Icons.eco,
           Colors.blue,
+          lang,
         ),
         const SizedBox(height: 8),
         _buildPhaseSection(
           context,
           ref,
           farm,
-          'Phase 3: Maintenance',
+          lang == 'en' ? 'Phase 3: Maintenance' : 'අදියර 3: නඩත්තුව',
           phases[3]!,
           Icons.build,
           Colors.orange,
+          lang,
         ),
         const SizedBox(height: 8),
         _buildPhaseSection(
           context,
           ref,
           farm,
-          'Phase 4: Harvesting & Processing',
+          lang == 'en' ? 'Phase 4: Harvesting & Processing' : 'අදියර 4: අස්වැන්න නෙළීම',
           phases[4]!,
           Icons.agriculture,
           Colors.purple,
+          lang,
         ),
       ],
     );
@@ -391,6 +400,7 @@ class FarmDetailsPage extends ConsumerWidget {
     List<FarmTask> tasks,
     IconData icon,
     Color color,
+    String lang,
   ) {
     return Card(
       elevation: 2,
@@ -403,21 +413,21 @@ class FarmDetailsPage extends ConsumerWidget {
               ),
         ),
         subtitle: Text(
-          '${tasks.length} task${tasks.length != 1 ? 's' : ''}',
+          lang == 'en' ? '${tasks.length} task${tasks.length != 1 ? 's' : ''}' : 'කාර්යයන් ${tasks.length}',
           style: Theme.of(context).textTheme.bodySmall,
         ),
         initiallyExpanded: tasks.isNotEmpty, // Auto-expand if has tasks
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _buildTaskListForPhase(context, ref, farm, tasks),
+            child: _buildTaskListForPhase(context, ref, farm, tasks, lang),
           ),
         ],
       ),
     );
   }
 
-  Map<int, List<FarmTask>> _groupTasksByPhase(FarmRecord farm, List<FarmTask> tasks) {
+  Map<int, List<FarmTask>> _groupTasksByPhase(FarmRecord farm, List<FarmTask> tasks, String lang) {
     final Map<int, List<FarmTask>> result = {
       1: [],
       2: [],
@@ -431,7 +441,7 @@ class FarmDetailsPage extends ConsumerWidget {
       // First, try to determine phase from the task's phase field
       // This respects the phase selected when creating a manual task
       final taskPhase = task.phase.toLowerCase().trim();
-      debugPrint('Task: ${task.taskName}, Phase: "${task.phase}", Lowercase: "$taskPhase"');
+      debugPrint('Task: ${task.taskName.get(lang)}, Phase: "${task.phase}", Lowercase: "$taskPhase"');
       
       // Check for exact matches first (from manual task dropdown)
       if (taskPhase == 'landscaping' || 
@@ -486,18 +496,19 @@ class FarmDetailsPage extends ConsumerWidget {
     WidgetRef ref,
     FarmRecord farm,
     List<FarmTask> tasks,
+    String lang,
   ) {
     debugPrint('_buildTaskListForPhase called with ${tasks.length} tasks');
     if (tasks.isEmpty) {
       return Text(
-        'No tasks in this phase yet.',
+        lang == 'en' ? 'No tasks in this phase yet.' : 'මෙම අදියරේ කාර්යයන් නොමැත.',
         style: Theme.of(context).textTheme.bodySmall,
       );
     }
 
     return Column(
       children: tasks.map((task) {
-        debugPrint('  Rendering task: ${task.taskName}, Status: ${task.status}');
+        debugPrint('  Rendering task: ${task.taskName.get(lang)}, Status: ${task.status}');
         final isManual = task.isManual;
         final isEmergency = task.priority.toLowerCase() == 'emergency' || task.priority.toLowerCase() == 'high';
         
@@ -549,7 +560,7 @@ class FarmDetailsPage extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                task.taskName,
+                                task.taskName.get(lang),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -573,7 +584,7 @@ class FarmDetailsPage extends ConsumerWidget {
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Text(
-                              'Type: ${task.taskType}',
+                              '${lang == 'en' ? 'Type' : 'වර්ගය'}: ${_getTaskTypeTranslation(task.taskType, lang)}',
                               style: const TextStyle(fontSize: 12),
                             ),
                             if (isManual)
@@ -592,12 +603,12 @@ class FarmDetailsPage extends ConsumerWidget {
                         const SizedBox(height: 4),
                         // Due Date
                         Text(
-                          'Due: ${task.dueDate.day}/${task.dueDate.month}/${task.dueDate.year}',
+                          '${lang == 'en' ? 'Due' : 'අවසන් දිනය'}: ${task.dueDate.day}/${task.dueDate.month}/${task.dueDate.year}',
                           style: const TextStyle(fontSize: 12),
                         ),
                         if (task.status == 'Completed' && task.dateCompleted != null)
                           Text(
-                            'Completed: ${task.dateCompleted!.day}/${task.dateCompleted!.month}/${task.dateCompleted!.year}',
+                            '${lang == 'en' ? 'Completed' : 'සම්පූර්ණ කළේ'}: ${task.dateCompleted!.day}/${task.dateCompleted!.month}/${task.dateCompleted!.year}',
                             style: const TextStyle(
                               fontSize: 12,
                               fontStyle: FontStyle.italic,
@@ -611,7 +622,7 @@ class FarmDetailsPage extends ConsumerWidget {
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Chip(
                       label: Text(
-                        task.status,
+                        _getStatusTranslation(task.status, lang),
                         style: const TextStyle(fontSize: 10),
                       ),
                       backgroundColor: _getStatusColor(task.status),
@@ -627,6 +638,32 @@ class FarmDetailsPage extends ConsumerWidget {
         );
       }).toList(),
     );
+  }
+
+  String _getStatusTranslation(String status, String lang) {
+    if (lang == 'en') return status;
+    switch (status) {
+      case 'Scheduled':
+        return 'සැලසුම් කළ';
+      case 'Completed':
+        return 'සම්පූර්ණයි';
+      case 'Overdue':
+        return 'පසුගිය';
+      default:
+        return status;
+    }
+  }
+
+  String _getTaskTypeTranslation(String type, String lang) {
+    if (lang == 'en') return type;
+    switch (type) {
+      case 'Manual':
+        return 'අතින් සැකසූ';
+      case 'Scheduled':
+        return 'සැලසුම් කළ';
+      default:
+        return type;
+    }
   }
 }
 

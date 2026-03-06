@@ -6,7 +6,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../seasons/controllers/season_controller.dart';
 import '../seasons/models/season_model.dart';
 import '../sessions/controllers/session_controller.dart';
-import '../sessions/models/session_model.dart';
 import '../../../../core/widgets/loading_spinner.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/utils/constants.dart';

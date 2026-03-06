@@ -101,9 +101,9 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
               InkWell(
                 onTap: () => _selectDate(context),
                 child: InputDecorator(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Date',
-                    suffixIcon: const Icon(Icons.calendar_today),
+                    suffixIcon: Icon(Icons.calendar_today),
                   ),
                   child: Text(
                     DateFormat('MMM dd, yyyy').format(_selectedDate),

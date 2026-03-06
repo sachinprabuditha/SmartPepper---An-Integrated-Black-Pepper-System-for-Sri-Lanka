@@ -1,16 +1,17 @@
 import 'guide_step_model.dart';
+import 'localized_string.dart';
 
 class AgronomyGuideResponse {
   final String id;
   final String districtId;
-  final String districtName;
+  final LocalizedString districtName;
   final String soilTypeId;
-  final String soilTypeName;
+  final LocalizedString soilTypeName;
   final String varietyId;
-  final String varietyName;
-  final String varietySpecialities;
-  final String varietySuitabilityReason;
-  final String varietySoilTypeRecommendation;
+  final LocalizedString varietyName;
+  final LocalizedString varietySpecialities;
+  final LocalizedString varietySuitabilityReason;
+  final LocalizedString varietySoilTypeRecommendation;
   final String varietySpacingMeters;
   final int? varietyVinesPerHectare;
   final String varietyPitDimensionsCm;
@@ -24,9 +25,9 @@ class AgronomyGuideResponse {
     required this.soilTypeName,
     required this.varietyId,
     required this.varietyName,
-    this.varietySpecialities = '',
-    this.varietySuitabilityReason = '',
-    this.varietySoilTypeRecommendation = '',
+    required this.varietySpecialities,
+    required this.varietySuitabilityReason,
+    required this.varietySoilTypeRecommendation,
     this.varietySpacingMeters = '',
     this.varietyVinesPerHectare,
     this.varietyPitDimensionsCm = '',
@@ -37,14 +38,14 @@ class AgronomyGuideResponse {
     return AgronomyGuideResponse(
       id: json['id']?.toString() ?? '',
       districtId: json['districtId']?.toString() ?? '',
-      districtName: json['districtName'] as String,
+      districtName: LocalizedString.fromJson(json['districtName']),
       soilTypeId: json['soilTypeId']?.toString() ?? '',
-      soilTypeName: json['soilTypeName'] as String,
+      soilTypeName: LocalizedString.fromJson(json['soilTypeName']),
       varietyId: json['varietyId'] as String,
-      varietyName: json['varietyName'] as String,
-      varietySpecialities: json['varietySpecialities'] as String? ?? '',
-      varietySuitabilityReason: json['varietySuitabilityReason'] as String? ?? '',
-      varietySoilTypeRecommendation: json['varietySoilTypeRecommendation'] as String? ?? '',
+      varietyName: LocalizedString.fromJson(json['varietyName']),
+      varietySpecialities: LocalizedString.fromJson(json['varietySpecialities']),
+      varietySuitabilityReason: LocalizedString.fromJson(json['varietySuitabilityReason']),
+      varietySoilTypeRecommendation: LocalizedString.fromJson(json['varietySoilTypeRecommendation']),
       varietySpacingMeters: json['varietySpacingMeters'] as String? ?? '',
       varietyVinesPerHectare: json['varietyVinesPerHectare'] as int?,
       varietyPitDimensionsCm: json['varietyPitDimensionsCm'] as String? ?? '',
@@ -59,14 +60,14 @@ class AgronomyGuideResponse {
     return {
       'id': id,
       'districtId': districtId,
-      'districtName': districtName,
+      'districtName': districtName.toJson(),
       'soilTypeId': soilTypeId,
-      'soilTypeName': soilTypeName,
+      'soilTypeName': soilTypeName.toJson(),
       'varietyId': varietyId,
-      'varietyName': varietyName,
-      'varietySpecialities': varietySpecialities,
-      'varietySuitabilityReason': varietySuitabilityReason,
-      'varietySoilTypeRecommendation': varietySoilTypeRecommendation,
+      'varietyName': varietyName.toJson(),
+      'varietySpecialities': varietySpecialities.toJson(),
+      'varietySuitabilityReason': varietySuitabilityReason.toJson(),
+      'varietySoilTypeRecommendation': varietySoilTypeRecommendation.toJson(),
       'varietySpacingMeters': varietySpacingMeters,
       'varietyVinesPerHectare': varietyVinesPerHectare,
       'varietyPitDimensionsCm': varietyPitDimensionsCm,

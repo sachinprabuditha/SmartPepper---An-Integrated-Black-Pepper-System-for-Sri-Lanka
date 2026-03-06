@@ -63,12 +63,15 @@ export const getFarms = async (userId) => {
             const dists = await db.collection('districts').doc(String(data.districtId)).get();
             if (dists.exists) districtName = dists.data().name;
         }
-        // ... similar for others if critical. 
-        // Skipping full enrichment for every list item to avoid N+1 reads loop delay, 
-        // BUT current UI might expect it.
-        // Let's assume we proceed without names or add simple lookups if strictly required by UI.
-        // The original code included them. Let's try to include if feasible or denormalize in future.
-        // For now: basic data.
+        if (data.soilTypeId) {
+            const soils = await db.collection('soilTypes').doc(String(data.soilTypeId)).get();
+            if (soils.exists) soilTypeName = soils.data().typeName || soils.data().name;
+        }
+
+        if (data.chosenVarietyId) {
+            const varieties = await db.collection('pepperVarieties').doc(String(data.chosenVarietyId)).get();
+            if (varieties.exists) varietyName = varieties.data().name;
+        }
 
         farms.push({
             ...data,
@@ -205,14 +208,14 @@ export const createManualTask = async (userId, taskData) => {
     const newTask = {
         id: docRef.id,
         farmId: taskData.farmId,
-        taskName: taskData.taskName,
+        taskName: { en: taskData.taskName, si: taskData.taskName },
         phase: taskData.phase || 'Maintenance',
         taskType: 'Manual',
         dueDate: new Date(taskData.dueDate),
         priority: taskData.priority || 'Medium',
         status: 'Scheduled',
-        detailedSteps: taskData.detailedSteps || [],
-        reasonWhy: taskData.reasonWhy,
+        detailedSteps: (taskData.detailedSteps || []).map(step => ({ en: step, si: step })),
+        reasonWhy: taskData.reasonWhy ? { en: taskData.reasonWhy, si: taskData.reasonWhy } : null,
         isManual: true,
         createdAt: new Date()
     };
@@ -312,55 +315,100 @@ async function generateScheduleForFarm(farmRecord) {
 
     let taskCount = 0;
 
-    for (const template of templates) {
-        // Sort Logic roughly same as SQL
-        const timingMonths = template.timingMonthsAfterStarting || 0;
-        let initialDueDate;
+    // Determine Climate Zone based on district
+    const getClimateZone = (districtId) => {
+        if (!districtId) return 'wet';
+        const dryZone = ['hambantota', 'anuradhapura', 'polonnaruwa', 'monaragala', 'trincomalee', 'batticaloa', 'ampara', 'vavuniya', 'mannar', 'mullaitivu', 'kilinochchi', 'jaffna', 'puttalam'];
+        const wetZone = ['colombo', 'gampaha', 'kalutara', 'galle', 'matara', 'ratnapura', 'kegalle'];
+        const intermediateZone = ['kurunegala', 'matale', 'kandy', 'badulla', 'nuwara_eliya'];
 
-        if (timingMonths === 0) {
-            initialDueDate = farmStartDate > now ? farmStartDate : now;
-        } else {
-            initialDueDate = new Date(farmStartDate);
-            initialDueDate.setMonth(initialDueDate.getMonth() + timingMonths);
+        const id = districtId.toLowerCase();
+        if (dryZone.includes(id)) return 'dry';
+        if (wetZone.includes(id)) return 'wet';
+        if (intermediateZone.includes(id)) return 'intermediate';
+        return 'wet'; // Default
+    };
+
+    const climateZone = getClimateZone(farmRecord.districtId);
+    const soilType = farmRecord.soilTypeId;
+
+    for (const template of templates) {
+        // Apply filters
+        if (template.climateZones && Array.isArray(template.climateZones) && !template.climateZones.includes(climateZone)) {
+            continue; // Skip if climate zone does not match
+        }
+        if (template.soilTypes && Array.isArray(template.soilTypes) && soilType && !template.soilTypes.includes(soilType)) {
+            continue; // Skip if soil type does not match
         }
 
-        const detailedSteps = template.instructionalDetails
-            ? template.instructionalDetails.split(/[\r\n]+/).filter(s => s.trim()).map(s => s.trim())
-            : [];
+        const timingMonths = template.timingMonthsAfterStarting || 0;
+        const repeatMonths = template.repeatEveryMonths;
+        const priority = template.priority || 'Medium';
 
-        const docRef = tasksRef.doc();
-        batch.set(docRef, {
-            id: docRef.id,
-            farmId: farmRecord.id,
-            taskName: template.taskName,
-            phase: template.phase || 'Maintenance',
-            taskType: template.taskType,
-            varietyKey: template.varietyKey,
-            dueDate: initialDueDate,
-            status: 'Scheduled',
-            detailedSteps: detailedSteps,
-            reasonWhy: '',
-            isManual: false,
-            priority: 'Medium',
-            createdAt: now
-        });
-        taskCount++;
+        // Instructional details as a localized object in an array
+        const detailedSteps = template.instructionalDetails ? [template.instructionalDetails] : [];
+
+        // Tasks generation iterations
+        const maxMonths = 36; // Generate schedule for up to 3 years
+        let iterations = [];
+
+        if (repeatMonths && repeatMonths > 0) {
+            for (let m = timingMonths; m <= maxMonths; m += repeatMonths) {
+                iterations.push(m);
+            }
+        } else {
+            iterations.push(timingMonths);
+        }
+
+        for (const m of iterations) {
+            let dueDate;
+            if (m === 0) {
+                dueDate = farmStartDate > now ? new Date(farmStartDate) : new Date(now);
+            } else {
+                dueDate = new Date(farmStartDate);
+                dueDate.setMonth(dueDate.getMonth() + m);
+            }
+
+            const docRef = tasksRef.doc();
+            batch.set(docRef, {
+                id: docRef.id,
+                farmId: farmRecord.id,
+                taskName: template.taskName, // Expected to be an object {en:..., si:...} based on new template
+                phase: template.phase || 'Maintenance',
+                taskType: template.taskType || 'Maintenance',
+                varietyKey: template.varietyKey || varietyKey,
+                dueDate: dueDate,
+                status: 'Scheduled',
+                detailedSteps: detailedSteps, // [{en:..., si:...}]
+                reasonWhy: null,
+                isManual: false,
+                priority: priority,
+                createdAt: now
+            });
+            taskCount++;
+        }
     }
 
-    // Dry zone logic
-    // Need to fetch district Name
-    let districtName = '';
-    if (farmRecord.districtId) {
-        // We might have it in farmRecord if we enriched it, but here we passed the raw object
-        // So fetch it
-        const d = await db.collection('meta_districts').doc(String(farmRecord.districtId)).get();
-        if (d.exists) districtName = d.data().name;
-    }
-
-    const dryZoneDistricts = ['Hambantota', 'Anuradhapura', 'Polonnaruwa', 'Kurunegala', 'Monaragala'];
-    if (districtName && dryZoneDistricts.includes(districtName)) {
+    // Extracted Dry Zone Summer Irrigation Logic
+    if (climateZone === 'dry') {
         const firstSeasonYear = farmStartDate.getMonth() < 2 ? farmStartDate.getFullYear() : farmStartDate.getFullYear() + 1;
         const summerMonths = [3, 4, 5]; // March-May
+
+        // Create localized detailed steps for the custom irrigation task
+        const irrigationSteps = [
+            {
+                en: "Inspect soil moisture at 15–20cm depth",
+                si: "සෙන්ටිමීටර 15-20ක් ගැඹුරට පසෙහි තෙතමනය පරීක්ෂා කරන්න"
+            },
+            {
+                en: "If soil is dry and no rain in last 5 days, schedule supplementary irrigation",
+                si: "පස වියළි නම් සහ පසුගිය දින 5 තුළ වැසි නොලැබුණේ නම්, අමතර ජලය සැපයීමට කටයුතු කරන්න"
+            },
+            {
+                en: "Check mulch cover around vines and repair any gaps",
+                si: "වැල් වටා ඇති මල්ච් ආවරණය පරීක්ෂා කර හිඩැස් ඇත්නම් පුරවන්න"
+            }
+        ];
 
         for (const month of summerMonths) {
             const dueDate = new Date(Date.UTC(firstSeasonYear, month - 1, 15, 0, 0, 0));
@@ -368,18 +416,14 @@ async function generateScheduleForFarm(farmRecord) {
             batch.set(docRef, {
                 id: docRef.id,
                 farmId: farmRecord.id,
-                taskName: 'Summer Irrigation Check',
+                taskName: { en: 'Summer Irrigation Check', si: 'ගිම්හාන ජලසම්පාදන පරීක්ෂාව' },
                 phase: 'Maintenance',
                 taskType: 'Irrigation',
                 varietyKey: 'ALL',
                 dueDate: dueDate,
                 status: 'Scheduled',
-                detailedSteps: [
-                    'Inspect soil moisture at 15–20cm depth',
-                    'If soil is dry and no rain in last 5 days, schedule supplementary irrigation',
-                    'Check mulch cover around vines and repair any gaps'
-                ],
-                reasonWhy: 'Dry-zone',
+                detailedSteps: irrigationSteps,
+                reasonWhy: { en: 'Dry-zone', si: 'වියළි කාලාපය' }, // String or object? Better keep it consistent
                 isManual: false,
                 priority: 'High',
                 createdAt: now

@@ -1,8 +1,10 @@
+import 'localized_string.dart';
+
 class GuideStep {
   final String id;
   final int stepNumber;
-  final String title;
-  final String details;
+  final LocalizedString title;
+  final LocalizedString details;
 
   GuideStep({
     required this.id,
@@ -15,8 +17,8 @@ class GuideStep {
     return GuideStep(
       id: json['id'].toString(),
       stepNumber: json['stepNumber'] as int,
-      title: json['title'] as String,
-      details: json['details'] as String,
+      title: LocalizedString.fromJson(json['title']),
+      details: LocalizedString.fromJson(json['details']),
     );
   }
 
@@ -24,8 +26,8 @@ class GuideStep {
     return {
       'id': id,
       'stepNumber': stepNumber,
-      'title': title,
-      'details': details,
+      'title': title.toJson(),
+      'details': details.toJson(),
     };
   }
 }

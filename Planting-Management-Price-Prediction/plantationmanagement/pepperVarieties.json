@@ -1,45 +1,126 @@
 {
     "var_panniyur_1": {
-        "name": "Panniyur-1",
-        "specialities": "World's first hybrid pepper; features long spikes and very high yield.",
-        "suitabilityReason": "Vigorous grower that thrives in open areas with high humidity.",
-        "soilTypeRecommendation": "Prefers well-drained loamy soil.",
+        "name": {
+            "en": "Panniyur-1",
+            "si": "පන්නියූර් 1"
+        },
+        "specialities": {
+            "en": "World's first pepper hybrid with long spikes and very high yield.",
+            "si": "දිගු ගෙඩි සහ ඉහළ අස්වැන්නක් ලබාදෙන ලෝකයේ පළමු ගම්මිරිස් හයිබ්‍රිඩ් වර්ගය."
+        },
+        "suitabilityReason": {
+            "en": "Best for low to mid-country wet zones with high humidity.",
+            "si": "ඉහළ ආර්ද්‍රතාවය සහිත පහළ සහ මධ්‍ය කඳුකර තෙත් කලාප සඳහා සුදුසුය."
+        },
+        "soilTypeRecommendation": {
+            "en": "Prefers well-drained loamy soil.",
+            "si": "හොඳින් ජලය පිටවන ලොමී පස සඳහා සුදුසුය."
+        },
         "spacingMeters": "2.5 x 2.5",
         "vinesPerHectare": 1600,
         "pitDimensionsCm": "60 x 60 x 60"
     },
     "var_kuching": {
-        "name": "Kuching",
-        "specialities": "High piperine content and excellent dry-to-green recovery ratio.",
-        "suitabilityReason": "More tolerant to adverse conditions and reliable in drier zones.",
-        "soilTypeRecommendation": "Thrives in sandy loam or well-drained gravelly soil.",
+        "name": {
+            "en": "Kuching",
+            "si": "කුචිං"
+        },
+        "specialities": {
+            "en": "High piperine content and excellent dry-to-green recovery ratio.",
+            "si": "ඉහළ පයිපරින් අන්තර්ගතය සහ හොඳ වියළි-කොළ ප්‍රතිසාධන අනුපාතය."
+        },
+        "suitabilityReason": {
+            "en": "Tolerates drier zones and adverse soil conditions.",
+            "si": "වියළි කලාප සහ අසමත් පස තත්ත්වයන්ට හොඳින් අනුගත වේ."
+        },
+        "soilTypeRecommendation": {
+            "en": "Thrives in sandy loam or well-drained gravelly soil.",
+            "si": "වැලි ලොමී හෝ හොඳින් ජලය පිටවන ගල් පස සඳහා සුදුසුය."
+        },
         "spacingMeters": "2.0 x 2.0",
         "vinesPerHectare": 2500,
         "pitDimensionsCm": "50 x 50 x 50"
     },
     "var_gk_49": {
-        "name": "GK 49",
-        "specialities": "A high-yielding local selection with very high pungency.",
-        "suitabilityReason": "Highly adaptable to Sri Lankan local conditions and pest resistant.",
-        "soilTypeRecommendation": "Adapts well to Red-Yellow Podzolic soils.",
+        "name": {
+            "en": "GK 49",
+            "si": "ජී.කේ. 49"
+        },
+        "specialities": {
+            "en": "Sri Lanka's premier high-yielding local pepper selection with superior pungency.",
+            "si": "ඉහළ අස්වැන්නක් සහ තද රසක් ඇති ශ්‍රී ලංකාවේ ප්‍රධාන දේශීය ගම්මිරිස් තේරීම."
+        },
+        "suitabilityReason": {
+            "en": "Highly adaptable to Sri Lankan agro-climatic conditions.",
+            "si": "ශ්‍රී ලංකාවේ කාලගුණික තත්ත්වයන්ට හොඳින් අනුගත වේ."
+        },
+        "soilTypeRecommendation": {
+            "en": "Adapts well to Red-Yellow Podzolic, loamy, and clay-loam soils.",
+            "si": "රතු-කහ පොඩ්සොලික්, ලොමී සහ මැටි-ලොමී පසවල හොඳින් වර්ධනය වේ."
+        },
         "spacingMeters": "2.5 x 2.5",
         "vinesPerHectare": 1600,
         "pitDimensionsCm": "60 x 60 x 60"
     },
-    "var_iw_5": {
-        "name": "IW 5",
-        "specialities": "Features a high growth rate during early establishment and stable yields.",
-        "suitabilityReason": "Well-suited for mid-country elevations.",
-        "soilTypeRecommendation": "Well-drained loamy or clay-loam soil.",
+    "var_dingi_rala": {
+        "name": {
+            "en": "Dingi Rala",
+            "si": "දිඟි රාල"
+        },
+        "specialities": {
+            "en": "Balanced hybrid combining the yield of Panniyur-1 with the pungency of GK-49.",
+            "si": "Panniyur-1 අස්වැන්න සහ GK-49 රසය එකතු කළ සමබර හයිබ්‍රිඩ් වර්ගයකි."
+        },
+        "suitabilityReason": {
+            "en": "Well suited for wet and intermediate zones at low to mid-country elevations.",
+            "si": "පහළ සහ මධ්‍ය කඳුකර තෙත් සහ මධ්‍ය කලාප සඳහා සුදුසුය."
+        },
+        "soilTypeRecommendation": {
+            "en": "Performs best in well-drained loamy and Red-Yellow Podzolic soils.",
+            "si": "හොඳින් ජලය පිටවන ලොමී සහ රතු-කහ පොඩ්සොලික් පස සඳහා සුදුසුය."
+        },
         "spacingMeters": "2.5 x 2.5",
         "vinesPerHectare": 1600,
         "pitDimensionsCm": "60 x 60 x 60"
     },
-    "var_local": {
-        "name": "Local",
-        "specialities": "Traditional Sri Lankan pepper variety with stable yield and strong adaptability.",
-        "suitabilityReason": "Naturally adapted to local climatic and soil conditions with minimal input requirements.",
-        "soilTypeRecommendation": "Grows well in a wide range of soils with good drainage.",
+    "var_bootawe_rala": {
+        "name": {
+            "en": "Bootawe Rala",
+            "si": "බූටාවේ රාල"
+        },
+        "specialities": {
+            "en": "Highest yielding variety with longest panicles and highest piperine content.",
+            "si": "ඉහළම අස්වැන්න, දිගුම ගෙඩි සහ වැඩිම පයිපරින් අන්තර්ගතය ඇති වර්ගය."
+        },
+        "suitabilityReason": {
+            "en": "Best suited for intermediate and up-country zones.",
+            "si": "මධ්‍ය සහ උඩරට කලාප සඳහා වඩාත් සුදුසුය."
+        },
+        "soilTypeRecommendation": {
+            "en": "Well-drained loamy, clay-loam and Red-Yellow Podzolic soils.",
+            "si": "හොඳින් ජලය පිටවන ලොමී, මැටි-ලොමී සහ රතු-කහ පොඩ්සොලික් පස."
+        },
+        "spacingMeters": "2.5 x 2.5",
+        "vinesPerHectare": 1600,
+        "pitDimensionsCm": "60 x 60 x 60"
+    },
+    "var_kohukumbure_rala": {
+        "name": {
+            "en": "Kohukumbure Rala",
+            "si": "කොහුකුඹුරේ රාල"
+        },
+        "specialities": {
+            "en": "Premium export quality pepper with highest oleoresin and oil content.",
+            "si": "ඉහළම ඔලියොරසින් සහ තෙල් අන්තර්ගතය ඇති උසස් අපනයන ගුණාත්මක ගම්මිරිස්."
+        },
+        "suitabilityReason": {
+            "en": "Best suited for mid to up-country wet zones.",
+            "si": "මධ්‍ය සහ උඩරට තෙත් කලාප සඳහා සුදුසුය."
+        },
+        "soilTypeRecommendation": {
+            "en": "Well-drained loamy and Red-Yellow Podzolic soils in cooler elevations.",
+            "si": "සිසිල් උස කලාපවල හොඳින් ජලය පිටවන ලොමී සහ රතු-කහ පොඩ්සොලික් පස."
+        },
         "spacingMeters": "2.5 x 2.5",
         "vinesPerHectare": 1600,
         "pitDimensionsCm": "60 x 60 x 60"

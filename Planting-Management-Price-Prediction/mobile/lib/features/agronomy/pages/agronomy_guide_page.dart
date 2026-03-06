@@ -9,7 +9,7 @@ import '../services/agronomy_service.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/widgets/loading_spinner.dart';
 import '../../../../core/widgets/empty_state.dart';
-import '../../../../core/widgets/dropdown_field.dart';
+import '../providers/language_provider.dart';
 
 // Provider for AgronomyService
 final agronomyServiceProvider = Provider<AgronomyService>((ref) {
@@ -144,10 +144,23 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = ref.watch(languageProvider);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Agronomy Guide'),
+        title: Text(lang == 'en' ? 'Agronomy Guide' : 'කෘෂිවිද්‍යා මාර්ගෝපදේශය'),
         elevation: 0,
+        actions: [
+          TextButton(
+            onPressed: () {
+              ref.read(languageProvider.notifier).state = lang == 'en' ? 'si' : 'en';
+            },
+            child: Text(
+              lang == 'en' ? 'සිංහල' : 'English',
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async => _handleRefresh(),
@@ -193,14 +206,14 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Planting Guide',
+                                lang == 'en' ? 'Planting Guide' : 'වගා මාර්ගෝපදේශය',
                                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                       color: Colors.white.withOpacity(0.9),
                                       fontSize: 12,
                                     ),
                               ),
                               Text(
-                                'Agronomy Guide',
+                                lang == 'en' ? 'Agronomy Guide' : 'කෘෂිවිද්‍යා මාර්ගෝපදේශය',
                                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -213,10 +226,10 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                     ),
                     const SizedBox(height: 20),
                     // District Selection
-                    _buildDistrictDropdown(),
+                    _buildDistrictDropdown(lang),
                     if (_selectedDistrict != null) ...[
                       const SizedBox(height: 16),
-                      _buildSoilTypeDropdown(),
+                      _buildSoilTypeDropdown(lang),
                     ],
                     const SizedBox(height: 24),
                     // Search Button
@@ -233,9 +246,9 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                           ),
                           elevation: 0,
                         ),
-                        child: const Text(
-                          'SEARCH GUIDES',
-                          style: TextStyle(
+                        child: Text(
+                          lang == 'en' ? 'SEARCH GUIDES' : 'මාර්ගෝපදේශ සොයන්න',
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -258,14 +271,14 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                     icon: Icons.search,
                   ),
                 )
-              : _buildGuidesContentSliver(),
+              : _buildGuidesContentSliver(lang),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDistrictDropdown() {
+  Widget _buildDistrictDropdown(String lang) {
     final districtsAsync = ref.watch(districtsProvider);
 
     return districtsAsync.when(
@@ -282,7 +295,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
             decoration: InputDecoration(
               border: InputBorder.none,
               prefixIcon: const Icon(Icons.location_on, color: Colors.grey),
-              hintText: 'Select District',
+              hintText: lang == 'en' ? 'Select District' : 'දිස්ත්‍රික්කය තෝරන්න',
               hintStyle: TextStyle(color: Colors.grey[600]),
             ),
             icon: Icon(
@@ -292,7 +305,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
             items: districts.map((district) {
               return DropdownMenuItem(
                 value: district,
-                child: Text(district.name),
+                child: Text(district.name.get(lang)),
               );
             }).toList(),
             onChanged: (value) {
@@ -322,7 +335,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
     );
   }
 
-  Widget _buildSoilTypeDropdown() {
+  Widget _buildSoilTypeDropdown(String lang) {
     if (_selectedDistrict == null) return const SizedBox.shrink();
 
     final soilsAsync = ref.watch(soilsByDistrictProvider(_selectedDistrict!.id));
@@ -342,7 +355,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'No soil types specific to this district found.',
+                    lang == 'en' ? 'No soil types specific to this district found.' : 'මෙම දිස්ත්‍රික්කයට විශේෂිත පස වර්ග හමු නොවිණි.',
                     style: TextStyle(color: Colors.grey[800], fontSize: 13),
                   ),
                 ),
@@ -362,7 +375,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
             decoration: InputDecoration(
               border: InputBorder.none,
               prefixIcon: const Icon(Icons.landscape, color: Colors.grey),
-              hintText: 'Select Soil Type (Optional)', // Updated hint
+              hintText: lang == 'en' ? 'Select Soil Type (Optional)' : 'පස වර්ගය තෝරන්න (විකල්ප)', // Updated hint
               hintStyle: TextStyle(color: Colors.grey[600]),
             ),
             icon: Icon(
@@ -371,14 +384,14 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
             ),
             items: [
               // Add option to deselect soil type
-              const DropdownMenuItem<SoilType>(
+              DropdownMenuItem<SoilType>(
                 value: null,
-                child: Text('All Soil Types', style: TextStyle(color: Colors.black)),
+                child: Text(lang == 'en' ? 'All Soil Types' : 'සියලුම පස වර්ග', style: const TextStyle(color: Colors.black)),
               ),
               ...soils.map((soil) {
                 return DropdownMenuItem(
                   value: soil,
-                  child: Text(soil.typeName),
+                  child: Text(soil.typeName.get(lang)),
                 );
               }),
             ],
@@ -403,7 +416,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
     );
   }
 
-  Widget _buildGuidesContentSliver() {
+  Widget _buildGuidesContentSliver(String lang) {
     if (!_hasSearched || _cachedGuidesKey == null) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
@@ -416,43 +429,59 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
           return SliverFillRemaining(
             hasScrollBody: false,
             child: EmptyState(
-              message: 'No planting guides found matching your criteria.',
+              message: lang == 'en' ? 'No planting guides found matching your criteria.' : 'ඔබගේ සෙවුමට ගැළපෙන මාර්ගෝපදේශ හමු නොවිණි.',
               icon: Icons.search_off,
             ),
           );
         }
-        return _buildAllGuidesSliver(guides);
+        return _buildAllGuidesSliver(guides, lang);
       },
-      loading: () => const SliverFillRemaining(
+      loading: () => SliverFillRemaining(
         hasScrollBody: false,
-        child: LoadingSpinner(message: 'Searching planting guides...'),
+        child: LoadingSpinner(message: lang == 'en' ? 'Searching planting guides...' : 'සොයමින් පවතී...'),
       ),
       error: (error, stack) => SliverFillRemaining(
         hasScrollBody: false,
-        child: _buildErrorState(error.toString()),
+        child: _buildErrorState(error.toString(), lang),
       ),
     );
   }
 
-  Widget _buildAllGuidesSliver(List<AgronomyGuideResponse> guides) {
+  Widget _buildAllGuidesSliver(List<AgronomyGuideResponse> guides, String lang) {
+    // Deduplicate guides by varietyId to prevent showing the same variety multiple times 
+    // when "All Soil Types" is selected.
+    final seenVarieties = <String>{};
+    final uniqueGuides = <AgronomyGuideResponse>[];
+    
+    for (final guide in guides) {
+      if (!seenVarieties.contains(guide.varietyId)) {
+        seenVarieties.add(guide.varietyId);
+        uniqueGuides.add(guide);
+      }
+    }
+
     return SliverPadding(
       padding: const EdgeInsets.only(bottom: 80),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final guide = guides[index];
+            final guide = uniqueGuides[index];
             return Padding(
               padding: EdgeInsets.fromLTRB(16, index == 0 ? 16 : 8, 16, 8),
-              child: _buildVarietyGuideCard(guide),
+              child: _buildVarietyGuideCard(guide, lang),
             );
           },
-          childCount: guides.length,
+          childCount: uniqueGuides.length,
         ),
       ),
     );
   }
 
-  Widget _buildVarietyGuideCard(AgronomyGuideResponse guide) {
+  Widget _buildVarietyGuideCard(AgronomyGuideResponse guide, String lang) {
+    final soilTypeText = _selectedSoilType == null 
+        ? (lang == 'en' ? 'All Suitable Soils' : 'සියලුම සුදුසු පස') 
+        : guide.soilTypeName.get(lang);
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 3,
@@ -478,6 +507,8 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Using placeholder logic as AgronomyGuideResponse does not contain plantingSpecifications
+            // Wait, we need a way to open variety details here. Since guide model is already simplified and the actual backend variety object is not here, it's better to remove this button or implement a fetch by Variety ID in the future if required. Note: The design initially didn't have this button. The multi_replace_file_content mistakenly added it due to a misplaced diff.
             // Variety Header
             Padding(
               padding: const EdgeInsets.all(20.0),
@@ -509,7 +540,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              guide.varietyName,
+                              guide.varietyName.get(lang),
                               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey[800],
@@ -517,7 +548,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${guide.districtName} • ${guide.soilTypeName}',
+                              '${guide.districtName.get(lang)} • $soilTypeText',
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Colors.grey[600],
                                   ),
@@ -528,30 +559,30 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                     ],
                   ),
                   // Variety Details
-                  if (guide.varietySpecialities.isNotEmpty) ...[
+                  if (guide.varietySpecialities.get(lang).isNotEmpty) ...[
                     const SizedBox(height: 16),
                     _buildDetailRow(
                       Icons.star,
-                      'Specialities',
-                      guide.varietySpecialities,
+                      lang == 'en' ? 'Specialities' : 'විශේෂතා',
+                      guide.varietySpecialities.get(lang),
                       Colors.amber,
                     ),
                   ],
-                  if (guide.varietySoilTypeRecommendation.isNotEmpty) ...[
+                  if (guide.varietySoilTypeRecommendation.get(lang).isNotEmpty) ...[
                     const SizedBox(height: 12),
                     _buildDetailRow(
                       Icons.landscape,
-                      'Soil Recommendation',
-                      guide.varietySoilTypeRecommendation,
+                      lang == 'en' ? 'Soil Recommendation' : 'නිර්දේශිත පස',
+                      guide.varietySoilTypeRecommendation.get(lang),
                       Colors.brown,
                     ),
                   ],
-                  if (guide.varietySuitabilityReason.isNotEmpty) ...[
+                  if (guide.varietySuitabilityReason.get(lang).isNotEmpty) ...[
                     const SizedBox(height: 12),
                     _buildDetailRow(
                       Icons.help_outline,
-                      'Why Suitable',
-                      guide.varietySuitabilityReason,
+                      lang == 'en' ? 'Why Suitable' : 'සුදුසු වීමට හේතුව',
+                      guide.varietySuitabilityReason.get(lang),
                       Colors.blue,
                     ),
                   ],
@@ -602,12 +633,12 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                 ],
               ),
             ),
-            // Guide Steps
+            // Inside _buildVarietyGuideCard
             if (guide.steps.isNotEmpty) ...[
               const Divider(height: 1),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                child: _buildStepsSection(guide.steps),
+                child: _buildStepsSection(guide.steps, lang),
               ),
             ],
           ],
@@ -616,7 +647,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
     );
   }
 
-  Widget _buildVarietiesSection(List<BlackPepperVariety> varieties) {
+  Widget _buildVarietiesSection(List<BlackPepperVariety> varieties, String lang) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -636,7 +667,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
               ),
               const SizedBox(width: 12),
               Text(
-                'Suitable Varieties',
+                lang == 'en' ? 'Suitable Varieties' : 'සුදුසු ප්‍රභේද',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.grey[800],
@@ -647,27 +678,25 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
         ),
         const SizedBox(height: 16),
         // Varieties List
-        ...varieties.map((variety) => _buildVarietyTile(variety)),
+        ...varieties.map((variety) => _buildVarietyTile(variety, lang)),
       ],
     );
   }
 
-  Widget _buildVarietyTile(BlackPepperVariety variety) {
+  Widget _buildVarietyTile(BlackPepperVariety variety, String lang) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 3,
+      elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         side: BorderSide(
           color: Colors.grey[200]!,
           width: 1,
         ),
       ),
       child: InkWell(
-        onTap: () {
-          _showVarietyDetails(variety);
-        },
-        borderRadius: BorderRadius.circular(20),
+        onTap: () => _showVarietyDetails(variety, lang),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
@@ -714,7 +743,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        variety.name,
+                        variety.name.get(lang),
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.grey[800],
@@ -722,7 +751,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        variety.specialities,
+                        variety.specialities.get(lang),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Colors.grey[600],
                             ),
@@ -745,7 +774,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
     );
   }
 
-  void _showVarietyDetails(BlackPepperVariety variety) {
+  void _showVarietyDetails(BlackPepperVariety variety, String lang) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -790,7 +819,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(
-                      variety.name,
+                      variety.name.get(lang),
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -803,8 +832,8 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
               // Soil Type Recommendation
               _buildDetailCard(
                 icon: Icons.landscape,
-                title: 'Suitable Soil',
-                content: variety.soilTypeRecommendation,
+                title: lang == 'en' ? 'Suitable Soil' : 'සුදුසු පස',
+                content: variety.soilTypeRecommendation.get(lang),
                 color: Colors.brown,
               ),
               const SizedBox(height: 16),
@@ -812,8 +841,8 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
               // Specialities
               _buildDetailCard(
                 icon: Icons.star,
-                title: 'Specialities',
-                content: variety.specialities,
+                title: lang == 'en' ? 'Specialities' : 'විශේෂතා',
+                content: variety.specialities.get(lang),
                 color: Colors.amber,
               ),
               const SizedBox(height: 16),
@@ -821,8 +850,8 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
               // Suitability Reason
               _buildDetailCard(
                 icon: Icons.help_outline,
-                title: 'Why here?',
-                content: variety.suitabilityReason,
+                title: lang == 'en' ? 'Why here?' : 'සුදුසු වීමට හේතුව',
+                content: variety.suitabilityReason.get(lang),
                 color: Colors.blue,
               ),
               const SizedBox(height: 16),
@@ -966,7 +995,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
     );
   }
 
-  Widget _buildStepsSection(List<GuideStep> steps) {
+  Widget _buildStepsSection(List<GuideStep> steps, String lang) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -986,7 +1015,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
               ),
               const SizedBox(width: 12),
               Text(
-                'Instructional Steps',
+                lang == 'en' ? 'Instructional Steps' : 'උපදෙස් පියවර',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.grey[800],
@@ -997,12 +1026,12 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
         ),
         const SizedBox(height: 16),
         // Steps List
-        ...steps.map((step) => _buildStepCard(step)),
+        ...steps.map((step) => _buildStepCard(step, lang)),
       ],
     );
   }
 
-  Widget _buildStepCard(GuideStep step) {
+  Widget _buildStepCard(GuideStep step, String lang) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -1054,7 +1083,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    step.title,
+                    step.title.get(lang),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Colors.grey[800],
@@ -1062,7 +1091,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    step.details,
+                    step.details.get(lang),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Colors.grey[700],
                           height: 1.5,
@@ -1078,7 +1107,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
   }
 
 
-  Widget _buildErrorState(String error) {
+  Widget _buildErrorState(String error, String lang) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1086,7 +1115,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
           Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
           const SizedBox(height: 16),
           Text(
-            'Error loading guide',
+            lang == 'en' ? 'Error loading guide' : 'මාර්ගෝපදේශය පැටවීමේ දෝෂයකි',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.red,
                 ),
@@ -1109,7 +1138,7 @@ class _AgronomyGuidePageState extends ConsumerState<AgronomyGuidePage> {
               }
             },
             icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
+            label: Text(lang == 'en' ? 'Retry' : 'නැවත උත්සාහ කරන්න'),
           ),
         ],
       ),

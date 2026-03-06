@@ -1,6 +1,8 @@
+import 'localized_string.dart';
+
 class SoilType {
   final String id;
-  final String typeName;
+  final LocalizedString typeName;
 
   SoilType({
     required this.id,
@@ -10,14 +12,14 @@ class SoilType {
   factory SoilType.fromJson(Map<String, dynamic> json) {
     return SoilType(
       id: json['id'].toString(),
-      typeName: (json['typeName'] ?? json['name'] ?? '').toString(),
+      typeName: LocalizedString.fromJson(json['typeName'] ?? json['name']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'typeName': typeName,
+      'typeName': typeName.toJson(),
     };
   }
 

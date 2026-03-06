@@ -1,9 +1,11 @@
+import 'localized_string.dart';
+
 class BlackPepperVariety {
   final String id;
-  final String name;
-  final String specialities;
-  final String suitabilityReason;
-  final String soilTypeRecommendation;
+  final LocalizedString name;
+  final LocalizedString specialities;
+  final LocalizedString suitabilityReason;
+  final LocalizedString soilTypeRecommendation;
   final PlantingSpecifications plantingSpecifications;
 
   BlackPepperVariety({
@@ -20,14 +22,14 @@ class BlackPepperVariety {
     
     return BlackPepperVariety(
       id: idValue?.toString() ?? '',
-      name: (json['name'] ?? json['Name'] ?? '').toString(),
-      specialities: (json['specialities'] ?? json['Specialities'] ?? '').toString(),
-      suitabilityReason: (json['suitability_reason'] ?? 
+      name: LocalizedString.fromJson(json['name'] ?? json['Name']),
+      specialities: LocalizedString.fromJson(json['specialities'] ?? json['Specialities']),
+      suitabilityReason: LocalizedString.fromJson(json['suitability_reason'] ?? 
                           json['SuitabilityReason'] ?? 
-                          json['suitabilityReason'] ?? '').toString(),
-      soilTypeRecommendation: (json['soil_type_recommendation'] ?? 
+                          json['suitabilityReason']),
+      soilTypeRecommendation: LocalizedString.fromJson(json['soil_type_recommendation'] ?? 
                                json['SoilTypeRecommendation'] ?? 
-                               json['soilTypeRecommendation'] ?? '').toString(),
+                               json['soilTypeRecommendation']),
       plantingSpecifications: _parsePlantingSpecifications(
         json['planting_specifications'] ?? 
         json['PlantingSpecifications'] ?? 
@@ -49,10 +51,10 @@ class BlackPepperVariety {
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'name': name,
-    'specialities': specialities,
-    'suitability_reason': suitabilityReason,
-    'soil_type_recommendation': soilTypeRecommendation,
+    'name': name.toJson(),
+    'specialities': specialities.toJson(),
+    'suitability_reason': suitabilityReason.toJson(),
+    'soil_type_recommendation': soilTypeRecommendation.toJson(),
     'planting_specifications': plantingSpecifications.toJson(),
   };
 

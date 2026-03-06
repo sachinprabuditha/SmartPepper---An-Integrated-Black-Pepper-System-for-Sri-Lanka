@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/season_controller.dart';
-import '../models/season_model.dart';
-import '../../sessions/pages/sessions_list_page.dart';
 import '../../sessions/pages/create_session_page.dart';
 import '../../sessions/widgets/session_card.dart';
 import '../../sessions/controllers/session_controller.dart';
@@ -13,6 +11,7 @@ import '../../../../core/widgets/loading_spinner.dart';
 import '../../../../core/widgets/empty_state.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../../core/utils/constants.dart';
+import '../../agronomy/providers/language_provider.dart';
 
 class SeasonDetailsPage extends ConsumerWidget {
   final String seasonId;
@@ -66,6 +65,7 @@ class SeasonDetailsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(languageProvider);
     final seasonAsync = ref.watch(seasonProvider(seasonId));
     final storage = const FlutterSecureStorage();
 
@@ -132,7 +132,7 @@ class SeasonDetailsPage extends ConsumerWidget {
                             data: (farm) => Column(
                               children: [
                                 _buildInfoRow(context, 'Farm', farm.farmName),
-                                _buildInfoRow(context, 'District', farm.district),
+                                _buildInfoRow(context, 'District', farm.district.get(lang)),
                               ],
                             ),
                             loading: () => _buildInfoRow(context, 'Farm', 'Loading...'),
@@ -208,11 +208,11 @@ class SeasonDetailsPage extends ConsumerWidget {
               sessionsState.when(
                 data: (sessions) {
                   if (sessions.isEmpty) {
-                    return SliverFillRemaining(
+                    return const SliverFillRemaining(
                       hasScrollBody: false,
                       child: Padding(
-                        padding: const EdgeInsets.all(32.0),
-                        child: const EmptyState(
+                        padding: EdgeInsets.all(32.0),
+                        child: EmptyState(
                           message: 'No harvesting sessions recorded yet.\nTap the + button below to add your first session.',
                           icon: Icons.inventory_2_outlined,
                         ),

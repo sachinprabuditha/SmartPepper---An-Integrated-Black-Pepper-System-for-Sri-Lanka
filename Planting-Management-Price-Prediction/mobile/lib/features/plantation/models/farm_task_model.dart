@@ -1,7 +1,9 @@
+import '../../agronomy/models/localized_string.dart';
+
 class FarmTask {
   final String id;
   final String farmId;
-  final String taskName;
+  final LocalizedString taskName;
   final String phase;
   final String taskType;
   final String varietyKey;
@@ -9,8 +11,8 @@ class FarmTask {
   final String status;
   final DateTime? dateCompleted;
   final InputDetails? inputDetails;
-  final List<String> detailedSteps;
-  final String? reasonWhy;
+  final List<LocalizedString> detailedSteps;
+  final LocalizedString? reasonWhy;
   final bool isManual;
   final String priority;
   final DateTime createdAt;
@@ -36,13 +38,13 @@ class FarmTask {
   factory FarmTask.fromJson(Map<String, dynamic> json) {
     final idValue = json['id'] ?? json['_id'] ?? json['Id'];
     if (idValue == null) {
-      throw FormatException('FarmTask ID is required but was null');
+      throw const FormatException('FarmTask ID is required but was null');
     }
 
     return FarmTask(
       id: idValue.toString(),
       farmId: (json['farm_id'] ?? json['farmId'] ?? json['FarmId'] ?? '').toString(),
-      taskName: (json['task_name'] ?? json['taskName'] ?? json['TaskName'] ?? '').toString(),
+      taskName: LocalizedString.fromJson(json['task_name'] ?? json['taskName'] ?? json['TaskName']),
       phase: (json['phase'] ?? json['Phase'] ?? '').toString(),
       taskType: (json['task_type'] ?? json['taskType'] ?? json['TaskType'] ?? '').toString(),
       varietyKey: (json['variety_key'] ?? json['varietyKey'] ?? json['VarietyKey'] ?? '').toString(),
@@ -54,8 +56,10 @@ class FarmTask {
       inputDetails: json['input_details'] != null || json['inputDetails'] != null || json['InputDetails'] != null
           ? InputDetails.fromJson((json['input_details'] ?? json['inputDetails'] ?? json['InputDetails']) as Map<String, dynamic>)
           : null,
-      detailedSteps: _parseStringList(json['detailed_steps'] ?? json['detailedSteps'] ?? json['DetailedSteps']),
-      reasonWhy: (json['reason_why'] ?? json['reasonWhy'] ?? json['ReasonWhy'])?.toString(),
+      detailedSteps: _parseDetailedSteps(json['detailed_steps'] ?? json['detailedSteps'] ?? json['DetailedSteps']),
+      reasonWhy: (json['reason_why'] ?? json['reasonWhy'] ?? json['ReasonWhy']) != null 
+          ? LocalizedString.fromJson(json['reason_why'] ?? json['reasonWhy'] ?? json['ReasonWhy']) 
+          : null,
       isManual: json['is_manual'] ?? json['isManual'] ?? json['IsManual'] ?? false,
       priority: (json['priority'] ?? json['Priority'] ?? 'Medium').toString(),
       createdAt: _parseDateTime(json['created_at'] ?? json['createdAt'] ?? json['CreatedAt']),
@@ -66,7 +70,7 @@ class FarmTask {
     return {
       'id': id,
       'farm_id': farmId,
-      'task_name': taskName,
+      'task_name': taskName.toJson(),
       'phase': phase,
       'task_type': taskType,
       'variety_key': varietyKey,
@@ -74,8 +78,8 @@ class FarmTask {
       'status': status,
       'date_completed': dateCompleted?.toIso8601String(),
       'input_details': inputDetails?.toJson(),
-      'detailed_steps': detailedSteps,
-      'reason_why': reasonWhy,
+      'detailed_steps': detailedSteps.map((e) => e.toJson()).toList(),
+      'reason_why': reasonWhy?.toJson(),
       'created_at': createdAt.toIso8601String(),
     };
   }
@@ -93,10 +97,10 @@ class FarmTask {
     return DateTime.now().toUtc();
   }
 
-  static List<String> _parseStringList(dynamic value) {
+  static List<LocalizedString> _parseDetailedSteps(dynamic value) {
     if (value == null) return [];
     if (value is List) {
-      return value.map((e) => e.toString()).toList();
+      return value.map((e) => LocalizedString.fromJson(e)).toList();
     }
     return [];
   }
@@ -143,9 +147,9 @@ class InputDetails {
     return InputDetails(
       items: itemsList,
       laborHours: _parseDouble(json['labor_hours'] ?? json['laborHours'] ?? json['LaborHours']),
-      notes: json['notes'] != null ? json['notes'].toString() : null,
+      notes: json['notes']?.toString(),
       // Legacy fields
-      itemUsed: json['item_used'] != null ? json['item_used'].toString() : null,
+      itemUsed: json['item_used']?.toString(),
       quantity: json['quantity'] != null ? _parseDouble(json['quantity']) : null,
       unitCostLKR: json['unit_cost_lkr'] != null ? _parseDouble(json['unit_cost_lkr']) : null,
     );
