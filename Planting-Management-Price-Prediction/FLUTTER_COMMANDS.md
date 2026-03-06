@@ -3,8 +3,7 @@
 ## 1. Open/Launch Android Emulator
 ```powershell
 cd "F:\Year 4\My Research\ResearchProject"
-flutter emulators --launch Pixel_5_API_35
-flutter emulators --launch Pixel_8_API_30
+flutter emulators --launch Pixel_8_Pro_API_35
 ```
 
 Or to see all available emulators first:

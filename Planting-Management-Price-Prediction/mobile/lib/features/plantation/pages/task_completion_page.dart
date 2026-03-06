@@ -5,6 +5,7 @@ import '../models/farm_task_model.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/input_field.dart';
 import '../../../../core/utils/validators.dart';
+import '../../agronomy/providers/language_provider.dart';
 
 class TaskCompletionPage extends ConsumerStatefulWidget {
   final FarmTask task;
@@ -117,14 +118,14 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
     });
   }
 
-  Future<void> _handleSubmit() async {
+  Future<void> _handleSubmit(String lang) async {
     if (_formKey.currentState!.validate()) {
       // Validate labor hours (required)
       final laborHours = double.tryParse(_laborHoursController.text.trim());
       if (laborHours == null || laborHours < 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please enter valid labor hours'),
+          SnackBar(
+            content: Text(lang == 'en' ? 'Please enter valid labor hours' : 'කරුණාකර නිවැරදි වැඩ කරන පැය ගණන ඇතුලත් කරන්න'),
             backgroundColor: Colors.red,
           ),
         );
@@ -176,8 +177,8 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
         if (mounted) {
           _updateTaskData(updatedTask);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Task completed successfully!'),
+            SnackBar(
+              content: Text(lang == 'en' ? 'Task completed successfully!' : 'කාර්යය සාර්ථකව සම්පූර්ණ කරන ලදී!'),
               backgroundColor: Colors.green,
             ),
           );
@@ -203,30 +204,34 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = ref.watch(languageProvider);
+    
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isCompleted ? 'Task Details' : 'Complete Task'),
+        title: Text(_isCompleted 
+            ? (lang == 'en' ? 'Task Details' : 'කාර්ය විස්තර') 
+            : (lang == 'en' ? 'Complete Task' : 'කාර්යය සම්පූර්ණ කරන්න')),
         actions: [
           // Edit task details button (manual tasks only, before completion)
           if (_canEditTaskDetails)
             IconButton(
               icon: const Icon(Icons.edit),
-              tooltip: 'Edit Task Details',
-              onPressed: () => _showEditTaskDialog(context),
+              tooltip: lang == 'en' ? 'Edit Task Details' : 'කාර්ය විස්තර සංස්කරණය කරන්න',
+              onPressed: () => _showEditTaskDialog(context, lang),
             ),
           // Edit completion details button (both types, after completion)
           if (_canEditCompletion)
             IconButton(
               icon: const Icon(Icons.edit_note),
-              tooltip: 'Edit Completion Details',
-              onPressed: () => _showEditCompletionDialog(context),
+              tooltip: lang == 'en' ? 'Edit Completion Details' : 'සම්පූර්ණ කිරීම් විස්තර සංස්කරණය කරන්න',
+              onPressed: () => _showEditCompletionDialog(context, lang),
             ),
           // Delete button (manual tasks only, before completion)
           if (_canDelete)
             IconButton(
               icon: const Icon(Icons.delete),
-              tooltip: 'Delete Task',
-              onPressed: () => _showDeleteConfirmation(context),
+              tooltip: lang == 'en' ? 'Delete Task' : 'කාර්යය මකන්න',
+              onPressed: () => _showDeleteConfirmation(context, lang),
             ),
         ],
       ),
@@ -245,7 +250,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          _currentTask.taskName,
+                          _currentTask.taskName.get(lang),
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -253,7 +258,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                       ),
                       if (_isCompleted)
                         Chip(
-                          label: const Text('Completed'),
+                          label: Text(lang == 'en' ? 'Completed' : 'සම්පූර්ණයි'),
                           backgroundColor: Colors.green,
                           labelStyle: const TextStyle(color: Colors.white),
                         ),
@@ -273,7 +278,9 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                         const Icon(Icons.check_circle, color: Colors.green),
                         const SizedBox(width: 8),
                         Text(
-                          'Completed on: ${_currentTask.dateCompleted!.day}/${_currentTask.dateCompleted!.month}/${_currentTask.dateCompleted!.year}',
+                          lang == 'en' 
+                            ? 'Completed on: ${_currentTask.dateCompleted!.day}/${_currentTask.dateCompleted!.month}/${_currentTask.dateCompleted!.year}'
+                            : 'සම්පූර්ණ කරන ලද්දේ: ${_currentTask.dateCompleted!.day}/${_currentTask.dateCompleted!.month}/${_currentTask.dateCompleted!.year}',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 fontWeight: FontWeight.w500,
                               ),
@@ -290,9 +297,9 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                   color: Colors.green[50],
                   child: ExpansionTile(
                     leading: const Icon(Icons.info_outline, color: Colors.green),
-                    title: const Text(
-                      'Task Instructions',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    title: Text(
+                      lang == 'en' ? 'Task Instructions' : 'කාර්යය උපදෙස්',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     children: [
                       Padding(
@@ -313,12 +320,12 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                                       color: Colors.green,
                                     ),
                                   ),
-                                  Expanded(
-                                    child: Text(
-                                      step,
-                                      style: Theme.of(context).textTheme.bodyMedium,
+                                    Expanded(
+                                      child: Text(
+                                        step.get(lang),
+                                        style: Theme.of(context).textTheme.bodyMedium,
+                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
                             );
@@ -329,7 +336,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                   ),
                 ),
               ],
-              if (_currentTask.reasonWhy != null && _currentTask.reasonWhy!.isNotEmpty) ...[
+              if (_currentTask.reasonWhy != null && _currentTask.reasonWhy!.get(lang).isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Card(
                   color: Colors.orange[50],
@@ -345,14 +352,14 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Why this task?',
+                                lang == 'en' ? 'Why this task?' : 'මෙම කාර්යය කුමකටද?',
                                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _currentTask.reasonWhy!,
+                                _currentTask.reasonWhy!.get(lang),
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ],
@@ -369,7 +376,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                 Divider(color: Colors.grey[300]),
                 const SizedBox(height: 16),
                 Text(
-                  'Completion Details',
+                  lang == 'en' ? 'Completion Details' : 'සම්පූර්ණ කිරීම් විස්තර',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -378,7 +385,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                 // Items Used
                 if (_currentTask.inputDetails != null && _currentTask.inputDetails!.items.isNotEmpty) ...[
                   Text(
-                    'Items Used',
+                    lang == 'en' ? 'Items Used' : 'භාවිතා කරන ලද අයිතම',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -400,19 +407,23 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            Wrap(
+                              alignment: WrapAlignment.spaceBetween,
+                              spacing: 16,
+                              runSpacing: 4,
                               children: [
-                                Text('Quantity: ${item.quantity} ${item.unit}'),
+                                Text('${lang == 'en' ? 'Quantity' : 'ප්‍රමාණය'}: ${item.quantity} ${item.unit}'),
                                 Text(item.unitCostLKR != null 
-                                  ? 'Unit Cost: LKR ${item.unitCostLKR!.toStringAsFixed(2)}'
-                                  : 'Unit Cost: Not specified'),
+                                  ? '${lang == 'en' ? 'Unit Cost' : 'ඒකක පිරිවැය'}: LKR ${item.unitCostLKR!.toStringAsFixed(2)}'
+                                  : (lang == 'en' ? 'Unit Cost: Not specified' : 'ඒකක පිරිවැය: සඳහන් කර නොමැත')),
                               ],
                             ),
                             if (item.unitCostLKR != null) ...[
                               const SizedBox(height: 4),
                               Text(
-                                'Total: LKR ${(item.quantity * item.unitCostLKR!).toStringAsFixed(2)}',
+                                lang == 'en' 
+                                  ? 'Total: LKR ${(item.quantity * item.unitCostLKR!).toStringAsFixed(2)}'
+                                  : 'එකතුව: රුපියල් ${(item.quantity * item.unitCostLKR!).toStringAsFixed(2)}',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Theme.of(context).colorScheme.primary,
@@ -437,7 +448,9 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'No items recorded yet. Use "Edit Completion Details" to add items.',
+                              lang == 'en' 
+                                ? 'No items recorded yet. Use "Edit Completion Details" to add items.'
+                                : 'තවමත් අයිතම කිසිවක් වාර්තා කර නොමැත. "සම්පූර්ණ කිරීම් විස්තර සංස්කරණය කරන්න" භාවිතා කර අයිතම එකතු කරන්න.',
                               style: TextStyle(color: Colors.grey[700]),
                             ),
                           ),
@@ -454,9 +467,11 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Labor Hours:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        Expanded(
+                          child: Text(
+                            lang == 'en' ? 'Labor Hours:' : 'වැඩ කරන පැය ගණන:',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                         Text(
                           _currentTask.inputDetails?.laborHours.toStringAsFixed(1) ?? '0.0',
@@ -475,9 +490,9 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Notes:',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          Text(
+                            lang == 'en' ? 'Notes:' : 'සටහන්:',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           Text(_currentTask.inputDetails!.notes!),
@@ -492,17 +507,19 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Items Used (Optional)',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                  Expanded(
+                    child: Text(
+                      lang == 'en' ? 'Items Used (Optional)' : 'භාවිතා කරන ලද අයිතම (අත්‍යවශ්‍ය නොවේ)',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.add_circle),
                     color: Theme.of(context).colorScheme.primary,
                     onPressed: _addItem,
-                    tooltip: 'Add Item',
+                    tooltip: lang == 'en' ? 'Add Item' : 'අයිතමයක් එක් කරන්න',
                   ),
                 ],
               ),
@@ -510,7 +527,9 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Text(
-                    'No items added. You can add items to track costs, or skip this section.',
+                    lang == 'en' 
+                      ? 'No items added. You can add items to track costs, or skip this section.'
+                      : 'අයිතම කිසිවක් එක් කර නොමැත. පිරිවැය නිරීක්ෂණය කිරීමට ඔබට අයිතම එකතු කළ හැකිය, නැතහොත් මෙම කොටස මඟ හැරිය හැකිය.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           fontStyle: FontStyle.italic,
                           color: Colors.grey[600],
@@ -519,36 +538,36 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                 ),
               const SizedBox(height: 8),
               ...List.generate(_items.length, (index) {
-                return _buildItemCard(index);
+                return _buildItemCard(index, lang);
               }),
               const SizedBox(height: 16),
               InputField(
-                label: 'Labor Hours',
+                label: lang == 'en' ? 'Labor Hours' : 'වැඩ කරන පැය ගණන',
                 controller: _laborHoursController,
-                hint: 'e.g., 8.5',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                hint: lang == 'en' ? 'e.g., 8.5' : 'උදා: 8.5',
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter labor hours';
+                    return lang == 'en' ? 'Please enter labor hours' : 'කරුණාකර වැඩ කරන පැය ගණන ඇතුලත් කරන්න';
                   }
                   final hours = double.tryParse(value);
                   if (hours == null || hours < 0) {
-                    return 'Please enter valid labor hours';
+                    return lang == 'en' ? 'Please enter valid labor hours' : 'කරුණාකර නිවැරදි වැඩ කරන පැය ගණන ඇතුලත් කරන්න';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               InputField(
-                label: 'Notes (Optional)',
+                label: lang == 'en' ? 'Notes (Optional)' : 'සටහන් (අත්‍යවශ්‍ය නොවේ)',
                 controller: _notesController,
-                hint: 'Additional notes about this task...',
+                hint: lang == 'en' ? 'Additional notes about this task...' : 'මෙම කාර්යය පිළිබඳ අමතර සටහන්...',
                 maxLines: 3,
               ),
               const SizedBox(height: 32),
               PrimaryButton(
-                text: 'Mark as Completed',
-                onPressed: _handleSubmit,
+                text: lang == 'en' ? 'Mark as Completed' : 'සම්පූර්ණ ලෙස සලකුණු කරන්න',
+                onPressed: () => _handleSubmit(lang),
               ),
               ],
             ],
@@ -558,7 +577,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
     );
   }
 
-  Widget _buildItemCard(int index) {
+  Widget _buildItemCard(int index, String lang) {
     final item = _items[index];
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -571,7 +590,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Item ${index + 1}',
+                  lang == 'en' ? 'Item ${index + 1}' : 'අයිතමය ${index + 1}',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -579,7 +598,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () => _removeItem(index),
-                  tooltip: 'Remove Item',
+                  tooltip: lang == 'en' ? 'Remove Item' : 'අයිතමය ඉවත් කරන්න',
                   iconSize: 20,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -588,9 +607,9 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
             ),
             const SizedBox(height: 8),
             InputField(
-              label: 'Item Name (Optional)',
+              label: lang == 'en' ? 'Item Name (Optional)' : 'අයිතමයේ නම (අත්‍යවශ්‍ය නොවේ)',
               controller: item.itemNameController,
-              hint: 'e.g., NPK 15:15:15, Pesticide X',
+              hint: lang == 'en' ? 'e.g., NPK 15:15:15, Pesticide X' : 'උදා: NPK 15:15:15, පළිබෝධනාශක X',
             ),
             const SizedBox(height: 8),
             Row(
@@ -598,16 +617,16 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                 Expanded(
                   flex: 2,
                   child: InputField(
-                    label: 'Quantity (Optional)',
+                    label: lang == 'en' ? 'Quantity (Optional)' : 'ප්‍රමාණය (අත්‍යවශ්‍ය නොවේ)',
                     controller: item.quantityController,
-                    hint: 'e.g., 50.5',
-                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    hint: lang == 'en' ? 'e.g., 50.5' : 'උදා: 50.5',
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     validator: (value) {
                       // Only validate if value is provided
                       if (value != null && value.isNotEmpty) {
                         final qty = double.tryParse(value);
                         if (qty == null || qty < 0) {
-                          return 'Invalid';
+                          return lang == 'en' ? 'Invalid' : 'අවලංගුයි';
                         }
                       }
                       return null;
@@ -618,9 +637,9 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: item.unit,
-                    decoration: const InputDecoration(
-                      labelText: 'Unit',
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                    decoration: InputDecoration(
+                      labelText: lang == 'en' ? 'Unit' : 'ඒකකය',
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                     ),
                     items: const [
                       DropdownMenuItem(value: 'kg', child: Text('kg')),
@@ -639,16 +658,16 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
             ),
             const SizedBox(height: 8),
             InputField(
-              label: 'Unit Cost (LKR) (Optional)',
+              label: lang == 'en' ? 'Unit Cost (LKR) (Optional)' : 'ඒකක පිරිවැය (රුපියල්) (අත්‍යවශ්‍ය නොවේ)',
               controller: item.unitCostController,
-              hint: 'e.g., 500.00',
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              hint: lang == 'en' ? 'e.g., 500.00' : 'උදා: 500.00',
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
               validator: (value) {
                 // Only validate if value is provided
                 if (value != null && value.isNotEmpty) {
                   final cost = double.tryParse(value);
                   if (cost == null || cost < 0) {
-                    return 'Invalid';
+                    return lang == 'en' ? 'Invalid' : 'අවලංගුයි';
                   }
                 }
                 return null;
@@ -659,7 +678,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
-                  'Total: LKR ${_calculateTotal(item)}',
+                  lang == 'en' ? 'Total: LKR ${_calculateTotal(item)}' : 'එකතුව: රුපියල් ${_calculateTotal(item)}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.primary,
@@ -681,43 +700,43 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
     return '0.00';
   }
 
-  void _showEditTaskDialog(BuildContext context) {
+  void _showEditTaskDialog(BuildContext context, String lang) {
     if (!context.mounted) return;
     
-    final taskNameController = TextEditingController(text: _currentTask.taskName);
+    final taskNameController = TextEditingController(text: _currentTask.taskName.get(lang));
     final phaseController = TextEditingController(text: _currentTask.phase);
     String selectedPriority = _currentTask.priority;
     DateTime? selectedDate = _currentTask.dueDate;
-    final reasonController = TextEditingController(text: _currentTask.reasonWhy ?? '');
-    final stepsController = TextEditingController(text: _currentTask.detailedSteps.join('\n'));
+    final reasonController = TextEditingController(text: _currentTask.reasonWhy?.get(lang) ?? '');
+    final stepsController = TextEditingController(text: _currentTask.detailedSteps.map((s) => s.get(lang)).join('\n'));
 
     showDialog<bool>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) {
           return AlertDialog(
-            title: const Text('Edit Task Details'),
+            title: Text(lang == 'en' ? 'Edit Task Details' : 'කාර්ය විස්තර සංස්කරණය කරන්න'),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   InputField(
-                    label: 'Task Name',
+                    label: lang == 'en' ? 'Task Name' : 'කාර්යයේ නම',
                     controller: taskNameController,
-                    validator: Validators.required,
+                    validator: (value) => Validators.required(value, fieldName: lang == 'en' ? 'Task name' : 'කාර්යයේ නම'),
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     value: widget.task.phase,
-                    decoration: const InputDecoration(
-                      labelText: 'Phase',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: lang == 'en' ? 'Phase' : 'අදියර',
+                      border: const OutlineInputBorder(),
                     ),
-                    items: const [
-                      DropdownMenuItem(value: 'Landscaping', child: Text('Landscaping')),
-                      DropdownMenuItem(value: 'Planting', child: Text('Planting')),
-                      DropdownMenuItem(value: 'Maintenance', child: Text('Maintenance')),
-                      DropdownMenuItem(value: 'Harvesting', child: Text('Harvesting')),
+                    items: [
+                      DropdownMenuItem(value: 'Landscaping', child: Text(lang == 'en' ? 'Landscaping' : 'භූමි අලංකරණය')),
+                      DropdownMenuItem(value: 'Planting', child: Text(lang == 'en' ? 'Planting' : 'සිටුවීම')),
+                      DropdownMenuItem(value: 'Maintenance', child: Text(lang == 'en' ? 'Maintenance' : 'නඩත්තුව')),
+                      DropdownMenuItem(value: 'Harvesting', child: Text(lang == 'en' ? 'Harvesting' : 'අස්වනු නෙලීම')),
                     ],
                     onChanged: (value) {
                       if (value != null) {
@@ -730,15 +749,15 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     value: selectedPriority,
-                    decoration: const InputDecoration(
-                      labelText: 'Priority',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: lang == 'en' ? 'Priority' : 'ප්‍රමුඛතාවය',
+                      border: const OutlineInputBorder(),
                     ),
-                    items: const [
-                      DropdownMenuItem(value: 'Low', child: Text('Low')),
-                      DropdownMenuItem(value: 'Medium', child: Text('Medium')),
-                      DropdownMenuItem(value: 'High', child: Text('High')),
-                      DropdownMenuItem(value: 'Emergency', child: Text('Emergency')),
+                    items: [
+                      DropdownMenuItem(value: 'Low', child: Text(lang == 'en' ? 'Low' : 'අඩු')),
+                      DropdownMenuItem(value: 'Medium', child: Text(lang == 'en' ? 'Medium' : 'මධ්‍යම')),
+                      DropdownMenuItem(value: 'High', child: Text(lang == 'en' ? 'High' : 'ඉහළ')),
+                      DropdownMenuItem(value: 'Emergency', child: Text(lang == 'en' ? 'Emergency' : 'හදිසි')),
                     ],
                     onChanged: (value) {
                       if (value != null) {
@@ -765,7 +784,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                     },
                     child: AbsorbPointer(
                       child: InputField(
-                        label: 'Due Date',
+                        label: lang == 'en' ? 'Due Date' : 'අවසන් දිනය',
                         controller: TextEditingController(
                           text: selectedDate != null
                               ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
@@ -773,7 +792,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                         ),
                         validator: (value) {
                           if (selectedDate == null) {
-                            return 'Please select a due date';
+                            return lang == 'en' ? 'Please select a due date' : 'කරුණාකර අවසන් දිනයක් තෝරන්න';
                           }
                           return null;
                         },
@@ -782,13 +801,13 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                   ),
                   const SizedBox(height: 16),
                   InputField(
-                    label: 'Reason (Optional)',
+                    label: lang == 'en' ? 'Reason (Optional)' : 'හේතුව (අත්‍යවශ්‍ය නොවේ)',
                     controller: reasonController,
                     maxLines: 2,
                   ),
                   const SizedBox(height: 16),
                   InputField(
-                    label: 'Detailed Steps (Optional, one per line)',
+                    label: lang == 'en' ? 'Detailed Steps (Optional, one per line)' : 'සවිස්තරාත්මක පියවර (අත්‍යවශ්‍ය නොවේ, පේළියකට එක බැගින්)',
                     controller: stepsController,
                     maxLines: 4,
                   ),
@@ -802,14 +821,14 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                     Navigator.of(dialogContext).pop(false);
                   }
                 },
-                child: const Text('Cancel'),
+                child: Text(lang == 'en' ? 'Cancel' : 'අවලංගු කරන්න'),
               ),
               ElevatedButton(
                 onPressed: () async {
                   if (taskNameController.text.trim().isEmpty || selectedDate == null) {
                     if (dialogContext.mounted) {
                       ScaffoldMessenger.of(dialogContext).showSnackBar(
-                        const SnackBar(content: Text('Please fill all required fields')),
+                        SnackBar(content: Text(lang == 'en' ? 'Please fill all required fields' : 'කරුණාකර අවශ්‍ය සියලුම ක්ෂේත්‍ර පුරවන්න')),
                       );
                     }
                     return;
@@ -850,7 +869,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                     }
                   }
                 },
-                child: const Text('Save'),
+                child: Text(lang == 'en' ? 'Save' : 'සුරකින්න'),
               ),
             ],
           );
@@ -883,7 +902,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
     });
   }
 
-  void _showEditCompletionDialog(BuildContext context) {
+  void _showEditCompletionDialog(BuildContext context, String lang) {
     if (!context.mounted) return;
     
     // Get current input details or use defaults
@@ -914,7 +933,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) {
           return AlertDialog(
-            title: const Text('Edit Completion Details'),
+            title: Text(lang == 'en' ? 'Edit Completion Details' : 'සම්පූර්ණ කිරීම් විස්තර සංස්කරණය කරන්න'),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -922,9 +941,15 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Items Used'),
+                      Expanded(
+                        child: Text(
+                          lang == 'en' ? 'Items Used' : 'භාවිතා කරන ලද අයිතම',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
                       IconButton(
                         icon: const Icon(Icons.add_circle),
+                        tooltip: lang == 'en' ? 'Add Item' : 'අයිතමයක් එක් කරන්න',
                         onPressed: () {
                           if (dialogContext.mounted) {
                             setDialogState(() {
@@ -950,12 +975,13 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    'Item ${index + 1}',
+                                    lang == 'en' ? 'Item ${index + 1}' : 'අයිතමය ${index + 1}',
                                     style: const TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete, size: 20),
+                                  tooltip: lang == 'en' ? 'Remove Item' : 'අයිතමය ඉවත් කරන්න',
                                   onPressed: () {
                                     if (dialogContext.mounted) {
                                       setDialogState(() {
@@ -972,7 +998,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                             ),
                             const SizedBox(height: 8),
                             InputField(
-                              label: 'Item Name',
+                              label: lang == 'en' ? 'Item Name' : 'අයිතමයේ නම',
                               controller: item.itemNameController,
                             ),
                             const SizedBox(height: 8),
@@ -981,9 +1007,9 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                                 Expanded(
                                   flex: 3,
                                   child: InputField(
-                                    label: 'Quantity',
+                                    label: lang == 'en' ? 'Quantity' : 'ප්‍රමාණය',
                                     controller: item.quantityController,
-                                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -991,9 +1017,9 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                                   flex: 2,
                                   child: DropdownButtonFormField<String>(
                                     value: item.unit,
-                                    decoration: const InputDecoration(
-                                      labelText: 'Unit',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                                    decoration: InputDecoration(
+                                      labelText: lang == 'en' ? 'Unit' : 'ඒකකය',
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
                                       isDense: true,
                                     ),
                                     isExpanded: true,
@@ -1016,9 +1042,9 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                             ),
                             const SizedBox(height: 8),
                             InputField(
-                              label: 'Unit Cost (LKR) (Optional)',
+                              label: lang == 'en' ? 'Unit Cost (LKR) (Optional)' : 'ඒකක පිරිවැය (රුපියල්) (අත්‍යවශ්‍ය නොවේ)',
                               controller: item.unitCostController,
-                              keyboardType: TextInputType.numberWithOptions(decimal: true),
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             ),
                           ],
                         ),
@@ -1027,23 +1053,23 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                   }),
                   const SizedBox(height: 16),
                   InputField(
-                    label: 'Labor Hours',
+                    label: lang == 'en' ? 'Labor Hours' : 'වැඩ කරන පැය ගණන',
                     controller: editLaborHoursController,
-                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Required';
+                        return lang == 'en' ? 'Required' : 'අත්‍යවශ්‍යයි';
                       }
                       final hours = double.tryParse(value);
                       if (hours == null || hours < 0) {
-                        return 'Invalid';
+                        return lang == 'en' ? 'Invalid' : 'අවලංගුයි';
                       }
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
                   InputField(
-                    label: 'Notes (Optional)',
+                    label: lang == 'en' ? 'Notes (Optional)' : 'සටහන් (අත්‍යවශ්‍ය නොවේ)',
                     controller: editNotesController,
                     maxLines: 3,
                   ),
@@ -1057,7 +1083,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                     Navigator.of(dialogContext).pop(false);
                   }
                 },
-                child: const Text('Cancel'),
+                child: Text(lang == 'en' ? 'Cancel' : 'අවලංගු කරන්න'),
               ),
               ElevatedButton(
                 onPressed: () async {
@@ -1065,7 +1091,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                   if (laborHours == null || laborHours < 0) {
                     if (dialogContext.mounted) {
                       ScaffoldMessenger.of(dialogContext).showSnackBar(
-                        const SnackBar(content: Text('Please enter valid labor hours')),
+                        SnackBar(content: Text(lang == 'en' ? 'Please enter valid labor hours' : 'කරුණාකර නිවැරදි වැඩ කරන පැය ගණන ඇතුලත් කරන්න')),
                       );
                     }
                     return;
@@ -1132,7 +1158,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                     }
                   }
                 },
-                child: const Text('Save'),
+                child: Text(lang == 'en' ? 'Save' : 'සුරකින්න'),
               ),
             ],
           );
@@ -1162,15 +1188,17 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
     });
   }
 
-  void _showDeleteConfirmation(BuildContext context) {
+  void _showDeleteConfirmation(BuildContext context, String lang) {
     if (!context.mounted) return;
     
     showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Task'),
+        title: Text(lang == 'en' ? 'Delete Task' : 'කාර්යය මකන්න'),
         content: Text(
-          'Are you sure you want to delete "${_currentTask.taskName}"? This action cannot be undone.',
+          lang == 'en' 
+            ? 'Are you sure you want to delete "${_currentTask.taskName.get(lang)}"? This action cannot be undone.'
+            : '"${_currentTask.taskName.get(lang)}" කාර්යය මකා දැමීමට ඔබට විශ්වාසද? මෙම ක්‍රියාව ආපසු හැරවිය නොහැක.',
         ),
         actions: [
           TextButton(
@@ -1179,7 +1207,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                 Navigator.of(dialogContext).pop(false);
               }
             },
-            child: const Text('Cancel'),
+            child: Text(lang == 'en' ? 'Cancel' : 'අවලංගු කරන්න'),
           ),
           TextButton(
             onPressed: () async {
@@ -1196,8 +1224,8 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                 
                 if (mounted && context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Task deleted successfully'),
+                    SnackBar(
+                      content: Text(lang == 'en' ? 'Task deleted successfully' : 'කාර්යය සාර්ථකව මකා දමන ලදී'),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -1216,7 +1244,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(lang == 'en' ? 'Delete' : 'මකන්න'),
           ),
         ],
       ),

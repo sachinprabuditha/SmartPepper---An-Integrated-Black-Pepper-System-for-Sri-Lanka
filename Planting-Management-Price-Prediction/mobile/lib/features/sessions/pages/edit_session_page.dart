@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../controllers/session_controller.dart';
-import '../models/session_model.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/input_field.dart';
 import '../../../../core/utils/validators.dart';
@@ -176,9 +175,7 @@ class _EditSessionPageState extends ConsumerState<EditSessionPage> {
           if (_notesController.text.isEmpty && session.notes != null) {
             _notesController.text = session.notes!;
           }
-          if (_selectedDate == null) {
-            _selectedDate = session.date;
-          }
+          _selectedDate ??= session.date;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
@@ -195,9 +192,9 @@ class _EditSessionPageState extends ConsumerState<EditSessionPage> {
                   InkWell(
                     onTap: () => _selectDate(context),
                     child: InputDecorator(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Date',
-                        suffixIcon: const Icon(Icons.calendar_today),
+                        suffixIcon: Icon(Icons.calendar_today),
                       ),
                       child: Text(
                         DateFormat('MMM dd, yyyy').format(_selectedDate!),

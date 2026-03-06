@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/season_controller.dart';
 import '../../plantation/controllers/plantation_controller.dart';
-import '../../plantation/models/farm_record_model.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/input_field.dart';
 import '../../../../core/widgets/dropdown_field.dart';

@@ -38,7 +38,7 @@ class SeasonModel {
     // Also handle MongoDB ObjectId format: {"$oid": "..."}
     dynamic idValue = json['id'] ?? json['_id'] ?? json['Id'];
     if (idValue == null) {
-      throw FormatException('Season ID is required but was null');
+      throw const FormatException('Season ID is required but was null');
     }
 
     // Handle MongoDB ObjectId format

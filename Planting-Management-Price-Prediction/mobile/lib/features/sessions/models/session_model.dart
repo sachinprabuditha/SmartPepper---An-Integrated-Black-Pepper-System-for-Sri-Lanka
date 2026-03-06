@@ -29,7 +29,7 @@ class SessionModel {
     // Handle both 'id' and '_id' fields from backend
     final idValue = json['id'] ?? json['_id'] ?? json['Id'];
     if (idValue == null) {
-      throw FormatException('Session ID is required but was null');
+      throw const FormatException('Session ID is required but was null');
     }
 
     // Handle null values and different casing

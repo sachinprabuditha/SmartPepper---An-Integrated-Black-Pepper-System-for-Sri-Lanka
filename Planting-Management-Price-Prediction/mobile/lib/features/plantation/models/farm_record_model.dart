@@ -1,10 +1,12 @@
+import '../../agronomy/models/localized_string.dart';
+
 class FarmRecord {
   final String id;
   final String userId;
   final String farmName;
-  final String district;
-  final String soilType;
-  final String chosenVariety;
+  final LocalizedString district;
+  final LocalizedString soilType;
+  final LocalizedString chosenVariety;
   final DateTime farmStartDate;
   final double areaHectares;
   final int totalVines;
@@ -26,16 +28,16 @@ class FarmRecord {
   factory FarmRecord.fromJson(Map<String, dynamic> json) {
     final idValue = json['id'] ?? json['_id'] ?? json['Id'];
     if (idValue == null) {
-      throw FormatException('FarmRecord ID is required but was null');
+      throw const FormatException('FarmRecord ID is required but was null');
     }
 
     return FarmRecord(
       id: idValue.toString(),
       userId: (json['user_id'] ?? json['userId'] ?? json['UserId'] ?? '').toString(),
       farmName: (json['farm_name'] ?? json['farmName'] ?? json['FarmName'] ?? '').toString(),
-      district: _parseName(json['district'] ?? json['District']),
-      soilType: _parseName(json['soil_type'] ?? json['soilType'] ?? json['SoilType'], key: 'typeName'),
-      chosenVariety: _parseName(json['chosen_variety'] ?? json['chosenVariety'] ?? json['ChosenVariety'] ?? json['PepperVariety']),
+      district: _parseLocalizedName(json['district'] ?? json['District']),
+      soilType: _parseLocalizedName(json['soil_type'] ?? json['soilType'] ?? json['SoilType'], fallbackKey: 'typeName'),
+      chosenVariety: _parseLocalizedName(json['chosen_variety'] ?? json['chosenVariety'] ?? json['ChosenVariety'] ?? json['PepperVariety']),
       farmStartDate: _parseDateTime(
         _getDateValue(json, 'farm_start_date') ??
         _getDateValue(json, 'farmStartDate') ??
@@ -55,9 +57,9 @@ class FarmRecord {
       'id': id,
       'user_id': userId,
       'farm_name': farmName,
-      'district': district,
-      'soil_type': soilType,
-      'chosen_variety': chosenVariety,
+      'district': district.toJson(),
+      'soil_type': soilType.toJson(),
+      'chosen_variety': chosenVariety.toJson(),
       'farm_start_date': farmStartDate.toIso8601String(),
       'area_hectares': areaHectares,
       'total_vines': totalVines,
@@ -65,13 +67,29 @@ class FarmRecord {
     };
   }
 
-  static String _parseName(dynamic value, {String key = 'name'}) {
-    if (value == null) return '';
-    if (value is String) return value;
+  static LocalizedString _parseLocalizedName(dynamic value, {String fallbackKey = 'name'}) {
+    if (value == null) return LocalizedString(en: '', si: '');
+    
     if (value is Map) {
-      return (value[key] ?? value['name'] ?? '').toString();
+      // If it's already a localized map directly
+      if (value.containsKey('en') || value.containsKey('si')) {
+        return LocalizedString.fromJson(value);
+      }
+      
+      // Extract the nested property which could be a plain string OR a localized map
+      final nameProp = value[fallbackKey] ?? value['name'];
+      
+      if (nameProp is Map) {
+         return LocalizedString.fromJson(nameProp);
+      }
+      
+      final nameStr = (nameProp ?? '').toString();
+      return LocalizedString(en: nameStr, si: nameStr);
     }
-    return value.toString();
+    
+    // If it's a plain string
+    final strVal = value.toString();
+    return LocalizedString(en: strVal, si: strVal);
   }
 
   static int _parseInt(dynamic value) {

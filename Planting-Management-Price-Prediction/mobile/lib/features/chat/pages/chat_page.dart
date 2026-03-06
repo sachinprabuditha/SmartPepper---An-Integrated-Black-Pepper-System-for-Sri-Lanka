@@ -12,7 +12,7 @@ import '../providers/message_provider.dart';
 import '../../plantation/controllers/plantation_controller.dart';
 
 class ChatPage extends ConsumerStatefulWidget {
-  const ChatPage({Key? key}) : super(key: key);
+  const ChatPage({super.key});
 
   @override
   ConsumerState<ChatPage> createState() => _ChatPageState();

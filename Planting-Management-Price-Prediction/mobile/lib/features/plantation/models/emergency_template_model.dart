@@ -20,7 +20,7 @@ class EmergencyTemplate {
   factory EmergencyTemplate.fromJson(Map<String, dynamic> json) {
     final idValue = json['id'] ?? json['_id'] ?? json['Id'];
     if (idValue == null) {
-      throw FormatException('EmergencyTemplate ID is required but was null');
+      throw const FormatException('EmergencyTemplate ID is required but was null');
     }
 
     return EmergencyTemplate(

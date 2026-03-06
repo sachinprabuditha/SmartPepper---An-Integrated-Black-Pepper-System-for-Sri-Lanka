@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/session_controller.dart';
-import '../models/session_model.dart';
 import '../pages/edit_session_page.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/loading_spinner.dart';

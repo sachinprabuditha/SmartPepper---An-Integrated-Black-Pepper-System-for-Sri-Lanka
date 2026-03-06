@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/season_controller.dart';
-import '../models/season_model.dart';
 import '../../plantation/controllers/plantation_controller.dart';
-import '../../plantation/models/farm_record_model.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/input_field.dart';
 import '../../../../core/widgets/dropdown_field.dart';
-import '../../../../core/utils/validators.dart';
 
 class EditSeasonPage extends ConsumerStatefulWidget {
   final String seasonId;
@@ -90,11 +87,11 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
       body: seasonAsync.when(
         data: (season) {
           _seasonNameController.text = season.seasonName;
-          if (_selectedFarmId == null) _selectedFarmId = season.farmId;
-          if (_startMonth == null) _startMonth = season.startMonth;
-          if (_startYear == null) _startYear = season.startYear;
-          if (_endMonth == null) _endMonth = season.endMonth;
-          if (_endYear == null) _endYear = season.endYear;
+          _selectedFarmId ??= season.farmId;
+          _startMonth ??= season.startMonth;
+          _startYear ??= season.startYear;
+          _endMonth ??= season.endMonth;
+          _endYear ??= season.endYear;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),

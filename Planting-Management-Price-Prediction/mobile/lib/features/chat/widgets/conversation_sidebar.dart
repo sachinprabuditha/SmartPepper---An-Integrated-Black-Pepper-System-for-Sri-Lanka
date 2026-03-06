@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/conversation_provider.dart';
-import '../models/conversation_model.dart';
 import '../providers/message_provider.dart';
 
 class ConversationSidebar extends ConsumerWidget {
