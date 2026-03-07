@@ -24,6 +24,20 @@ import '../screens/shared/auctions_screen.dart';
 import '../screens/shared/auction_by_id_screen.dart';
 import '../screens/shared/main_scaffold.dart';
 
+import '../screens/plantation/plantation_management_dashboard.dart';
+import '../screens/plantation/agronomy/agronomy_guide_screen.dart';
+import '../screens/plantation/plantation/pages/farms_list_page.dart';
+import '../screens/plantation/plantation/pages/farm_details_page.dart';
+import '../screens/plantation/plantation/pages/plantation_setup_page.dart';
+import '../screens/plantation/plantation/pages/edit_farm_page.dart';
+import '../screens/plantation/plantation/pages/task_completion_page.dart';
+import '../screens/plantation/seasons/seasons_screen.dart';
+import '../screens/plantation/predictions/price_prediction_screen.dart';
+import '../screens/plantation/chat/ai_chat_screen.dart';
+import '../screens/plantation/yield_analytics/yield_analytics_page.dart';
+import '../screens/plantation/plantation/models/farm_record_model.dart';
+import '../screens/plantation/plantation/models/farm_task_model.dart';
+
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
@@ -178,6 +192,71 @@ class AppRouter {
         path: '/shared/qr-scanner',
         name: 'sharedQrScanner',
         builder: (context, state) => const QRScannerScreen(),
+      ),
+      GoRoute(
+        path: '/shared/farm-management',
+        name: 'farmManagement',
+        builder: (context, state) => const PlantationManagementDashboard(),
+      ),
+      // Plantation feature routes
+      GoRoute(
+        path: '/plantation/farms',
+        name: 'plantationFarms',
+        builder: (context, state) => const FarmsListPage(),
+      ),
+      GoRoute(
+        path: '/plantation/farm/:farmId',
+        name: 'farmDetails',
+        builder: (context, state) {
+          final farmId = state.pathParameters['farmId']!;
+          return FarmDetailsPage(farmId: farmId);
+        },
+      ),
+      GoRoute(
+        path: '/plantation/setup',
+        name: 'plantationSetup',
+        builder: (context, state) => const PlantationSetupPage(),
+      ),
+      GoRoute(
+        path: '/plantation/edit-farm',
+        name: 'editFarm',
+        builder: (context, state) {
+          final farm = state.extra as FarmRecord;
+          return EditFarmPage(farm: farm);
+        },
+      ),
+      GoRoute(
+        path: '/plantation/task-completion',
+        name: 'taskCompletion',
+        builder: (context, state) {
+          final task = state.extra as FarmTask;
+          return TaskCompletionPage(task: task);
+        },
+      ),
+      GoRoute(
+        path: '/plantation/agronomy-guide',
+        name: 'agronomyGuide',
+        builder: (context, state) => const AgronomyGuideScreen(),
+      ),
+      GoRoute(
+        path: '/plantation/seasons',
+        name: 'seasons',
+        builder: (context, state) => const SeasonsScreen(),
+      ),
+      GoRoute(
+        path: '/plantation/price-prediction',
+        name: 'pricePrediction',
+        builder: (context, state) => const PricePredictionScreen(),
+      ),
+      GoRoute(
+        path: '/plantation/yield-analytics',
+        name: 'yieldAnalytics',
+        builder: (context, state) => const YieldAnalyticsPage(),
+      ),
+      GoRoute(
+        path: '/plantation/ai-chat',
+        name: 'aiChat',
+        builder: (context, state) => const AiChatScreen(),
       ),
     ],
     errorBuilder: (context, state) =>

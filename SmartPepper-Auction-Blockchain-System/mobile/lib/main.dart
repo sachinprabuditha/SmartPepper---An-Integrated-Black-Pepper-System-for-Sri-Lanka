@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' hide Provider, Consumer, ChangeNotifierProvider;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -62,7 +63,8 @@ void main() async {
   print('🚀 App initialization complete');
 
   runApp(
-    MultiProvider(
+    ProviderScope(
+      child: MultiProvider(
       providers: [
         // Provide service instances
         Provider<ApiService>.value(value: apiService),
@@ -108,6 +110,7 @@ void main() async {
         ),
       ],
       child: const SmartPepperApp(),
+      ),
     ),
   );
 }

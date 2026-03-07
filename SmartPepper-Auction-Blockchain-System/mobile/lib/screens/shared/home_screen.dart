@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/auction_provider.dart';
@@ -6,6 +7,7 @@ import '../../providers/lot_provider.dart';
 import '../../config/theme.dart';
 import '../../localization/app_localizations.dart';
 import '../farmer/create_lot_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -186,6 +188,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       const SizedBox(height: 24),
 
+                      // Plantation Management banner – farmers only
+                      if (user?.role.toLowerCase() == 'farmer') ...[
+                        _buildAssistantBanner(context),
+                        const SizedBox(height: 24),
+                      ],
+
+                      const SizedBox(height: 24),
+
                       // Recent Activity
                       Text(
                         context.tr('dashboard_recent_activity'),
@@ -335,15 +345,29 @@ class _HomeScreenState extends State<HomeScreen> {
             const SnackBar(content: Text('Tracking - Coming soon')),
           );
           break;
+        case 'Plantation Management':
+        case 'AI Trends':
+          context.push('/shared/farm-management');
+          break;
         default:
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('$actionLabel tapped')),
           );
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$actionLabel tapped')),
-      );
+      // Exporters and other roles: no access to Plantation Management
+      switch (actionLabel) {
+        case 'Analytics':
+        case 'AI Trends':
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('AI Trends - Coming soon')),
+          );
+          break;
+        default:
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$actionLabel tapped')),
+          );
+      }
     }
   }
 
@@ -372,7 +396,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         {
           'icon': Icons.analytics,
-          'label': 'Analytics',
+          'label': 'AI Trends',
           'color': Colors.purple,
         },
         {
@@ -405,7 +429,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         {
           'icon': Icons.analytics,
-          'label': 'Analytics',
+          'label': 'AI Trends',
           'color': Colors.purple,
         },
         {
@@ -431,8 +455,82 @@ class _HomeScreenState extends State<HomeScreen> {
           'label': 'Scan',
           'color': AppTheme.forestGreen,
         },
+        {
+          'icon': Icons.agriculture,
+          'label': 'Plantation Management',
+          'color': Colors.purple,
+        },
       ];
     }
+  }
+
+  Widget _buildAssistantBanner(BuildContext context) {
+    return InkWell(
+      onTap: () => context.push('/shared/farm-management'),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [AppTheme.forestGreen, Color(0xFF2E7D32)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.auto_awesome,
+                color: AppTheme.pepperGold,
+                size: 30,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Plantation Management',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Manage your plantation.',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildActionCard({

@@ -30,7 +30,12 @@ export const generateToken = (user) => {
  */
 export const verifyToken = (token) => {
     try {
-        return jwt.verify(token, SECRET_KEY, { issuer: 'HarvestTrackingAPI', audience: 'HarvestTrackingClient' });
+        const decoded = jwt.verify(token, SECRET_KEY);
+        // Compatibility for SmartPepper main app tokens which use 'userId' instead of 'nameid'
+        if (decoded && decoded.userId && !decoded.nameid) {
+            decoded.nameid = decoded.userId;
+        }
+        return decoded;
     } catch (error) {
         return null;
     }
