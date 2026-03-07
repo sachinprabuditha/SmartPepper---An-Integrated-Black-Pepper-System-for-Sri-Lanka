@@ -85,21 +85,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Logo
                 Center(
-                  child: Container(
+                  child: Image.asset(
+                    'assets/icons/logo_copy.png',
                     width: 120,
                     height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppTheme.pepperGold,
-                        width: 3,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.eco,
-                      size: 60,
-                      color: AppTheme.pepperGold,
-                    ),
+                    fit: BoxFit.contain,
                   ),
                 ),
 

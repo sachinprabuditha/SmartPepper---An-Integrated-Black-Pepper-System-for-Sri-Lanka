@@ -109,6 +109,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Logo
+                Center(
+                  child: Image.asset(
+                    'assets/icons/logo_copy.png',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
                 // Title
                 Text(
                   context.tr('auth_register'),

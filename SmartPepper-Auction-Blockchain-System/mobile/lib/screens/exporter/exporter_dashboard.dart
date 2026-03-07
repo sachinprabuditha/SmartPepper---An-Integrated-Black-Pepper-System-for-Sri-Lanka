@@ -204,12 +204,24 @@ class _ExporterDashboardState extends State<ExporterDashboard> {
             // Handle menu/drawer
           },
         ),
-        title: const Text(
-          'SmartPepper',
-          style: TextStyle(
-            color: AppTheme.pepperGold,
-            fontWeight: FontWeight.bold,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/icons/logo_copy.png',
+              width: 32,
+              height: 32,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'SmartPepper',
+              style: TextStyle(
+                color: AppTheme.pepperGold,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
         actions: [
           Stack(
@@ -342,7 +354,7 @@ class _ExporterDashboardState extends State<ExporterDashboard> {
                       icon: Icons.qr_code_scanner,
                       label: 'Scan QR Code',
                       color: Colors.teal,
-                      onTap: () => context.push('/qrScanner'),
+                      onTap: () => context.push('/qr-scanner'),
                     ),
                   ),
                 ],
