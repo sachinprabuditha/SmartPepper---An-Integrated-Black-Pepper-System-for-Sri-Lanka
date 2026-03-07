@@ -81,7 +81,7 @@ class _BrowseLotsScreenState extends State<BrowseLotsScreen> {
           IconButton(
             icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
             tooltip: context.tr('lot_scan_qr'),
-            onPressed: () => context.push('/qrScanner'),
+            onPressed: () => context.push('/qr-scanner'),
           ),
         ],
       ),

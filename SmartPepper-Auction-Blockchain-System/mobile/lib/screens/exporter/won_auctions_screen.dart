@@ -300,7 +300,10 @@ class _WonAuctionsScreenState extends State<WonAuctionsScreen> {
       elevation: 2,
       child: InkWell(
         onTap: () {
-          context.push('/exporter/auction/${auction['auction_id']}');
+          final auctionId = auction['auction_id'];
+          if (auctionId != null) {
+            context.push('/exporter/auction/$auctionId');
+          }
         },
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -484,11 +487,19 @@ class _WonAuctionsScreenState extends State<WonAuctionsScreen> {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             // Navigate to payment/escrow screen
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Payment feature coming soon'),
-                              ),
-                            );
+                            final auctionId = auction['auction_id'];
+                            if (auctionId != null) {
+                              context.push(
+                                '/exporter/payment/$auctionId',
+                                extra: auction,
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Invalid auction ID'),
+                                ),
+                              );
+                            }
                           },
                           icon: const Icon(Icons.payment),
                           label: const Text('Complete Payment'),
@@ -501,8 +512,10 @@ class _WonAuctionsScreenState extends State<WonAuctionsScreen> {
                       const SizedBox(width: 8),
                       IconButton(
                         onPressed: () {
-                          context.push(
-                              '/exporter/auction/${auction['auction_id']}');
+                          final auctionId = auction['auction_id'];
+                          if (auctionId != null) {
+                            context.push('/exporter/auction/$auctionId');
+                          }
                         },
                         icon: const Icon(Icons.arrow_forward),
                         tooltip: 'View Details',

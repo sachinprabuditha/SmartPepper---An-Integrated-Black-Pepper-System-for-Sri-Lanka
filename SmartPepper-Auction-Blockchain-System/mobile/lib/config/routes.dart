@@ -14,6 +14,7 @@ import '../screens/farmer/auction_monitor_screen.dart';
 import '../screens/exporter/browse_lots_screen.dart';
 import '../screens/exporter/my_bids_screen.dart';
 import '../screens/exporter/won_auctions_screen.dart';
+import '../screens/exporter/payment_escrow_screen.dart';
 import '../screens/exporter/exporter_profile_screen.dart';
 import '../screens/exporter/exporter_notifications_screen.dart';
 import '../screens/exporter/live_auctions_browser_screen.dart';
@@ -141,6 +142,18 @@ class AppRouter {
         path: '/exporter/won',
         name: 'wonAuctions',
         builder: (context, state) => const WonAuctionsScreen(),
+      ),
+      GoRoute(
+        path: '/exporter/payment/:auctionId',
+        name: 'paymentEscrow',
+        builder: (context, state) {
+          final auctionId = state.pathParameters['auctionId']!;
+          final auctionData = state.extra as Map<String, dynamic>? ?? {};
+          return PaymentEscrowScreen(
+            auctionId: auctionId,
+            auctionData: auctionData,
+          );
+        },
       ),
       GoRoute(
         path: '/exporter/profile',

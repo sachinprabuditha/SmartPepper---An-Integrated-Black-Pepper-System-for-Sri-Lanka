@@ -399,6 +399,59 @@ class BlockchainService {
     return result;
   }
 
+  /// Deposit escrow for a won auction
+  /// This locks the winning bid amount in the smart contract
+  Future<String> depositEscrow({
+    required String privateKey,
+    required int auctionId,
+    required BigInt amount,
+  }) async {
+    if (!_isInitialized) {
+      await initialize();
+    }
+
+    if (_pepperAuctionContract == null) {
+      throw Exception('Auction contract not loaded');
+    }
+
+    try {
+      // Ensure private key has correct format
+      String formattedPrivateKey = privateKey.trim();
+      if (!formattedPrivateKey.startsWith('0x')) {
+        formattedPrivateKey = '0x$formattedPrivateKey';
+      }
+
+      final credentials = EthPrivateKey.fromHex(formattedPrivateKey);
+
+      // Get depositEscrow function from contract
+      final depositEscrowFunction =
+          _pepperAuctionContract!.function('depositEscrow');
+
+      final transaction = Transaction.callContract(
+        contract: _pepperAuctionContract!,
+        function: depositEscrowFunction,
+        parameters: [BigInt.from(auctionId)],
+        value: EtherAmount.inWei(amount),
+      );
+
+      print(
+          'Depositing escrow for auction $auctionId with amount: $amount wei');
+
+      final txHash = await _client.sendTransaction(
+        credentials,
+        transaction,
+        chainId: Environment.chainId,
+      );
+
+      print('✅ Escrow deposit transaction sent: $txHash');
+
+      return txHash;
+    } catch (e) {
+      print('❌ Failed to deposit escrow: $e');
+      throw Exception('Failed to deposit escrow: $e');
+    }
+  }
+
   void dispose() {
     _client.dispose();
   }

@@ -131,12 +131,24 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
             // Handle menu/drawer
           },
         ),
-        title: Text(
-          context.tr('app_name'),
-          style: const TextStyle(
-            color: AppTheme.pepperGold,
-            fontWeight: FontWeight.bold,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/icons/logo_copy.png',
+              width: 32,
+              height: 32,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              context.tr('app_name'),
+              style: const TextStyle(
+                color: AppTheme.pepperGold,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
         actions: [
           Stack(

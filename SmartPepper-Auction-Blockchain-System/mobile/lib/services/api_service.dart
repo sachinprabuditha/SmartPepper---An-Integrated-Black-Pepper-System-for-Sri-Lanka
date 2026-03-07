@@ -212,7 +212,63 @@ class ApiService {
   Future<Map<String, dynamic>> getUserBids(String userId) async {
     try {
       final response = await _dio.get('/auctions/bids/user/$userId');
-      return response.data;
+      final data = response.data as Map<String, dynamic>;
+
+      // Helper function to convert Firebase Timestamp to ISO string
+      String? convertFirebaseTimestamp(dynamic timestamp) {
+        if (timestamp == null) return null;
+        if (timestamp is String) return timestamp;
+        if (timestamp is Map && timestamp['_seconds'] != null) {
+          final seconds = timestamp['_seconds'] as int;
+          final dateTime =
+              DateTime.fromMillisecondsSinceEpoch(seconds * 1000, isUtc: true);
+          return dateTime.toIso8601String();
+        }
+        return null;
+      }
+
+      // Transform camelCase to snake_case for auction data
+      if (data['auctions'] != null) {
+        final auctions = (data['auctions'] as List).map((auction) {
+          return {
+            'auction_id': auction['auctionId'],
+            'lot_id': auction['lotId'],
+            'status': auction['status'],
+            'current_bid': auction['currentBid'],
+            'start_time': convertFirebaseTimestamp(auction['startTime']),
+            'end_time': convertFirebaseTimestamp(auction['endTime']),
+            'farmer_address': auction['farmerAddress'],
+            'reserve_price': auction['reservePrice'],
+            'bid_count': auction['bidCount'],
+            'variety': auction['variety'],
+            'quantity': auction['quantity'],
+            'quality': auction['quality'],
+            'is_leading': auction['isLeading'],
+            'my_highest_bid': auction['myHighestBid'],
+            'my_highest_bid_lkr': auction['myHighestBidLkr'],
+            'my_bids': (auction['myBids'] as List?)?.map((bid) {
+                  return {
+                    'id': bid['id'],
+                    'amount': bid['amount'],
+                    'amount_lkr': bid['amountLkr'],
+                    'currency': bid['currency'],
+                    'placed_at': convertFirebaseTimestamp(bid['placedAt']),
+                    'status': bid['status'],
+                  };
+                }).toList() ??
+                [],
+          };
+        }).toList();
+
+        return {
+          'success': data['success'],
+          'count': data['count'],
+          'auctions': auctions,
+          'message': data['message'],
+        };
+      }
+
+      return data;
     } catch (e) {
       rethrow;
     }
@@ -399,6 +455,38 @@ class ApiService {
         }
       }
       throw Exception('Failed to add processing stage');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Lock escrow for auction
+  Future<Map<String, dynamic>> lockEscrow({
+    required String auctionId,
+    required String exporterAddress,
+    required String transactionHash,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/auctions/$auctionId/escrow/lock',
+        data: {
+          'exporterAddress': exporterAddress,
+          'transactionHash': transactionHash,
+        },
+      );
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Settle auction (after delivery confirmation)
+  Future<Map<String, dynamic>> settleAuction({
+    required String auctionId,
+  }) async {
+    try {
+      final response = await _dio.post('/auctions/$auctionId/settle');
+      return response.data;
     } catch (e) {
       rethrow;
     }
