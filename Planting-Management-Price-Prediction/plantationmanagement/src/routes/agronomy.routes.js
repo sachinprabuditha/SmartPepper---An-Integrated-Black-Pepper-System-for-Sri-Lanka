@@ -4,7 +4,7 @@ import { authenticate } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-router.use(authenticate);
+// router.use(authenticate); // Allow public access to agronomy guides and districts
 
 // Routes compatible with Frontend
 router.get('/guides', agronomyController.getGuides);
