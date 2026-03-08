@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../controllers/session_controller.dart';
+import '../../../../localization/app_localizations.dart';
 import '../../../../widgets/primary_button.dart';
 import '../../../../widgets/input_field.dart';
 import '../../../../utils/validators.dart';
@@ -59,8 +60,8 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Session created successfully'),
+            SnackBar(
+              content: Text(context.tr('session_created_success')),
               backgroundColor: Colors.green,
             ),
           );
@@ -83,7 +84,7 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Session'),
+        title: Text(context.tr('session_create')),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -93,17 +94,17 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               InputField(
-                label: 'Session Name',
+                label: context.tr('session_name'),
                 controller: _sessionNameController,
-                validator: (value) => Validators.required(value, fieldName: 'Session name'),
+                validator: (value) => Validators.required(value, fieldName: context.tr('session_name')),
               ),
               const SizedBox(height: 16),
               InkWell(
                 onTap: () => _selectDate(context),
                 child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Date',
-                    suffixIcon: Icon(Icons.calendar_today),
+                  decoration: InputDecoration(
+                    labelText: context.tr('session_date'),
+                    suffixIcon: const Icon(Icons.calendar_today),
                   ),
                   child: Text(
                     DateFormat('MMM dd, yyyy').format(_selectedDate),
@@ -113,27 +114,27 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
               ),
               const SizedBox(height: 16),
               InputField(
-                label: 'Yield (kg)',
+                label: context.tr('session_yield_kg'),
                 controller: _yieldController,
                 keyboardType: TextInputType.number,
-                validator: (value) => Validators.number(value, fieldName: 'Yield'),
+                validator: (value) => Validators.number(value, fieldName: context.tr('session_yield_field')),
               ),
               const SizedBox(height: 16),
               InputField(
-                label: 'Area Harvested (hectares)',
+                label: context.tr('session_area_hectares'),
                 controller: _areaController,
                 keyboardType: TextInputType.number,
-                validator: (value) => Validators.number(value, fieldName: 'Area harvested'),
+                validator: (value) => Validators.number(value, fieldName: context.tr('session_area_field')),
               ),
               const SizedBox(height: 16),
               InputField(
-                label: 'Notes (optional)',
+                label: context.tr('session_notes_optional'),
                 controller: _notesController,
                 maxLines: 4,
               ),
               const SizedBox(height: 32),
               PrimaryButton(
-                text: 'Create Session',
+                text: context.tr('session_create'),
                 onPressed: _handleSubmit,
               ),
             ],

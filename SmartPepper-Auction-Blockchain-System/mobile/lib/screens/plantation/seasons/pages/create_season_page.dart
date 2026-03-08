@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart' as vanilla_provider;
 import '../controllers/season_controller.dart';
 import '../../plantation/controllers/plantation_controller.dart';
+import '../../../../localization/app_localizations.dart';
 import '../../../../providers/language_provider.dart';
 import '../../../../widgets/language_picker_button.dart';
 import '../../../../widgets/primary_button.dart';
@@ -56,16 +57,9 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
             );
 
         if (mounted) {
-          final languageProvider =
-              vanilla_provider.Provider.of<LanguageProvider>(context, listen: false);
-          final lang = languageProvider.locale.languageCode;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                lang == 'en'
-                    ? 'Season created successfully'
-                    : 'කන්නය සාර්ථකව සාදන ලදී',
-              ),
+              content: Text(context.tr('plantation_season_created_success')),
               backgroundColor: Colors.green,
             ),
           );
@@ -91,7 +85,7 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(lang == 'en' ? 'Create Season' : 'කන්නයක් සාදන්න'),
+        title: Text(context.tr('plantation_create_season')),
         actions: const [
           LanguagePickerButton(),
           SizedBox(width: 8),
@@ -114,18 +108,16 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
                         return Card(
                           color: Colors.orange,
                           child: Padding(
-                            padding: EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.all(16.0),
                             child: Text(
-                              lang == 'en'
-                                  ? 'No farms available. Please create a farm first.'
-                                  : 'ගොවිපල කිසිවක් නොමැත. කරුණාකර පළමුව ගොවිපලක් සාදන්න.',
-                              style: TextStyle(color: Colors.white),
+                              context.tr('plantation_no_farms_create_first'),
+                              style: const TextStyle(color: Colors.white),
                             ),
                           ),
                         );
                       }
                       return DropdownField<String>(
-                        label: lang == 'en' ? 'Farm' : 'ගොවිපල',
+                        label: context.tr('plantation_farm'),
                         value: _selectedFarmId,
                         items: farms.map((farm) => DropdownMenuItem(
                           value: farm.id,
@@ -138,9 +130,7 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
                         },
                         validator: (value) {
                           if (value == null) {
-                            return lang == 'en'
-                                ? 'Please select a farm'
-                                : 'කරුණාකර ගොවිපලක් තෝරන්න';
+                            return context.tr('plantation_please_select_farm');
                           }
                           return null;
                         },
@@ -152,7 +142,7 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
-                          '${lang == 'en' ? 'Error loading farms' : 'ගොවිපල පූරණය කිරීමේ දෝෂයක්'}: $error',
+                          '${context.tr('plantation_error_loading_farms')}: $error',
                         ),
                       ),
                     ),
@@ -161,11 +151,11 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
               ),
               const SizedBox(height: 16),
               InputField(
-                label: lang == 'en' ? 'Season Name' : 'කන්න නම',
+                label: context.tr('plantation_season_name'),
                 controller: _seasonNameController,
                 validator: (value) => Validators.required(
                   value,
-                  fieldName: lang == 'en' ? 'Season name' : 'කන්න නම',
+                  fieldName: context.tr('plantation_season_name'),
                 ),
               ),
               const SizedBox(height: 16),
@@ -173,7 +163,7 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
                 children: [
                   Expanded(
                     child: DropdownField<int>(
-                      label: lang == 'en' ? 'Start Month' : 'ආරම්භ මාසය',
+                      label: context.tr('plantation_start_month'),
                       value: _startMonth,
                       items: _months
                           .map((month) => DropdownMenuItem(
@@ -188,7 +178,7 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
                       },
                       validator: (value) {
                         if (value == null) {
-                          return lang == 'en' ? 'Required' : 'අත්‍යවශ්‍යයි';
+                          return context.tr('plantation_required');
                         }
                         return null;
                       },
@@ -197,7 +187,7 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: DropdownField<int>(
-                      label: lang == 'en' ? 'Start Year' : 'ආරම්භ වර්ෂය',
+                      label: context.tr('plantation_start_year'),
                       value: _startYear,
                       items: _years
                           .map((year) => DropdownMenuItem(
@@ -212,7 +202,7 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
                       },
                       validator: (value) {
                         if (value == null) {
-                          return lang == 'en' ? 'Required' : 'අත්‍යවශ්‍යයි';
+                          return context.tr('plantation_required');
                         }
                         return null;
                       },
@@ -225,7 +215,7 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
                 children: [
                   Expanded(
                     child: DropdownField<int>(
-                      label: lang == 'en' ? 'End Month' : 'අවසන් මාසය',
+                      label: context.tr('plantation_end_month'),
                       value: _endMonth,
                       items: _months
                           .map((month) => DropdownMenuItem(
@@ -240,7 +230,7 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
                       },
                       validator: (value) {
                         if (value == null) {
-                          return lang == 'en' ? 'Required' : 'අත්‍යවශ්‍යයි';
+                          return context.tr('plantation_required');
                         }
                         return null;
                       },
@@ -249,7 +239,7 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: DropdownField<int>(
-                      label: lang == 'en' ? 'End Year' : 'අවසන් වර්ෂය',
+                      label: context.tr('plantation_end_year'),
                       value: _endYear,
                       items: _years
                           .map((year) => DropdownMenuItem(
@@ -264,7 +254,7 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
                       },
                       validator: (value) {
                         if (value == null) {
-                          return lang == 'en' ? 'Required' : 'අත්‍යවශ්‍යයි';
+                          return context.tr('plantation_required');
                         }
                         return null;
                       },
@@ -274,7 +264,7 @@ class _CreateSeasonPageState extends ConsumerState<CreateSeasonPage> {
               ),
               const SizedBox(height: 32),
               PrimaryButton(
-                text: lang == 'en' ? 'Create Season' : 'කන්නය සාදන්න',
+                text: context.tr('plantation_create_season'),
                 onPressed: _handleSubmit,
               ),
             ],

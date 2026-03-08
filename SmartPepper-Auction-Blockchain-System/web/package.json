@@ -30,7 +30,6 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
-    "@types/json5": "^0.0.30",
     "@types/node": "^20.19.25",
     "@types/prop-types": "^15.7.15",
     "@types/react": "^18.3.26",

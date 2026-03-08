@@ -31,6 +31,10 @@ class LocalizedString {
     switch (languageCode) {
       case 'si':
         return si.isNotEmpty ? si : en;
+      case 'ta':
+        // Tamil content is not stored separately in the backend.
+        // For Tamil UI we fall back to the English value.
+        return en.isNotEmpty ? en : si;
       case 'en':
       default:
         return en.isNotEmpty ? en : si;
