@@ -14,6 +14,7 @@ import '../screens/farmer/auction_monitor_screen.dart';
 import '../screens/exporter/browse_lots_screen.dart';
 import '../screens/exporter/my_bids_screen.dart';
 import '../screens/exporter/won_auctions_screen.dart';
+import '../screens/exporter/payment_escrow_screen.dart';
 import '../screens/exporter/exporter_profile_screen.dart';
 import '../screens/exporter/exporter_notifications_screen.dart';
 import '../screens/exporter/live_auctions_browser_screen.dart';
@@ -37,6 +38,7 @@ import '../screens/plantation/chat/ai_chat_screen.dart';
 import '../screens/plantation/yield_analytics/yield_analytics_page.dart';
 import '../screens/plantation/plantation/models/farm_record_model.dart';
 import '../screens/plantation/plantation/models/farm_task_model.dart';
+import '../screens/diseases/image_upload_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -143,6 +145,18 @@ class AppRouter {
         builder: (context, state) => const WonAuctionsScreen(),
       ),
       GoRoute(
+        path: '/exporter/payment/:auctionId',
+        name: 'paymentEscrow',
+        builder: (context, state) {
+          final auctionId = state.pathParameters['auctionId']!;
+          final auctionData = state.extra as Map<String, dynamic>? ?? {};
+          return PaymentEscrowScreen(
+            auctionId: auctionId,
+            auctionData: auctionData,
+          );
+        },
+      ),
+      GoRoute(
         path: '/exporter/profile',
         name: 'exporterProfile',
         builder: (context, state) => const ExporterProfileScreen(),
@@ -198,6 +212,14 @@ class AppRouter {
         name: 'farmManagement',
         builder: (context, state) => const PlantationManagementDashboard(),
       ),
+
+      // Disease Management Routes
+      GoRoute(
+        path: '/diseases/image-upload',
+        name: 'diseaseImageUpload',
+        builder: (context, state) => const ImageUploadScreen(),
+      ),
+
       // Plantation feature routes
       GoRoute(
         path: '/plantation/farms',

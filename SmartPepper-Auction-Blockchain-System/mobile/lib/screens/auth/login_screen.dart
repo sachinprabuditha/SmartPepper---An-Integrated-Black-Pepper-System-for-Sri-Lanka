@@ -85,32 +85,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Logo
                 Center(
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppTheme.pepperGold,
-                        width: 3,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.eco,
-                      size: 60,
-                      color: AppTheme.pepperGold,
-                    ),
+                  child: Image.asset(
+                    'assets/icons/SmartPepper-logo.png',
+                    width: 160,
+                    height: 160,
+                    fit: BoxFit.contain,
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 14),
 
                 // Title
                 Text(
                   context.tr('app_name'),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 32,
+                    fontSize: 36,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -122,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   context.tr('auth_welcome_back'),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     color: AppTheme.pepperGold,
                   ),
                 ),

@@ -58,7 +58,7 @@ class _LotsScreenState extends State<LotsScreen> {
           IconButton(
             icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
             onPressed: () {
-              context.push('/qrScanner');
+              context.push('/qr-scanner');
             },
           ),
         ],

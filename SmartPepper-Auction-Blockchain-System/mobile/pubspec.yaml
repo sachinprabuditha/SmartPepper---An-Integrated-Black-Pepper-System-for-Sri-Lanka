@@ -42,7 +42,7 @@ dependencies:
   # QR & NFC
   qr_flutter: ^4.1.0
   mobile_scanner: ^5.2.3 # Modern QR scanner with namespace support
-  nfc_manager: ^3.3.0
+  nfc_manager: ^4.0.0
 
   # Camera & Image
   camera: ^0.10.5+5
@@ -81,6 +81,10 @@ dependencies:
   # URL Launcher
   url_launcher: ^6.2.2
   json_annotation: ^4.9.0
+  google_maps_flutter: ^2.14.0
+  geolocator: ^14.0.2
+  percent_indicator: ^4.2.5
+  carousel_slider: ^5.1.2
 
 dev_dependencies:
   flutter_test:
@@ -115,7 +119,7 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icons/logo_copy.png"
+  image_path: "assets/icons/SmartPepper.png"
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/icons/logo_copy.png"
+  adaptive_icon_foreground: "assets/icons/SmartPepper.png"
   remove_alpha_ios: true

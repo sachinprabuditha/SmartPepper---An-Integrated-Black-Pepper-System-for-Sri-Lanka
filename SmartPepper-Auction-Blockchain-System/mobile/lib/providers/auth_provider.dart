@@ -156,14 +156,32 @@ class AuthProvider with ChangeNotifier {
         if (walletAddress != null) 'walletAddress': walletAddress,
       });
 
-      await storageService.saveToken(response['token']);
-      _user = User.fromJson(response['user']);
-      _isAuthenticated = true;
+      // Check if registration requires approval (exporter case)
+      final requiresApproval = response['requiresApproval'] ?? false;
+
+      if (requiresApproval) {
+        // Exporter registration - no token provided, approval pending
+        _loading = false;
+        notifyListeners();
+        return {
+          'success': true,
+          'requiresApproval': true,
+          'message': response['message'],
+        };
+      }
+
+      // For farmers and admins - proceed with normal login
+      if (response['token'] != null) {
+        await storageService.saveToken(response['token']);
+        _user = User.fromJson(response['user']);
+        _isAuthenticated = true;
+      }
 
       _loading = false;
       notifyListeners();
       return {
         'success': true,
+        'requiresApproval': false,
         'privateKey': privateKey,
         'walletAddress': walletAddress,
       };

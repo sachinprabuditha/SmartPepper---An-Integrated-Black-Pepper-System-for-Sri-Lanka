@@ -2,6 +2,7 @@
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Leaf, Menu, X, User, LogOut, ChevronDown, Sun, Moon } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,6 +11,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
@@ -32,9 +34,21 @@ export function Header() {
       <nav className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-pepper-gold hover:text-pepper-harvest transition">
-            <div className="bg-pepper-gold/20 backdrop-blur-sm rounded-lg p-1.5">
-              <Leaf className="w-8 h-8 text-pepper-gold" />
+          <Link href="/" className="flex items-center gap-1 text-2xl font-bold text-pepper-gold hover:text-pepper-harvest transition">
+            <div >
+              {!logoError ? (
+                <Image
+                  src="/SmartPepper-logo.png"
+                  alt="SmartPepper Logo"
+                  width={120}
+                  height={50}
+                  className="h-12 w-auto object-contain"
+                  onError={() => setLogoError(true)}
+                  priority
+                />
+              ) : (
+                <Leaf className="w-8 h-8 text-pepper-gold" />
+              )}
             </div>
             <span className="hidden sm:inline text-white">SmartPepper</span>
             <span className="hidden lg:inline text-xs text-pepper-gold/80 font-normal ml-1">Ceylon Black Pepper</span>
