@@ -1,0 +1,62 @@
+# Miscellaneous
+*.class
+*.log
+*.lock
+*.ctxt
+.DS_Store
+.idea/
+.vscode/
+
+# Visual Studio 
+.idea/
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+packages/
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+[Bb]in
+[Oo]bj
+*/debian
+debian/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+flutter_*.png
+
+# Android
+android/local.properties
+android/gradlew.bat
+android/app/libs/
+
+# iOS
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+
+# ML Models
+*.onnx
+
+# Node.js
+node_modules/
+.env
+serviceAccountKey.json
+smartpepper-645db-firebase-adminsdk-fbsvc-*.json
+plantationmanagement/rag_data/

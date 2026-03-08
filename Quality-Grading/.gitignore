@@ -1,0 +1,21 @@
+﻿# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+
+# Build outputs
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Large model files (optional - uncomment if you want to exclude)
+# *.onnx

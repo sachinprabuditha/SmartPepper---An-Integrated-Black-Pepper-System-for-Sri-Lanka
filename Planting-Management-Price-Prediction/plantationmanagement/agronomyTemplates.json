@@ -1,0 +1,856 @@
+{
+    "tmpl_land_clearing": {
+        "taskName": {
+            "en": "Land Clearing",
+            "si": "ඉඩම් පිරිසිදු කිරීම"
+        },
+        "phase": "Landscaping and Preparation",
+        "timingMonthsAfterStarting": 0,
+        "priority": "high",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Preparation",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Remove weeds and unwanted vegetation before cultivation.",
+            "si": "වගාව ආරම්භ කිරීමට පෙර වල් පැලෑටි ඉවත් කරන්න."
+        }
+    },
+    "tmpl_contour_bunds": {
+        "taskName": {
+            "en": "Construct Contour Bunds",
+            "si": "කොන්ටූර් බැම්ම සකස් කිරීම"
+        },
+        "phase": "Landscaping and Preparation",
+        "timingMonthsAfterStarting": 0,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate"
+        ],
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ],
+        "taskType": "Soil Conservation",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Construct contour bunds on slopes.",
+            "si": "කඳුබැසී ඉඩම්වල කොන්ටූර් බැම්ම සකස් කරන්න."
+        }
+    },
+    "tmpl_support_tree": {
+        "taskName": {
+            "en": "Plant Gliricidia Support Trees",
+            "si": "Gliricidia ආධාර ගස් සිටුවීම"
+        },
+        "phase": "Landscaping and Preparation",
+        "timingMonthsAfterStarting": 0,
+        "priority": "high",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate"
+        ],
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ],
+        "taskType": "Preparation",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Plant Gliricidia sticks before pepper planting.",
+            "si": "Gliricidia ආධාර ගස් සිටුවන්න."
+        }
+    },
+    "tmpl_pit_digging": {
+        "taskName": {
+            "en": "Dig Planting Pits",
+            "si": "වළ කැණීම"
+        },
+        "phase": "Landscaping and Preparation",
+        "timingMonthsAfterStarting": 0,
+        "priority": "high",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Preparation",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Dig pits 60cm x 60cm x 60cm.",
+            "si": "60cm x 60cm x 60cm වළ කැණීම."
+        }
+    },
+    "tmpl_maintenance_task_1": {
+        "taskName": {
+            "en": "Maintenance Activity 1",
+            "si": "නඩත්තු ක්‍රියාව 1"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 7,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_2": {
+        "taskName": {
+            "en": "Maintenance Activity 2",
+            "si": "නඩත්තු ක්‍රියාව 2"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 8,
+        "priority": "medium",
+        "repeatEveryMonths": 6,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_3": {
+        "taskName": {
+            "en": "Maintenance Activity 3",
+            "si": "නඩත්තු ක්‍රියාව 3"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 9,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_4": {
+        "taskName": {
+            "en": "Maintenance Activity 4",
+            "si": "නඩත්තු ක්‍රියාව 4"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 10,
+        "priority": "medium",
+        "repeatEveryMonths": 6,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_5": {
+        "taskName": {
+            "en": "Maintenance Activity 5",
+            "si": "නඩත්තු ක්‍රියාව 5"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 11,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_6": {
+        "taskName": {
+            "en": "Maintenance Activity 6",
+            "si": "නඩත්තු ක්‍රියාව 6"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 12,
+        "priority": "medium",
+        "repeatEveryMonths": 6,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_7": {
+        "taskName": {
+            "en": "Maintenance Activity 7",
+            "si": "නඩත්තු ක්‍රියාව 7"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 13,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_8": {
+        "taskName": {
+            "en": "Maintenance Activity 8",
+            "si": "නඩත්තු ක්‍රියාව 8"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 14,
+        "priority": "medium",
+        "repeatEveryMonths": 6,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_9": {
+        "taskName": {
+            "en": "Maintenance Activity 9",
+            "si": "නඩත්තු ක්‍රියාව 9"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 15,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_10": {
+        "taskName": {
+            "en": "Maintenance Activity 10",
+            "si": "නඩත්තු ක්‍රියාව 10"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 16,
+        "priority": "medium",
+        "repeatEveryMonths": 6,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_11": {
+        "taskName": {
+            "en": "Maintenance Activity 11",
+            "si": "නඩත්තු ක්‍රියාව 11"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 17,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_12": {
+        "taskName": {
+            "en": "Maintenance Activity 12",
+            "si": "නඩත්තු ක්‍රියාව 12"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 18,
+        "priority": "medium",
+        "repeatEveryMonths": 6,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_13": {
+        "taskName": {
+            "en": "Maintenance Activity 13",
+            "si": "නඩත්තු ක්‍රියාව 13"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 19,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_14": {
+        "taskName": {
+            "en": "Maintenance Activity 14",
+            "si": "නඩත්තු ක්‍රියාව 14"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 20,
+        "priority": "medium",
+        "repeatEveryMonths": 6,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_15": {
+        "taskName": {
+            "en": "Maintenance Activity 15",
+            "si": "නඩත්තු ක්‍රියාව 15"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 21,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_16": {
+        "taskName": {
+            "en": "Maintenance Activity 16",
+            "si": "නඩත්තු ක්‍රියාව 16"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 22,
+        "priority": "medium",
+        "repeatEveryMonths": 6,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_17": {
+        "taskName": {
+            "en": "Maintenance Activity 17",
+            "si": "නඩත්තු ක්‍රියාව 17"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 23,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_18": {
+        "taskName": {
+            "en": "Maintenance Activity 18",
+            "si": "නඩත්තු ක්‍රියාව 18"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 24,
+        "priority": "medium",
+        "repeatEveryMonths": 6,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_19": {
+        "taskName": {
+            "en": "Maintenance Activity 19",
+            "si": "නඩත්තු ක්‍රියාව 19"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 25,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_20": {
+        "taskName": {
+            "en": "Maintenance Activity 20",
+            "si": "නඩත්තු ක්‍රියාව 20"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 26,
+        "priority": "medium",
+        "repeatEveryMonths": 6,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_21": {
+        "taskName": {
+            "en": "Maintenance Activity 21",
+            "si": "නඩත්තු ක්‍රියාව 21"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 27,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_maintenance_task_22": {
+        "taskName": {
+            "en": "Maintenance Activity 22",
+            "si": "නඩත්තු ක්‍රියාව 22"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 28,
+        "priority": "medium",
+        "repeatEveryMonths": 6,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Maintenance",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Perform routine pepper maintenance.",
+            "si": "සාමාන්‍ය නඩත්තු කාර්යය සිදු කරන්න."
+        }
+    },
+    "tmpl_seedling_planting": {
+        "taskName": {
+            "en": "Plant Pepper Seedlings",
+            "si": "මිරිස් පැළ සිටුවීම"
+        },
+        "phase": "Planting",
+        "timingMonthsAfterStarting": 6,
+        "priority": "high",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate"
+        ],
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ],
+        "taskType": "Planting",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Plant seedlings near support tree.",
+            "si": "පැළ ආධාර ගස අසල සිටුවන්න."
+        }
+    },
+    "tmpl_mulching": {
+        "taskName": {
+            "en": "Apply Mulch",
+            "si": "මල්ච් යෙදීම"
+        },
+        "phase": "Planting",
+        "timingMonthsAfterStarting": 6,
+        "priority": "medium",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Mulching",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Apply mulch around plant base.",
+            "si": "පැළ වටා මල්ච් යොදන්න."
+        }
+    },
+    "tmpl_irrigation": {
+        "taskName": {
+            "en": "Supplemental Irrigation",
+            "si": "අමතර ජලය සැපයීම"
+        },
+        "phase": "Maintenance",
+        "timingMonthsAfterStarting": 8,
+        "priority": "medium",
+        "repeatEveryMonths": 1,
+        "climateZones": [
+            "dry"
+        ],
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ],
+        "taskType": "Irrigation",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Provide water during dry periods.",
+            "si": "වියළි කාලවලදී ජලය ලබා දෙන්න."
+        }
+    },
+    "tmpl_harvest_indicator": {
+        "taskName": {
+            "en": "Check Harvest Maturity",
+            "si": "අස්වැන්න සූදානම්දැයි පරීක්ෂා කිරීම"
+        },
+        "phase": "Harvesting",
+        "timingMonthsAfterStarting": 36,
+        "priority": "high",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Harvest",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Harvest when berries turn orange.",
+            "si": "බෙරි තැඹිලි පැහැයට හැරෙන විට අස්වැන්න ගන්න."
+        }
+    },
+    "tmpl_sun_drying": {
+        "taskName": {
+            "en": "Sun Dry Pepper",
+            "si": "සූර්ය වියළීම"
+        },
+        "phase": "Harvesting",
+        "timingMonthsAfterStarting": 36,
+        "priority": "high",
+        "repeatEveryMonths": null,
+        "climateZones": [
+            "wet",
+            "intermediate",
+            "dry"
+        ],
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ],
+        "taskType": "Processing",
+        "varietyKey": "ALL",
+        "instructionalDetails": {
+            "en": "Dry pepper under sunlight for 3–5 days.",
+            "si": "දින 3–5ක් සූර්ය තාපයෙන් වියළන්න."
+        }
+    }
+}

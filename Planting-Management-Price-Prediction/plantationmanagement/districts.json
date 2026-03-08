@@ -1,0 +1,260 @@
+{
+    "kandy": {
+        "name": {
+            "en": "Kandy",
+            "si": "මහනුවර"
+        },
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ]
+    },
+    "matale": {
+        "name": {
+            "en": "Matale",
+            "si": "මාතලේ"
+        },
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ]
+    },
+    "ratnapura": {
+        "name": {
+            "en": "Ratnapura",
+            "si": "රත්නපුර"
+        },
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ]
+    },
+    "kegalle": {
+        "name": {
+            "en": "Kegalle",
+            "si": "කෑගල්ල"
+        },
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ]
+    },
+    "nuwara_eliya": {
+        "name": {
+            "en": "Nuwara Eliya",
+            "si": "නුවරඑළිය"
+        },
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic"
+        ]
+    },
+    "badulla": {
+        "name": {
+            "en": "Badulla",
+            "si": "බදුල්ල"
+        },
+        "soilTypes": [
+            "loamy",
+            "clay_loam",
+            "red_yellow_podzolic",
+            "gravelly"
+        ]
+    },
+    "colombo": {
+        "name": {
+            "en": "Colombo",
+            "si": "කොළඹ"
+        },
+        "soilTypes": [
+            "loamy",
+            "sandy"
+        ]
+    },
+    "gampaha": {
+        "name": {
+            "en": "Gampaha",
+            "si": "ගම්පහ"
+        },
+        "soilTypes": [
+            "loamy",
+            "sandy"
+        ]
+    },
+    "kalutara": {
+        "name": {
+            "en": "Kalutara",
+            "si": "කළුතර"
+        },
+        "soilTypes": [
+            "loamy",
+            "sandy"
+        ]
+    },
+    "galle": {
+        "name": {
+            "en": "Galle",
+            "si": "ගාල්ල"
+        },
+        "soilTypes": [
+            "loamy",
+            "sandy"
+        ]
+    },
+    "matara": {
+        "name": {
+            "en": "Matara",
+            "si": "මාතර"
+        },
+        "soilTypes": [
+            "loamy",
+            "sandy"
+        ]
+    },
+    "kurunegala": {
+        "name": {
+            "en": "Kurunegala",
+            "si": "කුරුණෑගල"
+        },
+        "soilTypes": [
+            "gravelly",
+            "loamy"
+        ]
+    },
+    "monaragala": {
+        "name": {
+            "en": "Monaragala",
+            "si": "මොනරාගල"
+        },
+        "soilTypes": [
+            "gravelly",
+            "loamy"
+        ]
+    },
+    "anuradhapura": {
+        "name": {
+            "en": "Anuradhapura",
+            "si": "අනුරාධපුර"
+        },
+        "soilTypes": [
+            "gravelly",
+            "loamy"
+        ]
+    },
+    "polonnaruwa": {
+        "name": {
+            "en": "Polonnaruwa",
+            "si": "පොලොන්නරුව"
+        },
+        "soilTypes": [
+            "gravelly",
+            "loamy"
+        ]
+    },
+    "hambantota": {
+        "name": {
+            "en": "Hambantota",
+            "si": "හම්බන්තොට"
+        },
+        "soilTypes": [
+            "loamy",
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "puttalam": {
+        "name": {
+            "en": "Puttalam",
+            "si": "පුත්තලම"
+        },
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "mannar": {
+        "name": {
+            "en": "Mannar",
+            "si": "මාන්නාරම"
+        },
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "jaffna": {
+        "name": {
+            "en": "Jaffna",
+            "si": "යාපනය"
+        },
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "kilinochchi": {
+        "name": {
+            "en": "Kilinochchi",
+            "si": "කිලිනොච්චි"
+        },
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "mullaitivu": {
+        "name": {
+            "en": "Mullaitivu",
+            "si": "මුලතිව්"
+        },
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "vavuniya": {
+        "name": {
+            "en": "Vavuniya",
+            "si": "වවුනියා"
+        },
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "trincomalee": {
+        "name": {
+            "en": "Trincomalee",
+            "si": "ත්‍රිකුණාමලය"
+        },
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "batticaloa": {
+        "name": {
+            "en": "Batticaloa",
+            "si": "මඩකලපුව"
+        },
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    },
+    "ampara": {
+        "name": {
+            "en": "Ampara",
+            "si": "අම්පාර"
+        },
+        "soilTypes": [
+            "sandy",
+            "gravelly"
+        ]
+    }
+}

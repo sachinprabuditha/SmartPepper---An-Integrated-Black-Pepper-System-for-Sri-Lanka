@@ -1,0 +1,32 @@
+{
+    "loamy": {
+        "name": {
+            "en": "Loamy",
+            "si": "ලොමී පස"
+        }
+    },
+    "sandy": {
+        "name": {
+            "en": "Sandy",
+            "si": "වැලි පස"
+        }
+    },
+    "clay_loam": {
+        "name": {
+            "en": "Clay-Loam",
+            "si": "මැටි-ලොමී පස"
+        }
+    },
+    "red_yellow_podzolic": {
+        "name": {
+            "en": "Red-Yellow Podzolic",
+            "si": "රතු-කහ පොඩ්සොලික් පස"
+        }
+    },
+    "gravelly": {
+        "name": {
+            "en": "Gravelly",
+            "si": "ගල් පස"
+        }
+    }
+}

@@ -105,7 +105,7 @@ router.post('/register', async (req, res) => {
       created_at: admin.firestore.FieldValue.serverTimestamp(),
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     };
-    
+
     const userRef = await firestore.collection('users').add(userData);
     const userDoc = await userRef.get();
     const user = { id: userDoc.id, ...userDoc.data() };
@@ -293,6 +293,76 @@ router.post('/login', async (req, res) => {
 });
 
 /**
+ * GET /api/auth/me
+ * Get current authenticated user
+ */
+router.get('/me', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        success: false,
+        error: 'No token provided'
+      });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid or expired token'
+      });
+    }
+
+    const firestore = db.getDb();
+    const userDoc = await firestore.collection('users').doc(decoded.userId).get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    const userData = userDoc.data();
+
+    if (!userData.is_active) {
+      return res.status(403).json({
+        success: false,
+        error: 'Account is disabled'
+      });
+    }
+
+    res.json({
+      success: true,
+      user: {
+        id: userDoc.id,
+        email: userData.email,
+        name: userData.name,
+        role: userData.role,
+        walletAddress: userData.wallet_address,
+        verified: userData.verified,
+        phone: userData.phone,
+        address: userData.address,
+        city: userData.city,
+        language: userData.language
+      }
+    });
+  } catch (error) {
+    logger.error('Get current user error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get user'
+    });
+  }
+});
+
+/**
  * POST /api/auth/logout
  * User logout
  */
@@ -306,7 +376,7 @@ router.post('/logout', async (req, res) => {
       const sessionsSnap = await firestore.collection('user_sessions')
         .where('token', '==', token)
         .get();
-      
+
       const batch = firestore.batch();
       sessionsSnap.docs.forEach(doc => {
         batch.delete(doc.ref);
@@ -405,7 +475,7 @@ router.put('/profile', async (req, res) => {
 
     // Build update object dynamically
     const updates = {};
-    
+
     if (name !== undefined) updates.name = name;
     if (phone !== undefined) updates.phone = phone;
     if (address !== undefined) updates.address = address;
@@ -461,14 +531,14 @@ router.put('/profile', async (req, res) => {
     });
   } catch (error) {
     logger.error('Update profile error:', error);
-    
+
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({
         success: false,
         error: 'Invalid token'
       });
     }
-    
+
     res.status(500).json({
       success: false,
       error: 'Failed to update profile'

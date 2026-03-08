@@ -72,7 +72,9 @@ class AuthProvider with ChangeNotifier {
     try {
       final token = await storageService.getToken();
       if (token != null) {
-        final userData = await apiService.getCurrentUser();
+        final response = await apiService.getCurrentUser();
+        // Response is { success: true, user: {...} }, extract the user object
+        final userData = response['user'] ?? response;
         _user = User.fromJson(userData);
         _isAuthenticated = true;
       }
