@@ -84,7 +84,10 @@ router.post('/register', async (req, res) => {
       'exporter': 'exporter',
       'farmer': 'farmer'
     };
-
+    
+    // Exporters require admin approval before they can login
+    const requiresApproval = role === 'exporter';
+    
     const userData = {
       email,
       password_hash: passwordHash,
@@ -97,7 +100,8 @@ router.post('/register', async (req, res) => {
       language,
       user_type: userTypeMap[role],
       verified: false,
-      is_active: true,
+      is_active: requiresApproval ? false : true,
+      approval_status: requiresApproval ? 'pending' : 'approved',
       created_at: admin.firestore.FieldValue.serverTimestamp(),
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     };
@@ -121,17 +125,24 @@ router.post('/register', async (req, res) => {
       created_at: admin.firestore.FieldValue.serverTimestamp()
     });
 
+    // For exporters, return different message as they need approval
+    const responseMessage = user.role === 'exporter' 
+      ? 'Registration successful. Your account is pending admin approval. You will be able to login once approved.'
+      : 'Registration successful';
+
     res.status(201).json({
       success: true,
-      message: 'Registration successful',
+      message: responseMessage,
+      requiresApproval: user.role === 'exporter',
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
         role: user.role,
-        walletAddress: user.wallet_address
+        walletAddress: user.wallet_address,
+        approval_status: user.approval_status
       },
-      token
+      token: user.role === 'exporter' ? null : token // Don't provide token for exporters until approved
     });
   } catch (error) {
     logger.error('Registration error:', error);
@@ -181,6 +192,27 @@ router.post('/login', async (req, res) => {
         success: false,
         error: 'Account is disabled. Please contact administrator'
       });
+    }
+
+    // Check approval status for exporters
+    if (user.role === 'exporter') {
+      const approvalStatus = user.approval_status || 'pending';
+      
+      if (approvalStatus === 'pending') {
+        return res.status(403).json({
+          success: false,
+          error: 'Your account is pending admin approval. Please wait for approval before logging in.',
+          approval_status: 'pending'
+        });
+      }
+      
+      if (approvalStatus === 'rejected') {
+        return res.status(403).json({
+          success: false,
+          error: 'Your account registration has been rejected. Please contact administrator for more information.',
+          approval_status: 'rejected'
+        });
+      }
     }
 
     // Verify password

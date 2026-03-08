@@ -1,11 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { Leaf, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import { useState } from 'react';
 
 export function Footer() {
   const { user, isAuthenticated } = useAuth();
+  const [logoError, setLogoError] = useState(false);
 
   return (
     <footer className="bg-gray-900 text-white mt-auto">
@@ -14,8 +17,21 @@ export function Footer() {
           {/* Brand Section */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Leaf className="w-8 h-8 text-primary-400" />
-              <span className="text-xl font-bold">SmartPepper</span>
+              {!logoError ? (
+                <Image
+                  src="/SmartPepper.png"
+                  alt="SmartPepper Logo"
+                  width={120}
+                  height={32}
+                  className="h-12 w-auto object-contain"
+                  onError={() => setLogoError(true)}
+                />
+              ) : (
+                <>
+                  <Leaf className="w-8 h-8 text-primary-400" />
+                  <span className="text-xl font-bold">SmartPepper</span>
+                </>
+              )}
             </div>
             <p className="text-gray-400 text-sm mb-4">
               Blockchain-powered pepper auction platform connecting farmers and exporters worldwide.

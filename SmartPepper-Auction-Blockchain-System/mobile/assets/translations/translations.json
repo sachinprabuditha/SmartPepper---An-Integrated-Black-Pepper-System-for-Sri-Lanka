@@ -3130,5 +3130,29 @@
         "en": "Sign out from your account",
         "si": "ඔබේ ගිණුමෙන් නික්මෙන්න",
         "ta": "உங்கள் கணக்கிலிருந்து வெளியேறவும்"
+    },
+    {
+        "key": "common_go_back",
+        "en": "Go Back",
+        "si": "ආපසු යන්න",
+        "ta": "பின்னர் செல்லவும்"
+    },
+    {
+        "key": "auction_create_confirm",
+        "en": "Are you sure you want to create this auction?",
+        "si": "ඔබට ඇත්තටම මෙම වෙන්දේසිය සාදීමට අවශ්‍යද?",
+        "ta": "இந்த ஏலத்தை உருவாக்க நீங்கள் நிச்சயமாக விரும்புகிறீர்களா?"
+    },
+    {
+        "key": "common_summary",
+        "en": "Summary",
+        "si": "සාරාංශය",
+        "ta": "சுருக்கம்"
+    },
+    {
+        "key": "auction_confirm",
+        "en": "Confirm Auction",
+        "si": "වෙන්දේසිය තහවුරු කරන්න",
+        "ta": "ஏலத்தை உறுதிப்படுத்தவும்"
     }
 ]

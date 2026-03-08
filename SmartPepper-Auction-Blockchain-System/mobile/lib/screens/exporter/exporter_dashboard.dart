@@ -208,7 +208,7 @@ class _ExporterDashboardState extends State<ExporterDashboard> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(
-              'assets/icons/logo_copy.png',
+              'assets/icons/SmartPepper-logo.png',
               width: 32,
               height: 32,
               fit: BoxFit.contain,

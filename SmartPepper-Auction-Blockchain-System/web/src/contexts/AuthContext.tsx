@@ -99,25 +99,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (data: any) => {
     try {
       const response = await auth.register(data);
-      const { user, token } = response.data;
+      const { user, token, requiresApproval } = response.data;
 
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
+      // If exporter requires approval, don't login - redirect to info page
+      if (requiresApproval) {
+        router.push('/register/pending-approval');
+        return;
+      }
 
-      // Redirect to appropriate dashboard
-      switch (user.role) {
-        case 'farmer':
-          router.push('/dashboard/farmer');
-          break;
-        case 'exporter':
-          router.push('/dashboard/exporter');
-          break;
-        case 'admin':
-          router.push('/dashboard/admin');
-          break;
-        default:
-          router.push('/');
+      // For farmers and admins, proceed with normal login
+      if (token) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        setUser(user);
+
+        // Redirect to appropriate dashboard
+        switch (user.role) {
+          case 'farmer':
+            router.push('/dashboard/farmer');
+            break;
+          case 'exporter':
+            router.push('/dashboard/exporter');
+            break;
+          case 'admin':
+            router.push('/dashboard/admin');
+            break;
+          default:
+            router.push('/');
+        }
       }
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Registration failed');
