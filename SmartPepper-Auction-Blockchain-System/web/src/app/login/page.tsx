@@ -50,7 +50,7 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-green-900 dark:text-green-400 mb-2">
-            🌶️ SmartPepper
+            SmartPepper
           </h1>
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
             Sign in to your account

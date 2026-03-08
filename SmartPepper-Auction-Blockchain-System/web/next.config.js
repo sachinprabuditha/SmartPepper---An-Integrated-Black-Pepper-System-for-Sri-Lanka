@@ -9,13 +9,15 @@ const nextConfig = {
   },
   images: {
     domains: [
+      'localhost',
       'ipfs.io', 
       'gateway.pinata.cloud', 
       '192.168.8.116', 
       '192.168.1.190',
       '192.168.0.116',
       'gateway.ipfs.io',
-      'cloudflare-ipfs.com',
+      'cf-ipfs.com',
+      'dweb.link',
     ],
     remotePatterns: [
       {

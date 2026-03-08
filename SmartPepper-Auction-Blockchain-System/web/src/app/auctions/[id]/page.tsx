@@ -5,13 +5,13 @@ import { useParams } from 'next/navigation';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
 import { io, Socket } from 'socket.io-client';
-import { auctionApi } from '@/lib/api';
+import { auctionApi, lotApi } from '@/lib/api';
 import { useAuctionStore, Auction, Bid } from '@/store/auctionStore';
 import { PEPPER_AUCTION_ABI, CONTRACT_ADDRESS } from '@/config/contracts';
 import { AuctionTimer } from '@/components/auction/AuctionTimer';
 import { BidHistory } from '@/components/auction/BidHistory';
 import { BidForm } from '@/components/auction/BidForm';
-import { Loader2, CheckCircle, XCircle, User, Package, Calendar, Users, Wifi, DollarSign } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, User, Package, Calendar, Users, Wifi, DollarSign, ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Currency conversion constants
@@ -36,6 +36,64 @@ function formatEth(amount: number): string {
   return `${amount.toFixed(4)} ETH`;
 }
 
+// IPFS URL converter helper with multiple gateways for redundancy
+const IPFS_GATEWAYS = [
+  'http://localhost:8080/ipfs',
+  'https://ipfs.io/ipfs',
+  'https://cf-ipfs.com/ipfs',
+  'https://gateway.pinata.cloud/ipfs',
+  'https://dweb.link/ipfs',
+];
+
+function extractCID(url: string): string | null {
+  if (!url) return null;
+  
+  // If it's an ipfs:// URL, extract CID
+  if (url.startsWith('ipfs://')) {
+    return url.replace('ipfs://', '');
+  }
+  
+  // If it's just a CID
+  if (url.startsWith('Qm') || url.startsWith('bafy')) {
+    return url;
+  }
+  
+  // If it's already a gateway URL, extract CID
+  const match = url.match(/\/ipfs\/([a-zA-Z0-9]+)/);
+  if (match) {
+    return match[1];
+  }
+  
+  return null;
+}
+
+function convertToGatewayUrl(url: string, gatewayIndex: number = 0): string {
+  if (!url) return '';
+  
+  // If it's already a full HTTP URL and not IPFS, return as is
+  if ((url.startsWith('http://') || url.startsWith('https://')) && !url.includes('/ipfs/')) {
+    return url;
+  }
+  
+  const cid = extractCID(url);
+  if (cid) {
+    // Use the specified gateway (with fallback to first one)
+    const gateway = IPFS_GATEWAYS[gatewayIndex] || IPFS_GATEWAYS[0];
+    return `${gateway}/${cid}`;
+  }
+  
+  // Otherwise return as is
+  return url;
+}
+
+// Get all possible gateway URLs for an image
+function getAllGatewayUrls(url: string): string[] {
+  const cid = extractCID(url);
+  if (!cid) return [url];
+  
+  return IPFS_GATEWAYS.map(gateway => `${gateway}/${cid}`);
+}
+
 // Helper function to convert snake_case to camelCase
 function toCamelCase(obj: any): any {
   if (Array.isArray(obj)) {
@@ -50,6 +108,71 @@ function toCamelCase(obj: any): any {
   return obj;
 }
 
+// IPFSImage component with automatic gateway fallback
+function IPFSImage({ 
+  photoUrl, 
+  index, 
+  onClick 
+}: { 
+  photoUrl: string; 
+  index: number; 
+  onClick: () => void;
+}) {
+  const [currentGatewayIndex, setCurrentGatewayIndex] = useState(0);
+  const [hasError, setHasError] = useState(false);
+  const allUrls = getAllGatewayUrls(photoUrl);
+  const currentUrl = allUrls[currentGatewayIndex] || allUrls[0];
+
+  const handleError = () => {
+    console.error(`❌ Gateway ${currentGatewayIndex + 1}/${allUrls.length} failed:`, currentUrl);
+    
+    // Try next gateway
+    if (currentGatewayIndex < allUrls.length - 1) {
+      console.log(`🔄 Trying next gateway (${currentGatewayIndex + 2}/${allUrls.length})...`);
+      setCurrentGatewayIndex(prev => prev + 1);
+      setHasError(false);
+    } else {
+      console.error(`❌ All ${allUrls.length} gateways failed for photo ${index + 1}`);
+      setHasError(true);
+    }
+  };
+
+  const handleLoad = () => {
+    console.log(`✅ Image ${index + 1} loaded successfully via gateway ${currentGatewayIndex + 1}`);
+  };
+
+  return (
+    <div 
+      className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer group"
+      onClick={onClick}
+    >
+      {hasError ? (
+        <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+          <div className="text-center p-4">
+            <XCircle className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+            <p className="text-xs text-gray-500 dark:text-gray-400">Failed to load</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          <img
+            src={currentUrl}
+            alt={`Lot photo ${index + 1}`}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+            onError={handleError}
+            onLoad={handleLoad}
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+            <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium">
+              Click to view
+            </span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function AuctionDetailPage() {
   const params = useParams();
   const auctionId = params.id as string;
@@ -61,6 +184,8 @@ export default function AuctionDetailPage() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [connectedUsers, setConnectedUsers] = useState(0);
   const [wsConnected, setWsConnected] = useState(false);
+  const [lotData, setLotData] = useState<any>(null);
+  const [loadingLot, setLoadingLot] = useState(false);
   
   const { joinAuction, leaveAuction, connected } = useAuctionStore();
 
@@ -90,6 +215,49 @@ export default function AuctionDetailPage() {
       fetchAuction();
     }
   }, [auctionId]);
+
+  // Fetch lot data when auction is loaded
+  useEffect(() => {
+    async function fetchLot() {
+      if (!auction?.lotId) return;
+      
+      try {
+        setLoadingLot(true);
+        const response = await lotApi.getById(auction.lotId);
+        const lot = response.data.lot;
+        
+        console.log('📦 Fetched lot data:', lot);
+        console.log('🖼️ Lot pictures raw:', lot.lot_pictures, 'Type:', typeof lot.lot_pictures);
+        
+        // Parse lot_pictures if it's a string
+        if (lot.lot_pictures && typeof lot.lot_pictures === 'string') {
+          try {
+            lot.lot_pictures = JSON.parse(lot.lot_pictures);
+            console.log('✅ Parsed lot_pictures:', lot.lot_pictures);
+          } catch (e) {
+            console.error('❌ Failed to parse lot_pictures:', e);
+            lot.lot_pictures = [];
+          }
+        }
+        
+        // Ensure lot_pictures is an array
+        if (!Array.isArray(lot.lot_pictures)) {
+          console.warn('⚠️ lot_pictures is not an array, converting:', lot.lot_pictures);
+          lot.lot_pictures = [];
+        }
+        
+        console.log('🎯 Final lot_pictures:', lot.lot_pictures, 'Count:', lot.lot_pictures.length);
+        
+        setLotData(lot);
+      } catch (error) {
+        console.error('Failed to fetch lot details:', error);
+      } finally {
+        setLoadingLot(false);
+      }
+    }
+
+    fetchLot();
+  }, [auction?.lotId]);
 
   useEffect(() => {
     if (auction && address && connected) {
@@ -149,10 +317,11 @@ export default function AuctionDetailPage() {
       // Add bid to history (prepend to top)
       setBids(prev => [{
         id: `${bidData.bidder}-${bidData.timestamp}`,
+        auctionId: auction.auctionId,
         bidderAddress: bidData.bidder,
         amount: bidData.amount,
-        timestamp: bidData.timestamp,
-        auctionId: auction.auctionId,
+        placedAt: bidData.timestamp,
+        blockchainTxHash: bidData.txHash || '',
       } as Bid, ...prev]);
 
       // Show notification
@@ -160,7 +329,9 @@ export default function AuctionDetailPage() {
       if (isOwnBid) {
         toast.success('Your bid has been placed!');
       } else {
-        toast.info(`New bid: ${(parseFloat(bidData.amount) / 1e18).toFixed(4)} ETH`);
+        toast(`New bid: ${(parseFloat(bidData.amount) / 1e18).toFixed(4)} ETH`, {
+          icon: '📢',
+        });
       }
     });
 
@@ -286,6 +457,38 @@ export default function AuctionDetailPage() {
                 </>
               )}
             </div>
+
+            {/* Lot Photos Gallery */}
+            {lotData?.lot_pictures && lotData.lot_pictures.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <ImageIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <h3 className="text-lg font-semibold dark:text-white">Lot Photos</h3>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    ({lotData.lot_pictures.length} {lotData.lot_pictures.length === 1 ? 'photo' : 'photos'})
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {lotData.lot_pictures.map((photoUrl: string, index: number) => (
+                    <IPFSImage
+                      key={index}
+                      photoUrl={photoUrl}
+                      index={index}
+                      onClick={() => {
+                        const allUrls = getAllGatewayUrls(photoUrl);
+                        window.open(allUrls[0], '_blank');
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            {loadingLot && (
+              <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg text-center">
+                <Loader2 className="w-5 h-5 animate-spin text-primary-600 mx-auto" />
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Loading lot photos...</p>
+              </div>
+            )}
 
             {/* Auction Details */}
             <div className="grid md:grid-cols-2 gap-6">

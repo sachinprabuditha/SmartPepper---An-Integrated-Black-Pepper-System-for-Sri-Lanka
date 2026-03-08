@@ -9,6 +9,7 @@ import '../../../../widgets/loading_spinner.dart';
 import '../../../../widgets/empty_state.dart';
 import '../../../../widgets/primary_button.dart';
 import '../../../../providers/language_provider.dart';
+import '../../../../localization/app_localizations.dart';
 
 class FarmsListPage extends ConsumerStatefulWidget {
   const FarmsListPage({super.key});
@@ -43,12 +44,12 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
       
       return Scaffold(
       appBar: AppBar(
-        title: Text(lang == 'en' ? 'My Farms' : 'මගේ ගොවිපළවල්'),
+        title: Text(context.tr('plantation_my_farms')),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _refreshFarms,
-            tooltip: lang == 'en' ? 'Refresh' : 'යාවත්කාලීන කරන්න',
+            tooltip: context.tr('plantation_refresh'),
           ),
         ],
       ),
@@ -56,12 +57,10 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
         data: (farms) {
           if (farms.isEmpty) {
             return EmptyState(
-              message: lang == 'en' 
-                  ? 'No farms yet.\nStart your first plantation to begin tracking your crops!'
-                  : 'තවම ගොවිපළවල් නොමැත.\nඔබේ පළමු වගාව ආරම්භ කරන්න!',
+              message: context.tr('plantation_no_farms_yet'),
               icon: Icons.agriculture_outlined,
               action: PrimaryButton(
-                text: lang == 'en' ? 'Start Plantation' : 'වගාව ආරම්භ කරන්න',
+                text: context.tr('plantation_start_plantation'),
                 onPressed: () async {
                   final result = await context.pushNamed('plantationSetup');
                   if (result != null && mounted) {
@@ -114,7 +113,7 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  lang == 'en' ? 'Total Farms' : 'මුළු ගොවිපළවල්',
+                                  context.tr('plantation_total_farms'),
                                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                         color: Colors.white.withOpacity(0.9),
                                         fontSize: 12,
@@ -152,7 +151,7 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
             ),
           );
         },
-        loading: () => LoadingSpinner(message: lang == 'en' ? 'Loading farms...' : 'ගොවිපළවල් පටවමින්...'),
+        loading: () => LoadingSpinner(message: context.tr('plantation_loading_farms')),
         error: (error, stack) {
           developer.log('FarmsListPage: Error state - $error', error: error, stackTrace: stack);
           return RefreshIndicator(
@@ -160,11 +159,11 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: EmptyState(
-                message: lang == 'en' ? 'Error loading farms: ${error.toString()}' : 'ගොවිපළවල් පැටවීමේ දෝෂයකි: ${error.toString()}',
+                message: '${context.tr('plantation_error_loading_farms')}: ${error.toString()}',
                 icon: Icons.error_outline,
                 action: ElevatedButton(
                   onPressed: _refreshFarms,
-                  child: Text(lang == 'en' ? 'Retry' : 'නැවත උත්සාහ කරන්න'),
+                  child: Text(context.tr('common_retry')),
                 ),
               ),
             ),
@@ -180,7 +179,7 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
           }
         },
         icon: const Icon(Icons.add),
-        label: Text(lang == 'en' ? 'Start Plantation' : 'වගාව ආරම්භ කරන්න'),
+        label: Text(context.tr('plantation_start_plantation')),
       ),
     );
     } catch (e, stackTrace) {
@@ -299,7 +298,7 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            lang == 'en' ? 'Farm' : 'ගොවිපළ',
+                            context.tr('plantation_farm'),
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                   color: Colors.grey[600],
                                   fontSize: 12,
@@ -343,19 +342,17 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                            final confirm = await showDialog<bool>(
                              context: context,
                              builder: (ctx) => AlertDialog(
-                               title: Text(lang == 'en' ? 'Delete Farm' : 'ගොවිපළ මකන්න'),
-                               content: Text(lang == 'en' 
-                                   ? 'Are you sure you want to delete this farm? All related tasks will be removed.'
-                                   : 'මෙම ගොවිපළ මකා දැමීමට ඔබට විශ්වාසද? සියලුම අදාළ කාර්යයන් ඉවත් කරනු ලැබේ.'),
+                               title: Text(context.tr('plantation_delete_farm')),
+                               content: Text(context.tr('plantation_confirm_delete_farm')),
                                actions: [
                                  TextButton(
                                    onPressed: () => Navigator.pop(ctx, false),
-                                   child: Text(lang == 'en' ? 'Cancel' : 'අවලංගු කරන්න'),
+                                   child: Text(context.tr('common_cancel')),
                                  ),
                                  TextButton(
                                    onPressed: () => Navigator.pop(ctx, true),
                                    child: Text(
-                                     lang == 'en' ? 'Delete' : 'මකන්න',
+                                     context.tr('common_delete'),
                                      style: const TextStyle(color: Colors.red),
                                    ),
                                  ),
@@ -393,7 +390,7 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                       child: _buildInfoItem(
                         context,
                         Icons.location_on,
-                        lang == 'en' ? 'District' : 'දිස්ත්‍රික්කය',
+                        context.tr('plantation_district'),
                         farm.district.get(lang),
                         Colors.blue,
                       ),
@@ -403,7 +400,7 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                       child: _buildInfoItem(
                         context,
                         Icons.eco,
-                        lang == 'en' ? 'Variety' : 'ප්‍රභේදය',
+                        context.tr('plantation_variety'),
                         farm.chosenVariety.get(lang),
                         Colors.green,
                       ),
@@ -417,8 +414,8 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                       child: _buildInfoItem(
                         context,
                         Icons.square_foot,
-                        lang == 'en' ? 'Area' : 'භූමි ප්‍රමාණය',
-                        lang == 'en' ? '${farm.areaHectares} ha' : 'හෙක්ටයාර ${farm.areaHectares}',
+                        context.tr('plantation_area'),
+                        '${farm.areaHectares} ${context.tr('plantation_hectares')}',
                         Colors.orange,
                       ),
                     ),
@@ -427,7 +424,7 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                       child: _buildInfoItem(
                         context,
                         Icons.agriculture,
-                        lang == 'en' ? 'Vines' : 'වැල් ගණන',
+                        context.tr('plantation_vines'),
                         '${farm.totalVines}',
                         Colors.purple,
                       ),
@@ -466,7 +463,7 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              lang == 'en' ? 'Started' : 'ආරම්භ කළ දිනය',
+                              context.tr('plantation_started'),
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                     color: Colors.grey[600],
                                     fontSize: 11,

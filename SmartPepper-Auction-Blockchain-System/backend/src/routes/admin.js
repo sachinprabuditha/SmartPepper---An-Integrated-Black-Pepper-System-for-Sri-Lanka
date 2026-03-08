@@ -417,4 +417,473 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/admin/recent-activity
+ * Get recent system activities for admin dashboard
+ */
+router.get('/recent-activity', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const activities = [];
+
+    // Fetch recent admin actions
+    const adminActionsSnapshot = await db.collection('admin_actions')
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .get();
+
+    adminActionsSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      const actionType = data.action_type;
+      let description = '';
+      let icon = '✅';
+      let color = 'green';
+
+      if (actionType === 'approve_lot') {
+        description = `Lot ${data.target_id} approved`;
+        icon = '✅';
+        color = 'green';
+      } else if (actionType === 'reject_lot') {
+        description = `Lot ${data.target_id} rejected`;
+        icon = '❌';
+        color = 'red';
+      } else {
+        description = `Admin action: ${actionType}`;
+        icon = '⚙️';
+        color = 'purple';
+      }
+
+      activities.push({
+        type: 'admin_action',
+        description,
+        icon,
+        color,
+        timestamp: data.created_at,
+        details: data.details || {}
+      });
+    });
+
+    // Fetch recent auctions created
+    const auctionsSnapshot = await db.collection('auctions')
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .get();
+
+    auctionsSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      activities.push({
+        type: 'auction_created',
+        description: `New auction created: ${data.lot_id || doc.id}`,
+        icon: '🔨',
+        color: 'blue',
+        timestamp: data.created_at,
+        details: { auction_id: doc.id, lot_id: data.lot_id }
+      });
+    });
+
+    // Fetch recent lots submitted
+    const lotsSnapshot = await db.collection('pepper_lots')
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .get();
+
+    lotsSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      activities.push({
+        type: 'lot_submitted',
+        description: `New lot submitted: ${data.lot_id || doc.id}`,
+        icon: '📦',
+        color: 'orange',
+        timestamp: data.created_at,
+        details: { lot_id: data.lot_id, variety: data.variety, quantity: data.quantity }
+      });
+    });
+
+    // Fetch recent user registrations
+    const usersSnapshot = await db.collection('users')
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .get();
+
+    usersSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      activities.push({
+        type: 'user_registered',
+        description: `New user registered: ${data.name || data.email}`,
+        icon: '👤',
+        color: 'blue',
+        timestamp: data.created_at,
+        details: { user_id: doc.id, role: data.role, email: data.email }
+      });
+    });
+
+    // Fetch recent bids
+    const bidsSnapshot = await db.collection('bids')
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .get();
+
+    bidsSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      activities.push({
+        type: 'bid_placed',
+        description: `New bid placed on auction ${data.auction_id}`,
+        icon: '💰',
+        color: 'green',
+        timestamp: data.created_at,
+        details: { auction_id: data.auction_id, amount: data.amount, bidder: data.bidder_address }
+      });
+    });
+
+    // Sort all activities by timestamp (most recent first)
+    activities.sort((a, b) => {
+      const timeA = a.timestamp?.toMillis?.() || a.timestamp?.seconds * 1000 || 0;
+      const timeB = b.timestamp?.toMillis?.() || b.timestamp?.seconds * 1000 || 0;
+      return timeB - timeA;
+    });
+
+    // Return only the requested limit
+    const recentActivities = activities.slice(0, limit);
+
+    // Format timestamps for frontend
+    const formattedActivities = recentActivities.map(activity => ({
+      ...activity,
+      timestamp: activity.timestamp?.toDate?.() || activity.timestamp,
+      timeAgo: getTimeAgo(activity.timestamp)
+    }));
+
+    logger.info(`Fetched ${formattedActivities.length} recent activities`);
+
+    res.json({
+      success: true,
+      activities: formattedActivities
+    });
+  } catch (error) {
+    logger.error('Error fetching recent activity:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch recent activity',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Helper function to calculate time ago
+ */
+function getTimeAgo(timestamp) {
+  if (!timestamp) return 'Unknown';
+  
+  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  const now = new Date();
+  const seconds = Math.floor((now - date) / 1000);
+
+  if (seconds < 60) return `${seconds} seconds ago`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+  if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
+  return date.toLocaleDateString();
+}
+
+/**
+ * GET /api/admin/users/pending
+ * Get all users pending admin approval (exporters)
+ */
+router.get('/users/pending', async (req, res) => {
+  try {
+    const { limit = 50, offset = 0 } = req.query;
+    
+    // Query users with pending approval status
+    const pendingUsersSnapshot = await db.collection('users')
+      .where('approval_status', '==', 'pending')
+      .orderBy('created_at', 'desc')
+      .limit(parseInt(limit))
+      .offset(parseInt(offset))
+      .get();
+    
+    const users = pendingUsersSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        phone: data.phone || null,
+        address: data.address || null,
+        city: data.city || null,
+        wallet_address: data.wallet_address || null,
+        approval_status: data.approval_status,
+        created_at: data.created_at,
+        updated_at: data.updated_at
+      };
+    });
+
+    // Convert timestamps
+    const usersWithFormattedDates = convertTimestamps(users);
+
+    logger.info(`Fetched ${users.length} pending users`);
+
+    res.json({
+      success: true,
+      users: usersWithFormattedDates,
+      total: users.length
+    });
+  } catch (error) {
+    logger.error('Error fetching pending users:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch pending users',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/admin/users
+ * Get all users with optional filtering
+ */
+router.get('/users', async (req, res) => {
+  try {
+    const { limit = 50, offset = 0, role, approval_status } = req.query;
+    
+    let query = db.collection('users');
+    
+    // Apply filters
+    if (role) {
+      query = query.where('role', '==', role);
+    }
+    
+    if (approval_status) {
+      query = query.where('approval_status', '==', approval_status);
+    }
+    
+    const usersSnapshot = await query
+      .orderBy('created_at', 'desc')
+      .limit(parseInt(limit))
+      .offset(parseInt(offset))
+      .get();
+    
+    const users = usersSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        phone: data.phone || null,
+        address: data.address || null,
+        city: data.city || null,
+        wallet_address: data.wallet_address || null,
+        approval_status: data.approval_status || 'approved',
+        is_active: data.is_active,
+        verified: data.verified || false,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        last_login: data.last_login || null
+      };
+    });
+
+    // Convert timestamps
+    const usersWithFormattedDates = convertTimestamps(users);
+
+    logger.info(`Fetched ${users.length} users`);
+
+    res.json({
+      success: true,
+      users: usersWithFormattedDates,
+      total: users.length
+    });
+  } catch (error) {
+    logger.error('Error fetching users:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch users',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/admin/users/:userId/approve
+ * Approve a pending user (exporter)
+ */
+router.post('/users/:userId/approve', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { adminId, adminName } = req.body;
+
+    // Get user document
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    const userData = userDoc.data();
+
+    // Check if user is an exporter
+    if (userData.role !== 'exporter') {
+      return res.status(400).json({
+        success: false,
+        error: 'Only exporter accounts require approval'
+      });
+    }
+
+    // Update user status
+    await userRef.update({
+      approval_status: 'approved',
+      is_active: true,
+      approved_by: adminId || null,
+      approved_at: admin.firestore.FieldValue.serverTimestamp(),
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Log admin action
+    await db.collection('admin_actions').add({
+      admin_id: adminId || 'unknown',
+      admin_name: adminName || 'Admin',
+      action_type: 'approve_user',
+      target_id: userId,
+      target_type: 'user',
+      details: {
+        user_email: userData.email,
+        user_name: userData.name,
+        user_role: userData.role
+      },
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Log activity
+    await db.collection('activity_logs').add({
+      user_id: userId,
+      action: 'user_approved',
+      details: {
+        approved_by: adminId || 'unknown',
+        admin_name: adminName || 'Admin'
+      },
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    logger.info(`User ${userId} approved by admin ${adminId || 'unknown'}`);
+
+    res.json({
+      success: true,
+      message: 'User approved successfully',
+      user: {
+        id: userId,
+        approval_status: 'approved',
+        is_active: true
+      }
+    });
+  } catch (error) {
+    logger.error('Error approving user:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to approve user',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/admin/users/:userId/reject
+ * Reject a pending user (exporter)
+ */
+router.post('/users/:userId/reject', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { reason, adminId, adminName } = req.body;
+
+    if (!reason) {
+      return res.status(400).json({
+        success: false,
+        error: 'Rejection reason is required'
+      });
+    }
+
+    // Get user document
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    const userData = userDoc.data();
+
+    // Check if user is an exporter
+    if (userData.role !== 'exporter') {
+      return res.status(400).json({
+        success: false,
+        error: 'Only exporter accounts require approval'
+      });
+    }
+
+    // Update user status
+    await userRef.update({
+      approval_status: 'rejected',
+      is_active: false,
+      rejection_reason: reason,
+      rejected_by: adminId || null,
+      rejected_at: admin.firestore.FieldValue.serverTimestamp(),
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Log admin action
+    await db.collection('admin_actions').add({
+      admin_id: adminId || 'unknown',
+      admin_name: adminName || 'Admin',
+      action_type: 'reject_user',
+      target_id: userId,
+      target_type: 'user',
+      details: {
+        user_email: userData.email,
+        user_name: userData.name,
+        user_role: userData.role,
+        reason: reason
+      },
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Log activity
+    await db.collection('activity_logs').add({
+      user_id: userId,
+      action: 'user_rejected',
+      details: {
+        rejected_by: adminId || 'unknown',
+        admin_name: adminName || 'Admin',
+        reason: reason
+      },
+      created_at: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    logger.info(`User ${userId} rejected by admin ${adminId || 'unknown'}`);
+
+    res.json({
+      success: true,
+      message: 'User rejected successfully',
+      user: {
+        id: userId,
+        approval_status: 'rejected',
+        is_active: false
+      }
+    });
+  } catch (error) {
+    logger.error('Error rejecting user:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to reject user',
+      details: error.message
+    });
+  }
+});
+
 module.exports = router;
+

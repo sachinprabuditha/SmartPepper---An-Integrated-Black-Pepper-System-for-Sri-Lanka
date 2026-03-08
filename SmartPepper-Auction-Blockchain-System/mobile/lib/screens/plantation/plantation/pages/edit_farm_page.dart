@@ -7,6 +7,7 @@ import '../../../../widgets/input_field.dart';
 import '../../../../widgets/primary_button.dart';
 import '../../../../utils/validators.dart';
 import '../../../../providers/language_provider.dart';
+import '../../../../localization/app_localizations.dart';
 
 class EditFarmPage extends ConsumerStatefulWidget {
   final FarmRecord farm;
@@ -50,7 +51,7 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
       initialDate: _farmStartDate ?? DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
-      helpText: lang == 'en' ? 'Select Farm Start Date' : 'ගොවිපළ ආරම්භ කළ දිනය තෝරන්න',
+      helpText: context.tr('plantation_select_farm_start_date'),
     );
     if (picked != null) {
       setState(() {
@@ -59,7 +60,7 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
     }
   }
 
-  Future<void> _handleSubmit(String lang) async {
+  Future<void> _handleSubmit(BuildContext context, String lang) async {
     if (_formKey.currentState!.validate() &&
         _farmStartDate != null) {
       try {
@@ -67,11 +68,11 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
         final totalVines = int.tryParse(_totalVinesController.text.trim());
 
         if (areaHectares == null || areaHectares <= 0) {
-          _showError(lang == 'en' ? 'Please enter a valid area in hectares' : 'කරුණාකර නිවැරදි භූමි ප්‍රමාණයක් (හෙක්ටයාර) ඇතුලත් කරන්න');
+          _showError(context.tr('plantation_validation_valid_area'));
           return;
         }
         if (totalVines == null || totalVines <= 0) {
-          _showError(lang == 'en' ? 'Please enter a valid number of vines' : 'කරුණාකර නිවැරදි වැල් ගණනක් ඇතුලත් කරන්න');
+          _showError(context.tr('plantation_validation_valid_vines'));
           return;
         }
 
@@ -90,7 +91,7 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
           
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(lang == 'en' ? 'Farm updated successfully' : 'ගොවිපළ සාර්ථකව යාවත්කාලීන කරන ලදී'),
+              content: Text(context.tr('plantation_farm_updated')),
               backgroundColor: Colors.green,
             ),
           );
@@ -118,7 +119,7 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(lang == 'en' ? 'Edit Farm' : 'ගොවිපළ සංස්කරණය කරන්න'),
+        title: Text(context.tr('plantation_edit_farm')),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -128,14 +129,14 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               InputField(
-                label: lang == 'en' ? 'Farm Name' : 'ගොවිපළේ නම',
+                label: context.tr('plantation_farm_name'),
                 controller: _farmNameController,
-                validator: (value) => Validators.required(value, fieldName: lang == 'en' ? 'Farm name' : 'ගොවිපළේ නම'),
+                validator: (value) => Validators.required(value, fieldName: context.tr('plantation_farm_name')),
               ),
               const SizedBox(height: 16),
               // Read Only District
               InputField(
-                label: lang == 'en' ? 'District' : 'දිස්ත්‍රික්කය',
+                label: context.tr('plantation_district'),
                 controller: TextEditingController(text: widget.farm.district.get(lang)),
                 readOnly: true,
                 validator: null,
@@ -144,7 +145,7 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
               
               // Read Only Soil Type
               InputField(
-                label: lang == 'en' ? 'Soil Type' : 'පස වර්ගය',
+                label: context.tr('plantation_soil_type'),
                 controller: TextEditingController(text: widget.farm.soilType.get(lang)),
                 readOnly: true,
                 validator: null,
@@ -153,7 +154,7 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
 
               // Read Only Variety
               InputField(
-                label: lang == 'en' ? 'Chosen Variety' : 'තෝරාගත් ප්‍රභේදය',
+                label: context.tr('plantation_chosen_variety'),
                 controller: TextEditingController(text: widget.farm.chosenVariety.get(lang)),
                 readOnly: true,
                 validator: null,
@@ -170,15 +171,15 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
                           : '',
                     ),
                     decoration: InputDecoration(
-                      labelText: lang == 'en' ? 'Farm Start Date' : 'ගොවිපළ ආරම්භ කළ දිනය',
-                      hintText: lang == 'en' ? 'Select planting date' : 'ගොවිපළ ආරම්භ කළ දිනය තෝරන්න',
+                      labelText: context.tr('plantation_farm_start_date'),
+                      hintText: context.tr('plantation_select_planting_date_short'),
                       suffixIcon: const Icon(Icons.calendar_today),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     validator: (value) {
-                      if (_farmStartDate == null) return lang == 'en' ? 'Please select a farm start date' : 'කරුණාකර ආරම්භ කළ දිනයක් තෝරන්න';
+                      if (_farmStartDate == null) return context.tr('plantation_select_farm_start');
                       return null;
                     },
                   ),
@@ -186,32 +187,32 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
               ),
               const SizedBox(height: 16),
               InputField(
-                label: lang == 'en' ? 'Area in Hectares' : 'භූමි ප්‍රමාණය (හෙක්ටයාර)',
+                label: context.tr('plantation_area_in_hectares'),
                 controller: _areaHectaresController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 validator: (value) {
-                  if (value == null || value.isEmpty) return lang == 'en' ? 'Please enter area' : 'කරුණාකර භූමි ප්‍රමාණය ඇතුලත් කරන්න';
+                  if (value == null || value.isEmpty) return context.tr('plantation_please_enter_area');
                   final area = double.tryParse(value);
-                  if (area == null || area <= 0) return lang == 'en' ? 'Please enter a valid area' : 'කරුණාකර නිවැරදි භූමි ප්‍රමාණයක් ඇතුලත් කරන්න';
+                  if (area == null || area <= 0) return context.tr('plantation_validation_enter_valid_area');
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               InputField(
-                label: lang == 'en' ? 'Total Vines' : 'සම්පූර්ණ වැල් ගණන',
+                label: context.tr('plantation_total_vines'),
                 controller: _totalVinesController,
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == null || value.isEmpty) return lang == 'en' ? 'Please enter total vines' : 'කරුණාකර සම්පූර්ණ වැල් ගණන ඇතුලත් කරන්න';
+                  if (value == null || value.isEmpty) return context.tr('plantation_please_enter_vines');
                   final vines = int.tryParse(value);
-                  if (vines == null || vines <= 0) return lang == 'en' ? 'Please enter a valid number' : 'කරුණාකර නිවැරදි වැල් ගණනක් ඇතුලත් කරන්න';
+                  if (vines == null || vines <= 0) return context.tr('plantation_please_enter_valid_number');
                   return null;
                 },
               ),
               const SizedBox(height: 24),
               PrimaryButton(
-                text: lang == 'en' ? 'Save Changes' : 'වෙනස්කම් සුරකින්න',
-                onPressed: () => _handleSubmit(lang),
+                text: context.tr('plantation_save_changes'),
+                onPressed: () => _handleSubmit(context, lang),
               ),
             ],
           ),

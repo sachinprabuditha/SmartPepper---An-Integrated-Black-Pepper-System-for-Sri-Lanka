@@ -54,6 +54,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
 
       if (result['success'] == true) {
+        // Check if exporter requires approval
+        if (result['requiresApproval'] == true) {
+          await _showApprovalPendingDialog();
+          context.go('/login');
+          return;
+        }
+
         // Show private key if it was generated (for farmers)
         if (result['privateKey'] != null) {
           await _showPrivateKeyDialog(
@@ -89,6 +96,101 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  Future<void> _showApprovalPendingDialog() async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Registration Submitted!',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.yellow.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.yellow.shade700),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.access_time,
+                              color: Colors.yellow.shade700),
+                          const SizedBox(width: 8),
+                          const Expanded(
+                            child: Text(
+                              'Pending Admin Approval',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'What happens next:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        '1. An administrator will review your registration\n'
+                        '2. You will receive email notification once approved\n'
+                        '3. After approval, you can login and participate in auctions',
+                        style: TextStyle(fontSize: 12, height: 1.5),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Note: You will not be able to login until your account is approved. This typically takes 1-2 business days.',
+                    style: TextStyle(fontSize: 12, height: 1.4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK, Go to Login'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,7 +214,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Logo
                 Center(
                   child: Image.asset(
-                    'assets/icons/logo_copy.png',
+                    'assets/icons/SmartPepper.png',
                     width: 80,
                     height: 80,
                     fit: BoxFit.contain,
@@ -303,6 +405,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
 
                 const SizedBox(height: 32),
+
+                // Exporter Approval Notice
+                if (_selectedRole == 'exporter')
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.yellow.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.yellow.shade700),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.info_outline, color: Colors.yellow.shade700),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Admin Approval Required',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Exporter accounts require admin approval. You will receive notification once approved.',
+                                style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 12,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                const SizedBox(height: 24),
 
                 // Register Button
                 SizedBox(

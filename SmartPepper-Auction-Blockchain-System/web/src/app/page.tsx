@@ -4,9 +4,61 @@ import Link from 'next/link';
 import { AuctionList } from '@/components/auction/AuctionList';
 import { Leaf, TrendingUp, Shield, Zap, Users, ShoppingCart, Settings, Award, BarChart3, Package } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useEffect, useState } from 'react';
+import { auctionApi, adminApi } from '@/lib/api';
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
+  const [stats, setStats] = useState({
+    totalAuctions: 0,
+    activeFarmers: 0,
+    verifiedExporters: 0,
+    totalVolume: '0',
+  });
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    try {
+      // Fetch all auctions
+      const auctionsResponse = await auctionApi.getAll({ limit: 1000 });
+      const auctions = auctionsResponse.data.auctions || [];
+      
+      // Get admin stats if user is authenticated
+      let users = [];
+      try {
+        const usersResponse = await adminApi.getUsers({ limit: 1000 });
+        users = usersResponse.data.users || [];
+      } catch (error) {
+        // Non-admin users can't access this endpoint
+        console.log('Admin stats not available');
+      }
+
+      // Calculate stats
+      const farmers = users.filter((u: any) => u.role === 'farmer' && u.is_active);
+      const exporters = users.filter((u: any) => u.role === 'exporter' && u.approval_status === 'approved');
+      
+      // Calculate total volume from settled auctions (winning bids)
+      const settledAuctions = auctions.filter((a: any) => a.status === 'settled');
+      const totalVolume = settledAuctions.reduce((sum: number, auction: any) => {
+        return sum + (parseFloat(auction.winning_bid || '0'));
+      }, 0);
+
+      setStats({
+        totalAuctions: auctions.length,
+        activeFarmers: farmers.length,
+        verifiedExporters: exporters.length,
+        totalVolume: totalVolume.toFixed(2),
+      });
+    } catch (error) {
+      console.error('Failed to load stats:', error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
 
   return (
     <div>
@@ -18,15 +70,15 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex justify-center mb-6">
-              <div className="bg-white/10 backdrop-blur-sm rounded-full p-4">
-                <Leaf className="w-16 h-16 text-pepper-gold" />
-              </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
+                <img src="/SmartPepper.png" alt="SmartPepper Logo" className="w-20 h-20" />
+                </div>
             </div>
             
             {isAuthenticated ? (
               <>
                 <h1 className="text-5xl font-bold mb-4 text-shadow">
-                  Welcome back, {user?.name}! 🌶️
+                  Welcome back, {user?.name}!
                 </h1>
                 <p className="text-xl mb-8 text-pepper-gold">
                   {user?.role === 'farmer' && 'List your premium Sri Lankan black pepper lots and reach global buyers through our blockchain-powered auction platform.'}
@@ -220,19 +272,35 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold mb-2">1,234</div>
+              {loadingStats ? (
+                <div className="text-3xl font-bold mb-2 animate-pulse">...</div>
+              ) : (
+                <div className="text-4xl font-bold mb-2">{stats.totalAuctions.toLocaleString()}</div>
+              )}
               <div className="text-primary-200">Total Auctions</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">567</div>
+              {loadingStats ? (
+                <div className="text-3xl font-bold mb-2 animate-pulse">...</div>
+              ) : (
+                <div className="text-4xl font-bold mb-2">{stats.activeFarmers.toLocaleString()}</div>
+              )}
               <div className="text-primary-200">Active Farmers</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">89</div>
-              <div className="text-primary-200">Verified Buyers</div>
+              {loadingStats ? (
+                <div className="text-3xl font-bold mb-2 animate-pulse">...</div>
+              ) : (
+                <div className="text-4xl font-bold mb-2">{stats.verifiedExporters.toLocaleString()}</div>
+              )}
+              <div className="text-primary-200">Verified Exporters</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">₹12.5M</div>
+              {loadingStats ? (
+                <div className="text-3xl font-bold mb-2 animate-pulse">...</div>
+              ) : (
+                <div className="text-4xl font-bold mb-2">{stats.totalVolume} ETH</div>
+              )}
               <div className="text-primary-200">Total Trading Volume</div>
             </div>
           </div>

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart' as vanilla_provider;
 
 import '../../../config/theme.dart';
-import '../../../providers/language_provider.dart';
-import '../../../widgets/language_picker_button.dart';
+import '../../../localization/app_localizations.dart';
 import 'models/prediction_input_model.dart';
 import 'models/prediction_output_model.dart';
 import 'services/prediction_service.dart';
@@ -18,8 +16,7 @@ class PricePredictionScreen extends ConsumerStatefulWidget {
       _PricePredictionScreenState();
 }
 
-class _PricePredictionScreenState
-    extends ConsumerState<PricePredictionScreen> {
+class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers
@@ -131,17 +128,12 @@ class _PricePredictionScreenState
 
   @override
   Widget build(BuildContext context) {
-    final languageProvider =
-        vanilla_provider.Provider.of<LanguageProvider>(context);
-    final lang = languageProvider.locale.languageCode;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(lang == 'en' ? 'Price Prediction' : 'මිල අනාවැකි'),
+        title: Text(context.tr('price_prediction_title')),
         backgroundColor: AppTheme.forestGreen,
         foregroundColor: AppTheme.pepperGold,
         actions: const [
-          LanguagePickerButton(iconColor: AppTheme.pepperGold),
           SizedBox(width: 8),
         ],
       ),
@@ -152,78 +144,85 @@ class _PricePredictionScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildSectionTitle(lang == 'en' ? 'Market Data' : 'වෙළඳ දත්ත'),
+              _buildSectionTitle(context.tr('price_prediction_market_data')),
               const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
                     child: _buildNumberField(
+                      context,
                       _usdBuyController,
-                      lang == 'en' ? 'USD Buy Rate' : 'USD මිලදී ගැනීමේ අනුපාතය',
-                      lang == 'en' ? 'Enter rate' : 'අනුපාතය ඇතුළත් කරන්න',
-                      lang: lang,
+                      context.tr('price_prediction_usd_buy'),
+                      context.tr('price_prediction_enter_rate'),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: _buildNumberField(
+                      context,
                       _usdSellController,
-                      lang == 'en' ? 'USD Sell Rate' : 'USD විකිණීමේ අනුපාතය',
-                      lang == 'en' ? 'Enter rate' : 'අනුපාතය ඇතුළත් කරන්න',
-                      lang: lang,
+                      context.tr('price_prediction_usd_sell'),
+                      context.tr('price_prediction_enter_rate'),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-
-              _buildSectionTitle(
-                lang == 'en' ? 'Weather Conditions' : 'කාලගුණ තත්ත්වය',
-              ),
+              _buildSectionTitle(context.tr('price_prediction_weather')),
               const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
                     child: _buildNumberField(
+                      context,
                       _tempController,
-                      lang == 'en' ? 'Temperature (°C)' : 'උෂ්ණත්වය (°C)',
-                      lang == 'en' ? 'e.g. 28.5' : 'උදා: 28.5',
-                      lang: lang,
+                      context.tr('price_prediction_temperature'),
+                      context.tr('price_prediction_hint_eg'),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: _buildNumberField(
+                      context,
                       _precipController,
-                      lang == 'en' ? 'Precipitation' : 'වර්ෂාපතනය',
-                      lang == 'en' ? 'e.g. 0.0' : 'උදා: 0.0',
-                      lang: lang,
+                      context.tr('price_prediction_precipitation'),
+                      context.tr('price_prediction_hint_eg'),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-
-              _buildSectionTitle(lang == 'en' ? 'Details' : 'විස්තර'),
+              _buildSectionTitle(context.tr('price_prediction_details')),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _dateController,
                 decoration: InputDecoration(
-                  labelText: lang == 'en' ? 'Date' : 'දිනය',
+                  labelText: context.tr('session_date'),
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white24),
+                  ),
                   border: const OutlineInputBorder(),
-                  suffixIcon: const Icon(Icons.calendar_today),
+                  suffixIcon: const Icon(Icons.calendar_today,
+                      color: AppTheme.pepperGold),
                 ),
+                style: const TextStyle(color: Colors.white),
                 readOnly: true,
                 onTap: () => _selectDate(context),
               ),
               const SizedBox(height: 16),
-
               DropdownButtonFormField<String>(
                 value: _location,
                 decoration: InputDecoration(
-                  labelText: lang == 'en' ? 'Location' : 'ස්ථානය',
+                  labelText: context.tr('price_prediction_location'),
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white24),
+                  ),
                   border: const OutlineInputBorder(),
                 ),
+                style: const TextStyle(color: Colors.white),
+                dropdownColor: AppTheme.deepEmerald,
                 items: _locations
                     .map(
                       (loc) => DropdownMenuItem<String>(
@@ -239,13 +238,18 @@ class _PricePredictionScreenState
                 },
               ),
               const SizedBox(height: 16),
-
               DropdownButtonFormField<String>(
                 value: _grade,
                 decoration: InputDecoration(
-                  labelText: lang == 'en' ? 'Grade' : 'ශ්‍රේණිය',
+                  labelText: context.tr('price_prediction_grade'),
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white24),
+                  ),
                   border: const OutlineInputBorder(),
                 ),
+                style: const TextStyle(color: Colors.white),
+                dropdownColor: AppTheme.deepEmerald,
                 items: _grades
                     .map(
                       (g) => DropdownMenuItem<String>(
@@ -261,7 +265,6 @@ class _PricePredictionScreenState
                 },
               ),
               const SizedBox(height: 24),
-
               ElevatedButton(
                 onPressed: _isLoading ? null : _submitPrediction,
                 style: ElevatedButton.styleFrom(
@@ -279,14 +282,13 @@ class _PricePredictionScreenState
                         ),
                       )
                     : Text(
-                        lang == 'en' ? 'PREDICT PRICE' : 'මිල අනාවැකි කරන්න',
+                        context.tr('price_prediction_predict'),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
               ),
-
               const SizedBox(height: 24),
               if (_errorMessage != null)
                 Container(
@@ -301,7 +303,6 @@ class _PricePredictionScreenState
                     style: TextStyle(color: Colors.red[900]),
                   ),
                 ),
-
               if (_result != null)
                 Card(
                   elevation: 4,
@@ -314,29 +315,27 @@ class _PricePredictionScreenState
                     child: Column(
                       children: [
                         Text(
-                          lang == 'en' ? 'Prediction Results' : 'අනාවැකි ප්‍රතිඵල',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
-                              ?.copyWith(
-                                color: AppTheme.pepperGold,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          context.tr('price_prediction_results'),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    color: AppTheme.pepperGold,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         const Divider(),
                         const SizedBox(height: 16),
                         _buildResultRow(
-                          lang == 'en' ? 'Highest Price' : 'ඉහළම මිල',
+                          context.tr('price_prediction_highest'),
                           _result!.highestPrice,
                         ),
                         const SizedBox(height: 12),
                         _buildResultRow(
-                          lang == 'en' ? 'Average Price' : 'සාමාන්‍ය මිල',
+                          context.tr('price_prediction_average'),
                           _result!.averagePrice,
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          '${lang == 'en' ? 'Currency' : 'මුදල් ඒකකය'}: ${_result!.currency}',
+                          '${context.tr('common_currency')}: ${_result!.currency}',
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontStyle: FontStyle.italic,
@@ -346,7 +345,6 @@ class _PricePredictionScreenState
                     ),
                   ),
                 ),
-
               if (_result != null && !_isLoading) ...[
                 const SizedBox(height: 16),
                 Center(
@@ -357,7 +355,7 @@ class _PricePredictionScreenState
                       });
                     },
                     icon: const Icon(Icons.calculate),
-                    label: Text(lang == 'en' ? 'Valuate Yield' : 'අස්වැන්න අගය ගණනය කරන්න'),
+                    label: Text(context.tr('price_prediction_valuate')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueGrey,
                       foregroundColor: Colors.white,
@@ -384,11 +382,10 @@ class _PricePredictionScreenState
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Text(
-                                  lang == 'en' ? 'Valuate Your Yield' : 'ඔබේ අස්වැන්න අගය ගණනය කරන්න',
+                                  context.tr('price_prediction_valuate_title'),
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleMedium
@@ -403,8 +400,10 @@ class _PricePredictionScreenState
                                       const TextInputType.numberWithOptions(
                                           decimal: true),
                                   decoration: InputDecoration(
-                                    labelText: lang == 'en' ? 'Amount (kg)' : 'ප්‍රමාණය (කි.ග්‍රෑ.)',
-                                    hintText: lang == 'en' ? 'e.g. 50.5' : 'උදා: 50.5',
+                                    labelText: context
+                                        .tr('price_prediction_amount_kg'),
+                                    hintText: context
+                                        .tr('price_prediction_hint_eg_50'),
                                     border: const OutlineInputBorder(),
                                     prefixIcon: const Icon(
                                       Icons.inventory_2_outlined,
@@ -412,21 +411,17 @@ class _PricePredictionScreenState
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return lang == 'en'
-                                          ? 'Amount is required'
-                                          : 'ප්‍රමාණය අත්‍යවශ්‍යයි';
+                                      return context.tr(
+                                          'price_prediction_amount_required');
                                     }
-                                    final amount =
-                                        double.tryParse(value);
+                                    final amount = double.tryParse(value);
                                     if (amount == null) {
-                                      return lang == 'en'
-                                          ? 'Please enter a valid number'
-                                          : 'කරුණාකර වලංගු අංකයක් ඇතුළත් කරන්න';
+                                      return context
+                                          .tr('price_prediction_valid_number');
                                     }
                                     if (amount < 0) {
-                                      return lang == 'en'
-                                          ? 'Amount cannot be negative'
-                                          : 'ප්‍රමාණය ඍණ විය නොහැක';
+                                      return context.tr(
+                                          'price_prediction_amount_non_negative');
                                     }
                                     return null;
                                   },
@@ -434,14 +429,12 @@ class _PricePredictionScreenState
                                 const SizedBox(height: 16),
                                 ElevatedButton(
                                   onPressed: () {
-                                    if (_formKey.currentState!
-                                        .validate()) {
+                                    if (_formKey.currentState!.validate()) {
                                       final amount = double.parse(
                                         _amountController.text,
                                       );
                                       setState(() {
-                                        final roundedPrice =
-                                            double.parse(
+                                        final roundedPrice = double.parse(
                                           _result!.averagePrice
                                               .toStringAsFixed(2),
                                         );
@@ -454,7 +447,8 @@ class _PricePredictionScreenState
                                     backgroundColor: AppTheme.pepperGold,
                                     foregroundColor: AppTheme.forestGreen,
                                   ),
-                                  child: Text(lang == 'en' ? 'Calculate' : 'ගණනය කරන්න'),
+                                  child: Text(
+                                      context.tr('price_prediction_calculate')),
                                 ),
                                 if (_calculatedBaseValue != null) ...[
                                   const SizedBox(height: 20),
@@ -462,8 +456,7 @@ class _PricePredictionScreenState
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                       color: Colors.green.shade50,
-                                      borderRadius:
-                                          BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
                                         color: Colors.green.shade200,
                                       ),
@@ -471,9 +464,8 @@ class _PricePredictionScreenState
                                     child: Column(
                                       children: [
                                         Text(
-                                          lang == 'en'
-                                              ? 'Estimated Total Value'
-                                              : 'ඇස්තමේන්තු මුළු වටිනාකම',
+                                          context.tr(
+                                              'price_prediction_estimated_value'),
                                           style: TextStyle(
                                             fontSize: 14,
                                             color: Colors.black54,
@@ -485,8 +477,7 @@ class _PricePredictionScreenState
                                           style: TextStyle(
                                             fontSize: 24,
                                             fontWeight: FontWeight.bold,
-                                            color:
-                                                Colors.green.shade700,
+                                            color: Colors.green.shade700,
                                           ),
                                         ),
                                       ],
@@ -513,32 +504,37 @@ class _PricePredictionScreenState
       style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,
-        color: Colors.black87,
+        color: Colors.white,
       ),
     );
   }
 
   Widget _buildNumberField(
+    BuildContext context,
     TextEditingController controller,
     String label,
-    String hint, {
-    required String lang,
-  }) {
+    String hint,
+  ) {
     return TextFormField(
       controller: controller,
-      keyboardType:
-          const TextInputType.numberWithOptions(decimal: true),
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
         hintText: hint,
+        hintStyle: const TextStyle(color: Colors.white24),
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white24),
+        ),
         border: const OutlineInputBorder(),
       ),
+      style: const TextStyle(color: Colors.white),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return lang == 'en' ? 'Required' : 'අත්‍යවශ්‍යයි';
+          return context.tr('plantation_required');
         }
         if (double.tryParse(value) == null) {
-          return lang == 'en' ? 'Invalid number' : 'වලංගු නොවන අංකයක්';
+          return context.tr('price_prediction_valid_number');
         }
         return null;
       },
@@ -569,4 +565,3 @@ class _PricePredictionScreenState
     );
   }
 }
-
