@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../controllers/session_controller.dart';
+import '../../../../localization/app_localizations.dart';
 import '../../../../widgets/primary_button.dart';
 import '../../../../widgets/input_field.dart';
 import '../../../../utils/validators.dart';
@@ -63,18 +64,18 @@ class _EditSessionPageState extends ConsumerState<EditSessionPage> {
   Future<void> _deleteSession() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Session'),
-        content: const Text('Are you sure you want to delete this session? This action cannot be undone.'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(dialogContext.tr('session_delete')),
+        content: Text(dialogContext.tr('session_confirm_delete')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(dialogContext.tr('common_cancel')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(dialogContext.tr('common_delete')),
           ),
         ],
       ),
@@ -85,8 +86,8 @@ class _EditSessionPageState extends ConsumerState<EditSessionPage> {
         await ref.read(sessionControllerProvider(widget.seasonId).notifier).deleteSession(widget.sessionId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Session deleted successfully'),
+            SnackBar(
+              content: Text(context.tr('session_deleted_success')),
               backgroundColor: Colors.green,
             ),
           );
@@ -127,8 +128,8 @@ class _EditSessionPageState extends ConsumerState<EditSessionPage> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Session updated successfully'),
+            SnackBar(
+              content: Text(context.tr('session_updated_success')),
               backgroundColor: Colors.green,
             ),
           );
@@ -153,7 +154,7 @@ class _EditSessionPageState extends ConsumerState<EditSessionPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Session'),
+        title: Text(context.tr('session_edit')),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete),
@@ -185,16 +186,16 @@ class _EditSessionPageState extends ConsumerState<EditSessionPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   InputField(
-                    label: 'Session Name',
+                    label: context.tr('session_name'),
                     controller: _sessionNameController,
                   ),
                   const SizedBox(height: 16),
                   InkWell(
                     onTap: () => _selectDate(context),
                     child: InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: 'Date',
-                        suffixIcon: Icon(Icons.calendar_today),
+                      decoration: InputDecoration(
+                        labelText: context.tr('session_date'),
+                        suffixIcon: const Icon(Icons.calendar_today),
                       ),
                       child: Text(
                         DateFormat('MMM dd, yyyy').format(_selectedDate!),
@@ -204,37 +205,37 @@ class _EditSessionPageState extends ConsumerState<EditSessionPage> {
                   ),
                   const SizedBox(height: 16),
                   InputField(
-                    label: 'Yield (kg)',
+                    label: context.tr('session_yield_kg'),
                     controller: _yieldController,
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value != null && value.isNotEmpty) {
-                        return Validators.number(value, fieldName: 'Yield');
+                        return Validators.number(value, fieldName: context.tr('session_yield_field'));
                       }
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
                   InputField(
-                    label: 'Area Harvested (hectares)',
+                    label: context.tr('session_area_hectares'),
                     controller: _areaController,
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value != null && value.isNotEmpty) {
-                        return Validators.number(value, fieldName: 'Area harvested');
+                        return Validators.number(value, fieldName: context.tr('session_area_field'));
                       }
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
                   InputField(
-                    label: 'Notes (optional)',
+                    label: context.tr('session_notes_optional'),
                     controller: _notesController,
                     maxLines: 4,
                   ),
                   const SizedBox(height: 32),
                   PrimaryButton(
-                    text: 'Update Session',
+                    text: context.tr('session_update'),
                     onPressed: _handleSubmit,
                   ),
                 ],
@@ -244,7 +245,7 @@ class _EditSessionPageState extends ConsumerState<EditSessionPage> {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(
-          child: Text('Error: ${error.toString()}'),
+          child: Text('${context.tr('common_error')}: ${error.toString()}'),
         ),
       ),
     );

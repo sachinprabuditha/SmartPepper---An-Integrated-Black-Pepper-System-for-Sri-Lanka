@@ -3132,6 +3132,1642 @@
         "ta": "உங்கள் கணக்கிலிருந்து வெளியேறவும்"
     },
     {
+        "key": "plantation_management",
+        "en": "Plantation Management",
+        "si": "වගා කළමනාකරණය",
+        "ta": "தோட்ட மேலாண்மை"
+    },
+    {
+        "key": "plantation_management_subtitle",
+        "en": "Manage your plantation.",
+        "si": "ඔබේ වගාව කළමනාකරණය කරන්න.",
+        "ta": "உங்கள் தோட்டத்தை நிர்வகிக்கவும்."
+    },
+    {
+        "key": "plantation_management_farmer_only",
+        "en": "Plantation Management is available to farmers only.",
+        "si": "වගා කළමනාකරණය ගොවීන්ට පමණක් ලබා ගත හැක.",
+        "ta": "தோட்ட மேலாண்மை விவசாயிகளுக்கு மட்டுமே கிடைக்கும்."
+    },
+    {
+        "key": "plantation_welcome",
+        "en": "Welcome, {name}",
+        "si": "සාදරයෙන් පිළිගනිමු, {name}",
+        "ta": "வரவேற்கிறோம், {name}"
+    },
+    {
+        "key": "plantation_subtitle",
+        "en": "Manage your pepper plantation efficiently",
+        "si": "ඔබගේ ගම්මිரිස් වගාව කාර්යක්ෂමව කළමනාකරණය කරන්න",
+        "ta": "உங்கள் மிளகு தோட்டத்தை திறமையாக நிர்வகிக்கவும்"
+    },
+    {
+        "key": "plantation_agronomy_guide",
+        "en": "Agronomy Guide",
+        "si": "කෘෂි මාර්ගෝපදේශය",
+        "ta": "விவசாய வழிகாட்டி"
+    },
+    {
+        "key": "plantation_plantations",
+        "en": "Plantation",
+        "si": "වගාවන්",
+        "ta": "தோட்டம்"
+    },
+    {
+        "key": "plantation_seasons",
+        "en": "Seasons",
+        "si": "කන්නයන්",
+        "ta": "பருவங்கள்"
+    },
+    {
+        "key": "plantation_price_prediction",
+        "en": "Price Prediction",
+        "si": "මිල අනාවැකි",
+        "ta": "விலை கணிப்பு"
+    },
+    {
+        "key": "plantation_yield_analytics",
+        "en": "Yield Analytics",
+        "si": "විශ්ලේෂණයන්",
+        "ta": "மகசூல் பகுப்பாய்வு"
+    },
+    {
+        "key": "plantation_ai_chat",
+        "en": "AI Chat Assistant",
+        "si": "AI සහායක",
+        "ta": "AI அசிஸ்டன்ட்"
+    },
+    {
+        "key": "plantation_my_farms",
+        "en": "My Farms",
+        "si": "මගේ ගොවිපළවල්",
+        "ta": "எனது பண்ணைகள்"
+    },
+    {
+        "key": "plantation_start_plantation",
+        "en": "Start Plantation",
+        "si": "වගාව ආරම්භ කරන්න",
+        "ta": "தோட்டத்தைத் தொடங்கு"
+    },
+    {
+        "key": "plantation_total_farms",
+        "en": "Total Farms",
+        "si": "මුළු ගොවිපළවල්",
+        "ta": "மொத்த பண்ணைகள்"
+    },
+    {
+        "key": "plantation_farm",
+        "en": "Farm",
+        "si": "ගොවිපළ",
+        "ta": "பண்ணை"
+    },
+    {
+        "key": "plantation_district",
+        "en": "District",
+        "si": "දිස්ත්‍රික්කය",
+        "ta": "மாவட்டம்"
+    },
+    {
+        "key": "plantation_variety",
+        "en": "Variety",
+        "si": "ප්‍රභේදය",
+        "ta": "வகை"
+    },
+    {
+        "key": "plantation_area",
+        "en": "Area",
+        "si": "භූමි ප්‍රමාණය",
+        "ta": "பரப்பளவு"
+    },
+    {
+        "key": "plantation_vines",
+        "en": "Vines",
+        "si": "වැල් ගණන",
+        "ta": "வேலி எண்ணிக்கை"
+    },
+    {
+        "key": "plantation_harvest_seasons",
+        "en": "Harvest Seasons",
+        "si": "අස්වනු කන්න",
+        "ta": "அறுவடை பருவங்கள்"
+    },
+    {
+        "key": "plantation_season_details",
+        "en": "Season Details",
+        "si": "කන්න විස්තර",
+        "ta": "பருவ விவரங்கள்"
+    },
+    {
+        "key": "plantation_create_season",
+        "en": "Create Season",
+        "si": "කන්නයක් සාදන්න",
+        "ta": "பருவத்தை உருவாக்கு"
+    },
+    {
+        "key": "plantation_edit_season",
+        "en": "Edit Season",
+        "si": "කන්නය සංස්කරණය කරන්න",
+        "ta": "பருவத்தைத் திருத்து"
+    },
+    {
+        "key": "plantation_harvest_period",
+        "en": "Harvest Period",
+        "si": "අස්වනු කාලය",
+        "ta": "அறுவடை காலம்"
+    },
+    {
+        "key": "plantation_total_yield",
+        "en": "Total Yield",
+        "si": "මුළු අස්වැන්න",
+        "ta": "மொத்த மகசூல்"
+    },
+    {
+        "key": "plantation_status",
+        "en": "Status",
+        "si": "තත්ත්වය",
+        "ta": "நிலை"
+    },
+    {
+        "key": "plantation_active",
+        "en": "Active",
+        "si": "සක්‍රිය",
+        "ta": "செயலில்"
+    },
+    {
+        "key": "plantation_ended",
+        "en": "Ended",
+        "si": "අවසන්",
+        "ta": "முடிந்தது"
+    },
+    {
+        "key": "plantation_harvesting_sessions",
+        "en": "Harvesting Sessions",
+        "si": "අස්වනු වාර",
+        "ta": "அறுவடை அமர்வுகள்"
+    },
+    {
+        "key": "plantation_add_session",
+        "en": "Add Session",
+        "si": "වාරයක් එක් කරන්න",
+        "ta": "அமர்வைச் சேர்"
+    },
+    {
+        "key": "plantation_farm_details",
+        "en": "Farm Details",
+        "si": "ගොවිපළේ විස්තර",
+        "ta": "பண்ணை விவரங்கள்"
+    },
+    {
+        "key": "plantation_no_farms_yet",
+        "en": "No farms yet.\nStart your first plantation to begin tracking your crops!",
+        "si": "තවම ගොවිපළවල් නොමැත.\nඔබේ පළමු වගාව ආරම්භ කරන්න!",
+        "ta": "இன்னும் பண்ணைகள் இல்லை.\nஉங்கள் பயிர்களை கண்காணிக்க முதல் தோட்டத்தைத் தொடங்குங்கள்!"
+    },
+    {
+        "key": "plantation_loading_farms",
+        "en": "Loading farms...",
+        "si": "ගොවිපළවල් පටවමින්...",
+        "ta": "பண்ணைகள் ஏற்றுகிறது..."
+    },
+    {
+        "key": "plantation_error_loading_farms",
+        "en": "Error loading farms",
+        "si": "ගොවිපළවල් පැටවීමේ දෝෂයකි",
+        "ta": "பண்ணைகள் ஏற்றுவதில் பிழை"
+    },
+    {
+        "key": "plantation_delete_farm",
+        "en": "Delete Farm",
+        "si": "ගොවිපළ මකන්න",
+        "ta": "பண்ணையை நீக்கு"
+    },
+    {
+        "key": "plantation_confirm_delete_farm",
+        "en": "Are you sure you want to delete this farm? All related tasks will be removed.",
+        "si": "මෙම ගොවිපළ මකා දැමීමට ඔබට විශ්වාසද? සියලුම අදාළ කාර්යයන් ඉවත් කරනු ලැබේ.",
+        "ta": "இந்த பண்ணையை நீக்க விரும்புகிறீர்களா? தொடர்பான அனைத்து பணிகளும் அகற்றப்படும்."
+    },
+    {
+        "key": "plantation_farm_deleted",
+        "en": "Farm deleted",
+        "si": "ගොවிපළ මකා දමන ලදී",
+        "ta": "பண்ணை நீக்கப்பட்டது"
+    },
+    {
+        "key": "plantation_edit_farm",
+        "en": "Edit Farm",
+        "si": "ගොවිපළ සංස්කරණය කරන්න",
+        "ta": "பண்ணையைத் திருத்து"
+    },
+    {
+        "key": "plantation_add_manual_task",
+        "en": "Add Manual Task",
+        "si": "කාර්යයක් එක් කරන්න",
+        "ta": "கைமுறை பணியைச் சேர்"
+    },
+    {
+        "key": "plantation_farm_task_journey",
+        "en": "Farm Task Journey",
+        "si": "වගාවේ කාර්යයන් ගමන",
+        "ta": "பண்ணை பணி பயணம்"
+    },
+    {
+        "key": "plantation_no_tasks_scheduled",
+        "en": "No tasks scheduled yet.",
+        "si": "තවම කාර්යයන් සැලසුම් කර නොමැත.",
+        "ta": "இன்னும் பணிகள் திட்டமிடப்படவில்லை."
+    },
+    {
+        "key": "plantation_loading_tasks",
+        "en": "Loading tasks...",
+        "si": "කාර්යයන් පටවමින්...",
+        "ta": "பணிகள் ஏற்றுகிறது..."
+    },
+    {
+        "key": "plantation_loading_farm_details",
+        "en": "Loading farm details...",
+        "si": "ගොවිපළේ විස්තර පටවමින්...",
+        "ta": "பண்ணை விவரங்கள் ஏற்றுகிறது..."
+    },
+    {
+        "key": "plantation_manual_task_created",
+        "en": "Manual task created successfully!",
+        "si": "අතින් සැකසූ කාර්යය සාර්ථකව නිර්මාණය කරන ලදී!",
+        "ta": "கைமுறை பணி வெற்றிகரமாக உருவாக்கப்பட்டது!"
+    },
+    {
+        "key": "plantation_start_plantation_title",
+        "en": "Start Plantation",
+        "si": "වගාව අරඹන්න",
+        "ta": "தோட்டத்தைத் தொடங்கு"
+    },
+    {
+        "key": "plantation_required",
+        "en": "Required",
+        "si": "අත්‍යවශ්‍යයි",
+        "ta": "தேவை"
+    },
+    {
+        "key": "plantation_hectares",
+        "en": "hectares",
+        "si": "හෙක්ටයාර",
+        "ta": "ஹெக்டேர்"
+    },
+    {
+        "key": "plantation_total_vines",
+        "en": "Total Vines",
+        "si": "මුළු වැල් ගණන",
+        "ta": "மொத்த வேலிகள்"
+    },
+    {
+        "key": "plantation_farm_start_date",
+        "en": "Farm Start Date",
+        "si": "ගොවිපළ ආරම්භ කළ දිනය",
+        "ta": "பண்ணை தொடக்க தேதி"
+    },
+    {
+        "key": "plantation_started",
+        "en": "Started",
+        "si": "ආරම්භ කළ දිනය",
+        "ta": "தொடங்கியது"
+    },
+    {
+        "key": "plantation_phase_1",
+        "en": "Phase 1: Landscaping & Prep",
+        "si": "අදියර 1: ඉඩම් සකස් කිරීම",
+        "ta": "நிலை 1: நில அமைப்பு மற்றும் தயாரிப்பு"
+    },
+    {
+        "key": "plantation_phase_2",
+        "en": "Phase 2: Planting Day",
+        "si": "අදියර 2: පැළ සිටුවීම",
+        "ta": "நிலை 2: நடவு நாள்"
+    },
+    {
+        "key": "plantation_phase_3",
+        "en": "Phase 3: Maintenance",
+        "si": "අදියර 3: නඩත්තුව",
+        "ta": "நிலை 3: பராமரிப்பு"
+    },
+    {
+        "key": "plantation_phase_4",
+        "en": "Phase 4: Harvesting & Processing",
+        "si": "අදියර 4: අස්වැන්න නෙළීම",
+        "ta": "நிலை 4: அறுவடை மற்றும் செயலாக்கம்"
+    },
+    {
+        "key": "plantation_no_tasks_in_phase",
+        "en": "No tasks in this phase yet.",
+        "si": "මෙම අදියරේ කාර්යයන් නොමැත.",
+        "ta": "இந்த நிலையில் இன்னும் பணிகள் இல்லை."
+    },
+    {
+        "key": "plantation_type",
+        "en": "Type",
+        "si": "වර්ගය",
+        "ta": "வகை"
+    },
+    {
+        "key": "plantation_due",
+        "en": "Due",
+        "si": "අවසන් දිනය",
+        "ta": "காலம்"
+    },
+    {
+        "key": "plantation_completed",
+        "en": "Completed",
+        "si": "සම්පූර්ණ කළේ",
+        "ta": "முடிக்கப்பட்டது"
+    },
+    {
+        "key": "plantation_filter_by_farm",
+        "en": "Filter by Farm",
+        "si": "ගොවිපල අනුව පෙරන්න",
+        "ta": "பண்ணை அடிப்படையில் வடிகட்டு"
+    },
+    {
+        "key": "plantation_all_farms",
+        "en": "All Farms",
+        "si": "සියලු ගොවිපල",
+        "ta": "அனைத்து பண்ணைகள்"
+    },
+    {
+        "key": "plantation_total_seasons",
+        "en": "Total Seasons",
+        "si": "මුළු කන්න",
+        "ta": "மொத்த பருவங்கள்"
+    },
+    {
+        "key": "plantation_filtered_seasons",
+        "en": "Filtered Seasons",
+        "si": "පෙරහන් කළ කන්න",
+        "ta": "வடிகட்டப்பட்ட பருவங்கள்"
+    },
+    {
+        "key": "plantation_no_seasons_yet",
+        "en": "No harvest seasons yet.\nCreate your first season to start tracking your harvests!",
+        "si": "තවම අස්වනු කන්න නැත.\nඔබේ අස්වැන්න වාර්තා කිරීම ආරම්භ කිරීමට පළමු කන්නය සාදන්න!",
+        "ta": "இன்னும் அறுவடை பருவங்கள் இல்லை.\nஉங்கள் அறுவடைகளை கண்காணிக்க முதல் பருவத்தை உருவாக்குங்கள்!"
+    },
+    {
+        "key": "plantation_no_seasons_for_farm",
+        "en": "No seasons found for the selected farm.",
+        "si": "තෝරාගත් ගොවිපල සඳහා කන්න හමු නොවීය.",
+        "ta": "தேர்ந்தெடுக்கப்பட்ட பண்ணைக்கு பருவங்கள் இல்லை."
+    },
+    {
+        "key": "plantation_loading_seasons",
+        "en": "Loading seasons...",
+        "si": "කන්න පූරණය වෙමින්...",
+        "ta": "பருவங்கள் ஏற்றுகிறது..."
+    },
+    {
+        "key": "plantation_loading_user",
+        "en": "Loading user...",
+        "si": "පරිශීලකයා පූරණය වෙමින්...",
+        "ta": "பயனர் ஏற்றுகிறது..."
+    },
+    {
+        "key": "plantation_harvest_season",
+        "en": "Harvest Season",
+        "si": "අස්වනු කන්නය",
+        "ta": "அறுவடை பருவம்"
+    },
+    {
+        "key": "plantation_period",
+        "en": "Period",
+        "si": "කාලය",
+        "ta": "காலம்"
+    },
+    {
+        "key": "plantation_loading_farm",
+        "en": "Loading farm...",
+        "si": "ගොවිපල පූරණය වෙමින්...",
+        "ta": "பண்ணை ஏற்றுகிறது..."
+    },
+    {
+        "key": "plantation_na",
+        "en": "N/A",
+        "si": "නැත",
+        "ta": "இல்லை"
+    },
+    {
+        "key": "plantation_yield",
+        "en": "Yield",
+        "si": "අස්වැන්න",
+        "ta": "மகசூல்"
+    },
+    {
+        "key": "plantation_yield_ha",
+        "en": "Yield/Ha",
+        "si": "අස්වැන්න/හෙක්",
+        "ta": "மகசூல்/ஹெக்டேர்"
+    },
+    {
+        "key": "plantation_area_ha",
+        "en": "Area",
+        "si": "ප්‍රදේශය",
+        "ta": "பரப்பளவு"
+    },
+    {
+        "key": "plantation_refresh",
+        "en": "Refresh",
+        "si": "යාවත්කාලීන කරන්න",
+        "ta": "புதுப்பி"
+    },
+    {
+        "key": "plantation_season_name",
+        "en": "Season Name",
+        "si": "කන්න නම",
+        "ta": "பருவ பெயர்"
+    },
+    {
+        "key": "plantation_start_month",
+        "en": "Start Month",
+        "si": "ආරම්භ මාසය",
+        "ta": "தொடக்க மாதம்"
+    },
+    {
+        "key": "plantation_end_month",
+        "en": "End Month",
+        "si": "අවසන් මාසය",
+        "ta": "முடிவு மாதம்"
+    },
+    {
+        "key": "plantation_start_year",
+        "en": "Start Year",
+        "si": "ආරම්භ වර්ෂය",
+        "ta": "தொடக்க ஆண்டு"
+    },
+    {
+        "key": "plantation_end_year",
+        "en": "End Year",
+        "si": "අවසන් වර්ෂය",
+        "ta": "முடிவு ஆண்டு"
+    },
+    {
+        "key": "plantation_update_season",
+        "en": "Update Season",
+        "si": "කන්නය යාවත්කාලීන කරන්න",
+        "ta": "பருவத்தைப் புதுப்பி"
+    },
+    {
+        "key": "plantation_delete_season",
+        "en": "Delete Season",
+        "si": "කන්නය මකන්න",
+        "ta": "பருவத்தை நீக்கு"
+    },
+    {
+        "key": "plantation_confirm_delete_season",
+        "en": "Are you sure you want to delete this season? This action cannot be undone.",
+        "si": "මෙම කන්නය මකා දැමීමට ඔබට විශ්වාසද? මෙම ක්‍රියාව ආපසු හැරවිය නොහැක.",
+        "ta": "இந்த பருவத்தை நீக்க விரும்புகிறீர்களா? இந்த செயலை மாற்ற முடியாது."
+    },
+    {
+        "key": "plantation_season_deleted",
+        "en": "Season deleted successfully",
+        "si": "කන්නය සාර්ථකව මකා දැමීය",
+        "ta": "பருவம் வெற்றிகரமாக நீக்கப்பட்டது"
+    },
+    {
+        "key": "plantation_end_season",
+        "en": "End Season",
+        "si": "කන්නය අවසන් කරන්න",
+        "ta": "பருவத்தை முடி"
+    },
+    {
+        "key": "plantation_confirm_end_season",
+        "en": "Are you sure you want to end this season? You will not be able to add new harvesting sessions.",
+        "si": "මෙම කන්නය අවසන් කිරීමට ඔබට විශ්වාසද? ඉන් පසු නව අස්වනු වාර එක් කළ නොහැක.",
+        "ta": "இந்த பருவத்தை முடிக்க விரும்புகிறீர்களா? புதிய அறுவடை அமர்வுகளைச் சேர்க்க முடியாது."
+    },
+    {
+        "key": "plantation_season_ended",
+        "en": "Season ended successfully",
+        "si": "කන්නය සාර්ථකව අවසන් විය",
+        "ta": "பருவம் வெற்றிகரமாக முடிக்கப்பட்டது"
+    },
+    {
+        "key": "plantation_no_farms_available",
+        "en": "No farms available.",
+        "si": "ගොවිපල කිසිවක් නොමැත.",
+        "ta": "பண்ணைகள் இல்லை."
+    },
+    {
+        "key": "plantation_please_select_farm",
+        "en": "Please select a farm",
+        "si": "කරුණාකර ගොවිපලක් තෝරන්න",
+        "ta": "தயவுசெய்து ஒரு பண்ணையைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "plantation_loading_sessions",
+        "en": "Loading sessions...",
+        "si": "වාර පූරණය වෙමින්...",
+        "ta": "அமர்வுகள் ஏற்றுகிறது..."
+    },
+    {
+        "key": "plantation_no_sessions_yet",
+        "en": "No harvesting sessions recorded yet.\nTap the + button below to add your first session.",
+        "si": "තවම අස්වනු වාර වාර්තා වී නැත.\nඔබේ පළමු වාරය එක් කිරීමට පහත + බොත්තම ඔබන්න.",
+        "ta": "இன்னும் அறுவடை அமர்வுகள் பதிவு செய்யப்படவில்லை.\nமுதல் அமர்வைச் சேர்க்க கீழே + பொத்தானைத் தட்டுங்கள்."
+    },
+    {
+        "key": "plantation_loading_season",
+        "en": "Loading season...",
+        "si": "කන්නය පූරණය වෙමින්...",
+        "ta": "பருவம் ஏற்றுகிறது..."
+    },
+    {
+        "key": "plantation_error_loading_tasks",
+        "en": "Error loading tasks",
+        "si": "කාර්යයන් පැටවීමේ දෝෂයකි",
+        "ta": "பணிகள் ஏற்றுவதில் பிழை"
+    },
+    {
+        "key": "plantation_error_loading_farm",
+        "en": "Error loading farm",
+        "si": "ගොවිපළ පැටවීමේ දෝෂයකි",
+        "ta": "பண்ணை ஏற்றுவதில் பிழை"
+    },
+    {
+        "key": "plantation_farm_name",
+        "en": "Farm Name",
+        "si": "ගොවිපළේ නම",
+        "ta": "பண்ணை பெயர்"
+    },
+    {
+        "key": "plantation_enter_farm_name",
+        "en": "Enter your farm name",
+        "si": "ඔබගේ ගොවිපළේ නම ඇතුලත් කරන්න",
+        "ta": "உங்கள் பண்ணை பெயரை உள்ளிடவும்"
+    },
+    {
+        "key": "plantation_validation_valid_area",
+        "en": "Please enter a valid area in hectares",
+        "si": "කරුණාකර නිවැරදි භූමි ප්‍රමාණයක් (හෙක්ටයාර) ඇතුලත් කරන්න",
+        "ta": "தயவுசெய்து ஹெக்டேரில் சரியான பரப்பளவை உள்ளிடவும்"
+    },
+    {
+        "key": "plantation_validation_valid_vines",
+        "en": "Please enter a valid number of vines",
+        "si": "කරුණාකර නිවැරදි වැල් ගණනක් ඇතුලත් කරන්න",
+        "ta": "தயவுசெய்து சரியான வேலி எண்ணிக்கையை உள்ளிடவும்"
+    },
+    {
+        "key": "plantation_started_success",
+        "en": "Plantation started successfully! Schedule has been generated.",
+        "si": "වගාව සාර්ථකව ආරම්භ කරන ලදී! කාලසටහන සකස් කර ඇත.",
+        "ta": "தோட்டம் வெற்றிகரமாக தொடங்கப்பட்டது! அட்டவணை உருவாக்கப்பட்டது."
+    },
+    {
+        "key": "plantation_select_farm_start_date",
+        "en": "Select Farm Start Date",
+        "si": "ගොවිපළ ආරම්භ කළ දිනය තෝරන්න",
+        "ta": "பண்ணை தொடக்க தேதியைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "plantation_select_planting_date",
+        "en": "Please select a planting date",
+        "si": "කරුණාකර ආරම්භ කළ දිනයක් තෝරන්න",
+        "ta": "தயவுசெய்து நடவு தேதியைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "plantation_area_in_hectares",
+        "en": "Area in Hectares",
+        "si": "භූමි ප්‍රමාණය (හෙක්ටයාර)",
+        "ta": "ஹெக்டேரில் பரப்பளவு"
+    },
+    {
+        "key": "plantation_hint_eg_25",
+        "en": "e.g., 2.5",
+        "si": "උදා: 2.5",
+        "ta": "எ.கா. 2.5"
+    },
+    {
+        "key": "plantation_validation_enter_area",
+        "en": "Please enter area in hectares",
+        "si": "කරුණාකර භූමි ප්‍රමාණය ඇතුලත් කරන්න",
+        "ta": "தயவுசெய்து ஹெக்டேரில் பரப்பளவை உள்ளிடவும்"
+    },
+    {
+        "key": "plantation_validation_enter_valid_area",
+        "en": "Please enter a valid area",
+        "si": "කරුණාකර නිවැරදි භූමි ප්‍රමාණයක් ඇතුලත් කරන්න",
+        "ta": "தயவுசெய்து சரியான பரப்பளவை உள்ளிடவும்"
+    },
+    {
+        "key": "plantation_hint_eg_1000",
+        "en": "e.g., 1000",
+        "si": "උදා: 1000",
+        "ta": "எ.கா. 1000"
+    },
+    {
+        "key": "plantation_validation_enter_vines",
+        "en": "Please enter total number of vines",
+        "si": "කරුණාකර සම්පූර්ණ වැල් ගණන ඇතුලත් කරන්න",
+        "ta": "தயவுசெய்து மொத்த வேலி எண்ணிக்கையை உள்ளிடவும்"
+    },
+    {
+        "key": "plantation_validation_valid_number_vines",
+        "en": "Please enter a valid number of vines",
+        "si": "කරුණාකර නිවැරදි වැල් ගණනක් ඇතුලත් කරන්න",
+        "ta": "தயவுசெய்து சரியான வேலி எண்ணிக்கையை உள்ளிடவும்"
+    },
+    {
+        "key": "plantation_starting",
+        "en": "Starting plantation...",
+        "si": "වගාව ආරම්භ කරමින්...",
+        "ta": "தோட்டம் தொடங்குகிறது..."
+    },
+    {
+        "key": "plantation_no_districts",
+        "en": "No districts available",
+        "si": "දිස්ත්‍රික්ක නොමැත",
+        "ta": "மாவட்டங்கள் இல்லை"
+    },
+    {
+        "key": "plantation_please_select_district",
+        "en": "Please select a district",
+        "si": "කරුණාකර දිස්ත්‍රික්කයක් තෝරන්න",
+        "ta": "தயவுசெய்து மாவட்டத்தைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "plantation_error_loading_districts",
+        "en": "Error loading districts",
+        "si": "දිස්ත්‍රික්ක පැටවීමේ දෝෂයකි",
+        "ta": "மாவட்டங்கள் ஏற்றுவதில் பிழை"
+    },
+    {
+        "key": "plantation_no_soil_types_for",
+        "en": "No soil types available for {name}",
+        "si": "{name} සඳහා පස වර්ග නොමැත",
+        "ta": "{name} க்கு மண் வகைகள் இல்லை"
+    },
+    {
+        "key": "plantation_soil_type",
+        "en": "Soil Type",
+        "si": "පස වර්ගය",
+        "ta": "மண் வகை"
+    },
+    {
+        "key": "plantation_please_select_soil",
+        "en": "Please select a soil type",
+        "si": "කරුණාකර පස වර්ගයක් තෝරන්න",
+        "ta": "தயவுசெய்து மண் வகையைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "plantation_error_loading_soils",
+        "en": "Error loading soil types",
+        "si": "පස වර්ග පැටවීමේ දෝෂයකි",
+        "ta": "மண் வகைகள் ஏற்றுவதில் பிழை"
+    },
+    {
+        "key": "plantation_no_varieties_for",
+        "en": "No varieties available for {name}",
+        "si": "{name} සඳහා ප්‍රභේද නොමැත",
+        "ta": "{name} க்கு வகைகள் இல்லை"
+    },
+    {
+        "key": "plantation_chosen_variety",
+        "en": "Chosen Variety",
+        "si": "තෝරාගත් වර්ගය",
+        "ta": "தேர்ந்தெடுக்கப்பட்ட வகை"
+    },
+    {
+        "key": "plantation_please_select_variety",
+        "en": "Please select a variety",
+        "si": "කරුණාකර ප්‍රභේදයක් තෝරන්න",
+        "ta": "தயவுசெய்து வகையைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "plantation_variety_info",
+        "en": "Variety Information",
+        "si": "වර්ගයේ තොරතුරු",
+        "ta": "வகை தகவல்"
+    },
+    {
+        "key": "plantation_specialities",
+        "en": "Specialities",
+        "si": "විශේෂතා",
+        "ta": "சிறப்புகள்"
+    },
+    {
+        "key": "plantation_soil",
+        "en": "Soil",
+        "si": "පස",
+        "ta": "மண்"
+    },
+    {
+        "key": "plantation_spacing",
+        "en": "Spacing",
+        "si": "පරතරය",
+        "ta": "இடைவெளி"
+    },
+    {
+        "key": "plantation_vines_ha",
+        "en": "Vines/Ha",
+        "si": "හෙක්.කට වැල්",
+        "ta": "வேலிகள்/ஹெக்டேர்"
+    },
+    {
+        "key": "plantation_error_loading_varieties",
+        "en": "Error loading varieties",
+        "si": "ප්‍රභේද පැටවීමේ දෝෂයකි",
+        "ta": "வகைகள் ஏற்றுவதில் பிழை"
+    },
+    {
+        "key": "plantation_please_enter_area",
+        "en": "Please enter area",
+        "si": "කරුණාකර භූමි ප්‍රමාණය ඇතුලත් කරන්න",
+        "ta": "தயவுசெய்து பரப்பளவை உள்ளிடவும்"
+    },
+    {
+        "key": "plantation_please_enter_vines",
+        "en": "Please enter total vines",
+        "si": "කරුණාකර සම්පූර්ණ වැල් ගණන ඇතුලත් කරන්න",
+        "ta": "தயவுசெய்து மொத்த வேலிகளை உள்ளிடவும்"
+    },
+    {
+        "key": "plantation_please_enter_valid_number",
+        "en": "Please enter a valid number",
+        "si": "කරුණාකර නිවැරදි වැල් ගණනක් ඇතුලත් කරන්න",
+        "ta": "தயவுசெய்து சரியான எண்ணை உள்ளிடவும்"
+    },
+    {
+        "key": "plantation_select_farm_start",
+        "en": "Please select a farm start date",
+        "si": "කරුණාකර ආරම්භ කළ දිනයක් තෝරන්න",
+        "ta": "தயவுசெய்து பண்ணை தொடக்க தேதியைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "plantation_save_changes",
+        "en": "Save Changes",
+        "si": "වෙනස්කම් සුරකින්න",
+        "ta": "மாற்றங்களை சேமி"
+    },
+    {
+        "key": "plantation_farm_updated",
+        "en": "Farm updated successfully",
+        "si": "ගොවිපළ සාර්ථකව යාවත්කාලීන කරන ලදී",
+        "ta": "பண்ணை வெற்றிகரமாக புதுப்பிக்கப்பட்டது"
+    },
+    {
+        "key": "plantation_select_planting_date_short",
+        "en": "Select farm start date",
+        "si": "ගොවිපළ ආරම්භ කළ දිනය තෝරන්න",
+        "ta": "பண்ணை தொடக்க தேதியைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "plantation_not_applicable",
+        "en": "N/A",
+        "si": "අදාළ නොවේ",
+        "ta": "பொருந்தாது"
+    },
+    {
+        "key": "session_create",
+        "en": "Create Session",
+        "si": "වාරයක් සාදන්න",
+        "ta": "அமர்வை உருவாக்கு"
+    },
+    {
+        "key": "session_name",
+        "en": "Session Name",
+        "si": "වාරයේ නම",
+        "ta": "அமர்வு பெயர்"
+    },
+    {
+        "key": "session_date",
+        "en": "Date",
+        "si": "දිනය",
+        "ta": "தேதி"
+    },
+    {
+        "key": "session_yield_kg",
+        "en": "Yield (kg)",
+        "si": "අස්වැන්න (කි.ග්‍රෑ.)",
+        "ta": "மகசூல் (கிலோ)"
+    },
+    {
+        "key": "session_area_hectares",
+        "en": "Area Harvested (hectares)",
+        "si": "අස්වනු කළ ප්‍රදේශය (හෙක්ටයාර)",
+        "ta": "அறுவடை செய்யப்பட்ட பரப்பளவு (ஹெக்டேர்)"
+    },
+    {
+        "key": "session_notes_optional",
+        "en": "Notes (optional)",
+        "si": "සටහන් (අත්‍යවශ්‍ය නොවේ)",
+        "ta": "குறிப்புகள் (விரும்பினால்)"
+    },
+    {
+        "key": "session_created_success",
+        "en": "Session created successfully",
+        "si": "වාරය සාර්ථකව සාදන ලදී",
+        "ta": "அமர்வு வெற்றிகரமாக உருவாக்கப்பட்டது"
+    },
+    {
+        "key": "session_delete",
+        "en": "Delete Session",
+        "si": "වාරය මකන්න",
+        "ta": "அமர்வை நீக்கு"
+    },
+    {
+        "key": "session_confirm_delete",
+        "en": "Are you sure you want to delete this session? This action cannot be undone.",
+        "si": "මෙම වාරය මකා දැමීමට ඔබට විශ්වාසද? මෙම ක්‍රියාව ආපසු හැරවිය නොහැක.",
+        "ta": "இந்த அமர்வை நீக்க விரும்புகிறீர்களா? இந்த செயலை மாற்ற முடியாது."
+    },
+    {
+        "key": "session_deleted_success",
+        "en": "Session deleted successfully",
+        "si": "වාරය සාර්ථකව මකා දැමීය",
+        "ta": "அமர்வு வெற்றிகரமாக நீக்கப்பட்டது"
+    },
+    {
+        "key": "session_edit",
+        "en": "Edit Session",
+        "si": "වාරය සංස්කරණය කරන්න",
+        "ta": "அமர்வைத் திருத்து"
+    },
+    {
+        "key": "session_updated_success",
+        "en": "Session updated successfully",
+        "si": "වාරය සාර්ථකව යාවත්කාලීන විය",
+        "ta": "அமர்வு வெற்றிகரமாக புதுப்பிக்கப்பட்டது"
+    },
+    {
+        "key": "plantation_task",
+        "en": "task",
+        "si": "කාර්යය",
+        "ta": "பணி"
+    },
+    {
+        "key": "plantation_tasks",
+        "en": "tasks",
+        "si": "කාර්යයන්",
+        "ta": "பணிகள்"
+    },
+    {
+        "key": "manual_task_dialog_task_details",
+        "en": "Task Details",
+        "si": "කාර්ය විස්තර",
+        "ta": "பணி விவரங்கள்"
+    },
+    {
+        "key": "manual_task_dialog_task_name",
+        "en": "Task Name",
+        "si": "කාර්යයේ නම",
+        "ta": "பணி பெயர்"
+    },
+    {
+        "key": "manual_task_dialog_priority",
+        "en": "Priority",
+        "si": "ප්‍රමුඛතාවය",
+        "ta": "முன்னுரிமை"
+    },
+    {
+        "key": "manual_task_dialog_low",
+        "en": "Low",
+        "si": "අඩු",
+        "ta": "குறைந்த"
+    },
+    {
+        "key": "manual_task_dialog_medium",
+        "en": "Medium",
+        "si": "මධ්‍යම",
+        "ta": "நடுத்தர"
+    },
+    {
+        "key": "manual_task_dialog_high",
+        "en": "High",
+        "si": "ඉහළ",
+        "ta": "உயர்"
+    },
+    {
+        "key": "manual_task_dialog_emergency",
+        "en": "Emergency",
+        "si": "හදිසි",
+        "ta": "அவசர"
+    },
+    {
+        "key": "manual_task_dialog_phase_optional",
+        "en": "Phase (Optional)",
+        "si": "අදියර (අත්‍යවශ්‍ය නොවේ)",
+        "ta": "கட்டம் (விரும்பினால்)"
+    },
+    {
+        "key": "manual_task_dialog_default_maintenance",
+        "en": "Default: Maintenance",
+        "si": "පෙරනිමිය: නඩත්තුව",
+        "ta": "இயல்புநிலை: பராமரிப்பு"
+    },
+    {
+        "key": "manual_task_dialog_none_default",
+        "en": "None (Default)",
+        "si": "නැත (පෙරනිමිය)",
+        "ta": "இல்லை (இயல்புநிலை)"
+    },
+    {
+        "key": "manual_task_dialog_landscaping",
+        "en": "Landscaping",
+        "si": "භූමි අලංකරණය",
+        "ta": "நில அலங்காரம்"
+    },
+    {
+        "key": "manual_task_dialog_planting",
+        "en": "Planting",
+        "si": "සිටුවීම",
+        "ta": "நடவு"
+    },
+    {
+        "key": "manual_task_dialog_maintenance",
+        "en": "Maintenance",
+        "si": "නඩත්තුව",
+        "ta": "பராமரிப்பு"
+    },
+    {
+        "key": "manual_task_dialog_harvesting",
+        "en": "Harvesting",
+        "si": "අස්වනු නෙලීම",
+        "ta": "அறுவடை"
+    },
+    {
+        "key": "manual_task_dialog_due_date",
+        "en": "Due Date",
+        "si": "අවසන් දිනය",
+        "ta": "நிலுவை தேதி"
+    },
+    {
+        "key": "manual_task_dialog_please_select_due_date",
+        "en": "Please select a due date",
+        "si": "කරුණාකර අවසන් දිනයක් තෝරන්න",
+        "ta": "தயவுசெய்து நிலுவை தேதியைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "manual_task_dialog_instructions_optional",
+        "en": "Instructions/Steps (Optional)",
+        "si": "උපදෙස්/අදියර (අත්‍යවශ්‍ය නොවේ)",
+        "ta": "அறிவுறுத்தல்கள்/படிகள் (விரும்பினால்)"
+    },
+    {
+        "key": "manual_task_dialog_reason_optional",
+        "en": "Reason (Optional)",
+        "si": "හේතුව (අත්‍යවශ්‍ය නොවේ)",
+        "ta": "காரணம் (விரும்பினால்)"
+    },
+    {
+        "key": "manual_task_dialog_create_task",
+        "en": "Create Task",
+        "si": "කාර්යය නිර්මාණය කරන්න",
+        "ta": "பணியை உருவாக்கு"
+    },
+    {
+        "key": "manual_task_dialog_instructions_hint",
+        "en": "Detailed instructions for this task...",
+        "si": "මෙම කාර්යය සඳහා සවිස්තරාත්මක උපදෙස්...",
+        "ta": "இந்த பணிக்கான விரிவான அறிவுறுத்தல்கள்..."
+    },
+    {
+        "key": "manual_task_dialog_reason_hint",
+        "en": "Why is this task needed?",
+        "si": "මෙම කාර්යය අවශ්‍ය වන්නේ ඇයි?",
+        "ta": "இந்த பணி ஏன் தேவை?"
+    },
+    {
+        "key": "manual_task_dialog_select_due_date",
+        "en": "Select Due Date",
+        "si": "අවසන් දිනය තෝරන්න",
+        "ta": "நிலுவை தேதியைத் தேர்ந்தெடு"
+    },
+    {
+        "key": "task_completion_completion_details",
+        "en": "Completion Details",
+        "si": "සම්පූර්ණ කිරීමේ විස්තර",
+        "ta": "முடிவு விவரங்கள்"
+    },
+    {
+        "key": "task_completion_mark_completed",
+        "en": "Mark as Completed",
+        "si": "සම්පූර්ණයි ලෙස සලකුණු කරන්න",
+        "ta": "முடிக்கப்பட்டதாகக் குறி"
+    },
+    {
+        "key": "task_completion_items_used",
+        "en": "Items Used",
+        "si": "භාවිතා කළ අයිතම",
+        "ta": "பயன்படுத்தப்பட்ட பொருட்கள்"
+    },
+    {
+        "key": "task_completion_add_item",
+        "en": "Add Item",
+        "si": "අයිතමයක් එක් කරන්න",
+        "ta": "பொருளைச் சேர்"
+    },
+    {
+        "key": "task_completion_labor_hours",
+        "en": "Labor Hours",
+        "si": "වැඩ කරන පැය ගණන",
+        "ta": "தொழிலாளர் மணிநேரம்"
+    },
+    {
+        "key": "task_completion_notes_optional",
+        "en": "Notes (Optional)",
+        "si": "සටහන් (අත්‍යවශ්‍ය නොවේ)",
+        "ta": "குறிப்புகள் (விரும்பினால்)"
+    },
+    {
+        "key": "task_completion_edit_task",
+        "en": "Edit Task",
+        "si": "කාර්යය සංස්කරණය කරන්න",
+        "ta": "பணியைத் திருத்து"
+    },
+    {
+        "key": "task_completion_edit_completion_details",
+        "en": "Edit Completion Details",
+        "si": "විස්තර සංස්කරණය කරන්න",
+        "ta": "முடிவு விவரங்களைத் திருத்து"
+    },
+    {
+        "key": "task_completion_delete_task",
+        "en": "Delete Task",
+        "si": "කාර්යය මකන්න",
+        "ta": "பணியை நீக்கு"
+    },
+    {
+        "key": "task_completion_manual",
+        "en": "Manual",
+        "si": "අතින් සැකසූ",
+        "ta": "கைமுறை"
+    },
+    {
+        "key": "task_completion_phase",
+        "en": "Phase",
+        "si": "අදියර",
+        "ta": "கட்டம்"
+    },
+    {
+        "key": "task_completion_priority",
+        "en": "Priority",
+        "si": "ප්‍රමුඛතාවය",
+        "ta": "முன்னுரிமை"
+    },
+    {
+        "key": "task_completion_due_date",
+        "en": "Due Date",
+        "si": "අවසන් දිනය",
+        "ta": "நிலுவை தேதி"
+    },
+    {
+        "key": "task_completion_problem_reason",
+        "en": "Problem/Reason:",
+        "si": "ගැටළුව/හේතුව:",
+        "ta": "சிக்கல்/காரணம்:"
+    },
+    {
+        "key": "task_completion_detailed_instructions",
+        "en": "Detailed Instructions:",
+        "si": "සවිස්තරාත්මක උපදෙස්:",
+        "ta": "விரிவான அறிவுறுத்தல்கள்:"
+    },
+    {
+        "key": "task_completion_item_name",
+        "en": "Item Name",
+        "si": "අයිතමයේ නම",
+        "ta": "பொருள் பெயர்"
+    },
+    {
+        "key": "task_completion_qty",
+        "en": "Qty",
+        "si": "ප්‍රමාණය",
+        "ta": "அளவு"
+    },
+    {
+        "key": "task_completion_unit",
+        "en": "Unit",
+        "si": "ඒකකය",
+        "ta": "அலகு"
+    },
+    {
+        "key": "task_completion_cost_lkr",
+        "en": "Cost (LKR)",
+        "si": "පිරිවැය (රු.)",
+        "ta": "செலவு (ரூ.)"
+    },
+    {
+        "key": "task_completion_completion_summary",
+        "en": "Completion Summary",
+        "si": "සම්පූර්ණ කිරීමේ සාරාංශය",
+        "ta": "முடிவு சுருக்கம்"
+    },
+    {
+        "key": "task_completion_completed_on",
+        "en": "Completed On",
+        "si": "සම්පූර්ණ කළ දිනය",
+        "ta": "முடிக்கப்பட்ட தேதி"
+    },
+    {
+        "key": "task_completion_notes",
+        "en": "Notes",
+        "si": "සටහන්",
+        "ta": "குறிப்புகள்"
+    },
+    {
+        "key": "task_completion_items_used_label",
+        "en": "Items Used:",
+        "si": "භාවිතා කළ අයිතම:",
+        "ta": "பயன்படுத்தப்பட்ட பொருட்கள்:"
+    },
+    {
+        "key": "task_completion_no_items_recorded",
+        "en": "No items recorded",
+        "si": "අයිතම වාර්තා වී නොමැත",
+        "ta": "பொருட்கள் பதிவு செய்யப்படவில்லை"
+    },
+    {
+        "key": "task_completion_item",
+        "en": "Item",
+        "si": "අයිතමය",
+        "ta": "பொருள்"
+    },
+    {
+        "key": "task_completion_cost",
+        "en": "Cost",
+        "si": "පිරිවැය",
+        "ta": "செலவு"
+    },
+    {
+        "key": "task_completion_please_fill_required",
+        "en": "Please fill all required fields",
+        "si": "කරුණාකර අවශ්‍ය සියලුම ක්ෂේත්‍ර පුරවන්න",
+        "ta": "தயவுசெய்து தேவையான அனைத்து புலங்களையும் நிரப்பவும்"
+    },
+    {
+        "key": "task_completion_remove_item",
+        "en": "Remove Item",
+        "si": "අයිතමය ඉවත් කරන්න",
+        "ta": "பொருளை அகற்று"
+    },
+    {
+        "key": "task_completion_quantity",
+        "en": "Quantity",
+        "si": "ප්‍රමාණය",
+        "ta": "அளவு"
+    },
+    {
+        "key": "task_completion_unit_cost_optional",
+        "en": "Unit Cost (LKR) (Optional)",
+        "si": "ඒකක පිරිවැය (රුපියල්) (අත්‍යවශ්‍ය නොවේ)",
+        "ta": "அலகு செலவு (ரூ.) (விரும்பினால்)"
+    },
+    {
+        "key": "task_completion_required",
+        "en": "Required",
+        "si": "අත්‍යවශ්‍යයි",
+        "ta": "தேவை"
+    },
+    {
+        "key": "task_completion_invalid",
+        "en": "Invalid",
+        "si": "අවලංගුයි",
+        "ta": "தவறானது"
+    },
+    {
+        "key": "task_completion_please_valid_labor_hours",
+        "en": "Please enter valid labor hours",
+        "si": "කරුණාකර නිවැරදි වැඩ කරන පැය ගණන ඇතුළත් කරන්න",
+        "ta": "தயவுசெய்து சரியான தொழிலாளர் மணிநேரத்தை உள்ளிடவும்"
+    },
+    {
+        "key": "task_completion_task_deleted_success",
+        "en": "Task deleted successfully",
+        "si": "කාර්යය සාර්ථකව මකා දමන ලදී",
+        "ta": "பணி வெற்றிகரமாக நீக்கப்பட்டது"
+    },
+    {
+        "key": "task_completion_are_you_sure_delete",
+        "en": "Are you sure you want to delete this task? This action cannot be undone.",
+        "si": "මෙම කාර්යය මකා දැමීමට ඔබට විශ්වාසද? මෙම ක්‍රියාව ආපසු හැරවිය නොහැක.",
+        "ta": "இந்த பணியை நீக்க விரும்புகிறீர்களா? இந்த செயலை மாற்ற முடியாது."
+    },
+    {
+        "key": "task_completion_task_marked_completed",
+        "en": "Task marked as completed!",
+        "si": "කාර්යය සාර්ථකව නිම කරන ලදී!",
+        "ta": "பணி முடிக்கப்பட்டதாகக் குறிக்கப்பட்டது!"
+    },
+    {
+        "key": "task_completion_steps_one_per_line",
+        "en": "Steps (One per line)",
+        "si": "පියවර (පේළියකට එකක්)",
+        "ta": "படிகள் (ஒரு வரிக்கு ஒன்று)"
+    },
+    {
+        "key": "task_completion_reason",
+        "en": "Reason",
+        "si": "හේතුව",
+        "ta": "காரணம்"
+    },
+    {
+        "key": "task_completion_edit_task_dialog_title",
+        "en": "Edit Task",
+        "si": "කාර්ය සංස්කරණය",
+        "ta": "பணியைத் திருத்து"
+    },
+    {
+        "key": "session_update",
+        "en": "Update Session",
+        "si": "වාරය යාවත්කාලීන කරන්න",
+        "ta": "அமர்வைப் புதுப்பி"
+    },
+    {
+        "key": "session_yield_field",
+        "en": "Yield",
+        "si": "අස්වැන්න",
+        "ta": "மகசூல்"
+    },
+    {
+        "key": "session_area_field",
+        "en": "Area harvested",
+        "si": "අස්වනු කළ ප්‍රදේශය",
+        "ta": "அறுவடை செய்யப்பட்ட பரப்பளவு"
+    },
+    {
+        "key": "plantation_no_farms_create_first",
+        "en": "No farms available. Please create a farm first.",
+        "si": "ගොවිපල කිසිවක් නොමැත. කරුණාකර පළමුව ගොවිපලක් සාදන්න.",
+        "ta": "பண்ணைகள் இல்லை. தயவுசெய்து முதலில் ஒரு பண்ணையை உருவாக்குங்கள்."
+    },
+    {
+        "key": "plantation_season_created_success",
+        "en": "Season created successfully",
+        "si": "කන්නය සාර්ථකව සාදන ලදී",
+        "ta": "பருவம் வெற்றிகரமாக உருவாக்கப்பட்டது"
+    },
+    {
+        "key": "plantation_season_updated_success",
+        "en": "Season updated successfully",
+        "si": "කන්නය සාර්ථකව යාවත්කාලීන විය",
+        "ta": "பருவம் வெற்றிகரமாக புதுப்பிக்கப்பட்டது"
+    },
+    {
+        "key": "plantation_harvest_period_label",
+        "en": "Harvest Period",
+        "si": "අස්වනු කාලය",
+        "ta": "அறுவடை காலம்"
+    },
+    {
+        "key": "plantation_total_yield_label",
+        "en": "Total Yield",
+        "si": "මුළු අස්වැන්න",
+        "ta": "மொத்த மகசூல்"
+    },
+    {
+        "key": "plantation_end_season_button",
+        "en": "End Season",
+        "si": "කන්නය අවසන් කරන්න",
+        "ta": "பருவத்தை முடி"
+    },
+    {
+        "key": "plantation_add_session_label",
+        "en": "Add Session",
+        "si": "වාරයක් එක් කරන්න",
+        "ta": "அமர்வைச் சேர்"
+    },
+    {
+        "key": "yield_analytics_title",
+        "en": "Yield Analytics",
+        "si": "අස්වැන්න විශ්ලේෂණ",
+        "ta": "மகசூல் பகுப்பாய்வு"
+    },
+    {
+        "key": "yield_analytics_initializing",
+        "en": "Initializing analytics...",
+        "si": "විශ්ලේෂණ පූරණය වෙමින්...",
+        "ta": "பகுப்பாய்வு துவக்குகிறது..."
+    },
+    {
+        "key": "yield_analytics_no_data",
+        "en": "No yield data recorded yet.",
+        "si": "තවම අස්වැන්න දත්ත වාර්තා වී නැත.",
+        "ta": "இன்னும் மகசூல் தரவு பதிவு செய்யப்படவில்லை."
+    },
+    {
+        "key": "yield_analytics_season_trend",
+        "en": "Season Yield Trend (kg)",
+        "si": "කන්න අස්වැන්න ප්‍රවණතාව (කි.ග්‍රෑ.)",
+        "ta": "பருவ மகசூல் போக்கு (கிலோ)"
+    },
+    {
+        "key": "yield_analytics_season_comparison",
+        "en": "Season Comparison (kg)",
+        "si": "කන්න සංසන්දනය (කි.ග්‍රෑ.)",
+        "ta": "பருவ ஒப்பீடு (கிலோ)"
+    },
+    {
+        "key": "yield_analytics_harvest_distribution",
+        "en": "Harvest Distribution in Selected Season",
+        "si": "අස්වනු බෙදාහැරීම: තෝරාගත් කන්නය",
+        "ta": "தேர்ந்தெடுக்கப்பட்ட பருவத்தில் அறுவடை பரவல்"
+    },
+    {
+        "key": "yield_analytics_total_seasons",
+        "en": "Total Seasons",
+        "si": "මුළු කන්න",
+        "ta": "மொத்த பருவங்கள்"
+    },
+    {
+        "key": "yield_analytics_total_sessions",
+        "en": "Total Sessions",
+        "si": "මුළු වාර",
+        "ta": "மொத்த அமர்வுகள்"
+    },
+    {
+        "key": "yield_analytics_lifetime_yield",
+        "en": "Lifetime Yield",
+        "si": "ජීවිත කාලීන අස්වැන්න",
+        "ta": "ஆயுட் கால மகசூல்"
+    },
+    {
+        "key": "yield_analytics_avg_per_season",
+        "en": "Avg / Season",
+        "si": "සාමාන්‍යය / කන්නය",
+        "ta": "சராசரி / பருவம்"
+    },
+    {
+        "key": "yield_analytics_best_season",
+        "en": "Best Season",
+        "si": "හොඳම කන්නය",
+        "ta": "சிறந்த பருவம்"
+    },
+    {
+        "key": "yield_analytics_lowest_season",
+        "en": "Lowest Season",
+        "si": "අඩුම කන්නය",
+        "ta": "குறைந்த பருவம்"
+    },
+    {
+        "key": "yield_analytics_select_season",
+        "en": "Select Season",
+        "si": "කන්නය තෝරන්න",
+        "ta": "பருவத்தைத் தேர்ந்தெடு"
+    },
+    {
+        "key": "yield_analytics_no_sessions_season",
+        "en": "No sessions recorded for this season.",
+        "si": "මෙම කන්නය සඳහා වාර කිසිවක් වාර්තා වී නැත.",
+        "ta": "இந்த பருவத்திற்கு அமர்வுகள் பதிவு செய்யப்படவில்லை."
+    },
+    {
+        "key": "yield_analytics_calculating",
+        "en": "Calculating yield statistics...",
+        "si": "අස්වැන්න සංඛ්‍යාලේඛන ගණනය කරමින්...",
+        "ta": "மகசூல் புள்ளிவிவரங்கள் கணக்கிடப்படுகிறது..."
+    },
+    {
+        "key": "price_prediction_title",
+        "en": "Price Prediction",
+        "si": "මිල අනාවැකි",
+        "ta": "விலை கணிப்பு"
+    },
+    {
+        "key": "price_prediction_market_data",
+        "en": "Market Data",
+        "si": "වෙළඳ දත්ත",
+        "ta": "சந்தை தரவு"
+    },
+    {
+        "key": "price_prediction_weather",
+        "en": "Weather Conditions",
+        "si": "කාලගුණ තත්ත්වය",
+        "ta": "வானிலை நிலைமைகள்"
+    },
+    {
+        "key": "price_prediction_details",
+        "en": "Details",
+        "si": "විස්තර",
+        "ta": "விவரங்கள்"
+    },
+    {
+        "key": "price_prediction_predict",
+        "en": "PREDICT PRICE",
+        "si": "මිල අනාවැකි කරන්න",
+        "ta": "விலையை கணிக்கவும்"
+    },
+    {
+        "key": "price_prediction_results",
+        "en": "Prediction Results",
+        "si": "අනාවැකි ප්‍රතිඵල",
+        "ta": "கணிப்பு முடிவுகள்"
+    },
+    {
+        "key": "price_prediction_highest",
+        "en": "Highest Price",
+        "si": "ඉහළම මිල",
+        "ta": "அதிகபட்ச விலை"
+    },
+    {
+        "key": "price_prediction_average",
+        "en": "Average Price",
+        "si": "සාමාන්‍ය මිල",
+        "ta": "சராசரி விலை"
+    },
+    {
+        "key": "price_prediction_valuate",
+        "en": "Valuate Yield",
+        "si": "අස්වැන්න අගය ගණනය කරන්න",
+        "ta": "மகசூல் மதிப்பை கணக்கிடு"
+    },
+    {
+        "key": "price_prediction_valuate_title",
+        "en": "Valuate Your Yield",
+        "si": "ඔබේ අස්වැන්න අගය ගණනය කරන්න",
+        "ta": "உங்கள் மகசூல் மதிப்பை கணக்கிடுங்கள்"
+    },
+    {
+        "key": "price_prediction_amount_kg",
+        "en": "Amount (kg)",
+        "si": "ප්‍රමාණය (කි.ග්‍රෑ.)",
+        "ta": "அளவு (கிலோ)"
+    },
+    {
+        "key": "price_prediction_calculate",
+        "en": "Calculate",
+        "si": "ගණනය කරන්න",
+        "ta": "கணக்கிடு"
+    },
+    {
+        "key": "price_prediction_estimated_value",
+        "en": "Estimated Total Value",
+        "si": "ඇස්තමේන්තු මුළු වටිනාකම",
+        "ta": "மதிப்பீட்டு மொத்த மதிப்பு"
+    },
+    {
+        "key": "common_currency",
+        "en": "Currency",
+        "si": "මුදල් ඒකකය",
+        "ta": "நாணயம்"
+    },
+    {
+        "key": "price_prediction_usd_buy",
+        "en": "USD Buy Rate",
+        "si": "USD මිලදී ගැනීමේ අනුපාතය",
+        "ta": "USD வாங்கும் விகிதம்"
+    },
+    {
+        "key": "price_prediction_usd_sell",
+        "en": "USD Sell Rate",
+        "si": "USD විකිණීමේ අනුපාතය",
+        "ta": "USD விற்கும் விகிதம்"
+    },
+    {
+        "key": "price_prediction_enter_rate",
+        "en": "Enter rate",
+        "si": "අනුපාතය ඇතුළත් කරන්න",
+        "ta": "விகிதத்தை உள்ளிடவும்"
+    },
+    {
+        "key": "price_prediction_temperature",
+        "en": "Temperature (°C)",
+        "si": "උෂ්ණත්වය (°C)",
+        "ta": "வெப்பநிலை (°C)"
+    },
+    {
+        "key": "price_prediction_precipitation",
+        "en": "Precipitation",
+        "si": "වර්ෂාපතනය",
+        "ta": "மழைப்பொழிவு"
+    },
+    {
+        "key": "price_prediction_hint_eg",
+        "en": "e.g. 28.5",
+        "si": "උදා: 28.5",
+        "ta": "எ.கா. 28.5"
+    },
+    {
+        "key": "price_prediction_location",
+        "en": "Location",
+        "si": "ස්ථානය",
+        "ta": "இடம்"
+    },
+    {
+        "key": "price_prediction_grade",
+        "en": "Grade",
+        "si": "ශ්‍රේණිය",
+        "ta": "தரம்"
+    },
+    {
+        "key": "price_prediction_amount_required",
+        "en": "Amount is required",
+        "si": "ප්‍රමාණය අත්‍යවශ්‍යයි",
+        "ta": "அளவு தேவை"
+    },
+    {
+        "key": "price_prediction_valid_number",
+        "en": "Please enter a valid number",
+        "si": "කරුණාකර වලංගු අංකයක් ඇතුළත් කරන්න",
+        "ta": "தயவுசெய்து சரியான எண்ணை உள்ளிடவும்"
+    },
+    {
+        "key": "price_prediction_amount_non_negative",
+        "en": "Amount cannot be negative",
+        "si": "ප්‍රමාණය ඍණ විය නොහැක",
+        "ta": "அளவு எதிர்மறையாக இருக்க முடியாது"
+    },
+    {
+        "key": "price_prediction_hint_eg_50",
+        "en": "e.g. 50.5",
+        "si": "උදා: 50.5",
+        "ta": "எ.கா. 50.5"
+    },
+    {
+        "key": "agronomy_all_suitable_soils",
+        "en": "All Suitable Soils",
+        "si": "සියලුම සුදුසු පස",
+        "ta": "அனைத்து பொருத்தமான மண்"
+    },
+    {
+        "key": "agronomy_soil_recommendation",
+        "en": "Soil Recommendation",
+        "si": "නිර්දේශිත පස",
+        "ta": "மண் பரிந்துரை"
+    },
+    {
+        "key": "agronomy_why_suitable",
+        "en": "Why Suitable",
+        "si": "සුදුසු වීමට හේතුව",
+        "ta": "ஏன் பொருத்தமானது"
+    },
+    {
+        "key": "agronomy_instructional_steps",
+        "en": "Instructional Steps",
+        "si": "උපදෙස් පියවර",
+        "ta": "அறிவுறுத்தல் படிகள்"
+    },
+    {
+        "key": "agronomy_planting_guide",
+        "en": "Planting Guide",
+        "si": "වගා මාර්ගෝපදේශය",
+        "ta": "நடவு வழிகாட்டி"
+    },
+    {
+        "key": "agronomy_search_guides",
+        "en": "SEARCH GUIDES",
+        "si": "මාර්ගෝපදේශ සොයන්න",
+        "ta": "வழிகாட்டிகளைத் தேடு"
+    },
+    {
+        "key": "agronomy_select_district",
+        "en": "Select District",
+        "si": "දිස්ත්‍රික්කය තෝරන්න",
+        "ta": "மாவட்டத்தைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "agronomy_no_soil_for_district",
+        "en": "No soil types specific to this district found.",
+        "si": "මෙම දිස්ත්‍රික්කයට විශේෂිත පස වර්ග හමු නොවිණි.",
+        "ta": "இந்த மாவட்டத்திற்கான மண் வகைகள் காணப்படவில்லை."
+    },
+    {
+        "key": "agronomy_select_soil_optional",
+        "en": "Select Soil Type (Optional)",
+        "si": "පස වර්ගය තෝරන්න (විකල්ප)",
+        "ta": "மண் வகையைத் தேர்ந்தெடுக்கவும் (விரும்பினால்)"
+    },
+    {
+        "key": "agronomy_all_soil_types",
+        "en": "All Soil Types",
+        "si": "සියලුම පස වර්ග",
+        "ta": "அனைத்து மண் வகைகள்"
+    },
+    {
+        "key": "agronomy_no_guides_found",
+        "en": "No planting guides found matching your criteria.",
+        "si": "ඔබගේ සෙවුමට ගැළපෙන මාර්ගෝපදේශ හමු නොවිණි.",
+        "ta": "உங்கள் அளவுகோலுக்கு ஏற்ற நடவு வழிகாட்டிகள் காணப்படவில்லை."
+    },
+    {
+        "key": "agronomy_searching_guides",
+        "en": "Searching planting guides...",
+        "si": "සොයමින් පවතී...",
+        "ta": "வழிகாட்டிகளைத் தேடுகிறது..."
+    },
+    {
+        "key": "agronomy_error_loading_guide",
+        "en": "Error loading guide",
+        "si": "මාර්ගෝපදේශය පැටවීමේ දෝෂයකි",
+        "ta": "வழிகாட்டி ஏற்றுவதில் பிழை"
+    },
+    {
+        "key": "agronomy_select_district_to_search",
+        "en": "Select a district to search.",
+        "si": "සෙවීමට දිස්ත්‍රික්කය තෝරන්න.",
+        "ta": "தேட மாவட்டத்தைத் தேர்ந்தெடுக்கவும்."
+    },
+    {
+        "key": "agronomy_click_search_varieties",
+        "en": "Click search to find varieties.",
+        "si": "විශේෂයන් සොයා ගැනීමට සෙවීම ක්ලික් කරන්න.",
+        "ta": "வகைகளைக் கண்டுபிடிக்க தேடலைக் கிளிக் செய்யவும்."
         "key": "common_go_back",
         "en": "Go Back",
         "si": "ආපසු යන්න",

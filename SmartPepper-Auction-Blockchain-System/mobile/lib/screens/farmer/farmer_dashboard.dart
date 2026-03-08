@@ -621,22 +621,22 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
               ),
             ),
             const SizedBox(width: 16),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Plantation Management',
-                    style: TextStyle(
+                    context.tr('plantation_management'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    'Manage your plantation.',
-                    style: TextStyle(
+                    context.tr('plantation_management_subtitle'),
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 12,
                     ),

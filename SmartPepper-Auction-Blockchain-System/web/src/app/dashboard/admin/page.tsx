@@ -209,7 +209,7 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Link
               href="/dashboard/admin/users"
-              className="bg-white rounded-lg p-6 border-2 border-gray-200 hover:border-purple-500 transition relative"
+              className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition shadow-sm"
             >
               {stats.pendingApprovals > 0 && (
                 <div className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-8 w-8 flex items-center justify-center animate-pulse">
@@ -217,38 +217,55 @@ export default function AdminDashboard() {
                 </div>
               )}
               <div className="text-3xl mb-2">👥</div>
-              <div className="font-semibold">Manage Users</div>
-              <div className="text-sm text-gray-600">
-                {stats.pendingApprovals > 0 ? (
-                  <span className="text-red-600 font-medium">{stats.pendingApprovals} pending approval</span>
-                ) : (
-                  'View & verify users'
-                )}
-              </div>
+              <div className="font-semibold text-gray-900 dark:text-white">Manage Users</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">View & verify users</div>
             </Link>
             <Link
               href="/dashboard/admin/lots"
-              className="bg-white rounded-lg p-6 border-2 border-gray-200 hover:border-purple-500 transition"
+              className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition shadow-sm"
             >
               <div className="text-3xl mb-2">📦</div>
-              <div className="font-semibold">Manage Lots</div>
-              <div className="text-sm text-gray-600">Review pepper lots</div>
+              <div className="font-semibold text-gray-900 dark:text-white">Manage Lots</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Review pepper lots</div>
             </Link>
             <Link
               href="/dashboard/admin/auctions"
-              className="bg-white rounded-lg p-6 border-2 border-gray-200 hover:border-purple-500 transition"
+              className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition shadow-sm"
             >
               <div className="text-3xl mb-2">🔨</div>
-              <div className="font-semibold">Manage Auctions</div>
-              <div className="text-sm text-gray-600">Monitor auctions</div>
+              <div className="font-semibold text-gray-900 dark:text-white">Manage Auctions</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Monitor auctions</div>
             </Link>
             <Link
               href="/dashboard/admin/compliance"
-              className="bg-white rounded-lg p-6 border-2 border-gray-200 hover:border-purple-500 transition"
+              className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition shadow-sm"
             >
               <div className="text-3xl mb-2">✅</div>
-              <div className="font-semibold">Compliance</div>
-              <div className="text-sm text-gray-600">Review checks</div>
+              <div className="font-semibold text-gray-900 dark:text-white">Compliance</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Review checks</div>
+            </Link>
+          </div>
+        </div>
+
+        {/* Master Data & AI Management */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Master Data & AI Management</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Link
+              href="/dashboard/admin/knowledgebase"
+              className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition shadow-sm"
+            >
+              <div className="text-3xl mb-2">📚</div>
+              <div className="font-semibold text-gray-900 dark:text-white">Knowledgebase</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">RAG & AI Search</div>
+            </Link>
+            <Link
+              href="/dashboard/admin/agriculture"
+              className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition shadow-sm"
+            >
+              <div className="text-3xl mb-2">🚜</div>
+              <div className="font-semibold text-gray-900 dark:text-white">Agriculture Data</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Firestore Master Data</div>
             </Link>
           </div>
         </div>

@@ -4,11 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/language_provider.dart';
 import '../../config/theme.dart';
+import '../../localization/app_localizations.dart';
 import 'agronomy/agronomy_guide_screen.dart';
-import 'chat/ai_chat_screen.dart';
-import 'predictions/price_prediction_screen.dart';
-import 'seasons/seasons_screen.dart';
-import '../../widgets/language_picker_button.dart';
 
 class PlantationManagementDashboard extends StatelessWidget {
   const PlantationManagementDashboard({super.key});
@@ -23,7 +20,8 @@ class PlantationManagementDashboard extends StatelessWidget {
         if (context.mounted) {
           context.go('/');
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Plantation Management is available to farmers only.')),
+            SnackBar(
+                content: Text(context.tr('plantation_management_farmer_only'))),
           );
         }
       });
@@ -32,42 +30,40 @@ class PlantationManagementDashboard extends StatelessWidget {
       );
     }
     final userName = authProvider.user?.name ?? 'Farmer';
-    final languageProvider = context.watch<LanguageProvider>();
-    final lang = languageProvider.locale.languageCode;
 
     final features = [
       _FeatureCard(
-        label: lang == 'en' ? 'Agronomy Guide' : 'කෘෂි මාර්ගෝපදේශය',
+        label: context.tr('plantation_agronomy_guide'),
         icon: Icons.eco,
         color: AppTheme.sriLankanLeaf,
         route: '/plantation/agronomy-guide',
       ),
       _FeatureCard(
-        label: lang == 'en' ? 'Plantation' : 'වගාවන්',
+        label: context.tr('plantation_plantations'),
         icon: Icons.agriculture,
         color: AppTheme.pepperGold,
         route: '/plantation/farms',
       ),
       _FeatureCard(
-        label: lang == 'en' ? 'Seasons' : 'කන්නයන්',
+        label: context.tr('plantation_seasons'),
         icon: Icons.calendar_month,
         color: const Color(0xFFF57C00),
         route: '/plantation/seasons',
       ),
       _FeatureCard(
-        label: lang == 'en' ? 'Price Prediction' : 'මිල අනාවැකි',
+        label: context.tr('plantation_price_prediction'),
         icon: Icons.trending_up,
         color: const Color(0xFF7B1FA2),
         route: '/plantation/price-prediction',
       ),
       _FeatureCard(
-        label: lang == 'en' ? 'Yield Analytics' : 'විශ්ලේෂණයන්',
+        label: context.tr('plantation_yield_analytics'),
         icon: Icons.analytics_outlined,
         color: const Color(0xFF00897B),
         route: '/plantation/yield-analytics',
       ),
       _FeatureCard(
-        label: lang == 'en' ? 'AI Chat Assistant' : 'AI සහායක',
+        label: context.tr('plantation_ai_chat'),
         icon: Icons.chat_bubble_outline,
         color: const Color(0xFF1565C0),
         route: '/plantation/ai-chat',
@@ -84,7 +80,7 @@ class PlantationManagementDashboard extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          lang == 'en' ? 'Plantation Management' : 'වගා කළමනාකරණය',
+          context.tr('plantation_management'),
           style: const TextStyle(
             color: AppTheme.pepperGold,
             fontWeight: FontWeight.bold,
@@ -93,7 +89,6 @@ class PlantationManagementDashboard extends StatelessWidget {
         ),
         centerTitle: true,
         actions: const [
-          LanguagePickerButton(iconColor: AppTheme.pepperGold),
           SizedBox(width: 8),
         ],
       ),
@@ -108,7 +103,9 @@ class PlantationManagementDashboard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  lang == 'en' ? 'Welcome, $userName' : 'සාදරයෙන් පිළිගනිමු, $userName',
+                  context
+                      .tr('plantation_welcome')
+                      .replaceAll('{name}', userName),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -117,9 +114,7 @@ class PlantationManagementDashboard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  lang == 'en'
-                      ? 'Manage your pepper plantation efficiently'
-                      : 'ඔබගේ ගම්මිරිස් වගාව කාර්යක්ෂමව කළමනාකරණය කරන්න',
+                  context.tr('plantation_subtitle'),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.75),
                     fontSize: 13,

@@ -7,18 +7,19 @@ import '../../../../widgets/primary_button.dart';
 import '../../../../widgets/input_field.dart';
 import '../../../../widgets/dropdown_field.dart';
 import '../../../../widgets/loading_spinner.dart';
-import '../../../../widgets/language_picker_button.dart';
 import '../../../../utils/validators.dart';
 import '../../agronomy/models/district_model.dart';
 import '../../agronomy/models/soil_type_model.dart';
 import '../../agronomy/models/variety_model.dart';
 import '../../../../providers/language_provider.dart';
+import '../../../../localization/app_localizations.dart';
 
 class PlantationSetupPage extends ConsumerStatefulWidget {
   const PlantationSetupPage({super.key});
 
   @override
-  ConsumerState<PlantationSetupPage> createState() => _PlantationSetupPageState();
+  ConsumerState<PlantationSetupPage> createState() =>
+      _PlantationSetupPageState();
 }
 
 class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
@@ -47,7 +48,7 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
-      helpText: lang == 'en' ? 'Select Farm Start Date' : 'ගොවිපළ ආරම්භ කළ දිනය තෝරන්න',
+      helpText: context.tr('plantation_select_farm_start_date'),
     );
     if (picked != null) {
       setState(() {
@@ -63,13 +64,14 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
         _selectedVariety != null &&
         _farmStartDate != null) {
       try {
-        final areaHectares = double.tryParse(_areaHectaresController.text.trim());
+        final areaHectares =
+            double.tryParse(_areaHectaresController.text.trim());
         final totalVines = int.tryParse(_totalVinesController.text.trim());
 
         if (areaHectares == null || areaHectares <= 0) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(lang == 'en' ? 'Please enter a valid area in hectares' : 'කරුණාකර නිවැරදි භූමි ප්‍රමාණයක් (හෙක්ටයාර) ඇතුලත් කරන්න'),
+              content: Text(context.tr('plantation_validation_valid_area')),
               backgroundColor: Colors.red,
             ),
           );
@@ -79,16 +81,19 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
         if (totalVines == null || totalVines <= 0) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(lang == 'en' ? 'Please enter a valid number of vines' : 'කරුණාකර නිවැරදි වැල් ගණනක් ඇතුලත් කරන්න'),
+              content: Text(context.tr('plantation_validation_valid_vines')),
               backgroundColor: Colors.red,
             ),
           );
           return;
         }
 
-        developer.log('Submitting plantation: DistrictId=${_selectedDistrict!.id}, SoilTypeId=${_selectedSoilType!.id}, VarietyId=${_selectedVariety!.id}');
+        developer.log(
+            'Submitting plantation: DistrictId=${_selectedDistrict!.id}, SoilTypeId=${_selectedSoilType!.id}, VarietyId=${_selectedVariety!.id}');
 
-        final farmRecord = await ref.read(plantationControllerProvider.notifier).startPlantation(
+        final farmRecord = await ref
+            .read(plantationControllerProvider.notifier)
+            .startPlantation(
               farmName: _farmNameController.text.trim(),
               districtId: _selectedDistrict!.id,
               soilTypeId: _selectedSoilType!.id,
@@ -101,7 +106,7 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(lang == 'en' ? 'Plantation started successfully! Schedule has been generated.' : 'වගාව සාර්ථකව ආරම්භ කරන ලදී! කාලසටහන සකස් කර ඇත.'),
+              content: Text(context.tr('plantation_started_success')),
               backgroundColor: Colors.green,
               duration: const Duration(seconds: 3),
             ),
@@ -125,14 +130,14 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
   @override
   Widget build(BuildContext context) {
     final plantationState = ref.watch(plantationControllerProvider);
-    final languageProvider = vanilla_provider.Provider.of<LanguageProvider>(context);
+    final languageProvider =
+        vanilla_provider.Provider.of<LanguageProvider>(context);
     final lang = languageProvider.locale.languageCode;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(lang == 'en' ? 'Start Plantation' : 'වගාව අරඹන්න'),
+        title: Text(context.tr('plantation_start_plantation_title')),
         actions: const [
-          LanguagePickerButton(),
           SizedBox(width: 8),
         ],
       ),
@@ -144,20 +149,21 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               InputField(
-                label: lang == 'en' ? 'Farm Name' : 'ගොවිපළේ නම',
+                label: context.tr('plantation_farm_name'),
                 controller: _farmNameController,
-                hint: lang == 'en' ? 'Enter your farm name' : 'ඔබගේ ගොවිපළේ නම ඇතුලත් කරන්න',
-                validator: (value) => Validators.required(value, fieldName: lang == 'en' ? 'Farm name' : 'ගොවිපළේ නම'),
+                hint: context.tr('plantation_enter_farm_name'),
+                validator: (value) => Validators.required(value,
+                    fieldName: context.tr('plantation_farm_name')),
               ),
               const SizedBox(height: 16),
-              _buildDistrictDropdown(lang),
+              _buildDistrictDropdown(context, lang),
               if (_selectedDistrict != null) ...[
                 const SizedBox(height: 16),
-                _buildSoilTypeDropdown(lang),
+                _buildSoilTypeDropdown(context, lang),
               ],
               if (_selectedDistrict != null && _selectedSoilType != null) ...[
                 const SizedBox(height: 16),
-                _buildVarietyDropdown(lang),
+                _buildVarietyDropdown(context, lang),
               ],
               const SizedBox(height: 16),
               // Farm Start Date Picker
@@ -171,8 +177,9 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
                           : '',
                     ),
                     decoration: InputDecoration(
-                      labelText: lang == 'en' ? 'Farm Start Date' : 'ගොවිපළ ආරම්භ කළ දිනය',
-                      hintText: lang == 'en' ? 'Select farm start date' : 'ගොවිපළ ආරම්භ කළ දිනය තෝරන්න',
+                      labelText: context.tr('plantation_farm_start_date'),
+                      hintText:
+                          context.tr('plantation_select_planting_date_short'),
                       suffixIcon: const Icon(Icons.calendar_today),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -180,7 +187,7 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
                     ),
                     validator: (value) {
                       if (_farmStartDate == null) {
-                        return lang == 'en' ? 'Please select a planting date' : 'කරුණාකර ආරම්භ කළ දිනයක් තෝරන්න';
+                        return context.tr('plantation_select_planting_date');
                       }
                       return null;
                     },
@@ -189,43 +196,45 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
               ),
               const SizedBox(height: 16),
               InputField(
-                label: lang == 'en' ? 'Area in Hectares' : 'භූමි ප්‍රමාණය (හෙක්ටයාර)',
+                label: context.tr('plantation_area_in_hectares'),
                 controller: _areaHectaresController,
-                hint: lang == 'en' ? 'e.g., 2.5' : 'උදා: 2.5',
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                hint: context.tr('plantation_hint_eg_25'),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return lang == 'en' ? 'Please enter area in hectares' : 'කරුණාකර භූමි ප්‍රමාණය ඇතුලත් කරන්න';
+                    return context.tr('plantation_validation_enter_area');
                   }
                   final area = double.tryParse(value);
                   if (area == null || area <= 0) {
-                    return lang == 'en' ? 'Please enter a valid area' : 'කරුණාකර නිවැරදි භූමි ප්‍රමාණයක් ඇතුලත් කරන්න';
+                    return context.tr('plantation_validation_enter_valid_area');
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               InputField(
-                label: lang == 'en' ? 'Total Vines' : 'සම්පූර්ණ වැල් ගණන',
+                label: context.tr('plantation_total_vines'),
                 controller: _totalVinesController,
-                hint: lang == 'en' ? 'e.g., 1000' : 'උදා: 1000',
+                hint: context.tr('plantation_hint_eg_1000'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return lang == 'en' ? 'Please enter total number of vines' : 'කරුණාකර සම්පූර්ණ වැල් ගණන ඇතුලත් කරන්න';
+                    return context.tr('plantation_validation_enter_vines');
                   }
                   final vines = int.tryParse(value);
                   if (vines == null || vines <= 0) {
-                    return lang == 'en' ? 'Please enter a valid number of vines' : 'කරුණාකර නිවැරදි වැල් ගණනක් ඇතුලත් කරන්න';
+                    return context
+                        .tr('plantation_validation_valid_number_vines');
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 32),
               plantationState.isLoading
-                  ? LoadingSpinner(message: lang == 'en' ? 'Starting plantation...' : 'වගාව ආරම්භ කරමින්...')
+                  ? LoadingSpinner(message: context.tr('plantation_starting'))
                   : PrimaryButton(
-                      text: lang == 'en' ? 'Start Plantation' : 'වගාව ආරම්භ කරන්න',
+                      text: context.tr('plantation_start_plantation'),
                       onPressed: () => _handleSubmit(lang),
                     ),
             ],
@@ -235,7 +244,7 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
     );
   }
 
-  Widget _buildDistrictDropdown(String lang) {
+  Widget _buildDistrictDropdown(BuildContext context, String lang) {
     final districtsAsync = ref.watch(allDistrictsProvider);
 
     return districtsAsync.when(
@@ -253,7 +262,7 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    lang == 'en' ? 'No districts available' : 'දිස්ත්‍රික්ක නොමැත',
+                    context.tr('plantation_no_districts'),
                     style: TextStyle(color: Colors.orange[700]),
                   ),
                 ),
@@ -262,7 +271,7 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
           );
         }
         return DropdownField<District>(
-          label: lang == 'en' ? 'District' : 'දිස්ත්‍රික්කය',
+          label: context.tr('plantation_district'),
           value: _selectedDistrict,
           items: districts.map((district) {
             return DropdownMenuItem(
@@ -283,7 +292,7 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
           },
           validator: (value) {
             if (value == null) {
-              return lang == 'en' ? 'Please select a district' : 'කරුණාකර දිස්ත්‍රික්කයක් තෝරන්න';
+              return context.tr('plantation_please_select_district');
             }
             return null;
           },
@@ -297,17 +306,18 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          lang == 'en' ? 'Error loading districts: ${error.toString()}' : 'දිස්ත්‍රික්ක පැටවීමේ දෝෂයකි: ${error.toString()}',
+          '${context.tr('plantation_error_loading_districts')}: ${error.toString()}',
           style: TextStyle(color: Colors.red[700]),
         ),
       ),
     );
   }
 
-  Widget _buildSoilTypeDropdown(String lang) {
+  Widget _buildSoilTypeDropdown(BuildContext context, String lang) {
     if (_selectedDistrict == null) return const SizedBox.shrink();
 
-    final soilsAsync = ref.watch(soilsByDistrictProvider(_selectedDistrict!.id));
+    final soilsAsync =
+        ref.watch(soilsByDistrictProvider(_selectedDistrict!.id));
 
     return soilsAsync.when(
       data: (soils) {
@@ -324,7 +334,8 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    lang == 'en' ? 'No soil types available for ${_selectedDistrict!.name.get(lang)}' : '${_selectedDistrict!.name.get(lang)} සඳහා පස වර්ග නොමැත',
+                    context.tr('plantation_no_soil_types_for').replaceAll(
+                        '{name}', _selectedDistrict!.name.get(lang)),
                     style: TextStyle(color: Colors.orange[700]),
                   ),
                 ),
@@ -333,7 +344,7 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
           );
         }
         return DropdownField<SoilType>(
-          label: lang == 'en' ? 'Soil Type' : 'පස වර්ගය',
+          label: context.tr('plantation_soil_type'),
           value: _selectedSoilType,
           items: soils.map((soil) {
             return DropdownMenuItem(
@@ -350,7 +361,7 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
           },
           validator: (value) {
             if (value == null) {
-              return lang == 'en' ? 'Please select a soil type' : 'කරුණාකර පස වර්ගයක් තෝරන්න';
+              return context.tr('plantation_please_select_soil');
             }
             return null;
           },
@@ -364,24 +375,26 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          lang == 'en' ? 'Error loading soil types: ${error.toString()}' : 'පස වර්ග පැටවීමේ දෝෂයකි: ${error.toString()}',
+          '${context.tr('plantation_error_loading_soils')}: ${error.toString()}',
           style: TextStyle(color: Colors.red[700]),
         ),
       ),
     );
   }
 
-  Widget _buildVarietyDropdown(String lang) {
+  Widget _buildVarietyDropdown(BuildContext context, String lang) {
     if (_selectedDistrict == null || _selectedSoilType == null) {
       return const SizedBox.shrink();
     }
 
-    final currentKey = DistrictSoilKey(_selectedDistrict!.id, _selectedSoilType!.id);
+    final currentKey =
+        DistrictSoilKey(_selectedDistrict!.id, _selectedSoilType!.id);
     if (_cachedVarietiesKey == null || _cachedVarietiesKey != currentKey) {
       _cachedVarietiesKey = currentKey;
     }
 
-    final varietiesAsync = ref.watch(varietiesByDistrictAndSoilProvider(_cachedVarietiesKey!));
+    final varietiesAsync =
+        ref.watch(varietiesByDistrictAndSoilProvider(_cachedVarietiesKey!));
 
     return varietiesAsync.when(
       data: (varieties) {
@@ -398,7 +411,9 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    lang == 'en' ? 'No varieties available for ${_selectedDistrict!.name.get(lang)} - ${_selectedSoilType!.typeName.get(lang)}' : '${_selectedDistrict!.name.get(lang)} - ${_selectedSoilType!.typeName.get(lang)} සඳහා ප්‍රභේද නොමැත',
+                    context.tr('plantation_no_varieties_for').replaceAll(
+                        '{name}',
+                        '${_selectedDistrict!.name.get(lang)} - ${_selectedSoilType!.typeName.get(lang)}'),
                     style: TextStyle(color: Colors.orange[700]),
                   ),
                 ),
@@ -408,7 +423,8 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
         }
 
         // Reset selected variety if not in list
-        if (_selectedVariety != null && !varieties.any((v) => v.id == _selectedVariety!.id)) {
+        if (_selectedVariety != null &&
+            !varieties.any((v) => v.id == _selectedVariety!.id)) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             setState(() {
               _selectedVariety = null;
@@ -420,7 +436,7 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DropdownField<BlackPepperVariety>(
-              label: lang == 'en' ? 'Chosen Variety' : 'තෝරාගත් වර්ගය',
+              label: context.tr('plantation_chosen_variety'),
               value: _selectedVariety,
               items: varieties.map((variety) {
                 return DropdownMenuItem(
@@ -435,7 +451,7 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
               },
               validator: (value) {
                 if (value == null) {
-                  return lang == 'en' ? 'Please select a variety' : 'කරුණාකර ප්‍රභේදයක් තෝරන්න';
+                  return context.tr('plantation_please_select_variety');
                 }
                 return null;
               },
@@ -450,17 +466,34 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lang == 'en' ? 'Variety Information' : 'වර්ගයේ තොරතුරු',
+                        context.tr('plantation_variety_info'),
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
                             ),
                       ),
                       const SizedBox(height: 8),
-                      _buildInfoRow(lang == 'en' ? 'Specialities' : 'විශේෂතා', _selectedVariety!.specialities.get(lang), lang),
-                      _buildInfoRow(lang == 'en' ? 'Soil' : 'පස', _selectedVariety!.soilTypeRecommendation.get(lang), lang),
-                      _buildInfoRow(lang == 'en' ? 'Spacing' : 'පරතරය', _selectedVariety!.plantingSpecifications.spacingMeters, lang),
-                      _buildInfoRow(lang == 'en' ? 'Vines/Ha' : 'හෙක්.කට වැල්', '${_selectedVariety!.plantingSpecifications.vinesPerHectare}', lang),
+                      _buildInfoRow(
+                          context,
+                          context.tr('plantation_specialities'),
+                          _selectedVariety!.specialities.get(lang),
+                          lang),
+                      _buildInfoRow(
+                          context,
+                          context.tr('plantation_soil'),
+                          _selectedVariety!.soilTypeRecommendation.get(lang),
+                          lang),
+                      _buildInfoRow(
+                          context,
+                          context.tr('plantation_spacing'),
+                          _selectedVariety!
+                              .plantingSpecifications.spacingMeters,
+                          lang),
+                      _buildInfoRow(
+                          context,
+                          context.tr('plantation_vines_ha'),
+                          '${_selectedVariety!.plantingSpecifications.vinesPerHectare}',
+                          lang),
                     ],
                   ),
                 ),
@@ -476,14 +509,15 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          lang == 'en' ? 'Error loading varieties: ${error.toString()}' : 'ප්‍රභේද පැටවීමේ දෝෂයකි: ${error.toString()}',
+          '${context.tr('plantation_error_loading_varieties')}: ${error.toString()}',
           style: TextStyle(color: Colors.red[700]),
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value, String lang) {
+  Widget _buildInfoRow(
+      BuildContext context, String label, String value, String lang) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4.0),
       child: Row(
@@ -501,7 +535,9 @@ class _PlantationSetupPageState extends ConsumerState<PlantationSetupPage> {
           ),
           Expanded(
             child: Text(
-              value.isNotEmpty ? value : (lang == 'en' ? 'N/A' : 'අදාළ නොවේ'),
+              value.isNotEmpty
+                  ? value
+                  : context.tr('plantation_not_applicable'),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Colors.black87,
                   ),

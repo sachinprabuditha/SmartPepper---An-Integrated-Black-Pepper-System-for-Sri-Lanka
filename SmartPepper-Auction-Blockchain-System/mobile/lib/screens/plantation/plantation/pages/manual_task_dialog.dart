@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart' as vanilla_provider;
+import '../../../../localization/app_localizations.dart';
 import '../../../../widgets/input_field.dart';
 import '../../../../utils/validators.dart';
 import '../../../../providers/language_provider.dart';
@@ -35,13 +36,13 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context, String lang) async {
+  Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      helpText: lang == 'en' ? 'Select Due Date' : 'අවසන් දිනය තෝරන්න',
+      helpText: context.tr('manual_task_dialog_select_due_date'),
     );
     if (picked != null) {
       setState(() {
@@ -52,9 +53,6 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final languageProvider = vanilla_provider.Provider.of<LanguageProvider>(context);
-    final lang = languageProvider.locale.languageCode;
-
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -84,7 +82,7 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      lang == 'en' ? 'Add Manual Task' : 'කාර්යයක් එක් කරන්න',
+                      context.tr('plantation_add_manual_task'),
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -94,7 +92,7 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
-                    tooltip: lang == 'en' ? 'Close' : 'වසන්න',
+                    tooltip: context.tr('common_close'),
                   ),
                 ],
               ),
@@ -109,23 +107,23 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        lang == 'en' ? 'Task Details' : 'කාර්ය විස්තර',
+                        context.tr('manual_task_dialog_task_details'),
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                       ),
                       const SizedBox(height: 16),
                       InputField(
-                        label: lang == 'en' ? 'Task Name' : 'කාර්යයේ නම',
+                        label: context.tr('manual_task_dialog_task_name'),
                         controller: _taskNameController,
-                        validator: (value) => Validators.required(value, fieldName: lang == 'en' ? 'Task name' : 'කාර්යයේ නම'),
+                        validator: (value) => Validators.required(value, fieldName: context.tr('manual_task_dialog_task_name')),
                       ),
                       const SizedBox(height: 16),
                       // Priority Dropdown
                       DropdownButtonFormField<String>(
                         value: _priority,
                         decoration: InputDecoration(
-                          labelText: lang == 'en' ? 'Priority' : 'ප්‍රමුඛතාවය',
+                          labelText: context.tr('manual_task_dialog_priority'),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -139,7 +137,7 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                               children: [
                                 const Icon(Icons.arrow_downward, size: 16, color: Colors.green),
                                 const SizedBox(width: 8),
-                                Flexible(child: Text(lang == 'en' ? 'Low' : 'අඩු')),
+                                Flexible(child: Text(context.tr('manual_task_dialog_low'))),
                               ],
                             ),
                           ),
@@ -150,7 +148,7 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                               children: [
                                 Icon(Icons.remove, size: 16, color: Colors.yellow[700]),
                                 const SizedBox(width: 8),
-                                Flexible(child: Text(lang == 'en' ? 'Medium' : 'මධ්‍යම')),
+                                Flexible(child: Text(context.tr('manual_task_dialog_medium'))),
                               ],
                             ),
                           ),
@@ -161,7 +159,7 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                               children: [
                                 const Icon(Icons.arrow_upward, size: 16, color: Colors.orange),
                                 const SizedBox(width: 8),
-                                Flexible(child: Text(lang == 'en' ? 'High' : 'ඉහළ')),
+                                Flexible(child: Text(context.tr('manual_task_dialog_high'))),
                               ],
                             ),
                           ),
@@ -172,7 +170,7 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                               children: [
                                 const Icon(Icons.warning, size: 16, color: Colors.red),
                                 const SizedBox(width: 8),
-                                Flexible(child: Text(lang == 'en' ? 'Emergency' : 'හදිසි')),
+                                Flexible(child: Text(context.tr('manual_task_dialog_emergency'))),
                               ],
                             ),
                           ),
@@ -188,8 +186,8 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                       DropdownButtonFormField<String?>(
                         value: _selectedPhase,
                         decoration: InputDecoration(
-                          labelText: lang == 'en' ? 'Phase (Optional)' : 'අදියර (අත්‍යවශ්‍ය නොවේ)',
-                          hintText: lang == 'en' ? 'Default: Maintenance' : 'පෙරනිමිය: නඩත්තුව',
+                          labelText: context.tr('manual_task_dialog_phase_optional'),
+                          hintText: context.tr('manual_task_dialog_default_maintenance'),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -198,12 +196,12 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                         items: [
                           DropdownMenuItem<String?>(
                             value: null,
-                            child: Text(lang == 'en' ? 'None (Default)' : 'නැත (පෙරනිමිය)'),
+                            child: Text(context.tr('manual_task_dialog_none_default')),
                           ),
-                          DropdownMenuItem(value: 'Landscaping', child: Text(lang == 'en' ? 'Landscaping' : 'භූමි අලංකරණය')),
-                          DropdownMenuItem(value: 'Planting', child: Text(lang == 'en' ? 'Planting' : 'සිටුවීම')),
-                          DropdownMenuItem(value: 'Maintenance', child: Text(lang == 'en' ? 'Maintenance' : 'නඩත්තුව')),
-                          DropdownMenuItem(value: 'Harvesting', child: Text(lang == 'en' ? 'Harvesting' : 'අස්වනු නෙලීම')),
+                          DropdownMenuItem(value: 'Landscaping', child: Text(context.tr('manual_task_dialog_landscaping'))),
+                          DropdownMenuItem(value: 'Planting', child: Text(context.tr('manual_task_dialog_planting'))),
+                          DropdownMenuItem(value: 'Maintenance', child: Text(context.tr('manual_task_dialog_maintenance'))),
+                          DropdownMenuItem(value: 'Harvesting', child: Text(context.tr('manual_task_dialog_harvesting'))),
                         ],
                         onChanged: (value) {
                           setState(() {
@@ -213,10 +211,10 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                       ),
                       const SizedBox(height: 16),
                       GestureDetector(
-                        onTap: () => _selectDate(context, lang),
+                        onTap: () => _selectDate(context),
                         child: AbsorbPointer(
                           child: InputField(
-                            label: lang == 'en' ? 'Due Date' : 'අවසන් දිනය',
+                            label: context.tr('manual_task_dialog_due_date'),
                             controller: TextEditingController(
                               text: _dueDate != null
                                   ? '${_dueDate!.day}/${_dueDate!.month}/${_dueDate!.year}'
@@ -224,7 +222,7 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                             ),
                             validator: (value) {
                               if (_dueDate == null) {
-                                return lang == 'en' ? 'Please select a due date' : 'කරුණාකර අවසන් දිනයක් තෝරන්න';
+                                return context.tr('manual_task_dialog_please_select_due_date');
                               }
                               return null;
                             },
@@ -233,16 +231,16 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                       ),
                       const SizedBox(height: 16),
                       InputField(
-                        label: lang == 'en' ? 'Instructions/Steps (Optional)' : 'උපදෙස්/අදියර (අත්‍යවශ්‍ය නොවේ)',
+                        label: context.tr('manual_task_dialog_instructions_optional'),
                         controller: _instructionsController,
-                        hint: lang == 'en' ? 'Detailed instructions for this task...' : 'මෙම කාර්යය සඳහා සවිස්තරාත්මක උපදෙස්...',
+                        hint: context.tr('manual_task_dialog_instructions_hint'),
                         maxLines: 4,
                       ),
                       const SizedBox(height: 16),
                       InputField(
-                        label: lang == 'en' ? 'Reason (Optional)' : 'හේතුව (අත්‍යවශ්‍ය නොවේ)',
+                        label: context.tr('manual_task_dialog_reason_optional'),
                         controller: _reasonController,
-                        hint: lang == 'en' ? 'Why is this task needed?' : 'මෙම කාර්යය අවශ්‍ය වන්නේ ඇයි?',
+                        hint: context.tr('manual_task_dialog_reason_hint'),
                         maxLines: 2,
                       ),
                     ],
@@ -268,12 +266,12 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text(lang == 'en' ? 'Cancel' : 'අවලංගු කරන්න'),
+                    child: Text(context.tr('common_cancel')),
                   ),
                   ElevatedButton.icon(
-                    onPressed: () => _handleSubmit(lang),
+                    onPressed: () => _handleSubmit(context),
                     icon: const Icon(Icons.add_task),
-                    label: Text(lang == 'en' ? 'Create Task' : 'කාර්යය නිර්මාණය කරන්න'),
+                    label: Text(context.tr('manual_task_dialog_create_task')),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     ),
@@ -287,7 +285,7 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
     );
   }
 
-  void _handleSubmit(String lang) {
+  void _handleSubmit(BuildContext context) {
     if (_formKey.currentState!.validate() && _dueDate != null) {
       final detailedSteps = _instructionsController.text.trim().isEmpty
           ? null
@@ -306,7 +304,7 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
     } else if (_dueDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(lang == 'en' ? 'Please select a due date' : 'කරුණාකර අවසන් දිනයක් තෝරන්න'),
+          content: Text(context.tr('manual_task_dialog_please_select_due_date')),
           backgroundColor: Colors.red,
         ),
       );

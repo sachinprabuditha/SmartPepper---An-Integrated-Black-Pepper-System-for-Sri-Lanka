@@ -9,6 +9,15 @@ const api = axios.create({
   },
 });
 
+const PLANTATION_API_URL = process.env.NEXT_PUBLIC_PLANTATION_API_URL || 'http://localhost:5000';
+
+const plantationApi = axios.create({
+  baseURL: `${PLANTATION_API_URL}/api`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 // Add token to requests if available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
@@ -53,10 +62,10 @@ api.interceptors.response.use(
 export const auctionApi = {
   getAll: (params?: { status?: string; farmer?: string; limit?: number; offset?: number }) =>
     api.get('/auctions', { params }),
-  
+
   getById: (id: number) =>
     api.get(`/auctions/${id}`),
-  
+
   create: (data: {
     lotId: string;
     farmerAddress: string;
@@ -65,33 +74,33 @@ export const auctionApi = {
     duration: number;
   }) =>
     api.post('/auctions', data),
-  
+
   placeBid: (id: number, data: {
     bidderAddress: string;
     bidderName?: string;
     amount: string;
   }) =>
     api.post(`/auctions/${id}/bid`, data),
-  
+
   getBids: (id: number) =>
     api.get(`/auctions/${id}/bids`),
-  
+
   getUserBids: (userId: string) =>
     api.get(`/auctions/bids/user/${userId}`),
-  
+
   lockEscrow: (id: number, data: {
     winnerAddress: string;
     amount: string;
     txHash: string;
   }) =>
     api.post(`/auctions/${id}/escrow/lock`, data),
-  
+
   settle: (id: number, data: {
     settlerAddress: string;
     txHash: string;
   }) =>
     api.post(`/auctions/${id}/settle`, data),
-  
+
   cancel: (id: number, data: {
     cancellerAddress: string;
     reason: string;
@@ -99,7 +108,7 @@ export const auctionApi = {
     refundTxHash?: string;
   }) =>
     api.post(`/auctions/${id}/cancel`, data),
-  
+
   end: (id: number) =>
     api.post(`/auctions/${id}/end`),
 };
@@ -108,10 +117,10 @@ export const auctionApi = {
 export const lotApi = {
   getAll: (params?: { status?: string; farmer?: string; limit?: number; offset?: number }) =>
     api.get('/lots', { params }),
-  
+
   getById: (lotId: string) =>
     api.get(`/lots/${lotId}`),
-  
+
   create: (data: {
     lotId: string;
     farmerAddress: string;
@@ -130,7 +139,7 @@ export const lotApi = {
 export const userApi = {
   getByAddress: (address: string) =>
     api.get(`/users/${address}`),
-  
+
   create: (data: {
     walletAddress: string;
     userType: string;
@@ -146,10 +155,10 @@ export const userApi = {
 export const complianceApi = {
   check: (lotId: string) =>
     api.post('/compliance/check', { lotId }),
-  
+
   getHistory: (lotId: string) =>
     api.get(`/compliance/${lotId}`),
-  
+
   uploadCertificate: (file: string) =>
     api.post('/compliance/upload', { file }),
 };
@@ -164,20 +173,38 @@ export const escrowApi = {
     userId: string;
   }) =>
     api.post('/escrow/deposit', data),
-  
+
   getStatus: (auctionId: number) =>
     api.get(`/escrow/status/${auctionId}`),
-  
+
   verify: (data: {
     auctionId: number;
     txHash: string;
   }) =>
     api.post('/escrow/verify', data),
-  
+
   getUserDeposits: (userId: string) =>
     api.get(`/escrow/user/${userId}`),
 };
 
+export const kgApi = {
+  getStatus: () => plantationApi.get('/kb/status'),
+  getFiles: () => plantationApi.get('/kb/files'),
+  upload: (formData: FormData) => plantationApi.post('/kb/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  processStep: (step: 'extract' | 'clean' | 'chunk' | 'index', targetFiles?: string[]) =>
+    plantationApi.post(`/kb/process/${step}`, { targetFiles }),
+  deleteFile: (filename: string) => plantationApi.delete(`/kb/files/${filename}`),
+  setupCollection: () => plantationApi.post('/kb/collection/setup'),
+  testCollection: () => plantationApi.get('/kb/collection/test'),
+  search: (query: string) => plantationApi.post('/kb/search', { query }),
+};
+
+export const agricultureApi = {
+  getStatus: () => plantationApi.get('/agriculture/status'),
+  seed: (collection: string, jsonData?: any) =>
+    plantationApi.post(`/agriculture/seed/${collection}`, { jsonData }),
 // Admin
 export const adminApi = {
   getRecentActivity: (limit?: number) =>
