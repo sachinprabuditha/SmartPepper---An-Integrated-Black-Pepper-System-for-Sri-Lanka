@@ -38,6 +38,7 @@ import '../screens/plantation/chat/ai_chat_screen.dart';
 import '../screens/plantation/yield_analytics/yield_analytics_page.dart';
 import '../screens/plantation/plantation/models/farm_record_model.dart';
 import '../screens/plantation/plantation/models/farm_task_model.dart';
+import '../screens/diseases/image_upload_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -211,6 +212,14 @@ class AppRouter {
         name: 'farmManagement',
         builder: (context, state) => const PlantationManagementDashboard(),
       ),
+
+      // Disease Management Routes
+      GoRoute(
+        path: '/diseases/image-upload',
+        name: 'diseaseImageUpload',
+        builder: (context, state) => const ImageUploadScreen(),
+      ),
+
       // Plantation feature routes
       GoRoute(
         path: '/plantation/farms',
