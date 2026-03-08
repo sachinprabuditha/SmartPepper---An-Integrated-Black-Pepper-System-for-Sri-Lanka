@@ -9,8 +9,13 @@ import { Toaster } from 'react-hot-toast';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'SmartPepper - Blockchain Pepper Auction Platform',
-  description: 'Real-time blockchain-based pepper auction with supply chain traceability',
+  title: 'SmartPepper',
+  description: 'AN INTEGRATED BLACK PEPPER SYSTEM FOR SRI LANKA',
+  icons: {
+    icon: '/SmartPepper-logo.png',
+    shortcut: '/SmartPepper-logo.png',
+    apple: '/SmartPepper-logo.png',
+  },
 };
 
 export default function RootLayout({

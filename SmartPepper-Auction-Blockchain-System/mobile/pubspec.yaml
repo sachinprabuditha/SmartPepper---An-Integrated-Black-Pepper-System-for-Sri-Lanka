@@ -113,7 +113,7 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icons/logo_copy.png"
+  image_path: "assets/icons/SmartPepper.png"
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/icons/logo_copy.png"
+  adaptive_icon_foreground: "assets/icons/SmartPepper.png"
   remove_alpha_ios: true

@@ -219,7 +219,7 @@ export default function FarmerDashboard() {
               href="/create"
               className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-6 hover:from-green-600 hover:to-green-700 transition"
             >
-              <div className="text-3xl mb-2">🌶️</div>
+              <div className="text-3xl mb-2"></div>
               <div className="font-semibold">Create Auction</div>
               <div className="text-sm opacity-90">List your pepper lots</div>
             </Link>

@@ -4,13 +4,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { auctionApi, lotApi, userApi } from '@/lib/api';
+import { auctionApi, lotApi, adminApi } from '@/lib/api';
 
 export default function AdminDashboard() {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState({
     totalUsers: 0,
+    pendingApprovals: 0,
     totalLots: 0,
     totalAuctions: 0,
     activeAuctions: 0,
@@ -18,6 +19,12 @@ export default function AdminDashboard() {
     totalRevenue: '0',
   });
   const [recentActivity, setRecentActivity] = useState([]);
+  const [systemHealth, setSystemHealth] = useState({
+    backend: { status: 'checking', percentage: 0, label: 'Checking...' },
+    database: { status: 'checking', percentage: 0, label: 'Checking...' },
+    blockchain: { status: 'checking', percentage: 0, label: 'Checking...' },
+    websocket: { status: 'checking', percentage: 0, label: 'Checking...' },
+  });
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) {
@@ -28,26 +35,119 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (user && user.role === 'admin') {
       loadDashboardData();
+      checkSystemHealth();
+      
+      // Refresh health every 30 seconds
+      const healthInterval = setInterval(checkSystemHealth, 30000);
+      return () => clearInterval(healthInterval);
     }
   }, [user]);
+
+  const checkSystemHealth = async () => {
+    const startTime = Date.now();
+    
+    // Check Backend API
+    try {
+      const backendStart = Date.now();
+      await auctionApi.getAll({ limit: 1 });
+      const backendTime = Date.now() - backendStart;
+      setSystemHealth((prev) => ({
+        ...prev,
+        backend: {
+          status: backendTime < 500 ? 'healthy' : backendTime < 1000 ? 'warning' : 'error',
+          percentage: 100,
+          label: `${backendTime}ms`,
+        },
+      }));
+    } catch (error) {
+      setSystemHealth((prev) => ({
+        ...prev,
+        backend: { status: 'error', percentage: 0, label: 'Offline' },
+      }));
+    }
+
+    // Check Database (via API)
+    try {
+      const dbStart = Date.now();
+      await adminApi.getUsers({ limit: 1 });
+      const dbTime = Date.now() - dbStart;
+      setSystemHealth((prev) => ({
+        ...prev,
+        database: {
+          status: dbTime < 500 ? 'healthy' : dbTime < 1000 ? 'warning' : 'error',
+          percentage: dbTime < 500 ? 100 : dbTime < 1000 ? 80 : 60,
+          label: `${dbTime}ms`,
+        },
+      }));
+    } catch (error) {
+      setSystemHealth((prev) => ({
+        ...prev,
+        database: { status: 'error', percentage: 0, label: 'Error' },
+      }));
+    }
+
+    // Check Blockchain (via lot API that uses blockchain)
+    try {
+      const bcStart = Date.now();
+      await lotApi.getAll({ limit: 1 });
+      const bcTime = Date.now() - bcStart;
+      setSystemHealth((prev) => ({
+        ...prev,
+        blockchain: {
+          status: 'healthy',
+          percentage: 100,
+          label: 'Synced',
+        },
+      }));
+    } catch (error) {
+      setSystemHealth((prev) => ({
+        ...prev,
+        blockchain: { status: 'warning', percentage: 50, label: 'Limited' },
+      }));
+    }
+
+    // Check WebSocket (simulated - check if WS would be available)
+    const wsHealthy = typeof window !== 'undefined' && 'WebSocket' in window;
+    setSystemHealth((prev) => ({
+      ...prev,
+      websocket: {
+        status: wsHealthy ? 'healthy' : 'error',
+        percentage: wsHealthy ? 100 : 0,
+        label: wsHealthy ? 'Available' : 'Unavailable',
+      },
+    }));
+  };
 
   const loadDashboardData = async () => {
     try {
       // Load system stats
       const lotsResponse = await lotApi.getAll({ limit: 100 });
       const auctionsResponse = await auctionApi.getAll({ limit: 100 });
+      
+      // Load user counts
+      const usersResponse = await adminApi.getUsers({});
+      const pendingUsersResponse = await adminApi.getPendingUsers();
 
       const lots = lotsResponse.data.lots || [];
       const auctions = auctionsResponse.data.auctions || [];
+      const users = usersResponse.data.users || [];
+      const pendingUsers = pendingUsersResponse.data.users || [];
 
       setStats({
-        totalUsers: 0, // TODO: Need users count API
+        totalUsers: users.length,
+        pendingApprovals: pendingUsers.length,
         totalLots: lots.length,
         totalAuctions: auctions.length,
         activeAuctions: auctions.filter((a: any) => a.status === 'active').length,
         pendingCompliance: lots.filter((l: any) => l.status === 'pending_compliance').length,
         totalRevenue: '0', // TODO: Calculate from settled auctions
       });
+
+      // Load recent activity
+      const activityResponse = await adminApi.getRecentActivity(10);
+      if (activityResponse.data.success) {
+        setRecentActivity(activityResponse.data.activities);
+      }
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     }
@@ -74,17 +174,57 @@ export default function AdminDashboard() {
           <p className="text-gray-600 dark:text-gray-400 mt-2">SmartPepper System Management - Monitor and control all platform activities</p>
         </div>
 
+        {/* Pending Approvals Banner */}
+        {stats.pendingApprovals > 0 && (
+          <div className="mb-6 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 dark:border-yellow-700 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-200">
+                    {stats.pendingApprovals} Exporter{stats.pendingApprovals > 1 ? 's' : ''} Pending Approval
+                  </h3>
+                  <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                    New exporter registrations require your review and approval
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/dashboard/admin/users"
+                className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-2 rounded-lg font-medium transition"
+              >
+                Review Now
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Quick Actions */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Link
               href="/dashboard/admin/users"
-              className="bg-white rounded-lg p-6 border-2 border-gray-200 hover:border-purple-500 transition"
+              className="bg-white rounded-lg p-6 border-2 border-gray-200 hover:border-purple-500 transition relative"
             >
+              {stats.pendingApprovals > 0 && (
+                <div className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-8 w-8 flex items-center justify-center animate-pulse">
+                  {stats.pendingApprovals}
+                </div>
+              )}
               <div className="text-3xl mb-2">👥</div>
               <div className="font-semibold">Manage Users</div>
-              <div className="text-sm text-gray-600">View & verify users</div>
+              <div className="text-sm text-gray-600">
+                {stats.pendingApprovals > 0 ? (
+                  <span className="text-red-600 font-medium">{stats.pendingApprovals} pending approval</span>
+                ) : (
+                  'View & verify users'
+                )}
+              </div>
             </Link>
             <Link
               href="/dashboard/admin/lots"
@@ -174,36 +314,42 @@ export default function AdminDashboard() {
           {/* Recent Activity */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3 pb-3 border-b border-gray-100">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900">New auction created</p>
-                  <p className="text-xs text-gray-500">5 minutes ago</p>
-                </div>
+            {recentActivity.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <p className="text-sm">No recent activity</p>
               </div>
-              <div className="flex items-center space-x-3 pb-3 border-b border-gray-100">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900">User registered</p>
-                  <p className="text-xs text-gray-500">12 minutes ago</p>
-                </div>
+            ) : (
+              <div className="space-y-4">
+                {recentActivity.map((activity: any, index: number) => (
+                  <div
+                    key={index}
+                    className={`flex items-center space-x-3 ${
+                      index < recentActivity.length - 1 ? 'pb-3 border-b border-gray-100' : ''
+                    }`}
+                  >
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        activity.color === 'green'
+                          ? 'bg-green-500'
+                          : activity.color === 'blue'
+                          ? 'bg-blue-500'
+                          : activity.color === 'yellow'
+                          ? 'bg-yellow-500'
+                          : activity.color === 'orange'
+                          ? 'bg-orange-500'
+                          : activity.color === 'red'
+                          ? 'bg-red-500'
+                          : 'bg-purple-500'
+                      }`}
+                    ></div>
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-900">{activity.description}</p>
+                      <p className="text-xs text-gray-500">{activity.timeAgo}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center space-x-3 pb-3 border-b border-gray-100">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900">Compliance check pending</p>
-                  <p className="text-xs text-gray-500">1 hour ago</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900">Auction settled</p>
-                  <p className="text-xs text-gray-500">2 hours ago</p>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* System Health */}
@@ -212,40 +358,104 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600">Blockchain Sync</span>
-                  <span className="text-green-600 font-medium">100%</span>
+                  <span className="text-gray-600">Backend API</span>
+                  <span className={`font-medium ${
+                    systemHealth.backend.status === 'healthy' ? 'text-green-600' :
+                    systemHealth.backend.status === 'warning' ? 'text-yellow-600' :
+                    systemHealth.backend.status === 'error' ? 'text-red-600' :
+                    'text-gray-400'
+                  }`}>
+                    {systemHealth.backend.label}
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{ width: '100%' }}></div>
+                  <div 
+                    className={`h-2 rounded-full transition-all ${
+                      systemHealth.backend.status === 'healthy' ? 'bg-green-600' :
+                      systemHealth.backend.status === 'warning' ? 'bg-yellow-600' :
+                      'bg-red-600'
+                    }`}
+                    style={{ width: `${systemHealth.backend.percentage}%` }}
+                  ></div>
                 </div>
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600">Database</span>
-                  <span className="text-green-600 font-medium">Healthy</span>
+                  <span className={`font-medium ${
+                    systemHealth.database.status === 'healthy' ? 'text-green-600' :
+                    systemHealth.database.status === 'warning' ? 'text-yellow-600' :
+                    systemHealth.database.status === 'error' ? 'text-red-600' :
+                    'text-gray-400'
+                  }`}>
+                    {systemHealth.database.label}
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{ width: '95%' }}></div>
+                  <div 
+                    className={`h-2 rounded-full transition-all ${
+                      systemHealth.database.status === 'healthy' ? 'bg-green-600' :
+                      systemHealth.database.status === 'warning' ? 'bg-yellow-600' :
+                      'bg-red-600'
+                    }`}
+                    style={{ width: `${systemHealth.database.percentage}%` }}
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-600">Blockchain Sync</span>
+                  <span className={`font-medium ${
+                    systemHealth.blockchain.status === 'healthy' ? 'text-green-600' :
+                    systemHealth.blockchain.status === 'warning' ? 'text-yellow-600' :
+                    systemHealth.blockchain.status === 'error' ? 'text-red-600' :
+                    'text-gray-400'
+                  }`}>
+                    {systemHealth.blockchain.label}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className={`h-2 rounded-full transition-all ${
+                      systemHealth.blockchain.status === 'healthy' ? 'bg-green-600' :
+                      systemHealth.blockchain.status === 'warning' ? 'bg-yellow-600' :
+                      'bg-red-600'
+                    }`}
+                    style={{ width: `${systemHealth.blockchain.percentage}%` }}
+                  ></div>
                 </div>
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600">WebSocket</span>
-                  <span className="text-green-600 font-medium">Connected</span>
+                  <span className={`font-medium ${
+                    systemHealth.websocket.status === 'healthy' ? 'text-green-600' :
+                    systemHealth.websocket.status === 'warning' ? 'text-yellow-600' :
+                    systemHealth.websocket.status === 'error' ? 'text-red-600' :
+                    'text-gray-400'
+                  }`}>
+                    {systemHealth.websocket.label}
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{ width: '100%' }}></div>
+                  <div 
+                    className={`h-2 rounded-full transition-all ${
+                      systemHealth.websocket.status === 'healthy' ? 'bg-green-600' :
+                      systemHealth.websocket.status === 'warning' ? 'bg-yellow-600' :
+                      'bg-red-600'
+                    }`}
+                    style={{ width: `${systemHealth.websocket.percentage}%` }}
+                  ></div>
                 </div>
               </div>
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600">Redis Cache</span>
-                  <span className="text-green-600 font-medium">Online</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{ width: '98%' }}></div>
-                </div>
-              </div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <button
+                onClick={checkSystemHealth}
+                className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+              >
+                🔄 Refresh Health Check
+              </button>
             </div>
           </div>
         </div>

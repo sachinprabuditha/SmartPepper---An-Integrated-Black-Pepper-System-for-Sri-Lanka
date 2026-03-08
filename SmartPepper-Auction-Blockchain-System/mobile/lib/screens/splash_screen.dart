@@ -41,18 +41,18 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             // Logo
             Image.asset(
-              'assets/icons/logo_copy.png',
+              'assets/icons/SmartPepper-logo.png',
               width: 150,
               height: 150,
               fit: BoxFit.contain,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 22),
             Text(
               'SmartPepper',
               style: Theme.of(context).textTheme.displayMedium,
             ),
             const SizedBox(height: 8),
-            const Text('Blockchain-Enabled Pepper Exports'),
+            const Text('AN INTEGRATED BLACK PEPPER SYSTEM FOR SRI LANKA'),
             const SizedBox(height: 48),
             const CircularProgressIndicator(),
           ],

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { ArrowLeft, CheckCircle, XCircle, Loader2, ExternalLink, FileText, AlertTriangle, Image as ImageIcon } from 'lucide-react';
 
 interface LotDetail {
@@ -43,9 +42,16 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
   const [showCertificateModal, setShowCertificateModal] = useState(false);
   const [certificateUrl, setCertificateUrl] = useState<string>('');
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.116:3002' || 'http://192.168.8.116:3002';
-  // Use public IPFS gateway with fallback to local
-  const IPFS_GATEWAY = process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://ipfs.io/ipfs';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.116:3002' || 'http://192.168.8.116:3002' || 'http://192.168.8.151:3002';
+  
+  // Use multiple IPFS gateways for redundancy
+  const IPFS_GATEWAYS = [
+    'http://localhost:8080/ipfs',
+    'https://ipfs.io/ipfs',
+    'https://cf-ipfs.com/ipfs',
+    'https://gateway.pinata.cloud/ipfs',
+    'https://dweb.link/ipfs',
+  ];
 
   useEffect(() => {
     fetchLotDetails();
@@ -70,13 +76,25 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
     }
   };
 
-  const getIPFSUrl = (url: string) => {
+  const getIPFSUrl = (url: string, gatewayIndex: number = 0) => {
     if (!url) return '';
     if (url.startsWith('http')) return url;
+    
+    const gateway = IPFS_GATEWAYS[gatewayIndex] || IPFS_GATEWAYS[0];
+    
     if (url.startsWith('ipfs://')) {
-      return url.replace('ipfs://', `${IPFS_GATEWAY}/`);
+      return url.replace('ipfs://', `${gateway}/`);
     }
-    return `${IPFS_GATEWAY}/${url}`;
+    return `${gateway}/${url}`;
+  };
+  
+  // Get all possible gateway URLs for an image
+  const getAllIPFSUrls = (url: string): string[] => {
+    if (!url) return [];
+    if (url.startsWith('http')) return [url];
+    
+    const cid = url.startsWith('ipfs://') ? url.replace('ipfs://', '') : url;
+    return IPFS_GATEWAYS.map(gateway => `${gateway}/${cid}`);
   };
 
   const fetchMetadata = async (metadataUri: string) => {
@@ -472,11 +490,10 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                       className="relative h-64 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 cursor-pointer hover:opacity-90 transition-opacity"
                       onClick={() => setSelectedImage(getIPFSUrl(url))}
                     >
-                      <Image
+                      <img
                         src={getIPFSUrl(url)}
                         alt={`Lot picture ${index + 1}`}
-                        fill
-                        className="object-cover"
+                        className="w-full h-full object-cover"
                       />
                       <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
                         Photo {index + 1}
@@ -500,11 +517,10 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                       className="relative h-64 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 cursor-pointer hover:opacity-90 transition-opacity"
                       onClick={() => setSelectedImage(getIPFSUrl(url))}
                     >
-                      <Image
+                      <img
                         src={getIPFSUrl(url)}
                         alt={`Certificate ${index + 1}`}
-                        fill
-                        className="object-cover"
+                        className="w-full h-full object-cover"
                       />
                       <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
                         Certificate {index + 1}
@@ -905,12 +921,10 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-6xl max-h-[90vh]">
-            <Image
+            <img
               src={selectedImage}
               alt="Full size"
-              width={1200}
-              height={800}
-              className="object-contain max-h-[90vh]"
+              className="object-contain max-h-[90vh] max-w-full"
             />
             <button
               onClick={() => setSelectedImage(null)}

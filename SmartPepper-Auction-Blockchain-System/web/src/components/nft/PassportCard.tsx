@@ -27,7 +27,7 @@ export function PassportCard({ tokenId, passport, showQR = true }: PassportCardP
       <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold mb-1">🌶️ Pepper Passport</h2>
+            <h2 className="text-2xl font-bold mb-1">Pepper Passport</h2>
             <p className="text-green-100">NFT Token #{tokenId}</p>
           </div>
           {passport.isActive && (
