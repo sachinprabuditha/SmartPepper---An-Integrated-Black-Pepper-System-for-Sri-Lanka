@@ -291,7 +291,6 @@ export default function AdminDashboard() {
             </button>
               <div className="font-semibold text-gray-900 dark:text-white">Compliance</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Review checks</div>
-            </Link>
           </div>
         </div>
 

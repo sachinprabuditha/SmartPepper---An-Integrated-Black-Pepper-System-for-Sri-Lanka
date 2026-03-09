@@ -1,6 +1,7 @@
 const admin = require('firebase-admin');
 const logger = require('../utils/logger');
 const BlockchainService = require('./blockchainService');
+const notificationService = require('./notificationService');
 const currencyConverter = require('../utils/currencyConverter');
 
 /**
@@ -197,21 +198,34 @@ class AuctionFinalizationService {
     try {
       const firestore = admin.firestore();
       
-      await firestore.collection('notifications').add({
-        user_address: auction.current_bidder.toLowerCase(),
-        type: 'auction_won',
-        title: 'Congratulations! You Won the Auction',
-        message: `You won auction for ${auction.lot_id || 'lot'}. Price: ${auction.current_bid} ETH. Please proceed with payment.`,
-        data: {
+      // Get winner user ID from wallet address
+      const winnerSnapshot = await firestore.collection('users')
+        .where('wallet_address_lower', '==', auction.current_bidder.toLowerCase())
+        .limit(1)
+        .get();
+      
+      if (winnerSnapshot.empty) {
+        logger.warn('Winner user not found for wallet address', { wallet: auction.current_bidder });
+        return;
+      }
+      
+      const winnerId = winnerSnapshot.docs[0].id;
+      const bidAmountLkr = auction.current_bid_lkr || (await currencyConverter.convertToLkr(parseFloat(auction.current_bid))).toFixed(2);
+      
+      await notificationService.createNotification(
+        winnerId,
+        'auction_won',
+        'Congratulations! You Won the Auction',
+        `You won auction for ${auction.lot_id || 'lot'}. Price: LKR ${bidAmountLkr} (${auction.current_bid} ETH). Please proceed with payment.`,
+        {
           auction_id: auctionId,
           lot_id: auction.lot_id,
           final_price: auction.current_bid,
-          final_price_lkr: auction.current_bid_lkr,
-          action_required: 'payment'
-        },
-        read: false,
-        created_at: admin.firestore.FieldValue.serverTimestamp()
-      });
+          final_price_lkr: bidAmountLkr,
+          action_required: 'payment',
+          navigate: 'auction_monitor'
+        }
+      );
 
       logger.info(`📧 Winner notification created for ${auction.current_bidder}`);
     } catch (error) {
@@ -224,35 +238,34 @@ class AuctionFinalizationService {
    */
   async createFarmerNotification(auction, auctionId, outcome) {
     try {
-      const firestore = admin.firestore();
+      // Get farmer user ID from wallet address
+      const farmerId = await notificationService.getFarmerIdFromWallet(auction.farmer_address);
       
-      const messages = {
-        won: {
-          title: 'Auction Completed Successfully',
-          message: `Your auction for ${auction.lot_id || 'lot'} sold for ${auction.current_bid} ETH to ${auction.current_bidder}. Awaiting payment.`
-        },
-        failed: {
-          title: 'Auction Ended Without Sale',
-          message: `Your auction for ${auction.lot_id || 'lot'} ended without meeting the reserve price. You can create a new auction.`
-        }
-      };
+      if (!farmerId) {
+        logger.warn('Farmer user not found for wallet address', { wallet: auction.farmer_address });
+        return;
+      }
+      
+      if (outcome === 'won') {
+        // Auction sold with winner
+        const finalAmountLkr = auction.current_bid_lkr || (await currencyConverter.convertToLkr(parseFloat(auction.current_bid))).toFixed(2);
+        const winnerName = auction.current_bidder_name || auction.current_bidder;
+        
+        await notificationService.notifyAuctionSold(
+          farmerId,
+          auctionId,
+          winnerName,
+          finalAmountLkr
+        );
+      } else {
+        // Auction ended without sale
+        await notificationService.notifyAuctionNoSale(
+          farmerId,
+          auctionId
+        );
+      }
 
-      await firestore.collection('notifications').add({
-        user_address: auction.farmer_address.toLowerCase(),
-        type: outcome === 'won' ? 'auction_sold' : 'auction_no_sale',
-        title: messages[outcome].title,
-        message: messages[outcome].message,
-        data: {
-          auction_id: auctionId,
-          lot_id: auction.lot_id,
-          final_price: auction.current_bid || '0',
-          outcome
-        },
-        read: false,
-        created_at: admin.firestore.FieldValue.serverTimestamp()
-      });
-
-      logger.info(`📧 Farmer notification created for ${auction.farmer_address}`);
+      logger.info(`📧 Farmer notification created for ${auction.farmer_address}`, { outcome });
     } catch (error) {
       logger.error('Failed to create farmer notification:', error);
     }
