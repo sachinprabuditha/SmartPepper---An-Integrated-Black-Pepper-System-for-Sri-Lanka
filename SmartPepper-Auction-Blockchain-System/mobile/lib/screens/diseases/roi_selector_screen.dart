@@ -300,7 +300,7 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
         children: [
           Container(
             width: double.infinity,
-            color: AppTheme.deepEmerald,
+            color: AppTheme.forestGreen,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             child: Row(
               children: [
@@ -321,7 +321,7 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
           ),
           Expanded(
             child: _image == null
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
                         AppTheme.pepperGold,
@@ -403,9 +403,9 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
                       style: const TextStyle(fontSize: 16),
                     ),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF2E7D32),
-                      side: const BorderSide(
-                        color: Color(0xFF2E7D32),
+                      foregroundColor: Colors.white,
+                      side: BorderSide(
+                        color: Colors.white,
                         width: 2,
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -522,7 +522,7 @@ class ROIPainter extends CustomPainter {
 
       // Draw the path outline
       final pathPaint = Paint()
-        ..color = const Color(0xFF2E7D32)
+        ..color = AppTheme.pepperGold
         ..style = PaintingStyle.stroke
         ..strokeWidth = 4
         ..strokeCap = StrokeCap.round
@@ -531,7 +531,7 @@ class ROIPainter extends CustomPainter {
 
       // Draw path points as dots for visual feedback
       final dotPaint = Paint()
-        ..color = const Color(0xFF4CAF50)
+        ..color = Colors.white
         ..style = PaintingStyle.fill;
 
       for (final point in displayPath) {
@@ -547,7 +547,7 @@ class ROIPainter extends CustomPainter {
         canvas.drawCircle(
           displayPath.first,
           6,
-          Paint()..color = const Color(0xFF2E7D32),
+          Paint()..color = AppTheme.pepperGold,
         );
       }
 
@@ -557,7 +557,7 @@ class ROIPainter extends CustomPainter {
           text: const TextSpan(
             text: '✓ Plant Selected',
             style: TextStyle(
-              color: Color(0xFF2E7D32),
+              color: AppTheme.forestGreen,
               fontSize: 16,
               fontWeight: FontWeight.bold,
               backgroundColor: Colors.white,
@@ -582,7 +582,7 @@ class ROIPainter extends CustomPainter {
             fontWeight: FontWeight.bold,
             shadows: [
               Shadow(
-                color: Color(0xFF2E7D32),
+                color: AppTheme.pepperGold,
                 blurRadius: 4,
                 offset: Offset(0, 1),
               ),
@@ -637,7 +637,7 @@ class ThreeBounceLoader extends StatelessWidget {
                 children: [
                   const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      Color(0xFF2E7D32),
+                      AppTheme.pepperGold,
                     ),
                     strokeWidth: 4,
                   ),

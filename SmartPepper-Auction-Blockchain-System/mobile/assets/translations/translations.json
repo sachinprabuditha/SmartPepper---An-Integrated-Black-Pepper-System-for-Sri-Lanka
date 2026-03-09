@@ -4786,5 +4786,449 @@
         "en": "Confirm Auction",
         "si": "වෙන්දේසිය තහවුරු කරන්න",
         "ta": "ஏலத்தை உறுதிப்படுத்தவும்"
+    },
+    {
+        "key": "disease_leaf_analyzer_title",
+        "en": "Leaf Disease Analyzer",
+        "si": "කොළ රෝග විශ්ලේෂකය",
+        "ta": "இலை நோய் பகுப்பாய்வி"
+    },
+    {
+        "key": "disease_upload_analyze",
+        "en": "Upload & Analyze Leaf Images",
+        "si": "කොළ රූප උඩුගත කර විශ්ලේෂණය කරන්න",
+        "ta": "இலை படங்களை பதிவேற்றி பகுப்பாய்வு செய்யுங்கள்"
+    },
+    {
+        "key": "disease_upload_subtitle",
+        "en": "Capture or select images of pepper leaves for disease detection",
+        "si": "රෝග හඳුනාගැනීම සඳහා ගම්මිරිස් කොළ රූප ගන්න හෝ තෝරන්න",
+        "ta": "நோய் கண்டறிதலுக்காக மிளகு இலைகளின் படங்களை எடுக்கவும் அல்லது தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "disease_no_image_selected",
+        "en": "No Image Selected",
+        "si": "රූපයක් තෝරා නොමැත",
+        "ta": "படம் தேர்ந்தெடுக்கப்படவில்லை"
+    },
+    {
+        "key": "disease_tap_button_info",
+        "en": "Tap the button below to select an image",
+        "si": "රූපයක් තෝරන්න පහත බොත්තම තට්ටු කරන්න",
+        "ta": "படத்தை தேர்ந்தெடுக்க கீழே உள்ள பொத்தானை அழுத்தவும்"
+    },
+    {
+        "key": "disease_best_results_tip",
+        "en": "For best results, capture clear images in good lighting",
+        "si": "හොඳම ප්‍රතිඵල සඳහා, හොඳ ආලෝකයක පැහැදිලි රූප ගන්න",
+        "ta": "சிறந்த முடிவுகளுக்கு, நல்ல வெளிச்சத்தில் தெளிவான படங்களை எடுக்கவும்"
+    },
+    {
+        "key": "disease_upload_image",
+        "en": "Upload Image",
+        "si": "රූපය උඩුගත කරන්න",
+        "ta": "படத்தை பதிவேற்றவும்"
+    },
+    {
+        "key": "disease_view_disease_map",
+        "en": "View Disease Map",
+        "si": "රෝග සිතියම බලන්න",
+        "ta": "நோய் வரைபடத்தைப் பார்க்கவும்"
+    },
+    {
+        "key": "disease_loading_image",
+        "en": "Loading Image...",
+        "si": "රූපය පූරණය වෙමින්...",
+        "ta": "படம் ஏற்றப்படுகிறது..."
+    },
+    {
+        "key": "disease_preparing_image",
+        "en": "Preparing for analysis...",
+        "si": "විශ්ලේෂණය සඳහා සූදානම් කරමින්...",
+        "ta": "பகுப்பாய்வுக்கு தயாராகிறது..."
+    },
+    {
+        "key": "disease_analyzing",
+        "en": "Analyzing...",
+        "si": "විශ්ලේෂණය කරමින්...",
+        "ta": "பகுப்பாய்வு செய்யப்படுகிறது..."
+    },
+    {
+        "key": "disease_analysis_time_info",
+        "en": "Analysis may take a few moments",
+        "si": "විශ්ලේෂණය අවසන් වීමට මොහොතක් ගත විය හැක",
+        "ta": "பகுப்பாய்வு சில நிமிடங்கள் எடுக்கலாம்"
+    },
+    {
+        "key": "disease_analyze_images",
+        "en": "Analyze Images",
+        "si": "රූප විශ්ලේෂණය කරන්න",
+        "ta": "படங்களை பகுப்பாய்வு செய்யுங்கள்"
+    },
+    {
+        "key": "disease_add_another_image",
+        "en": "Add Another Image",
+        "si": "තවත් රූපයක් එකතු කරන්න",
+        "ta": "மற்றொரு படத்தை சேர்க்கவும்"
+    },
+    {
+        "key": "disease_select_image_source",
+        "en": "Select Image Source",
+        "si": "රූප මූලාශ්‍රය තෝරන්න",
+        "ta": "படத்தின் மூலத்தைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "disease_camera",
+        "en": "Camera",
+        "si": "කැමරාව",
+        "ta": "கேமரா"
+    },
+    {
+        "key": "disease_gallery",
+        "en": "Gallery",
+        "si": "ගැලරිය",
+        "ta": "கேலரி"
+    },
+    {
+        "key": "disease_location_required",
+        "en": "Location Required",
+        "si": "ස්ථානය අවශ්‍යයි",
+        "ta": "இருப்பிடம் தேவை"
+    },
+    {
+        "key": "disease_retry_location",
+        "en": "Retry Location",
+        "si": "ස්ථානය නැවත උත්සාහ කරන්න",
+        "ta": "இருப்பிடத்தை மீண்டும் முயற்சிக்கவும்"
+    },
+    {
+        "key": "disease_location_required_error",
+        "en": "Location is required for disease mapping. Please enable location services.",
+        "si": "රෝග සිතියම් ගත කිරීම සඳහා ස්ථානය අවශ්‍යයි. කරුණාකර ස්ථාන සේවා සබල කරන්න.",
+        "ta": "நோய் வரைபடத்திற்கு இருப்பிடம் தேவை. தயவுசெய்து இருப்பிட சேவைகளை இயக்கவும்."
+    },
+    {
+        "key": "disease_max_images",
+        "en": "Maximum 4 images allowed",
+        "si": "උපරිම රූප 4ක් අවසර ඇත",
+        "ta": "அதிகபட்சம் 4 படங்கள் அனுமதிக்கப்படுகின்றன"
+    },
+    {
+        "key": "disease_location_disabled",
+        "en": "Location services are disabled. Please enable them in settings.",
+        "si": "ස්ථාන සේවා අබල කර ඇත. කරුණාකර සැකසුම්වල ඒවා සබල කරන්න.",
+        "ta": "இருப்பிட சேவைகள் முடக்கப்பட்டுள்ளன. அமைப்புகளில் அவற்றை இயக்கவும்."
+    },
+    {
+        "key": "disease_location_denied",
+        "en": "Location permission denied. Please grant permission in settings.",
+        "si": "ස්ථාන අවසරය ප්‍රතික්ෂේප කරන ලදී. කරුණාකර සැකසුම්වල අවසරය ලබා දෙන්න.",
+        "ta": "இருப்பிட அனுமதி மறுக்கப்பட்டது. அமைப்புகளில் அனுமதி வழங்கவும்."
+    },
+    {
+        "key": "disease_location_denied_forever",
+        "en": "Location permission permanently denied. Please enable it in app settings.",
+        "si": "ස්ථාන අවසරය ස්ථිරවම ප්‍රතික්ෂේප කරන ලදී. කරුණාකර යෙදුම් සැකසුම්වල එය සබල කරන්න.",
+        "ta": "இருப்பிட அனுமதி நிரந்தரமாக மறுக்கப்பட்டது. பயன்பாட்டு அமைப்புகளில் அதை இயக்கவும்."
+    },
+    {
+        "key": "disease_location_captured",
+        "en": "Location Captured",
+        "si": "ස්ථානය ග්‍රහණය කරන ලදී",
+        "ta": "இருப்பிடம் பதிவு செய்யப்பட்டது"
+    },
+    {
+        "key": "disease_select_image_first",
+        "en": "Please select at least one image first",
+        "si": "කරුණාකර පළමුව අවම වශයෙන් එක් රූපයක් තෝරන්න",
+        "ta": "முதலில் குறைந்தது ஒரு படத்தையாவது தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "disease_analysis_results",
+        "en": "Analysis Results",
+        "si": "විශ්ලේෂණ ප්‍රතිඵල",
+        "ta": "பகுப்பாய்வு முடிவுகள்"
+    },
+    {
+        "key": "disease_location_not_saved_gallery",
+        "en": "Location data not saved (gallery image)",
+        "si": "ස්ථාන දත්ත සුරකින ලද නැත (ගැලරි රූපය)",
+        "ta": "இருப்பிட தரவு சேமிக்கப்படவில்லை (கேலரி படம்)"
+    },
+    {
+        "key": "disease_healthy_location_saved",
+        "en": "Healthy plant location saved successfully!",
+        "si": "සෞඛ්‍ය සම්පන්න ශාක ස්ථානය සාර්ථකව සුරකින ලදී!",
+        "ta": "ஆரோக்கியமான தாவர இருப்பிடம் வெற்றிகரமாக சேமிக்கப்பட்டது!"
+    },
+    {
+        "key": "disease_location_saved",
+        "en": "Disease location saved",
+        "si": "රෝග ස්ථානය සුරකින ලදී",
+        "ta": "நோய் இருப்பிடம் சேமிக்கப்பட்டது"
+    },
+    {
+        "key": "disease_view_map",
+        "en": "View Map",
+        "si": "සිතියම බලන්න",
+        "ta": "வரைபடத்தைப் பார்க்கவும்"
+    },
+    {
+        "key": "disease_error_saving_location",
+        "en": "Error saving location",
+        "si": "ස්ථානය සුරැකීමේ දෝෂය",
+        "ta": "இருப்பிடத்தை சேமிப்பதில் பிழை"
+    },
+    {
+        "key": "disease_total_detected",
+        "en": "Total Detected:",
+        "si": "මුළු හඳුනාගත් ප්‍රමාණය:",
+        "ta": "மொத்தம் கண்டறியப்பட்டது:"
+    },
+    {
+        "key": "disease_whole_tree_severity",
+        "en": "Whole Tree Severity",
+        "si": "සම්පූර්ණ ගස රෝග බරපතලකම",
+        "ta": "முழு மர தீவிரம்"
+    },
+    {
+        "key": "disease_severity",
+        "en": "Severity",
+        "si": "බරපතලකම",
+        "ta": "தீவிரம்"
+    },
+    {
+        "key": "disease_location_captured_label",
+        "en": "Location Captured",
+        "si": "ස්ථානය ග්‍රහණය කරන ලදී",
+        "ta": "இருப்பிடம் பதிவு செய்யப்பட்டது"
+    },
+    {
+        "key": "disease_detailed_analysis",
+        "en": "Detailed Analysis",
+        "si": "සවිස්තරාත්මක විශ්ලේෂණය",
+        "ta": "விரிவான பகுப்பாய்வு"
+    },
+    {
+        "key": "disease_leaf_detected",
+        "en": "leaf detected",
+        "si": "කොළ හඳුනාගන්නා ලදී",
+        "ta": "இலை கண்டறியப்பட்டது"
+    },
+    {
+        "key": "disease_leaves_detected",
+        "en": "leaves detected",
+        "si": "කොළ හඳුනාගන්නා ලදී",
+        "ta": "இலைகள் கண்டறியப்பட்டன"
+    },
+    {
+        "key": "disease_forecast_spread",
+        "en": "Forecast Spread",
+        "si": "ව්‍යාප්ති අනාවැකිය",
+        "ta": "பரவல் முன்னறிவிப்பு"
+    },
+    {
+        "key": "disease_analyze_another",
+        "en": "Analyze Another",
+        "si": "වෙනත් එකක් විශ්ලේෂණය කරන්න",
+        "ta": "வேறொன்றை பகுப்பாய்வு செய்யுங்கள்"
+    },
+    {
+        "key": "disease_error_loading_locations",
+        "en": "Error loading disease locations",
+        "si": "රෝග ස්ථාන පූරණය කිරීමේ දෝෂය",
+        "ta": "நோய் இருப்பிடங்களை ஏற்றுவதில் பிழை"
+    },
+    {
+        "key": "disease_map_legend",
+        "en": "Map Legend",
+        "si": "සිතියම් විස්තරය",
+        "ta": "வரைபட விளக்கம்"
+    },
+    {
+        "key": "disease_map_title",
+        "en": "Disease Map",
+        "si": "රෝග සිතියම",
+        "ta": "நோய் வரைபடம்"
+    },
+    {
+        "key": "disease_detected",
+        "en": "Detected",
+        "si": "හඳුනාගන්නා ලදී",
+        "ta": "கண்டறியப்பட்டது"
+    },
+    {
+        "key": "disease_total_leaves",
+        "en": "Total Leaves:",
+        "si": "මුළු කොළ ප්‍රමාණය:",
+        "ta": "மொத்த இலைகள்:"
+    },
+    {
+        "key": "disease_location_label",
+        "en": "Location:",
+        "si": "ස්ථානය:",
+        "ta": "இருப்பிடம்:"
+    },
+    {
+        "key": "disease_breakdown",
+        "en": "Breakdown",
+        "si": "විස්තරය",
+        "ta": "விவரங்கள்"
+    },
+    {
+        "key": "disease_remedies_title",
+        "en": "Remedies",
+        "si": "පිළියම්",
+        "ta": "தீர்வுகள்"
+    },
+    {
+        "key": "disease_eco_friendly_solutions",
+        "en": "Eco-Friendly Solutions",
+        "si": "පරිසර හිතකාමී විසඳුම්",
+        "ta": "சுற்றுச்சூழல் நட்பு தீர்வுகள்"
+    },
+    {
+        "key": "disease_chemical_solutions",
+        "en": "Chemical Solutions",
+        "si": "රසායනික විසඳුම්",
+        "ta": "இரசாயன தீர்வுகள்"
+    },
+    {
+        "key": "disease_severity_stage",
+        "en": "Severity Stage",
+        "si": "බරපතලකම් මට්ටම",
+        "ta": "தீவிர நிலை"
+    },
+    {
+        "key": "disease_stage_1_desc",
+        "en": "Very Low - Early detection, minimal intervention needed",
+        "si": "ඉතා අඩු - මුල් හඳුනාගැනීම, අවම මැදිහත්වීමක් අවශ්‍යයි",
+        "ta": "மிகக் குறைவு - ஆரம்ப கண்டறிதல், குறைந்த தலையீடு தேவை"
+    },
+    {
+        "key": "disease_stage_2_desc",
+        "en": "Low - Monitor closely and apply organic treatments",
+        "si": "අඩු - සමීපව නිරීක්ෂණය කර කාබනික ප්‍රතිකාර යොදන්න",
+        "ta": "குறைவு - நெருக்கமாக கண்காணித்து இயற்கை சிகிச்சை செய்யவும்"
+    },
+    {
+        "key": "disease_stage_3_desc",
+        "en": "Moderate - Immediate action recommended",
+        "si": "මධ්‍යස්ථ - ක්ෂණික ක්‍රියාමාර්ග නිර්දේශිතයි",
+        "ta": "மிதமான - உடனடி நடவடிக்கை பரிந்துரைக்கப்படுகிறது"
+    },
+    {
+        "key": "disease_stage_4_desc",
+        "en": "High - Urgent intervention required",
+        "si": "ඉහළ - හදිසි මැදිහත්වීමක් අවශ්‍යයි",
+        "ta": "அதிகம் - அவசர தலையீடு தேவை"
+    },
+    {
+        "key": "disease_stage_5_desc",
+        "en": "Critical - Immediate professional assistance needed",
+        "si": "අවදානම - ක්ෂණික වෘත්තීය උපකාර අවශ්‍යයි",
+        "ta": "முக்கியமான - உடனடி தொழில்முறை உதவி தேவை"
+    },
+    {
+        "key": "disease_no_remedies",
+        "en": "No remedies available for this disease",
+        "si": "මෙම රෝගය සඳහා පිළියම් නොමැත",
+        "ta": "இந்த நோய்க்கான தீர்வுகள் இல்லை"
+    },
+    {
+        "key": "disease_spread_forecasting",
+        "en": "Spread Forecasting",
+        "si": "ව්‍යාප්ති අනාවැකිය",
+        "ta": "பரவல் முன்னறிவிப்பு"
+    },
+    {
+        "key": "disease_no_spread_detected",
+        "en": "No Spread Risk Detected",
+        "si": "ව්‍යාප්ති අවදානමක් හඳුනාගෙන නැත",
+        "ta": "பரவல் ஆபத்து எதுவும் கண்டறியப்படவில்லை"
+    },
+    {
+        "key": "disease_plants_healthy",
+        "en": "Your plants are healthy!",
+        "si": "ඔබේ ශාක සෞඛ්‍ය සම්පන්නයි!",
+        "ta": "உங்கள் தாவரங்கள் ஆரோக்கியமாக உள்ளன!"
+    },
+    {
+        "key": "disease_current_severity",
+        "en": "Current Severity",
+        "si": "වත්මන් බරපතලකම",
+        "ta": "தற்போதைய தீவிரம்"
+    },
+    {
+        "key": "disease_est_days_spread",
+        "en": "Est. Days to Spread",
+        "si": "ව්‍යාප්තියට ඇස්තමේන්තුගත දින",
+        "ta": "பரவுவதற்கான மதிப்பிடப்பட்ட நாட்கள்"
+    },
+    {
+        "key": "disease_days",
+        "en": "days",
+        "si": "දින",
+        "ta": "நாட்கள்"
+    },
+    {
+        "key": "disease_view_remedies",
+        "en": "View Remedies",
+        "si": "පිළියම් බලන්න",
+        "ta": "தீர்வுகளைப் பார்க்கவும்"
+    },
+    {
+        "key": "disease_draw_around_plant",
+        "en": "Please draw around the plant/leaf you want to analyze",
+        "si": "කරුණාකර ඔබට විශ්ලේෂණය කිරීමට අවශ්‍ය ශාකය/කොළ වටා ඇඳගන්න",
+        "ta": "நீங்கள் பகுப்பாய்வு செய்ய விரும்பும் தாவரம்/இலையை சுற்றி வரையவும்"
+    },
+    {
+        "key": "disease_selection_failed",
+        "en": "Selection failed. Please try again.",
+        "si": "තෝරාගැනීම අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න.",
+        "ta": "தேர்வு தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்."
+    },
+    {
+        "key": "disease_select_target_plant",
+        "en": "Select Target Plant",
+        "si": "ඉලක්කගත ශාකය තෝරන්න",
+        "ta": "இலக்கு தாவரத்தைத் தேர்ந்தெடுக்கவும்"
+    },
+    {
+        "key": "disease_clear_redraw",
+        "en": "Clear & Redraw",
+        "si": "මකා නැවත ඇඳගන්න",
+        "ta": "அழித்து மீண்டும் வரையவும்"
+    },
+    {
+        "key": "disease_draw_instruction_start",
+        "en": "Draw around the plant to select it for analysis",
+        "si": "විශ්ලේෂණය සඳහා ශාකය තෝරා ගැනීමට ශාකය වටා ඇඳීම කරන්න",
+        "ta": "பகுப்பாய்வுக்காக தாவரத்தைத் தேர்ந்தெடுக்க அதைச் சுற்றி வரையவும்"
+    },
+    {
+        "key": "disease_selection_complete",
+        "en": "Selection complete - tap Confirm",
+        "si": "තේරීම සම්පූර්ණයි - තහවුරු කරන්න තට්ටු කරන්න",
+        "ta": "தேர்வு முடிந்தது - உறுதிப்படுத்த தட்டவும்"
+    },
+    {
+        "key": "disease_keep_drawing",
+        "en": "Keep drawing to close the selection",
+        "si": "තෝරාගැනීම වසා දැමීමට දිගටම ඇඳීම කරන්න",
+        "ta": "தேர்வை மூட தொடர்ந்து வரையவும்"
+    },
+    {
+        "key": "disease_confirm_selection",
+        "en": "Confirm Selection",
+        "si": "තෝරාගැනීම තහවුරු කරන්න",
+        "ta": "தேர்வை உறுதிப்படுத்தவும்"
+    },
+    {
+        "key": "disease_skip_analyze_full",
+        "en": "Skip & Analyze Full Image",
+        "si": "මඟහරින්න සහ සම්පූර්ණ රූපය විශ්ලේෂණය කරන්න",
+        "ta": "தவிர்த்து முழு படத்தையும் பகுப்பாய்வு செய்யுங்கள்"
     }
 ]

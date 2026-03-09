@@ -20,6 +20,7 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
         widget.analysisResult['forecast_report'] as List<dynamic>? ?? [];
 
     return Scaffold(
+      backgroundColor: AppTheme.forestGreen,
       appBar: AppBar(
         title: Text(context.tr('disease_spread_forecasting')),
         backgroundColor: AppTheme.forestGreen,
@@ -33,7 +34,7 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
                   Icon(
                     Icons.check_circle_outline,
                     size: 100,
-                    color: AppTheme.sriLankanLeaf.withOpacity(0.5),
+                    color: AppTheme.pepperGold,
                   ),
                   const SizedBox(height: 24),
                   Text(
@@ -41,14 +42,14 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.sriLankanLeaf,
+                      color: Colors.white,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     context.tr('disease_plants_healthy'),
-                    style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.6)),
+                    style: const TextStyle(fontSize: 16, color: Colors.white70),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -65,19 +66,20 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
 
                 Color riskColor;
                 if (days <= 14) {
-                  riskColor = AppTheme.errorColor;
+                  riskColor = const Color(0xFFEF5350); // Light red
                 } else if (days <= 30) {
-                  riskColor = AppTheme.warningColor;
+                  riskColor = const Color(0xFFFFA726); // Light orange
                 } else {
-                  riskColor = AppTheme.pepperGold;
+                  riskColor = const Color(0xFF66BB6A); // Light green
                 }
 
                 return Card(
-                  elevation: 4,
+                  elevation: 6,
                   margin: const EdgeInsets.only(bottom: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                   ),
+                  color: const Color(0xFFE8F5E9),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -91,9 +93,10 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
                             Expanded(
                               child: Text(
                                 diseaseName,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
+                                  color: riskColor,
                                 ),
                               ),
                             ),
@@ -106,13 +109,14 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
                             Text(
                               context.tr('disease_current_severity'),
                               style: TextStyle(
-                                  fontSize: 16, color: Colors.white.withOpacity(0.6)),
+                                  fontSize: 16, color: Colors.grey[700]),
                             ),
                             Text(
                               '${severity.toStringAsFixed(1)}%',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                color: riskColor,
                               ),
                             ),
                           ],
@@ -121,19 +125,20 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: riskColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                            border:
-                                Border.all(color: riskColor.withOpacity(0.5)),
+                            color: riskColor.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                                color: riskColor.withOpacity(0.4), width: 2),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 context.tr('disease_est_days_spread'),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
+                                  color: Colors.grey[800],
                                 ),
                               ),
                               Text(
@@ -172,8 +177,8 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
                             icon: const Icon(Icons.medical_services, size: 20),
                             label: Text(context.tr('disease_view_remedies')),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.pepperGold,
-                              foregroundColor: AppTheme.forestGreen,
+                              backgroundColor: const Color(0xFF2E7D32),
+                              foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),

@@ -70,7 +70,8 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
         // Save healthy plant location
         await _saveDiseaseLocation('Healthy', 0.0, isHealthy: true);
       }
-    } else if (widget.currentPosition == null && (hasDisease || healthyCount > 0)) {
+    } else if (widget.currentPosition == null &&
+        (hasDisease || healthyCount > 0)) {
       // Detection successful but no GPS location (image from gallery)
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -80,8 +81,7 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                 const Icon(Icons.info_outline, color: Colors.white),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                      context.tr('disease_location_not_saved_gallery')),
+                  child: Text(context.tr('disease_location_not_saved_gallery')),
                 ),
               ],
             ),
@@ -93,7 +93,8 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
     }
   }
 
-  Future<void> _saveDiseaseLocation(String diseaseName, double severity, {bool isHealthy = false}) async {
+  Future<void> _saveDiseaseLocation(String diseaseName, double severity,
+      {bool isHealthy = false}) async {
     if (_isSavingLocation || widget.currentPosition == null) return;
 
     setState(() {
@@ -119,10 +120,10 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
       await _apiService.saveDiseaseLocation(newLocation);
 
       if (mounted) {
-        final message = isHealthy 
+        final message = isHealthy
             ? context.tr('disease_healthy_location_saved')
             : '${context.tr('disease_location_saved')}: $diseaseName';
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -162,11 +163,11 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
 
   Color _getSeverityColor(double severity) {
     if (severity < 20) {
-      return AppTheme.sriLankanLeaf;
+      return const Color(0xFF66BB6A); // Light green
     } else if (severity < 40) {
-      return AppTheme.warningColor;
+      return const Color(0xFFFFA726); // Light orange
     } else {
-      return AppTheme.errorColor;
+      return const Color(0xFFEF5350); // Light red
     }
   }
 
@@ -181,9 +182,9 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
   }
 
   Color _getHealthColor(double health) {
-    if (health >= 80) return AppTheme.sriLankanLeaf;
-    if (health >= 50) return AppTheme.warningColor;
-    return AppTheme.errorColor;
+    if (health >= 80) return const Color(0xFF66BB6A); // Light green
+    if (health >= 50) return const Color(0xFFFFA726); // Light orange
+    return const Color(0xFFEF5350); // Light red
   }
 
   String _getHealthLabel(double health) {
@@ -204,15 +205,22 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
         isHealthScore ? _getHealthLabel(score) : _getSeverityLabel(score);
 
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [cardColor.withOpacity(0.1), Colors.white],
+            colors: [
+              const Color(0xFFE8F5E9), // Light green
+              const Color(0xFFF1F8E9), // Very light green
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
+          ),
+          border: Border.all(
+            color: cardColor.withOpacity(0.4),
+            width: 2,
           ),
         ),
         padding: const EdgeInsets.all(24.0),
@@ -224,9 +232,10 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      color: cardColor,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -252,38 +261,56 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
             ),
             const SizedBox(height: 20),
             CircularPercentIndicator(
-              radius: 70.0,
-              lineWidth: 12.0,
+              radius: 75.0,
+              lineWidth: 14.0,
               percent: score / 100,
-              center: Text(
-                '${score.toStringAsFixed(1)}%',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: cardColor,
-                ),
+              center: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${score.toStringAsFixed(1)}%',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: cardColor,
+                    ),
+                  ),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: cardColor.withOpacity(0.8),
+                    ),
+                  ),
+                ],
               ),
               progressColor: cardColor,
-              backgroundColor: Colors.grey[300]!,
+              backgroundColor: cardColor.withOpacity(0.2),
               circularStrokeCap: CircularStrokeCap.round,
             ),
             const Spacer(),
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
+                color: cardColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: cardColor.withOpacity(0.3),
+                  width: 1,
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.eco, color: AppTheme.sriLankanLeaf, size: 18),
+                  Icon(Icons.eco, color: cardColor, size: 20),
                   const SizedBox(width: 8),
                   Text(
                     '${context.tr('disease_total_detected')} $totalLeaves',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
+                      color: cardColor,
                     ),
                   ),
                 ],
@@ -332,24 +359,12 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
     });
 
     return Scaffold(
+      backgroundColor: AppTheme.forestGreen,
       appBar: AppBar(
         title: Text(context.tr('disease_analysis_results')),
+        backgroundColor: AppTheme.forestGreen,
+        foregroundColor: AppTheme.pepperGold,
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              // Navigate back to home with fresh image upload screen
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) => const ImageUploadScreen(),
-                ),
-                (route) => false,
-              );
-            },
-            tooltip: 'Back to Home',
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -361,7 +376,7 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
               if (widget.currentPosition != null)
                 Card(
                   elevation: 4,
-                  color: AppTheme.deepEmerald.withOpacity(0.3),
+                  color: Colors.white.withOpacity(0.9),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -369,9 +384,9 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.location_on,
-                          color: AppTheme.pepperGold,
+                          color: AppTheme.forestGreen,
                           size: 28,
                         ),
                         const SizedBox(width: 12),
@@ -454,7 +469,8 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                         children: [
                           Icon(
                             Icons.analytics,
-                            color: Theme.of(context).primaryColor,
+                            color: AppTheme.pepperGold,
+                            size: 28,
                           ),
                           const SizedBox(width: 8),
                           Text(
@@ -462,6 +478,7 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
+                              color: AppTheme.pepperGold,
                             ),
                           ),
                         ],
@@ -574,7 +591,7 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                             style: const TextStyle(fontSize: 16),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange[700],
+                            backgroundColor: const Color(0xFF2E7D32),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(

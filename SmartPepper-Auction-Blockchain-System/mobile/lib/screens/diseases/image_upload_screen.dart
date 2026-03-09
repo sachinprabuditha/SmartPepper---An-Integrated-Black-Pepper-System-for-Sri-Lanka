@@ -55,7 +55,8 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
             final shouldContinue = await showDialog<bool>(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Icon(Icons.warning_amber, color: Colors.orange, size: 48),
+                title: const Icon(Icons.warning_amber,
+                    color: Colors.orange, size: 48),
                 content: Text(
                   context.tr('disease_location_required'),
                 ),
@@ -71,14 +72,14 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                 ],
               ),
             );
-            
+
             if (shouldContinue != true) {
               setState(() {
                 _isPickingImage = false;
               });
               return;
             }
-            
+
             // Retry getting location
             await _getCurrentLocation();
             if (_currentPosition == null) {
@@ -353,11 +354,14 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final imageDisplayHeight = screenHeight * 0.5; // 70% of screen height
+    final imageDisplayHeight = screenHeight * 0.35; // 35% of screen height
 
     return Scaffold(
+      backgroundColor: AppTheme.forestGreen,
       appBar: AppBar(
         title: Text(context.tr('disease_leaf_analyzer_title')),
+        backgroundColor: AppTheme.forestGreen,
+        foregroundColor: AppTheme.pepperGold,
         centerTitle: true,
         elevation: 2,
       ),
@@ -373,14 +377,14 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.pepperGold,
+                  color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
                 context.tr('disease_upload_subtitle'),
-                style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.7)),
+                style: const TextStyle(fontSize: 14, color: Colors.white70),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),

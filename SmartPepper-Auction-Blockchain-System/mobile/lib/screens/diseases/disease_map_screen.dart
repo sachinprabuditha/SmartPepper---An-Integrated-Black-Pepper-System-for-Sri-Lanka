@@ -193,6 +193,8 @@ class _DiseaseMapScreenState extends State<DiseaseMapScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(context.tr('disease_map_title')),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
         centerTitle: true,
         actions: [
           IconButton(

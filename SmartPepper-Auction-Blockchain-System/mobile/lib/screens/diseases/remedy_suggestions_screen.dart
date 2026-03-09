@@ -53,6 +53,7 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
         [];
 
     return Scaffold(
+      backgroundColor: AppTheme.forestGreen,
       appBar: AppBar(
         title: Text(
             '${widget.diseaseName} ${context.tr('disease_remedies_title')}'),
@@ -60,9 +61,9 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
         foregroundColor: AppTheme.pepperGold,
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: Colors.white,
+          indicatorColor: AppTheme.pepperGold,
           indicatorWeight: 3,
-          labelColor: Colors.white,
+          labelColor: AppTheme.pepperGold,
           unselectedLabelColor: Colors.white70,
           labelStyle: const TextStyle(
             fontSize: 16,
@@ -82,12 +83,20 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            color: AppTheme.deepEmerald.withOpacity(0.3),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F5E9),
+              border: Border(
+                bottom: BorderSide(
+                  color: AppTheme.pepperGold.withOpacity(0.3),
+                  width: 2,
+                ),
+              ),
+            ),
             child: Row(
               children: [
                 Icon(
                   Icons.warning_amber_rounded,
-                  color: AppTheme.warningColor,
+                  color: const Color(0xFFFFA726),
                   size: 32,
                 ),
                 const SizedBox(width: 12),
@@ -97,9 +106,10 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
                     children: [
                       Text(
                         '${context.tr('disease_severity_stage')} $stage (${widget.severity.toStringAsFixed(1)}%)',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFFA726),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -107,7 +117,7 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
                         _getStageDescription(stage),
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.grey[700],
                         ),
                       ),
                     ],
@@ -121,9 +131,9 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
               controller: _tabController,
               children: [
                 // Eco Friendly Tab
-                _buildRemedyList(ecoList, AppTheme.sriLankanLeaf),
+                _buildRemedyList(ecoList, const Color(0xFF66BB6A)),
                 // Chemical Solutions Tab
-                _buildRemedyList(chemList, AppTheme.pepperGold),
+                _buildRemedyList(chemList, const Color(0xFFFFA726)),
               ],
             ),
           ),
@@ -151,7 +161,12 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
 
   Widget _buildRemedyList(List<String> items, Color color) {
     if (items.isEmpty) {
-      return Center(child: Text(context.tr('disease_no_remedies')));
+      return Center(
+        child: Text(
+          context.tr('disease_no_remedies'),
+          style: const TextStyle(color: Colors.white),
+        ),
+      );
     }
 
     return ListView.builder(
@@ -159,11 +174,12 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
       itemCount: items.length,
       itemBuilder: (context, index) {
         return Card(
-          elevation: 2,
+          elevation: 4,
           margin: const EdgeInsets.only(bottom: 12),
+          color: const Color(0xFFE8F5E9),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: color.withOpacity(0.3), width: 1),
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: color.withOpacity(0.4), width: 2),
           ),
           child: Padding(
             padding:
@@ -171,12 +187,16 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.check_circle_outline, color: color, size: 24),
+                Icon(Icons.check_circle, color: color, size: 24),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     items[index],
-                    style: const TextStyle(fontSize: 16, height: 1.4),
+                    style: TextStyle(
+                      fontSize: 16,
+                      height: 1.4,
+                      color: Colors.grey[800],
+                    ),
                   ),
                 ),
               ],

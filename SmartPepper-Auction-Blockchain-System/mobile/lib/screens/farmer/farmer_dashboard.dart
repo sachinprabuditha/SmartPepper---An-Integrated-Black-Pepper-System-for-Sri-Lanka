@@ -664,7 +664,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF1565C0), Color(0xFF0D47A1)],
+            colors: [AppTheme.forestGreen, Color(0xFF2E7D32)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
