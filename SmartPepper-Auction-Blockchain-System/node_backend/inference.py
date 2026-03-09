@@ -6,7 +6,10 @@ from torchvision import models
 import numpy as np
 from ultralytics import YOLO
 
-from config import DEVICE, YOLO_PATH, MODEL_FOLDER, NUM_CLASSES, class_names, DEBUG_ROOT
+from config import (
+    DEVICE, YOLO_PATH, MODEL_FOLDER, NUM_CLASSES, class_names, DEBUG_ROOT,
+    YOLO_CONFIDENCE, YOLO_IOU, YOLO_IMAGE_SIZE
+)
 from utils import extract_crops
 
 class InferenceEngine:
@@ -34,24 +37,24 @@ class InferenceEngine:
         print(f"✅ Loaded {len(self.fold_models)} classifier models")
 
     def analyze_images(self, frames, timestamp):
-        # Run YOLO on the list of frames
-        results_list = self.detector(frames, conf=0.25, iou=0.35, imgsz=1024, verbose=False)
+        # Run YOLO with configuration from config.py (can be overridden by .env)
+        results_list = self.detector(frames, conf=YOLO_CONFIDENCE, iou=YOLO_IOU, imgsz=YOLO_IMAGE_SIZE, verbose=False)
 
-        total_leaves = 0
         all_leaf_batch = []
         all_meta = []
         
         # Aggregate crops from all frames
         for frame_idx, (results, frame) in enumerate(zip(results_list, frames)):
-            if results.masks is not None:
-                total_leaves += len(results.masks.data)
-                
             leaf_batch, meta = extract_crops(results, frame)
             all_leaf_batch.extend(leaf_batch)
             
             # Store frame_idx with original crop idx
             for i, crop in meta:
                 all_meta.append((f"{frame_idx}_{i}", crop))
+        
+        # Count total leaves AFTER filtering (not before)
+        # This ensures the count matches the sum of all categories
+        total_leaves = len(all_leaf_batch)
         
         infected_count = 0
         stats = {k: 0 for k in class_names + ["Uncertain"]}
