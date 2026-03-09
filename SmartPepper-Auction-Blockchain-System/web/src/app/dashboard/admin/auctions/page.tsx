@@ -21,6 +21,9 @@ interface Auction {
   quantity?: number;
   quality?: string;
   origin?: string;
+  finalized?: boolean;
+  settlement_status?: string;
+  winner_address?: string;
 }
 
 export default function ManageAuctionsPage() {
@@ -69,7 +72,7 @@ export default function ManageAuctionsPage() {
 
     try {
       setFinalizingAuction(auctionId);
-      const response = await fetch(`http://localhost:3002/api/auction/${auctionId}/finalize`, {
+      const response = await fetch(`http://localhost:3002/api/auctions/${auctionId}/finalize`, {
         method: 'POST',
       });
 
@@ -79,7 +82,12 @@ export default function ManageAuctionsPage() {
       }
 
       const result = await response.json();
-      alert(`Auction finalized successfully! ${result.settled ? 'Blockchain settlement completed.' : 'Awaiting blockchain settlement.'}`);
+      
+      if (result.alreadyFinalized) {
+        alert(`Auction is already finalized!\n\nStatus: ${result.status}\nSettlement: ${result.settlementStatus || 'pending'}\nWinner: ${result.winner ? result.winner.slice(0, 10) + '...' + result.winner.slice(-8) : 'N/A'}\n\nNext step: Winner should lock escrow.`);
+      } else {
+        alert(`Auction finalized successfully! ${result.result?.success ? 'Winner notified.' : 'Awaiting blockchain settlement.'}`);
+      }
       
       // Refresh auctions
       await fetchAuctions();
@@ -329,12 +337,25 @@ export default function ManageAuctionsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(auction.status)}`}>
-                          {auction.status === 'active' && <PlayCircle className="w-3 h-3 mr-1" />}
-                          {auction.status === 'ended' && <StopCircle className="w-3 h-3 mr-1" />}
-                          {auction.status === 'settled' && <CheckCircle className="w-3 h-3 mr-1" />}
-                          {auction.status.toUpperCase()}
-                        </span>
+                        <div className="space-y-1">
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(auction.status)}`}>
+                            {auction.status === 'active' && <PlayCircle className="w-3 h-3 mr-1" />}
+                            {auction.status === 'ended' && <StopCircle className="w-3 h-3 mr-1" />}
+                            {auction.status === 'settled' && <CheckCircle className="w-3 h-3 mr-1" />}
+                            {auction.status.toUpperCase()}
+                          </span>
+                          {auction.finalized && (
+                            <div className="text-xs text-green-600 dark:text-green-400 flex items-center">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Finalized
+                            </div>
+                          )}
+                          {auction.settlement_status && (
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              {auction.settlement_status.replace(/_/g, ' ').toUpperCase()}
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <div className="flex flex-col space-y-2">
@@ -344,7 +365,7 @@ export default function ManageAuctionsPage() {
                           >
                             View Details
                           </button>
-                          {auction.status === 'ended' && (
+                          {auction.status === 'ended' && !auction.finalized && (
                             <button
                               onClick={() => handleFinalizeAuction(auction.auction_id)}
                               disabled={finalizingAuction === auction.auction_id}
@@ -354,6 +375,11 @@ export default function ManageAuctionsPage() {
                             >
                               {finalizingAuction === auction.auction_id ? 'Finalizing...' : '⚡ Finalize'}
                             </button>
+                          )}
+                          {auction.finalized && auction.winner_address && (
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              Winner: {auction.winner_address.slice(0, 6)}...{auction.winner_address.slice(-4)}
+                            </div>
                           )}
                         </div>
                       </td>

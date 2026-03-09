@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
 import '../../services/api_service.dart';
+import '../../services/quality_grading_service.dart';
 
 class AddProcessingStageScreen extends StatefulWidget {
   final String lotId;
@@ -16,8 +17,11 @@ class AddProcessingStageScreen extends StatefulWidget {
 class _AddProcessingStageScreenState extends State<AddProcessingStageScreen> {
   final _formKey = GlobalKey<FormState>();
   final _apiService = ApiService();
+  final _qualityGradingService = QualityGradingService();
 
   String? _selectedStageType;
+  QualityGradingRecord? _mlQualityGrading;
+  bool _isLoadingMLData = false;
   final _stageNameController = TextEditingController();
   final _locationController = TextEditingController();
   final _operatorController = TextEditingController();
@@ -110,6 +114,91 @@ class _AddProcessingStageScreenState extends State<AddProcessingStageScreen> {
         (s) => s['value'] == _selectedStageType,
       );
       _stageNameController.text = '${stageInfo['label']} Process';
+
+      // Fetch ML data when Grading stage is selected
+      if (_selectedStageType == 'grading') {
+        _fetchMLQualityGrading();
+      }
+    }
+  }
+
+  Future<void> _fetchMLQualityGrading() async {
+    setState(() {
+      _isLoadingMLData = true;
+    });
+
+    try {
+      final latestGrading =
+          await _qualityGradingService.getLatestQualityGrading();
+
+      if (latestGrading != null && mounted) {
+        setState(() {
+          _mlQualityGrading = latestGrading;
+          // Auto-populate grading fields with ML data
+          _gradeController.text = latestGrading.getMappedGrade();
+          _colorController.text = 'Black'; // Default for pepper
+          // Calculate uniformity from pure percentage
+          final purePercentage = latestGrading.visualPercentages['pure'] ?? 0.0;
+          _uniformityController.text = purePercentage.toStringAsFixed(1);
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'ML grading data loaded: ${latestGrading.getMappedGrade()}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.white),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'No ML quality grading found. Please enter manually.',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to fetch ML grading: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingMLData = false;
+        });
+      }
     }
   }
 
@@ -128,11 +217,34 @@ class _AddProcessingStageScreenState extends State<AddProcessingStageScreen> {
           'duration_hours': int.tryParse(_durationHoursController.text) ?? 0,
         };
       case 'grading':
-        return {
+        final gradingMetrics = {
           'grade': _gradeController.text,
           'color': _colorController.text,
           'uniformity': _uniformityController.text,
         };
+
+        // Include ML quality grading data if available
+        if (_mlQualityGrading != null) {
+          gradingMetrics['ml_detected'] = 'true';
+          gradingMetrics['ml_classification'] = _mlQualityGrading!.finalGrade;
+          gradingMetrics['ml_density'] = _mlQualityGrading!.density.toString();
+          gradingMetrics['ml_weight_grams'] =
+              _mlQualityGrading!.weightGrams.toString();
+          gradingMetrics['ml_pure_percentage'] =
+              (_mlQualityGrading!.visualPercentages['pure'] ?? 0.0).toString();
+          gradingMetrics['ml_molded_percentage'] =
+              (_mlQualityGrading!.visualPercentages['molded'] ?? 0.0)
+                  .toString();
+          gradingMetrics['ml_discolored_percentage'] =
+              (_mlQualityGrading!.visualPercentages['discolored'] ?? 0.0)
+                  .toString();
+          gradingMetrics['ml_scan_timestamp'] =
+              _mlQualityGrading!.timestamp.toIso8601String();
+        } else {
+          gradingMetrics['ml_detected'] = 'false';
+        }
+
+        return gradingMetrics;
       case 'packaging':
         return {
           'package_material': _packageMaterialController.text,
@@ -166,7 +278,7 @@ class _AddProcessingStageScreenState extends State<AddProcessingStageScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await _apiService.addProcessingStage(
+      await _apiService.addProcessingStage(
         lotId: widget.lotId,
         stageType: _selectedStageType!,
         stageName: _stageNameController.text,
@@ -414,12 +526,212 @@ class _AddProcessingStageScreenState extends State<AddProcessingStageScreen> {
           ),
         ),
         const SizedBox(height: 12),
+
+        // ML Quality Grading Data Section
+        if (_isLoadingMLData)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppTheme.forestGreen.withOpacity(0.1),
+                  AppTheme.pepperGold.withOpacity(0.1)
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppTheme.forestGreen.withOpacity(0.3)),
+            ),
+            child: Row(
+              children: [
+                CircularProgressIndicator(
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AppTheme.forestGreen),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'Loading ML grading data...',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppTheme.forestGreen,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          )
+        else if (_mlQualityGrading != null) ...[
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppTheme.forestGreen.withOpacity(0.15),
+                  AppTheme.pepperGold.withOpacity(0.15),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                  color: AppTheme.forestGreen.withOpacity(0.4), width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.forestGreen.withOpacity(0.2),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.forestGreen,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.forestGreen.withOpacity(0.4),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.precision_manufacturing,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'ML Quality Grading',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.forestGreen,
+                            ),
+                          ),
+                          Text(
+                            'Scanned at ${DateFormat('MMM dd, yyyy HH:mm').format(_mlQualityGrading!.timestamp)}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppTheme.pepperGold,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.pepperGold.withOpacity(0.4),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.lock, size: 14, color: Colors.white),
+                          const SizedBox(width: 4),
+                          Text(
+                            _mlQualityGrading!.getMappedGrade(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                const Divider(color: Colors.grey),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildMLMetricCard(
+                        'Density',
+                        '${_mlQualityGrading!.density.toStringAsFixed(1)} g/L',
+                        Icons.spa,
+                        Colors.green,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildMLMetricCard(
+                        'Weight',
+                        '${_mlQualityGrading!.weightGrams.toStringAsFixed(1)} g',
+                        Icons.scale,
+                        Colors.blue,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Visual Analysis',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.forestGreen,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildVisualAnalysisRow(
+                  'Pure',
+                  _mlQualityGrading!.visualPercentages['pure'] ?? 0.0,
+                  Colors.green,
+                ),
+                const SizedBox(height: 6),
+                _buildVisualAnalysisRow(
+                  'Molded',
+                  _mlQualityGrading!.visualPercentages['molded'] ?? 0.0,
+                  Colors.orange,
+                ),
+                const SizedBox(height: 6),
+                _buildVisualAnalysisRow(
+                  'Discolored',
+                  _mlQualityGrading!.visualPercentages['discolored'] ?? 0.0,
+                  Colors.red,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // Manual Grading Fields
         DropdownButtonFormField<String>(
           value: _gradeController.text.isEmpty ? null : _gradeController.text,
-          decoration: const InputDecoration(
-            labelText: 'Quality Grade',
+          decoration: InputDecoration(
+            labelText: _mlQualityGrading != null
+                ? 'Quality Grade (from ML)'
+                : 'Quality Grade',
             prefixIcon: Icon(Icons.grade),
             border: OutlineInputBorder(),
+            suffixIcon: _mlQualityGrading != null
+                ? Icon(Icons.lock, size: 16, color: AppTheme.pepperGold)
+                : null,
           ),
           items: ['AAA', 'AA', 'A', 'B', 'C']
               .map((grade) => DropdownMenuItem(
@@ -427,11 +739,13 @@ class _AddProcessingStageScreenState extends State<AddProcessingStageScreen> {
                     child: Text(grade),
                   ))
               .toList(),
-          onChanged: (value) {
-            setState(() {
-              _gradeController.text = value ?? '';
-            });
-          },
+          onChanged: _mlQualityGrading != null
+              ? null
+              : (value) {
+                  setState(() {
+                    _gradeController.text = value ?? '';
+                  });
+                },
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please select grade';
@@ -442,7 +756,7 @@ class _AddProcessingStageScreenState extends State<AddProcessingStageScreen> {
         const SizedBox(height: 12),
         TextFormField(
           controller: _colorController,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.black87),
           decoration: const InputDecoration(
             labelText: 'Color',
             hintText: 'e.g., Black, White, Green',
@@ -459,19 +773,110 @@ class _AddProcessingStageScreenState extends State<AddProcessingStageScreen> {
         const SizedBox(height: 12),
         TextFormField(
           controller: _uniformityController,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
+          style: const TextStyle(color: Colors.black87),
+          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
             labelText: 'Uniformity (%)',
             hintText: 'e.g., 95',
             prefixIcon: Icon(Icons.percent),
             border: OutlineInputBorder(),
+            suffixIcon: _mlQualityGrading != null
+                ? Tooltip(
+                    message: 'Auto-filled from ML pure percentage',
+                    child: Icon(Icons.auto_awesome,
+                        size: 16, color: AppTheme.forestGreen),
+                  )
+                : null,
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter uniformity percentage';
             }
+            final uniformity = double.tryParse(value);
+            if (uniformity == null || uniformity < 0 || uniformity > 100) {
+              return 'Uniformity must be between 0 and 100';
+            }
             return null;
           },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMLMetricCard(
+      String label, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.15),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVisualAnalysisRow(String label, double percentage, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              '${percentage.toStringAsFixed(1)}%',
+              style: TextStyle(
+                fontSize: 12,
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: percentage / 100,
+            backgroundColor: Colors.grey[300],
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+            minHeight: 6,
+          ),
         ),
       ],
     );
