@@ -5,6 +5,13 @@ export interface Auction {
   auctionId: number;
   lotId: string;
   farmerAddress: string;
+  farmerName?: string;
+  farmLocation?: string;
+  lotPictures?: string[];
+  variety?: string;
+  quantity?: string;
+  quality?: string;
+  origin?: string;
   startPrice: string;
   reservePrice: string;
   currentBid: string;
@@ -133,14 +140,14 @@ export const useAuctionStore = create<AuctionState>((set, get) => ({
         auctionId,
         bidderAddress: bidder,
         amount,
-        timestamp,
+        placedAt: timestamp,
         blockchainTxHash: '',
       };
 
       get().addBid(auctionId, bid);
       get().updateAuction(auctionId, {
         currentBid: amount,
-        currentBidderAddress: bidder,
+        currentBidder: bidder,
         bidCount,
       });
     });

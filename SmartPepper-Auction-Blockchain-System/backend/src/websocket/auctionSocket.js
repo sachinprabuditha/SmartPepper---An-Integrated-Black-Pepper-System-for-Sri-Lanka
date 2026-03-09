@@ -143,6 +143,26 @@ class AuctionWebSocket {
     }
   }
 
+  // Broadcast payment received
+  async broadcastPaymentReceived(auctionId, paymentData) {
+    try {
+      await this.updateAuctionState(auctionId, {
+        paymentReceived: true,
+        ...paymentData
+      });
+
+      this.auctionNamespace.to(`auction_${auctionId}`).emit('payment_received', {
+        auctionId,
+        ...paymentData,
+        timestamp: new Date()
+      });
+
+      logger.info('Payment received broadcast', { auctionId, amount: paymentData.amount });
+    } catch (error) {
+      logger.error('Error broadcasting payment:', error);
+    }
+  }
+
   // Broadcast compliance status
   async broadcastComplianceStatus(auctionId, passed) {
     try {

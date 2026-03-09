@@ -5,17 +5,11 @@ import { useAccount } from 'wagmi';
 import { auctionApi } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { Loader2, TrendingUp, Zap, AlertCircle, DollarSign } from 'lucide-react';
+import { exchangeRateService } from '@/services/exchangeRateService';
 
-// Currency conversion
-const ETH_TO_LKR_RATE = 322580.65;
-
+// Currency conversion using live rates
 function ethToLkr(eth: number): string {
-  return new Intl.NumberFormat('en-LK', {
-    style: 'currency',
-    currency: 'LKR',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(eth * ETH_TO_LKR_RATE);
+  return exchangeRateService.formatLkr(exchangeRateService.ethToLkr(eth));
 }
 
 interface BidFormProps {

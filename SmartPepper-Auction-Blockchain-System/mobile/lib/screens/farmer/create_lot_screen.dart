@@ -13,7 +13,9 @@ import '../../config/theme.dart';
 import '../../localization/app_localizations.dart';
 
 class CreateLotScreen extends StatefulWidget {
-  const CreateLotScreen({super.key});
+  final Map<String, dynamic>? prefillData;
+
+  const CreateLotScreen({super.key, this.prefillData});
 
   @override
   State<CreateLotScreen> createState() => _CreateLotScreenState();
@@ -47,6 +49,7 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
   void initState() {
     super.initState();
     _loadFarmerInfo();
+    _applyPrefillData();
   }
 
   Future<void> _loadFarmerInfo() async {
@@ -55,6 +58,32 @@ class _CreateLotScreenState extends State<CreateLotScreen> {
       setState(() {
         _farmerNameController.text = authProvider.user!.name;
       });
+    }
+  }
+
+  void _applyPrefillData() {
+    if (widget.prefillData != null) {
+      final data = widget.prefillData!;
+
+      if (data['variety'] != null) {
+        final variety = data['variety'] as String;
+        if (_pepperVarieties.contains(variety)) {
+          _varietyController.text = variety;
+        }
+      }
+
+      if (data['quantity'] != null) {
+        _quantityController.text = data['quantity'].toString();
+      }
+
+      if (data['quality'] != null) {
+        final quality = data['quality'] as String;
+        if (_qualityGrades.contains(quality)) {
+          setState(() {
+            _selectedQuality = quality;
+          });
+        }
+      }
     }
   }
 

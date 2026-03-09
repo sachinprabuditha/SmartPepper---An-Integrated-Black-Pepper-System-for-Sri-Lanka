@@ -11,29 +11,25 @@ import { PEPPER_AUCTION_ABI, CONTRACT_ADDRESS } from '@/config/contracts';
 import { AuctionTimer } from '@/components/auction/AuctionTimer';
 import { BidHistory } from '@/components/auction/BidHistory';
 import { BidForm } from '@/components/auction/BidForm';
-import { Loader2, CheckCircle, XCircle, User, Package, Calendar, Users, Wifi, DollarSign, ImageIcon } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, User, Package, Calendar, Users, Wifi, DollarSign, ImageIcon, MapPin, Award, Sprout, Scale, TreeDeciduous } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { exchangeRateService } from '@/services/exchangeRateService';
 
-// Currency conversion constants
-const LKR_TO_ETH_RATE = 0.0000031; // 1 LKR ≈ 0.0000031 ETH
-const ETH_TO_LKR_RATE = 322580.65; // 1 ETH ≈ 322,580 LKR
-
-// Currency conversion helpers
+// Currency conversion helpers using live rates
 function ethToLkr(ethAmount: number): number {
-  return ethAmount * ETH_TO_LKR_RATE;
+  return exchangeRateService.ethToLkr(ethAmount);
+}
+
+function lkrToEth(lkrAmount: number): number {
+  return exchangeRateService.lkrToEth(lkrAmount);
 }
 
 function formatLkr(amount: number): string {
-  return new Intl.NumberFormat('en-LK', {
-    style: 'currency',
-    currency: 'LKR',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  return exchangeRateService.formatLkr(amount);
 }
 
 function formatEth(amount: number): string {
-  return `${amount.toFixed(4)} ETH`;
+  return exchangeRateService.formatEth(amount);
 }
 
 // IPFS URL converter helper with multiple gateways for redundancy
@@ -189,6 +185,14 @@ export default function AuctionDetailPage() {
   
   const { joinAuction, leaveAuction, connected } = useAuctionStore();
 
+  // Initialize exchange rate service
+  useEffect(() => {
+    exchangeRateService.initialize();
+    return () => {
+      exchangeRateService.stopUpdates();
+    };
+  }, []);
+
   useEffect(() => {
     async function fetchAuction() {
       try {
@@ -227,7 +231,9 @@ export default function AuctionDetailPage() {
         const lot = response.data.lot;
         
         console.log('📦 Fetched lot data:', lot);
-        console.log('🖼️ Lot pictures raw:', lot.lot_pictures, 'Type:', typeof lot.lot_pictures);
+        console.log('� Farmer name:', lot.farmer_name);
+        console.log('📍 Farm location:', lot.farm_location);
+        console.log('�🖼️ Lot pictures raw:', lot.lot_pictures, 'Type:', typeof lot.lot_pictures);
         
         // Parse lot_pictures if it's a string
         if (lot.lot_pictures && typeof lot.lot_pictures === 'string') {
@@ -458,6 +464,122 @@ export default function AuctionDetailPage() {
               )}
             </div>
 
+            {/* Farmer Information */}
+            {lotData && (
+              <div className="mb-6 p-5 bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                <div className="flex items-center gap-2 mb-4">
+                  <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  <h3 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100">Farmer Information</h3>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-emerald-700 dark:text-emerald-300 mb-1">Name</p>
+                    <p className="font-medium text-emerald-900 dark:text-emerald-50">
+                      {lotData.farmer_name || lotData.farmerName || 'Unknown Farmer'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-emerald-700 dark:text-emerald-300 mb-1">Wallet Address</p>
+                    <p className="font-mono text-xs text-emerald-900 dark:text-emerald-50 break-all">
+                      {auction.farmerAddress}
+                    </p>
+                  </div>
+                  {(lotData.farm_location || lotData.farmLocation) && (
+                    <div className="md:col-span-2">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <p className="text-sm text-emerald-700 dark:text-emerald-300">Farm Location</p>
+                      </div>
+                      <p className="font-medium text-emerald-900 dark:text-emerald-50 mt-1">
+                        {lotData.farm_location || lotData.farmLocation}
+                      </p>
+                    </div>
+                  )}
+                  {lotData.origin && (
+                    <div className="md:col-span-2">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <p className="text-sm text-emerald-700 dark:text-emerald-300">Origin</p>
+                      </div>
+                      <p className="font-medium text-emerald-900 dark:text-emerald-50 mt-1">
+                        {lotData.origin}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Lot Details */}
+            {lotData && (
+              <div className="mb-6 p-5 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-2 mb-4">
+                  <Package className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <h3 className="text-lg font-semibold dark:text-white">Lot Details</h3>
+                </div>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {lotData.variety && (
+                    <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                      <TreeDeciduous className="w-5 h-5 text-primary-600 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Variety</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{lotData.variety}</p>
+                      </div>
+                    </div>
+                  )}
+                  {lotData.quantity && (
+                    <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                      <Scale className="w-5 h-5 text-primary-600 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Quantity</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{lotData.quantity} kg</p>
+                      </div>
+                    </div>
+                  )}
+                  {lotData.quality && (
+                    <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                      <Award className="w-5 h-5 text-primary-600 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Quality Grade</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{lotData.quality}</p>
+                      </div>
+                    </div>
+                  )}
+                  {lotData.harvest_date && (
+                    <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                      <Calendar className="w-5 h-5 text-primary-600 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Harvest Date</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">
+                          {new Date(lotData.harvest_date).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {lotData.organic_certified !== undefined && (
+                    <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                      <Sprout className="w-5 h-5 text-primary-600 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Organic Certified</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">
+                          {lotData.organic_certified ? '✓ Yes' : '✗ No'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {lotData.certificate_hash && (
+                    <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Certificate</p>
+                        <p className="font-semibold text-green-600">Verified</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Lot Photos Gallery */}
             {lotData?.lot_pictures && lotData.lot_pictures.length > 0 && (
               <div className="mb-6">
@@ -494,10 +616,10 @@ export default function AuctionDetailPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <User className="w-5 h-5 text-gray-500" />
+                  <Calendar className="w-5 h-5 text-gray-500" />
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Farmer</p>
-                    <p className="font-mono text-sm">{auction.farmerAddress}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Start Time</p>
+                    <p className="font-medium">{new Date(auction.startTime).toLocaleString()}</p>
                   </div>
                 </div>
 
@@ -516,6 +638,14 @@ export default function AuctionDetailPage() {
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Total Bids</p>
                     <p className="text-2xl font-bold text-primary-600">{auction.bidCount}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <Users className="w-5 h-5 text-gray-500" />
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
+                    <p className="font-medium capitalize">{auction.status}</p>
                   </div>
                 </div>
               </div>
@@ -570,7 +700,7 @@ export default function AuctionDetailPage() {
             {/* Currency Information Footer */}
             <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <p className="text-xs text-blue-700 dark:text-blue-300">
-                <span className="font-semibold">Exchange Rate:</span> 1 ETH ≈ {formatLkr(ETH_TO_LKR_RATE)} • All blockchain transactions use ETH
+                <span className="font-semibold">Exchange Rate:</span> 1 ETH ≈ {formatLkr(exchangeRateService.getRates().ethToLkr)} • All blockchain transactions use ETH
               </p>
             </div>
           </div>

@@ -4,11 +4,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Loader2 } from 'lucide-react';
 import { auctionApi, lotApi, adminApi } from '@/lib/api';
 
 export default function AdminDashboard() {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
   const [stats, setStats] = useState({
     totalUsers: 0,
     pendingApprovals: 0,
@@ -25,6 +27,11 @@ export default function AdminDashboard() {
     blockchain: { status: 'checking', percentage: 0, label: 'Checking...' },
     websocket: { status: 'checking', percentage: 0, label: 'Checking...' },
   });
+
+  const handleNavigation = (path: string) => {
+    setNavigatingTo(path);
+    router.push(path);
+  };
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) {
@@ -193,12 +200,20 @@ export default function AdminDashboard() {
                   </p>
                 </div>
               </div>
-              <Link
-                href="/dashboard/admin/users"
-                className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-2 rounded-lg font-medium transition"
+              <button
+                onClick={() => handleNavigation('/dashboard/admin/users')}
+                disabled={navigatingTo === '/dashboard/admin/users'}
+                className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-2 rounded-lg font-medium transition disabled:opacity-70 flex items-center gap-2"
               >
-                Review Now
-              </Link>
+                {navigatingTo === '/dashboard/admin/users' ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  'Review Now'
+                )}
+              </button>
             </div>
           </div>
         )}
@@ -207,43 +222,75 @@ export default function AdminDashboard() {
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Link
-              href="/dashboard/admin/users"
-              className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition shadow-sm"
+            <button
+              onClick={() => handleNavigation('/dashboard/admin/users')}
+              disabled={navigatingTo === '/dashboard/admin/users'}
+              className="bg-white rounded-lg p-6 border-2 border-gray-200 hover:border-purple-500 transition relative disabled:opacity-70 text-left w-full"
             >
               {stats.pendingApprovals > 0 && (
                 <div className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-8 w-8 flex items-center justify-center animate-pulse">
                   {stats.pendingApprovals}
                 </div>
               )}
+              {navigatingTo === '/dashboard/admin/users' && (
+                <div className="absolute top-2 right-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
+                </div>
+              )}
               <div className="text-3xl mb-2">👥</div>
-              <div className="font-semibold text-gray-900 dark:text-white">Manage Users</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">View & verify users</div>
-            </Link>
-            <Link
-              href="/dashboard/admin/lots"
-              className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition shadow-sm"
+              <div className="font-semibold">Manage Users</div>
+              <div className="text-sm text-gray-600">
+                {stats.pendingApprovals > 0 ? (
+                  <span className="text-red-600 font-medium">{stats.pendingApprovals} pending approval</span>
+                ) : (
+                  'View & verify users'
+                )}
+              </div>
+            </button>
+            <button
+              onClick={() => handleNavigation('/dashboard/admin/lots')}
+              disabled={navigatingTo === '/dashboard/admin/lots'}
+              className="bg-white rounded-lg p-6 border-2 border-gray-200 hover:border-purple-500 transition relative disabled:opacity-70 text-left w-full"
             >
+              {navigatingTo === '/dashboard/admin/lots' && (
+                <div className="absolute top-2 right-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
+                </div>
+              )}
               <div className="text-3xl mb-2">📦</div>
-              <div className="font-semibold text-gray-900 dark:text-white">Manage Lots</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Review pepper lots</div>
-            </Link>
-            <Link
-              href="/dashboard/admin/auctions"
-              className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition shadow-sm"
+              <div className="font-semibold">Manage Lots</div>
+              <div className="text-sm text-gray-600">Review pepper lots</div>
+            </button>
+            <button
+              onClick={() => handleNavigation('/dashboard/admin/auctions')}
+              disabled={navigatingTo === '/dashboard/admin/auctions'}
+              className="bg-white rounded-lg p-6 border-2 border-gray-200 hover:border-purple-500 transition relative disabled:opacity-70 text-left w-full"
             >
+              {navigatingTo === '/dashboard/admin/auctions' && (
+                <div className="absolute top-2 right-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
+                </div>
+              )}
               <div className="text-3xl mb-2">🔨</div>
-              <div className="font-semibold text-gray-900 dark:text-white">Manage Auctions</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Monitor auctions</div>
-            </Link>
-            <Link
-              href="/dashboard/admin/compliance"
-              className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition shadow-sm"
+              <div className="font-semibold">Manage Auctions</div>
+              <div className="text-sm text-gray-600">Monitor auctions</div>
+            </button>
+            <button
+              onClick={() => handleNavigation('/dashboard/admin/compliance')}
+              disabled={navigatingTo === '/dashboard/admin/compliance'}
+              className="bg-white rounded-lg p-6 border-2 border-gray-200 hover:border-purple-500 transition relative disabled:opacity-70 text-left w-full"
             >
+              {navigatingTo === '/dashboard/admin/compliance' && (
+                <div className="absolute top-2 right-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
+                </div>
+              )}
               <div className="text-3xl mb-2">✅</div>
+              <div className="font-semibold">Compliance</div>
+              <div className="text-sm text-gray-600">Review checks</div>
+            </button>
               <div className="font-semibold text-gray-900 dark:text-white">Compliance</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Review checks</div>
-            </Link>
           </div>
         </div>
 
@@ -273,20 +320,26 @@ export default function AdminDashboard() {
         {/* Governance Section */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Auction Governance</h2>
-          <Link
-            href="/dashboard/admin/governance"
-            className="block bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg p-6 text-white hover:from-purple-700 hover:to-purple-900 transition shadow-lg"
+          <button
+            onClick={() => handleNavigation('/dashboard/admin/governance')}
+            disabled={navigatingTo === '/dashboard/admin/governance'}
+            className="block w-full bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg p-6 text-white hover:from-purple-700 hover:to-purple-900 transition shadow-lg disabled:opacity-70 text-left"
           >
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl mb-2">🛡️ Governance & Rule Management</div>
+                <div className="text-2xl mb-2 flex items-center gap-2">
+                  🛡️ Governance & Rule Management
+                  {navigatingTo === '/dashboard/admin/governance' && (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  )}
+                </div>
                 <div className="text-purple-100">
                   Define auction templates, set bid increments, approve emergency cancellations, and audit logs
                 </div>
               </div>
               <div className="text-4xl">→</div>
             </div>
-          </Link>
+          </button>
         </div>
 
         {/* System Stats */}

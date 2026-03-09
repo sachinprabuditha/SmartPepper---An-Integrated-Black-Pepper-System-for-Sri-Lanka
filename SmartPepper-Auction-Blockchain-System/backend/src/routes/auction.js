@@ -3,6 +3,7 @@ const router = express.Router();
 const admin = require('firebase-admin');
 const BlockchainService = require('../services/blockchainService');
 const ComplianceService = require('../services/complianceService');
+const notificationService = require('../services/notificationService');
 const currencyConverter = require('../utils/currencyConverter');
 const logger = require('../utils/logger');
 const { v4: uuidv4 } = require('uuid');
@@ -118,6 +119,30 @@ router.get('/', async (req, res) => {
           auctionData.quantity = lotData.quantity;
           auctionData.quality = lotData.quality;
           auctionData.origin = lotData.origin;
+          auctionData.farm_location = lotData.farm_location;
+          auctionData.lot_pictures = lotData.lot_pictures || [];
+          
+          // Fetch farmer details for farmer name
+          if (lotData.farmer_id) {
+            const farmerDoc = await firestore.collection('users').doc(lotData.farmer_id).get();
+            if (farmerDoc.exists) {
+              const farmerData = farmerDoc.data();
+              auctionData.farmer_name = farmerData.name || 'Unknown Farmer';
+            }
+          }
+          
+          // If no farmer found by ID, try by wallet address
+          if (!auctionData.farmer_name && auctionData.farmer_address) {
+            const farmerSnapshot = await firestore.collection('users')
+              .where('wallet_address_lower', '==', auctionData.farmer_address.toLowerCase())
+              .limit(1)
+              .get();
+            
+            if (!farmerSnapshot.empty) {
+              const farmerData = farmerSnapshot.docs[0].data();
+              auctionData.farmer_name = farmerData.name || 'Unknown Farmer';
+            }
+          }
         }
       }
       
@@ -897,6 +922,23 @@ router.post('/:id/bid', async (req, res) => {
       });
     }
 
+    // Create notification for farmer
+    try {
+      const farmerId = await notificationService.getFarmerIdFromWallet(auction.farmer_address);
+      if (farmerId) {
+        await notificationService.notifyBidPlaced(
+          farmerId,
+          id,
+          bidderName || 'Anonymous',
+          bidInLkr.toFixed(2),
+          (auction.bid_count || 0) + 1
+        );
+        logger.info('Notification created for farmer', { farmerId, auctionId: id });
+      }
+    } catch (notifError) {
+      logger.error('Failed to create bid notification:', notifError);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Bid placed successfully',
@@ -1457,15 +1499,49 @@ router.post('/:id/settle', async (req, res) => {
       farmerPayout
     });
 
-    // Broadcast settlement via WebSocket
-    const io = req.app.get('io');
-    if (io) {
-      io.to(`auction-${id}`).emit('auction-settled', {
-        auctionId: id,
+    // Broadcast settlement via WebSocket using AuctionWebSocket class
+    const auctionSocket = req.app.get('auctionSocket');
+    if (auctionSocket) {
+      await auctionSocket.broadcastAuctionSettled(id, {
         status: 'settled',
         finalAmount,
         winner: escrow.depositor_address
       });
+      
+      // Also broadcast payment received event for farmer
+      await auctionSocket.broadcastPaymentReceived(id, {
+        amount: farmerPayout,
+        currency: 'ETH',
+        recipient: auction.farmer_address
+      });
+    }
+
+    // Create notifications for farmer
+    try {
+      const farmerId = await notificationService.getFarmerIdFromWallet(auction.farmer_address);
+      if (farmerId) {
+        // Convert amounts to LKR for notifications
+        const finalAmountLkr = await currencyConverter.convertToLkr(finalAmount);
+        const farmerEarningsLkr = await currencyConverter.convertToLkr(farmerPayout);
+        
+        await notificationService.notifyAuctionSettled(
+          farmerId,
+          id,
+          finalAmountLkr.toFixed(2),
+          farmerEarningsLkr.toFixed(2)
+        );
+        
+        await notificationService.notifyPaymentReceived(
+          farmerId,
+          id,
+          farmerPayout.toFixed(4),
+          'ETH'
+        );
+        
+        logger.info('Settlement notifications created for farmer', { farmerId, auctionId: id });
+      }
+    } catch (notifError) {
+      logger.error('Failed to create settlement notifications:', notifError);
     }
 
     res.json({

@@ -35,8 +35,7 @@ class PredictionService {
       }
 
       // If someone later wraps it with { success, data }, handle that too.
-      if (response.data is Map &&
-          (response.data as Map).containsKey('data')) {
+      if (response.data is Map && (response.data as Map).containsKey('data')) {
         final apiResponse = ApiResponseModel<Map<String, dynamic>>.fromJson(
           Map<String, dynamic>.from(response.data as Map),
           (json) => Map<String, dynamic>.from(json as Map),
@@ -59,5 +58,25 @@ class PredictionService {
       throw Exception('Network error: ${e.message}');
     }
   }
-}
 
+  Future<Map<String, dynamic>> getLatestWeather(String district) async {
+    try {
+      final Response response = await _client.dio.get(
+        '/prediction/weather/$district',
+      );
+
+      if (response.data is Map<String, dynamic> &&
+          response.data['success'] == true) {
+        return response.data['data'] as Map<String, dynamic>;
+      }
+
+      throw Exception('Failed to fetch weather data');
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.statusCode == 404) {
+        // Handle 404 silently or return null to let the UI know no data exists
+        return {};
+      }
+      throw Exception('Network error while fetching weather: ${e.message}');
+    }
+  }
+}

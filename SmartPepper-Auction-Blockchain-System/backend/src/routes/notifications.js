@@ -1,19 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const logger = require('../utils/logger');
+const notificationService = require('../services/notificationService');
+const { authenticate } = require('../middleware/auth');
 
 /**
  * GET /api/notifications
- * Get user notifications (placeholder for now)
+ * Get user notifications
  */
-router.get('/', async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
   try {
-    // Return empty notifications for now
-    // This can be expanded later with Firebase Cloud Messaging or database-backed notifications
+    const userId = req.user.id;
+    const limit = parseInt(req.query.limit) || 50;
+    const unreadOnly = req.query.unreadOnly === 'true';
+
+    // Fetch notifications from Firestore
+    const notifications = await notificationService.getNotifications(userId, limit, unreadOnly);
+    const unreadCount = await notificationService.getUnreadCount(userId);
+
     res.json({
       success: true,
-      notifications: [],
-      unreadCount: 0
+      notifications,
+      unreadCount
     });
   } catch (error) {
     logger.error('Error fetching notifications:', error);
@@ -28,11 +36,19 @@ router.get('/', async (req, res) => {
  * POST /api/notifications/mark-read
  * Mark notifications as read
  */
-router.post('/mark-read', async (req, res) => {
+router.post('/mark-read', authenticate, async (req, res) => {
   try {
     const { notificationIds } = req.body;
     
-    // Placeholder - implement later with actual notification system
+    if (!notificationIds || !Array.isArray(notificationIds) || notificationIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'notificationIds array is required'
+      });
+    }
+
+    await notificationService.markAsRead(notificationIds);
+
     res.json({
       success: true,
       message: 'Notifications marked as read'
@@ -42,6 +58,28 @@ router.post('/mark-read', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to mark notifications as read'
+    });
+  }
+});
+
+/**
+ * GET /api/notifications/unread-count
+ * Get count of unread notifications
+ */
+router.get('/unread-count', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const unreadCount = await notificationService.getUnreadCount(userId);
+
+    res.json({
+      success: true,
+      unreadCount
+    });
+  } catch (error) {
+    logger.error('Error getting unread count:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get unread count'
     });
   }
 });

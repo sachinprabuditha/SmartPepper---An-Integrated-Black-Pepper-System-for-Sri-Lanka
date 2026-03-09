@@ -7,6 +7,7 @@ import '../../../localization/app_localizations.dart';
 import 'models/prediction_input_model.dart';
 import 'models/prediction_output_model.dart';
 import 'services/prediction_service.dart';
+import 'services/exchange_service.dart';
 
 class PricePredictionScreen extends ConsumerStatefulWidget {
   const PricePredictionScreen({super.key});
@@ -27,17 +28,21 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
   final _dateController = TextEditingController();
 
   // State variables
-  DateTime _selectedDate = DateTime.now();
-  String _location = 'Colombo';
-  String _grade = 'GR-2';
+  DateTime? _selectedDate;
+  String? _location;
+  String? _grade;
   bool _isLoading = false;
   PredictionOutput? _result;
   String? _errorMessage;
+  bool _isFetchingRates = false;
 
   // Yield Valuation state
   bool _showValuation = false;
   final TextEditingController _amountController = TextEditingController();
   double? _calculatedBaseValue;
+
+  // Weather fetching state
+  bool _isFetchingWeather = false;
 
   // Constants
   final List<String> _locations = const [
@@ -57,7 +62,81 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
   @override
   void initState() {
     super.initState();
-    _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate);
+  }
+
+  Future<void> _fetchLatestWeather(String location) async {
+    if (!mounted) return;
+    setState(() {
+      _isFetchingWeather = true;
+    });
+
+    try {
+      final service = ref.read(predictionServiceProvider);
+      final weatherInfo = await service.getLatestWeather(location);
+
+      if (!mounted) return;
+
+      if (weatherInfo.isNotEmpty) {
+        setState(() {
+          _tempController.text = weatherInfo['temperature']?.toString() ?? '';
+          _precipController.text =
+              weatherInfo['precipitation']?.toString() ?? '';
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Weather data updated for $location'),
+            backgroundColor: AppTheme.forestGreen,
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      // Do not clear the text fields on error to allow manual entry, just show error optionally
+      print('Failed to fetch weather: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isFetchingWeather = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchExchangeRates() async {
+    if (!mounted) return;
+    setState(() {
+      _isFetchingRates = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final exchangeService = ref.read(exchangeServiceProvider);
+      final rateData = await exchangeService.getUSDToLKR();
+
+      if (!mounted) return;
+      setState(() {
+        _usdBuyController.text = rateData.buyRate.toStringAsFixed(2);
+        _usdSellController.text = rateData.sellRate.toStringAsFixed(2);
+        _isFetchingRates = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('USD Rates updated from ${rateData.source}'),
+          backgroundColor: AppTheme.forestGreen,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isFetchingRates = false;
+        _errorMessage = "Could not fetch exchange rates: $e";
+      });
+    }
   }
 
   @override
@@ -74,7 +153,7 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
+      initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
@@ -83,11 +162,19 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
         _selectedDate = picked;
         _dateController.text = DateFormat('yyyy-MM-dd').format(picked);
       });
+      _fetchExchangeRates();
     }
   }
 
   Future<void> _submitPrediction() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (_selectedDate == null || _location == null || _grade == null) {
+      setState(() {
+        _errorMessage = context.tr('plantation_required');
+      });
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -104,9 +191,9 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
         usdSellRate: double.parse(_usdSellController.text),
         temperature: double.parse(_tempController.text),
         precipitation: double.parse(_precipController.text),
-        date: _selectedDate,
-        location: _location,
-        grade: _grade,
+        date: _selectedDate!,
+        location: _location!,
+        grade: _grade!,
       );
 
       final service = ref.read(predictionServiceProvider);
@@ -144,7 +231,56 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildSectionTitle(context.tr('price_prediction_market_data')),
+              _buildSectionTitle(context.tr('session_date')),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _dateController,
+                decoration: InputDecoration(
+                  labelText: context.tr('session_date'),
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white24),
+                  ),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: const Icon(Icons.calendar_today,
+                      color: AppTheme.pepperGold),
+                ),
+                style: const TextStyle(color: Colors.white),
+                readOnly: true,
+                onTap: () => _selectDate(context),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return context.tr('plantation_required');
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildSectionTitle(
+                      context.tr('price_prediction_market_data')),
+                  if (_isFetchingRates)
+                    const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppTheme.pepperGold,
+                      ),
+                    )
+                  else
+                    IconButton(
+                      icon: const Icon(Icons.refresh,
+                          color: AppTheme.pepperGold, size: 20),
+                      onPressed: _fetchExchangeRates,
+                      tooltip: 'Refresh Exchange Rates',
+                      constraints: const BoxConstraints(),
+                      padding: EdgeInsets.zero,
+                    ),
+                ],
+              ),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -168,7 +304,70 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              _buildSectionTitle(context.tr('price_prediction_weather')),
+              _buildSectionTitle(context.tr('price_prediction_location')),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: _location,
+                decoration: InputDecoration(
+                  labelText: context.tr('price_prediction_location'),
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white24),
+                  ),
+                  border: const OutlineInputBorder(),
+                ),
+                style: const TextStyle(color: Colors.white),
+                dropdownColor: AppTheme.deepEmerald,
+                validator: (value) =>
+                    value == null ? context.tr('plantation_required') : null,
+                items: _locations
+                    .map(
+                      (loc) => DropdownMenuItem<String>(
+                        value: loc,
+                        child: Text(loc),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null && value != _location) {
+                    setState(() {
+                      _location = value;
+                      _result = null;
+                      _showValuation = false;
+                      _amountController.clear();
+                      _calculatedBaseValue = null;
+                    });
+                    _fetchLatestWeather(value);
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildSectionTitle(context.tr('price_prediction_weather')),
+                  if (_isFetchingWeather)
+                    const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppTheme.pepperGold,
+                      ),
+                    )
+                  else
+                    IconButton(
+                      icon: const Icon(Icons.refresh,
+                          color: AppTheme.pepperGold, size: 20),
+                      onPressed: () {
+                        if (_location != null) _fetchLatestWeather(_location!);
+                      },
+                      tooltip: 'Refresh Weather',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                ],
+              ),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -192,52 +391,8 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              _buildSectionTitle(context.tr('price_prediction_details')),
+              _buildSectionTitle(context.tr('price_prediction_grade')),
               const SizedBox(height: 8),
-              TextFormField(
-                controller: _dateController,
-                decoration: InputDecoration(
-                  labelText: context.tr('session_date'),
-                  labelStyle: const TextStyle(color: Colors.white70),
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white24),
-                  ),
-                  border: const OutlineInputBorder(),
-                  suffixIcon: const Icon(Icons.calendar_today,
-                      color: AppTheme.pepperGold),
-                ),
-                style: const TextStyle(color: Colors.white),
-                readOnly: true,
-                onTap: () => _selectDate(context),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _location,
-                decoration: InputDecoration(
-                  labelText: context.tr('price_prediction_location'),
-                  labelStyle: const TextStyle(color: Colors.white70),
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white24),
-                  ),
-                  border: const OutlineInputBorder(),
-                ),
-                style: const TextStyle(color: Colors.white),
-                dropdownColor: AppTheme.deepEmerald,
-                items: _locations
-                    .map(
-                      (loc) => DropdownMenuItem<String>(
-                        value: loc,
-                        child: Text(loc),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _location = value ?? _location;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _grade,
                 decoration: InputDecoration(
@@ -250,6 +405,8 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
                 ),
                 style: const TextStyle(color: Colors.white),
                 dropdownColor: AppTheme.deepEmerald,
+                validator: (value) =>
+                    value == null ? context.tr('plantation_required') : null,
                 items: _grades
                     .map(
                       (g) => DropdownMenuItem<String>(
