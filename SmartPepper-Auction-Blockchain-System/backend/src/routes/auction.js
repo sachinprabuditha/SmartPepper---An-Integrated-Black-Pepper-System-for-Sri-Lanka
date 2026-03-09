@@ -1707,11 +1707,44 @@ router.post('/:id/finalize', async (req, res) => {
 
     logger.info('Manual finalization requested for auction:', id);
 
+    // Check auction status first
+    const auctionDoc = await firestore.collection('auctions').doc(id).get();
+    
+    if (!auctionDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Auction not found'
+      });
+    }
+
+    const auction = auctionDoc.data();
+    
+    // Check if already finalized
+    if (auction.finalized) {
+      return res.json({
+        success: true,
+        alreadyFinalized: true,
+        message: 'Auction is already finalized',
+        status: auction.status,
+        settlementStatus: auction.settlement_status,
+        winner: auction.winner_address,
+        finalPrice: auction.final_price
+      });
+    }
+
+    // Check if auction has ended
+    if (auction.status !== 'ended') {
+      return res.status(400).json({
+        success: false,
+        error: `Auction cannot be finalized - current status: ${auction.status}`
+      });
+    }
+
     const result = await auctionFinalizationService.finalizeEndedAuctions([id]);
 
     res.json({
       success: true,
-      message: 'Finalization triggered',
+      message: 'Auction finalized successfully',
       result
     });
   } catch (error) {

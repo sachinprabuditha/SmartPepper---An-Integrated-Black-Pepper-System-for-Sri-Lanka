@@ -20,6 +20,7 @@ const governanceRoutes = require('./routes/governance');
 const escrowRoutes = require('./routes/escrow');
 const notificationsRoutes = require('./routes/notifications');
 const qualityGradingRoutes = require('./routes/qualityGrading');
+const pepperVarietiesRoutes = require('./routes/pepperVarieties');
 const { startAuctionStatusMonitor } = require('./services/auctionStatusService');
 
 // Load NFT routes with error handling
@@ -76,6 +77,7 @@ app.use('/api/governance', governanceRoutes);
 app.use('/api/escrow', escrowRoutes);
 app.use('/api/traceability', require('./routes/traceability'));
 app.use('/api/quality-grading', qualityGradingRoutes);
+app.use('/api/pepper-varieties', pepperVarietiesRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
