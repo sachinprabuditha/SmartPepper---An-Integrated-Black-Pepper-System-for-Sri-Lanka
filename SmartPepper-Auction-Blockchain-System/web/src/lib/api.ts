@@ -205,39 +205,41 @@ export const agricultureApi = {
   getStatus: () => plantationApi.get('/agriculture/status'),
   seed: (collection: string, jsonData?: any) =>
     plantationApi.post(`/agriculture/seed/${collection}`, { jsonData }),
+};
+
 // Admin
 export const adminApi = {
   getRecentActivity: (limit?: number) =>
     api.get('/admin/recent-activity', { params: { limit } }),
-  
+
   getStats: () =>
     api.get('/admin/stats'),
-  
+
   getPendingLots: () =>
     api.get('/admin/lots/pending'),
-  
+
   getLotById: (lotId: string) =>
     api.get(`/admin/lots/${lotId}`),
-  
+
   approveLot: (lotId: string, data: { adminId?: string; adminName?: string }) =>
     api.post(`/admin/lots/${lotId}/approve`, data),
-  
+
   rejectLot: (lotId: string, data: { reason: string; adminId?: string; adminName?: string }) =>
     api.post(`/admin/lots/${lotId}/reject`, data),
-  
+
   // User management
   getPendingUsers: () =>
     api.get('/admin/users/pending'),
-  
+
   getUsers: (params?: { role?: string; approval_status?: string; limit?: number; offset?: number }) =>
     api.get('/admin/users', { params }),
-  
+
   approveUser: (userId: string, data: { adminId?: string; adminName?: string }) =>
     api.post(`/admin/users/${userId}/approve`, data),
-  
+
   rejectUser: (userId: string, data: { reason: string; adminId?: string; adminName?: string }) =>
     api.post(`/admin/users/${userId}/reject`, data),
-  
+
   // System health
   getSystemHealth: () =>
     api.get('/admin/health'),
@@ -247,7 +249,7 @@ export const adminApi = {
 export const healthApi = {
   checkBackend: () =>
     api.get('/health'),
-  
+
   checkDatabase: () =>
     api.get('/health/database'),
 };
