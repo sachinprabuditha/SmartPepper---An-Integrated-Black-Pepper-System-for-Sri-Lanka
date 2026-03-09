@@ -4792,5 +4792,11 @@
         "en": "Confirm Auction",
         "si": "වෙන්දේසිය තහවුරු කරන්න",
         "ta": "ஏலத்தை உறுதிப்படுத்தவும்"
+    },
+    {
+        "key": "view_settlement_status",
+        "en": "View Settlement Status",
+        "si": "විසඳුම් තත්ත්වය බලන්න",
+        "ta": "தீர்வு நிலையைக் காண்க"
     }
 ]

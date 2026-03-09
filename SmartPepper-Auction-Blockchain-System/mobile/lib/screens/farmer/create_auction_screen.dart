@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/lot_provider.dart';
 import '../../services/api_service.dart';
+import '../../services/notification_service.dart';
 import '../../config/theme.dart';
 import '../../localization/app_localizations.dart';
 
@@ -395,6 +396,22 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
           _showApprovalPendingDialog();
         } else {
           _showSuccessDialog(response);
+
+          // Trigger notification for auction start
+          final notificationService = context.read<NotificationService>();
+          final auctionData = response['auction'] as Map<String, dynamic>?;
+          if (auctionData != null) {
+            notificationService.notifyAuctionStart(
+              lotId: auctionData['lotId'] ?? _selectedLot?.id ?? '',
+              variety: _selectedLot?.variety ?? 'Pepper',
+              startingPrice:
+                  double.tryParse(_reservePriceController.text) ?? 0.0,
+              endTime: DateTime.parse(auctionData['endTime'] ??
+                  DateTime.now()
+                      .add(Duration(days: _durationDays))
+                      .toIso8601String()),
+            );
+          }
         }
       }
     } catch (e) {

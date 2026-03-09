@@ -80,6 +80,10 @@ dependencies:
 
   # URL Launcher
   url_launcher: ^6.2.2
+
+  # Sharing
+  share_plus: ^10.1.2
+
   json_annotation: ^4.9.0
   google_maps_flutter: ^2.14.0
   geolocator: ^14.0.2

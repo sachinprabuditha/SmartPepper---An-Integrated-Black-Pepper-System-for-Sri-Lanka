@@ -5,11 +5,17 @@ import '../models/notification.dart';
 import 'api_service.dart';
 import 'storage_service.dart';
 
+/// Callback type for notification tap actions
+typedef NotificationTapCallback = void Function(Map<String, dynamic> payload);
+
 /// Service for managing in-app and push notifications
 class NotificationService {
   final ApiService _apiService;
   final StorageService _storageService;
   final FlutterLocalNotificationsPlugin _localNotifications;
+
+  /// Callback to handle notification taps
+  NotificationTapCallback? onNotificationTap;
 
   static const String _notificationsKey = 'cached_notifications';
   static const String _unreadCountKey = 'unread_notification_count';
@@ -17,6 +23,7 @@ class NotificationService {
   NotificationService({
     required ApiService apiService,
     required StorageService storageService,
+    this.onNotificationTap,
   })  : _apiService = apiService,
         _storageService = storageService,
         _localNotifications = FlutterLocalNotificationsPlugin();
@@ -27,7 +34,8 @@ class NotificationService {
     await _requestPermissions();
 
     // Initialize local notifications
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -53,8 +61,21 @@ class NotificationService {
 
   /// Handle notification tap
   void _onNotificationTapped(NotificationResponse response) {
-    // TODO: Navigate to appropriate screen based on notification data
-    print('Notification tapped: ${response.payload}');
+    if (response.payload != null) {
+      try {
+        final payload = jsonDecode(response.payload!) as Map<String, dynamic>;
+
+        // Call the callback if set
+        if (onNotificationTap != null) {
+          onNotificationTap!(payload);
+        }
+
+        print(
+            'Notification tapped - Type: ${payload['type']}, Data: ${payload}');
+      } catch (e) {
+        print('Error parsing notification payload: $e');
+      }
+    }
   }
 
   /// Fetch notifications from server
@@ -62,7 +83,8 @@ class NotificationService {
     try {
       final response = await _apiService.get('/notifications');
       final List<dynamic> data = response['notifications'] as List;
-      final notifications = data.map((json) => AppNotification.fromJson(json)).toList();
+      final notifications =
+          data.map((json) => AppNotification.fromJson(json)).toList();
 
       // Cache notifications locally
       await _cacheNotifications(notifications);
@@ -90,8 +112,10 @@ class NotificationService {
   /// Mark notification as read
   Future<bool> markAsRead(String notificationId) async {
     try {
-      await _apiService.patch('/notifications/$notificationId/read', {});
-      
+      await _apiService.post('/notifications/mark-read', {
+        'notificationIds': [notificationId],
+      });
+
       // Update cached notifications
       final cached = await _getCachedNotifications();
       final updated = cached.map((n) {
@@ -116,11 +140,18 @@ class NotificationService {
   /// Mark all notifications as read
   Future<bool> markAllAsRead() async {
     try {
-      await _apiService.patch('/notifications/read-all', {});
-      
+      // Get all notification IDs
+      final notifications = await _getCachedNotifications();
+      final notificationIds = notifications.map((n) => n.id).toList();
+
+      if (notificationIds.isEmpty) return true;
+
+      await _apiService.post('/notifications/mark-read', {
+        'notificationIds': notificationIds,
+      });
+
       // Update cached notifications
-      final cached = await _getCachedNotifications();
-      final updated = cached.map((n) {
+      final updated = notifications.map((n) {
         return AppNotification.fromJson({
           ...n.toJson(),
           'read': true,
@@ -225,9 +256,10 @@ class NotificationService {
   }) async {
     await showLocalNotification(
       title: approved ? '✅ Lot Approved' : '❌ Lot Rejected',
-      body: message ?? (approved 
-          ? 'Your lot has been approved for auction'
-          : 'Your lot did not meet compliance requirements'),
+      body: message ??
+          (approved
+              ? 'Your lot has been approved for auction'
+              : 'Your lot did not meet compliance requirements'),
       payload: jsonEncode({'type': 'compliance', 'lotId': lotId}),
       priority: NotificationPriority.high,
     );
@@ -243,6 +275,80 @@ class NotificationService {
       body: 'You received LKR $amount for your pepper lot',
       payload: jsonEncode({'type': 'payment', 'lotId': lotId}),
       priority: NotificationPriority.max,
+    );
+  }
+
+  /// Show auction settled notification
+  Future<void> notifyAuctionSettled({
+    required String auctionId,
+    required double finalAmount,
+    required double farmerEarnings,
+  }) async {
+    await showLocalNotification(
+      title: '✅ Settlement Complete!',
+      body:
+          'Your auction has been settled. You earned ${farmerEarnings.toStringAsFixed(4)} ETH',
+      payload: jsonEncode({
+        'type': 'auction_settled',
+        'auctionId': auctionId,
+        'navigate': 'settlement_tracking',
+      }),
+      priority: NotificationPriority.max,
+    );
+  }
+
+  /// Show payment received notification
+  Future<void> notifyPaymentReceived({
+    required String auctionId,
+    required double amount,
+    required String currency,
+  }) async {
+    await showLocalNotification(
+      title: '💰 Payment Received!',
+      body:
+          'Settlement payment of $amount $currency has been transferred to your wallet',
+      payload: jsonEncode({
+        'type': 'payment_received',
+        'auctionId': auctionId,
+        'navigate': 'settlement_tracking',
+      }),
+      priority: NotificationPriority.max,
+    );
+  }
+
+  /// Show auction sold notification (for farmer)
+  Future<void> notifyAuctionSold({
+    required String auctionId,
+    required double finalPrice,
+    required String winnerAddress,
+  }) async {
+    await showLocalNotification(
+      title: '🎉 Auction Sold!',
+      body:
+          'Your lot sold for ${finalPrice.toStringAsFixed(4)} ETH. Awaiting settlement.',
+      payload: jsonEncode({
+        'type': 'auction_sold',
+        'auctionId': auctionId,
+        'navigate': 'monitor_auction',
+      }),
+      priority: NotificationPriority.high,
+    );
+  }
+
+  /// Show auction no sale notification
+  Future<void> notifyAuctionNoSale({
+    required String auctionId,
+    required String variety,
+  }) async {
+    await showLocalNotification(
+      title: '⏸️ Auction Ended - No Sale',
+      body: 'Your $variety lot didn\'t meet the reserve price. Tap to re-list.',
+      payload: jsonEncode({
+        'type': 'auction_no_sale',
+        'auctionId': auctionId,
+        'navigate': 'settlement_tracking',
+      }),
+      priority: NotificationPriority.high,
     );
   }
 
