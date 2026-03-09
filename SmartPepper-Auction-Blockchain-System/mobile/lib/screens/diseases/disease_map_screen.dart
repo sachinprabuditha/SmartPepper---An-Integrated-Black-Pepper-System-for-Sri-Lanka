@@ -1,9 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartpepper_mobile/models/disease_location.dart';
+import 'package:smartpepper_mobile/config/theme.dart';
 import 'package:intl/intl.dart';
+import '../../localization/app_localizations.dart';
+import '../../services/disease_api_service.dart';
 
 class DiseaseMapScreen extends StatefulWidget {
   const DiseaseMapScreen({super.key});
@@ -17,6 +18,7 @@ class _DiseaseMapScreenState extends State<DiseaseMapScreen> {
   List<DiseaseLocation> _diseaseLocations = [];
   Set<Marker> _markers = {};
   bool _isLoading = true;
+  final DiseaseApiService _apiService = DiseaseApiService();
 
   // Default location (Sri Lanka - Pepper growing region)
   static const LatLng _defaultLocation = LatLng(7.8731, 80.7718);
@@ -28,15 +30,15 @@ class _DiseaseMapScreenState extends State<DiseaseMapScreen> {
   }
 
   Future<void> _loadDiseaseLocations() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final locationsJson = prefs.getStringList('disease_locations') ?? [];
+      final locations = await _apiService.getDiseaseLocations();
 
       setState(() {
-        _diseaseLocations =
-            locationsJson
-                .map((json) => DiseaseLocation.fromJson(jsonDecode(json)))
-                .toList();
+        _diseaseLocations = locations;
         _createMarkers();
         _isLoading = false;
       });
@@ -47,7 +49,9 @@ class _DiseaseMapScreenState extends State<DiseaseMapScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error loading locations: $e')));
+        ).showSnackBar(SnackBar(
+            content:
+                Text('${context.tr('disease_error_loading_locations')}: $e')));
       }
     }
   }
@@ -83,116 +87,79 @@ class _DiseaseMapScreenState extends State<DiseaseMapScreen> {
     );
   }
 
-  Future<void> _clearAllLocations() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Clear All Data'),
-            content: const Text(
-              'Are you sure you want to remove all disease locations from the map?',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
-                child: const Text('Clear All'),
-              ),
-            ],
-          ),
-    );
-
-    if (confirm == true) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('disease_locations');
-      setState(() {
-        _diseaseLocations.clear();
-        _markers.clear();
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('All disease locations cleared')),
-        );
-      }
-    }
-  }
-
   void _showLegend() {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Row(
-              children: [
-                Icon(Icons.map, color: Color(0xFF2E7D32)),
-                SizedBox(width: 8),
-                Text('Map Legend'),
-              ],
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.map, color: AppTheme.pepperGold),
+            const SizedBox(width: 8),
+            Text(context.tr('disease_map_legend')),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildLegendItem('Healthy Plants', AppTheme.sriLankanLeaf),
+            const SizedBox(height: 8),
+            _buildLegendItem('Critical Severity (70%+)', Colors.red),
+            const SizedBox(height: 8),
+            _buildLegendItem('High Severity (40-69%)', Colors.orange),
+            const SizedBox(height: 8),
+            _buildLegendItem(
+              'Moderate Severity (20-39%)',
+              Colors.yellow[700]!,
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildLegendItem('Critical Severity (70%+)', Colors.red),
-                const SizedBox(height: 8),
-                _buildLegendItem('High Severity (40-69%)', Colors.orange),
-                const SizedBox(height: 8),
-                _buildLegendItem(
-                  'Moderate Severity (20-39%)',
-                  Colors.yellow[700]!,
-                ),
-                const SizedBox(height: 8),
-                _buildLegendItem('Low Severity (<20%)', Colors.green),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(height: 8),
+            _buildLegendItem('Low Severity (<20%)', AppTheme.sriLankanLeaf),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.deepEmerald.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            size: 16,
-                            color: Colors.blue[700],
-                          ),
-                          const SizedBox(width: 8),
-                          const Expanded(
-                            child: Text(
-                              'Disease Tracking Info:',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: AppTheme.pepperGold,
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        '• Only infected plants are marked\n• Healthy plants are not tracked\n• Map always displays your farm area',
-                        style: TextStyle(fontSize: 11),
+                      const SizedBox(width: 8),
+                      const Expanded(
+                        child: Text(
+                          'Disease Tracking Info:',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
+                  const SizedBox(height: 4),
+                  const Text(
+                    '• Both healthy and infected plants are tracked\n• Green markers indicate healthy plants\n• Other colors indicate disease severity\n• Map displays your farm monitoring areas',
+                    style: TextStyle(fontSize: 11),
+                  ),
+                ],
               ),
-            ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(context.tr('common_close')),
           ),
+        ],
+      ),
     );
   }
 
@@ -225,7 +192,7 @@ class _DiseaseMapScreenState extends State<DiseaseMapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Disease Map'),
+        title: Text(context.tr('disease_map_title')),
         centerTitle: true,
         actions: [
           IconButton(
@@ -233,121 +200,114 @@ class _DiseaseMapScreenState extends State<DiseaseMapScreen> {
             onPressed: _showLegend,
             tooltip: 'Show Legend',
           ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline),
-            onPressed: _diseaseLocations.isNotEmpty ? _clearAllLocations : null,
-            tooltip: 'Clear All',
-          ),
         ],
       ),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Stack(
-                children: [
-                  GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                      target:
-                          _diseaseLocations.isNotEmpty
-                              ? _diseaseLocations.first.coordinates
-                              : _defaultLocation,
-                      zoom: _diseaseLocations.isNotEmpty ? 15 : 8,
-                    ),
-                    markers: _markers,
-                    onMapCreated: (controller) {
-                      _mapController = controller;
-                    },
-                    myLocationEnabled: true,
-                    myLocationButtonEnabled: true,
-                    compassEnabled: true,
-                    mapToolbarEnabled: true,
-                    zoomControlsEnabled: true,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Stack(
+              children: [
+                GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target: _diseaseLocations.isNotEmpty
+                        ? _diseaseLocations.first.coordinates
+                        : _defaultLocation,
+                    zoom: _diseaseLocations.isNotEmpty ? 15 : 8,
                   ),
+                  markers: _markers,
+                  onMapCreated: (controller) {
+                    _mapController = controller;
+                  },
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  compassEnabled: true,
+                  mapToolbarEnabled: true,
+                  zoomControlsEnabled: true,
+                ),
 
-                  // Info Card at bottom
-                  Positioned(
-                    bottom: 16,
-                    left: 16,
-                    right: 16,
-                    child: Card(
-                      elevation: 8,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.location_on,
-                                      color: Color(0xFF2E7D32),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Infected Locations: ${_diseaseLocations.length}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.info_outline,
-                                    size: 20,
+                // Info Card at bottom
+                Positioned(
+                  bottom: 16,
+                  left: 16,
+                  right: 16,
+                  child: Card(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_on,
+                                    color: AppTheme.pepperGold,
                                   ),
-                                  onPressed: _showLegend,
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                ),
-                              ],
-                            ),
-                            if (_diseaseLocations.isEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.check_circle_outline,
-                                      color: Colors.green[600],
-                                      size: 32,
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Tracked Locations: ${_diseaseLocations.length}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      'Great news! No infected plants detected yet.',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.green[700],
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Analyze plant images to track disease locations on this map.',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                          ],
-                        ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.info_outline,
+                                  size: 20,
+                                ),
+                                onPressed: _showLegend,
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
+                            ],
+                          ),
+                          if (_diseaseLocations.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.check_circle_outline,
+                                    color: Colors.green[600],
+                                    size: 32,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Great news! No infected plants detected yet.',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.green[700],
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Analyze plant images to track disease locations on this map.',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
     );
   }
 
@@ -419,7 +379,7 @@ class DiseaseDetailsSheet extends StatelessWidget {
               const Icon(Icons.warning_amber, color: Colors.orange),
               const SizedBox(width: 8),
               Text(
-                'Severity: ${location.severity.toStringAsFixed(1)}%',
+                '${context.tr('disease_severity')}: ${location.severity.toStringAsFixed(1)}%',
                 style: const TextStyle(fontSize: 16),
               ),
             ],
@@ -432,7 +392,7 @@ class DiseaseDetailsSheet extends StatelessWidget {
               const Icon(Icons.calendar_today, color: Colors.blue),
               const SizedBox(width: 8),
               Text(
-                'Detected: ${DateFormat('MMMM dd, yyyy').format(location.detectedDate)}',
+                '${context.tr('disease_detected')} ${DateFormat('MMMM dd, yyyy').format(location.detectedDate)}',
                 style: const TextStyle(fontSize: 16),
               ),
             ],
@@ -445,7 +405,7 @@ class DiseaseDetailsSheet extends StatelessWidget {
               const Icon(Icons.eco, color: Color(0xFF2E7D32)),
               const SizedBox(width: 8),
               Text(
-                'Total Leaves: ${location.totalLeaves}',
+                '${context.tr('disease_total_leaves')} ${location.totalLeaves}',
                 style: const TextStyle(fontSize: 16),
               ),
             ],
@@ -459,7 +419,7 @@ class DiseaseDetailsSheet extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Location: ${location.coordinates.latitude.toStringAsFixed(6)}, ${location.coordinates.longitude.toStringAsFixed(6)}',
+                  '${context.tr('disease_location_label')} ${location.coordinates.latitude.toStringAsFixed(6)}, ${location.coordinates.longitude.toStringAsFixed(6)}',
                   style: const TextStyle(fontSize: 14),
                 ),
               ),
@@ -468,9 +428,9 @@ class DiseaseDetailsSheet extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Disease Breakdown
-          const Text(
-            'Disease Breakdown:',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          Text(
+            context.tr('disease_breakdown'),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: 8),
           ...location.diseaseCounts.entries.map((entry) {
@@ -514,7 +474,7 @@ class DiseaseDetailsSheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Close'),
+              child: Text(context.tr('common_close')),
             ),
           ),
         ],

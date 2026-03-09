@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smartpepper_mobile/config/theme.dart';
+import '../../localization/app_localizations.dart';
 import 'remedy_suggestions_screen.dart';
 
 class SpreadForecastingScreen extends StatefulWidget {
@@ -14,13 +16,14 @@ class SpreadForecastingScreen extends StatefulWidget {
 class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
   @override
   Widget build(BuildContext context) {
-    final forecastReport = widget.analysisResult['forecast_report'] as List<dynamic>? ?? [];
+    final forecastReport =
+        widget.analysisResult['forecast_report'] as List<dynamic>? ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Disease Spread Forecasting'),
-        backgroundColor: const Color(0xFF2E7D32),
-        foregroundColor: Colors.white,
+        title: Text(context.tr('disease_spread_forecasting')),
+        backgroundColor: AppTheme.forestGreen,
+        foregroundColor: AppTheme.pepperGold,
       ),
       body: forecastReport.isEmpty
           ? Center(
@@ -30,22 +33,22 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
                   Icon(
                     Icons.check_circle_outline,
                     size: 100,
-                    color: Colors.green.withOpacity(0.5),
+                    color: AppTheme.sriLankanLeaf.withOpacity(0.5),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
-                    'No Disease Spread Detected',
-                    style: TextStyle(
+                  Text(
+                    context.tr('disease_no_spread_detected'),
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green,
+                      color: AppTheme.sriLankanLeaf,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Your plants are healthy or no verifiable disease instances were found.',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    context.tr('disease_plants_healthy'),
+                    style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.6)),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -62,11 +65,11 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
 
                 Color riskColor;
                 if (days <= 14) {
-                  riskColor = Colors.red;
+                  riskColor = AppTheme.errorColor;
                 } else if (days <= 30) {
-                  riskColor = Colors.orange;
+                  riskColor = AppTheme.warningColor;
                 } else {
-                  riskColor = Colors.yellow[800]!;
+                  riskColor = AppTheme.pepperGold;
                 }
 
                 return Card(
@@ -82,7 +85,8 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.warning_amber_rounded, color: riskColor, size: 28),
+                            Icon(Icons.warning_amber_rounded,
+                                color: riskColor, size: 28),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
@@ -99,9 +103,10 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Current Severity:',
-                              style: TextStyle(fontSize: 16, color: Colors.grey),
+                            Text(
+                              context.tr('disease_current_severity'),
+                              style: TextStyle(
+                                  fontSize: 16, color: Colors.white.withOpacity(0.6)),
                             ),
                             Text(
                               '${severity.toStringAsFixed(1)}%',
@@ -118,20 +123,21 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
                           decoration: BoxDecoration(
                             color: riskColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: riskColor.withOpacity(0.5)),
+                            border:
+                                Border.all(color: riskColor.withOpacity(0.5)),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'Est. Days to Full Spread:',
-                                style: TextStyle(
+                              Text(
+                                context.tr('disease_est_days_spread'),
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               Text(
-                                '${days.toStringAsFixed(1)} Days',
+                                '${days.toStringAsFixed(1)} ${context.tr('disease_days')}',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -153,16 +159,21 @@ class _SpreadForecastingScreenState extends State<SpreadForecastingScreen> {
                                     diseaseName: diseaseName,
                                     severity: severity,
                                     stage: report['stage'] as int? ?? 1,
-                                    remedies: report['remedies'] as Map<String, dynamic>? ?? {'chemical': <String>[], 'ecoFriendly': <String>[]},
+                                    remedies: report['remedies']
+                                            as Map<String, dynamic>? ??
+                                        {
+                                          'chemical': <String>[],
+                                          'ecoFriendly': <String>[]
+                                        },
                                   ),
                                 ),
                               );
                             },
                             icon: const Icon(Icons.medical_services, size: 20),
-                            label: const Text('View Remedies'),
+                            label: Text(context.tr('disease_view_remedies')),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green[700],
-                              foregroundColor: Colors.white,
+                              backgroundColor: AppTheme.pepperGold,
+                              foregroundColor: AppTheme.forestGreen,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),

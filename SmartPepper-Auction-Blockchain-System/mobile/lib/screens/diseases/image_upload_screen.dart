@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:smartpepper_mobile/config/app_config.dart';
+import 'package:smartpepper_mobile/config/theme.dart';
+import '../../localization/app_localizations.dart';
 import 'analysis_result_screen.dart';
 import 'disease_map_screen.dart';
 import 'roi_selector_screen.dart';
@@ -32,6 +34,12 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
     });
 
     try {
+      // Capture GPS location ONLY for camera (not gallery)
+      // Gallery images are from the past, so current location is not relevant
+      if (source == ImageSource.camera) {
+        await _getCurrentLocation();
+      }
+
       final XFile? image = await _picker.pickImage(
         source: source,
         imageQuality: 100, // Maximum quality - no reduction
@@ -41,9 +49,46 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
       if (image != null) {
         final imageFile = File(image.path);
 
-        // Get GPS location only when image is captured from camera
-        if (source == ImageSource.camera) {
-          await _getCurrentLocation();
+        // Verify GPS location was captured (only required for camera images)
+        if (source == ImageSource.camera && _currentPosition == null) {
+          if (mounted) {
+            final shouldContinue = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Icon(Icons.warning_amber, color: Colors.orange, size: 48),
+                content: Text(
+                  context.tr('disease_location_required'),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text(context.tr('common_cancel')),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text(context.tr('disease_retry_location')),
+                  ),
+                ],
+              ),
+            );
+            
+            if (shouldContinue != true) {
+              setState(() {
+                _isPickingImage = false;
+              });
+              return;
+            }
+            
+            // Retry getting location
+            await _getCurrentLocation();
+            if (_currentPosition == null) {
+              _showErrorDialog(context.tr('disease_location_required_error'));
+              setState(() {
+                _isPickingImage = false;
+              });
+              return;
+            }
+          }
         }
 
         // Navigate to ROI selector screen (keep loading state active)
@@ -62,7 +107,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
             if (_selectedImages.length < 4) {
               _selectedImages.add(selectedROI);
             } else {
-              _showErrorDialog('Maximum 4 images allowed');
+              _showErrorDialog(context.tr('disease_max_images'));
             }
           });
         } else {
@@ -90,11 +135,11 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
       if (!serviceEnabled) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text(
-                'Location services are disabled. Enable to track disease locations.',
+                context.tr('disease_location_disabled'),
               ),
-              duration: Duration(seconds: 3),
+              duration: const Duration(seconds: 3),
             ),
           );
         }
@@ -108,11 +153,11 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
         if (permission == LocationPermission.denied) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 content: Text(
-                  'Location permission denied. Disease location won\'t be saved.',
+                  context.tr('disease_location_denied'),
                 ),
-                duration: Duration(seconds: 3),
+                duration: const Duration(seconds: 3),
               ),
             );
           }
@@ -123,11 +168,11 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
       if (permission == LocationPermission.deniedForever) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text(
-                'Location permission permanently denied. Enable in settings.',
+                context.tr('disease_location_denied_forever'),
               ),
-              duration: Duration(seconds: 3),
+              duration: const Duration(seconds: 3),
             ),
           );
         }
@@ -147,7 +192,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Location captured: ${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}',
+              '${context.tr('disease_location_captured')}: ${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}',
             ),
             duration: const Duration(seconds: 2),
             backgroundColor: Colors.green,
@@ -161,7 +206,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
 
   Future<void> _analyzeImage() async {
     if (_selectedImages.isEmpty) {
-      _showErrorDialog('Please select at least one image first');
+      _showErrorDialog(context.tr('disease_select_image_first'));
       return;
     }
 
@@ -187,16 +232,14 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
 
       // Send request with extended timeout for large images
       // Processing 300 leaves can take 3-4 minutes
-      var streamedResponse = await client
-          .send(request)
-          .timeout(
-            const Duration(seconds: 300), // 5 minutes
-            onTimeout: () {
-              throw Exception(
-                'Request timeout - Server took too long to respond',
-              );
-            },
+      var streamedResponse = await client.send(request).timeout(
+        const Duration(seconds: 300), // 5 minutes
+        onTimeout: () {
+          throw Exception(
+            'Request timeout - Server took too long to respond',
           );
+        },
+      );
 
       // Read response with even longer timeout for large data transfer
       print(
@@ -224,12 +267,11 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder:
-                (context) => AnalysisResultScreen(
-                  analysisResult: jsonResponse,
-                  originalImage: _selectedImages.first,
-                  currentPosition: _currentPosition,
-                ),
+            builder: (context) => AnalysisResultScreen(
+              analysisResult: jsonResponse,
+              originalImage: _selectedImages.first,
+              currentPosition: _currentPosition,
+            ),
           ),
         );
       } else {
@@ -265,48 +307,46 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Error'),
-            content: Text(message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: Text(context.tr('common_error')),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(context.tr('common_ok')),
           ),
+        ],
+      ),
     );
   }
 
   void _showImageSourceDialog() {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Select Image Source'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.camera_alt),
-                  title: const Text('Camera'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickImage(ImageSource.camera);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.photo_library),
-                  title: const Text('Gallery'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickImage(ImageSource.gallery);
-                  },
-                ),
-              ],
+      builder: (context) => AlertDialog(
+        title: Text(context.tr('disease_select_image_source')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: Text(context.tr('disease_camera')),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
             ),
-          ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: Text(context.tr('disease_gallery')),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -317,7 +357,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pepper Leaf Health Analyzer'),
+        title: Text(context.tr('disease_leaf_analyzer_title')),
         centerTitle: true,
         elevation: 2,
       ),
@@ -328,19 +368,19 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Dashboard Header
-              const Text(
-                'Upload & Analyze Pepper Leaves',
-                style: TextStyle(
+              Text(
+                context.tr('disease_upload_analyze'),
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF2E7D32),
+                  color: AppTheme.pepperGold,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Take a photo or select from gallery to detect diseases',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+              Text(
+                context.tr('disease_upload_subtitle'),
+                style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.7)),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -365,85 +405,83 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(12),
                         ),
-                        child:
-                            _selectedImages.isEmpty
-                                ? Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.image_outlined,
-                                        size: 100,
-                                        color: Colors.grey[400],
+                        child: _selectedImages.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.image_outlined,
+                                      size: 100,
+                                      color: Colors.grey[400],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      context.tr('disease_no_image_selected'),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.grey[600],
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        'No image selected',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.grey[600],
-                                          fontWeight: FontWeight.w500,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      context.tr('disease_tap_button_info'),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[500],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: _selectedImages.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                      right: 8.0,
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Image.file(
+                                          _selectedImages[index],
+                                          height: imageDisplayHeight,
+                                          width: MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              0.8,
+                                          fit: BoxFit.contain,
                                         ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Tap the button below to select up to 4 images',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey[500],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                                : ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: _selectedImages.length,
-                                  itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 8.0,
-                                      ),
-                                      child: Stack(
-                                        children: [
-                                          Image.file(
-                                            _selectedImages[index],
-                                            height: imageDisplayHeight,
-                                            width:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                0.8,
-                                            fit: BoxFit.contain,
-                                          ),
-                                          Positioned(
-                                            top: 8,
-                                            right: 8,
-                                            child: Container(
-                                              decoration: const BoxDecoration(
-                                                color: Colors.white,
-                                                shape: BoxShape.circle,
+                                        Positioned(
+                                          top: 8,
+                                          right: 8,
+                                          child: Container(
+                                            decoration: const BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: IconButton(
+                                              icon: const Icon(
+                                                Icons.remove_circle,
+                                                color: Colors.red,
                                               ),
-                                              child: IconButton(
-                                                icon: const Icon(
-                                                  Icons.remove_circle,
-                                                  color: Colors.red,
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _selectedImages.removeAt(
-                                                      index,
-                                                    );
-                                                  });
-                                                },
-                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  _selectedImages.removeAt(
+                                                    index,
+                                                  );
+                                                });
+                                              },
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
                       ),
                     ),
                     // Info Card inside the image card
@@ -457,7 +495,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                       ),
                       child: Center(
                         child: Text(
-                          'For best results, capture clear images with good lighting',
+                          context.tr('disease_best_results_tip'),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.blue[900],
@@ -479,9 +517,9 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                   child: ElevatedButton.icon(
                     onPressed: _showImageSourceDialog,
                     icon: const Icon(Icons.upload_file, size: 28),
-                    label: const Text(
-                      'Upload Image',
-                      style: TextStyle(
+                    label: Text(
+                      context.tr('disease_upload_image'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -510,9 +548,9 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                       );
                     },
                     icon: const Icon(Icons.map, size: 28),
-                    label: const Text(
-                      'View Disease Map',
-                      style: TextStyle(
+                    label: Text(
+                      context.tr('disease_view_disease_map'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -553,9 +591,9 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Loading image...',
-                                    style: TextStyle(
+                                  Text(
+                                    context.tr('disease_loading_image'),
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
                                       color: Color(0xFF2E7D32),
@@ -563,7 +601,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'Preparing image and fetching location',
+                                    context.tr('disease_preparing_image'),
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey[700],
@@ -597,9 +635,9 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Analyzing image...',
-                                    style: TextStyle(
+                                  Text(
+                                    context.tr('disease_analyzing'),
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
                                       color: Color(0xFF2E7D32),
@@ -607,7 +645,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'This may take 2-4 minutes for images with many leaves',
+                                    context.tr('disease_analysis_time_info'),
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey[700],
@@ -623,14 +661,13 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed:
-                            (_isLoading || _isPickingImage)
-                                ? null
-                                : _analyzeImage,
+                        onPressed: (_isLoading || _isPickingImage)
+                            ? null
+                            : _analyzeImage,
                         icon: const Icon(Icons.analytics, size: 28),
-                        label: const Text(
-                          'Analyze Image',
-                          style: TextStyle(fontSize: 18),
+                        label: Text(
+                          context.tr('disease_analyze_images'),
+                          style: const TextStyle(fontSize: 18),
                         ),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -648,13 +685,12 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: OutlinedButton.icon(
-                          onPressed:
-                              (_isLoading || _isPickingImage)
-                                  ? null
-                                  : _showImageSourceDialog,
+                          onPressed: (_isLoading || _isPickingImage)
+                              ? null
+                              : _showImageSourceDialog,
                           icon: const Icon(Icons.add_photo_alternate),
                           label: Text(
-                            'Add Another Image (${_selectedImages.length}/4)',
+                            '${context.tr('disease_add_another_image')} (${_selectedImages.length}/4)',
                           ),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
