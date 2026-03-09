@@ -358,7 +358,7 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppTheme.forestGreen,
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.2),
@@ -383,8 +383,8 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2E7D32),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.pepperGold,
+                      foregroundColor: Colors.black87,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -397,14 +397,17 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: _skipSelection,
-                    icon: const Icon(Icons.skip_next, size: 24),
+                    icon: const Icon(Icons.image, size: 24),
                     label: Text(
                       context.tr('disease_skip_analyze_full'),
-                      style: const TextStyle(fontSize: 16),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      side: BorderSide(
+                      side: const BorderSide(
                         color: Colors.white,
                         width: 2,
                       ),
