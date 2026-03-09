@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smartpepper_mobile/config/theme.dart';
+import '../../localization/app_localizations.dart';
 
 class RemedySuggestionsScreen extends StatefulWidget {
   final String diseaseName;
@@ -38,34 +40,42 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
   @override
   Widget build(BuildContext context) {
     int stage = widget.stage;
-    
+
     // Convert dynamic lists to typed String lists safely
     final ecoList = (widget.remedies['ecoFriendly'] as List<dynamic>?)
             ?.map((e) => e.toString())
-            .toList() ?? [];
-            
+            .toList() ??
+        [];
+
     final chemList = (widget.remedies['chemical'] as List<dynamic>?)
             ?.map((e) => e.toString())
-            .toList() ?? [];
+            .toList() ??
+        [];
 
     return Scaffold(
+      backgroundColor: AppTheme.forestGreen,
       appBar: AppBar(
-        title: Text('${widget.diseaseName} Remedies'),
-        backgroundColor: const Color(0xFF2E7D32),
-        foregroundColor: Colors.white,
+        title: Text(
+            '${widget.diseaseName} ${context.tr('disease_remedies_title')}'),
+        backgroundColor: AppTheme.forestGreen,
+        foregroundColor: AppTheme.pepperGold,
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: Colors.white,
+          indicatorColor: AppTheme.pepperGold,
           indicatorWeight: 3,
-          labelColor: Colors.white,
+          labelColor: AppTheme.pepperGold,
           unselectedLabelColor: Colors.white70,
           labelStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
-          tabs: const [
-            Tab(icon: Icon(Icons.eco), text: 'Eco Friendly Solutions'),
-            Tab(icon: Icon(Icons.science), text: 'Chemical Solutions'),
+          tabs: [
+            Tab(
+                icon: const Icon(Icons.eco),
+                text: context.tr('disease_eco_friendly_solutions')),
+            Tab(
+                icon: const Icon(Icons.science),
+                text: context.tr('disease_chemical_solutions')),
           ],
         ),
       ),
@@ -73,12 +83,20 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            color: Colors.green[50],
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F5E9),
+              border: Border(
+                bottom: BorderSide(
+                  color: AppTheme.pepperGold.withOpacity(0.3),
+                  width: 2,
+                ),
+              ),
+            ),
             child: Row(
               children: [
                 Icon(
                   Icons.warning_amber_rounded,
-                  color: Colors.orange[800],
+                  color: const Color(0xFFFFA726),
                   size: 32,
                 ),
                 const SizedBox(width: 12),
@@ -87,10 +105,11 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Severity Stage $stage (${widget.severity.toStringAsFixed(1)}%)',
-                        style: const TextStyle(
+                        '${context.tr('disease_severity_stage')} $stage (${widget.severity.toStringAsFixed(1)}%)',
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFFA726),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -98,7 +117,7 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
                         _getStageDescription(stage),
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey[800],
+                          color: Colors.grey[700],
                         ),
                       ),
                     ],
@@ -112,9 +131,9 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
               controller: _tabController,
               children: [
                 // Eco Friendly Tab
-                _buildRemedyList(ecoList, Colors.green),
+                _buildRemedyList(ecoList, const Color(0xFF66BB6A)),
                 // Chemical Solutions Tab
-                _buildRemedyList(chemList, Colors.blue),
+                _buildRemedyList(chemList, const Color(0xFFFFA726)),
               ],
             ),
           ),
@@ -124,19 +143,30 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
   }
 
   String _getStageDescription(int stage) {
-    switch(stage) {
-      case 1: return 'Initial infection. Focus on prevention and light suppression.';
-      case 2: return 'Moderate spread. Requires immediate targeted intervention.';
-      case 3: return 'Significant infection. Aggressive treatment needed to save the crop.';
-      case 4: return 'Severe infection. High risk of crop loss; robust salvaging required.';
-      case 5: return 'Critical condition. Vine may not recover; focus on containment and clearing.';
-      default: return '';
+    switch (stage) {
+      case 1:
+        return context.tr('disease_stage_1_desc');
+      case 2:
+        return context.tr('disease_stage_2_desc');
+      case 3:
+        return context.tr('disease_stage_3_desc');
+      case 4:
+        return context.tr('disease_stage_4_desc');
+      case 5:
+        return context.tr('disease_stage_5_desc');
+      default:
+        return '';
     }
   }
 
   Widget _buildRemedyList(List<String> items, Color color) {
     if (items.isEmpty) {
-      return const Center(child: Text("No remedies found for this stage."));
+      return Center(
+        child: Text(
+          context.tr('disease_no_remedies'),
+          style: const TextStyle(color: Colors.white),
+        ),
+      );
     }
 
     return ListView.builder(
@@ -144,23 +174,29 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
       itemCount: items.length,
       itemBuilder: (context, index) {
         return Card(
-          elevation: 2,
+          elevation: 4,
           margin: const EdgeInsets.only(bottom: 12),
+          color: const Color(0xFFE8F5E9),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: color.withOpacity(0.3), width: 1),
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: color.withOpacity(0.4), width: 2),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.check_circle_outline, color: color, size: 24),
+                Icon(Icons.check_circle, color: color, size: 24),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     items[index],
-                    style: const TextStyle(fontSize: 16, height: 1.4),
+                    style: TextStyle(
+                      fontSize: 16,
+                      height: 1.4,
+                      color: Colors.grey[800],
+                    ),
                   ),
                 ),
               ],
@@ -171,4 +207,3 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
     );
   }
 }
-

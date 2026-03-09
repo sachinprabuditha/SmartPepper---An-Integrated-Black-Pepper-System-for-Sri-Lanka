@@ -3,6 +3,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
+import 'package:smartpepper_mobile/config/theme.dart';
+import '../../localization/app_localizations.dart';
 
 class ROISelectorScreen extends StatefulWidget {
   final File imageFile;
@@ -153,10 +155,9 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
       img.fill(mask, color: img.ColorRgb8(255, 255, 255));
 
       // Convert path points to Point objects for polygon
-      final polygonPoints =
-          _drawnPath.map((p) {
-            return img.Point(p.dx.toInt(), p.dy.toInt());
-          }).toList();
+      final polygonPoints = _drawnPath.map((p) {
+        return img.Point(p.dx.toInt(), p.dy.toInt());
+      }).toList();
 
       // Draw filled polygon on mask (black = selected area)
       img.fillPolygon(
@@ -228,9 +229,9 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
   void _confirmSelection() async {
     if (_drawnPath.length < 3 || !_isPathClosed) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please draw around the target plant to select it'),
-          backgroundColor: Colors.orange,
+        SnackBar(
+          content: Text(context.tr('disease_draw_around_plant')),
+          backgroundColor: AppTheme.warningColor,
         ),
       );
       return;
@@ -258,9 +259,9 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
       // Close loading dialog and show error
       Navigator.pop(context); // Close loading
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to process selection. Please try again.'),
-          backgroundColor: Color(0xFF2E7D32),
+        SnackBar(
+          content: Text(context.tr('disease_selection_failed')),
+          backgroundColor: AppTheme.errorColor,
         ),
       );
     }
@@ -281,17 +282,17 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.forestGreen,
       appBar: AppBar(
-        title: const Text('Select Target Plant'),
-        backgroundColor: const Color(0xFF2E7D32),
-        foregroundColor: Colors.white,
+        title: Text(context.tr('disease_select_target_plant')),
+        backgroundColor: AppTheme.forestGreen,
+        foregroundColor: AppTheme.pepperGold,
         actions: [
           if (_drawnPath.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: _resetSelection,
-              tooltip: 'Clear & Redraw',
+              tooltip: context.tr('disease_clear_redraw'),
             ),
         ],
       ),
@@ -299,7 +300,7 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
         children: [
           Container(
             width: double.infinity,
-            color: const Color(0xFF4CAF50),
+            color: AppTheme.forestGreen,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             child: Row(
               children: [
@@ -308,59 +309,56 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
                 Expanded(
                   child: Text(
                     _drawnPath.isEmpty
-                        ? 'Draw around the plant with your finger'
+                        ? context.tr('disease_draw_instruction_start')
                         : _isPathClosed
-                        ? 'Selection complete! Confirm or redraw'
-                        : 'Keep drawing to outline the plant',
+                            ? context.tr('disease_selection_complete')
+                            : context.tr('disease_keep_drawing'),
                     style: const TextStyle(color: Colors.white, fontSize: 14),
                   ),
                 ),
               ],
             ),
           ),
-
           Expanded(
-            child:
-                _image == null
-                    ? const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Color(0xFF2E7D32),
-                        ),
+            child: _image == null
+                ? Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppTheme.pepperGold,
                       ),
-                    )
-                    : LayoutBuilder(
-                      builder: (context, constraints) {
-                        final widgetSize = Size(
-                          constraints.maxWidth,
-                          constraints.maxHeight,
-                        );
-                        return GestureDetector(
-                          onPanStart:
-                              (details) => _onPanStart(details, widgetSize),
-                          onPanUpdate:
-                              (details) => _onPanUpdate(details, widgetSize),
-                          onPanEnd: _onPanEnd,
-                          child: CustomPaint(
-                            size: widgetSize,
-                            painter: ROIPainter(
-                              image: _image!,
-                              imageSize: _imageSize!,
-                              drawnPath: _drawnPath,
-                              isPathClosed: _isPathClosed,
-                              scale: _scale,
-                              imageOffset: _imageOffset,
-                            ),
-                          ),
-                        );
-                      },
                     ),
+                  )
+                : LayoutBuilder(
+                    builder: (context, constraints) {
+                      final widgetSize = Size(
+                        constraints.maxWidth,
+                        constraints.maxHeight,
+                      );
+                      return GestureDetector(
+                        onPanStart: (details) =>
+                            _onPanStart(details, widgetSize),
+                        onPanUpdate: (details) =>
+                            _onPanUpdate(details, widgetSize),
+                        onPanEnd: _onPanEnd,
+                        child: CustomPaint(
+                          size: widgetSize,
+                          painter: ROIPainter(
+                            image: _image!,
+                            imageSize: _imageSize!,
+                            drawnPath: _drawnPath,
+                            isPathClosed: _isPathClosed,
+                            scale: _scale,
+                            imageOffset: _imageOffset,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
-
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppTheme.forestGreen,
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.2),
@@ -377,16 +375,16 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
                   child: ElevatedButton.icon(
                     onPressed: _confirmSelection,
                     icon: const Icon(Icons.check_circle, size: 24),
-                    label: const Text(
-                      'Confirm Selection',
-                      style: TextStyle(
+                    label: Text(
+                      context.tr('disease_confirm_selection'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2E7D32),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.pepperGold,
+                      foregroundColor: Colors.black87,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -399,15 +397,18 @@ class _ROISelectorScreenState extends State<ROISelectorScreen> {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: _skipSelection,
-                    icon: const Icon(Icons.skip_next, size: 24),
-                    label: const Text(
-                      'Skip - Analyze Full Image',
-                      style: TextStyle(fontSize: 16),
+                    icon: const Icon(Icons.image, size: 24),
+                    label: Text(
+                      context.tr('disease_skip_analyze_full'),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF2E7D32),
+                      foregroundColor: Colors.white,
                       side: const BorderSide(
-                        color: Color(0xFF2E7D32),
+                        color: Colors.white,
                         width: 2,
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -481,13 +482,12 @@ class ROIPainter extends CustomPainter {
     // Draw the freehand path and overlay
     if (drawnPath.isNotEmpty) {
       // Convert image coordinates to widget coordinates for display
-      final displayPath =
-          drawnPath.map((p) {
-            return Offset(
-              (p.dx * displayScale) + offsetX,
-              (p.dy * displayScale) + offsetY,
-            );
-          }).toList();
+      final displayPath = drawnPath.map((p) {
+        return Offset(
+          (p.dx * displayScale) + offsetX,
+          (p.dy * displayScale) + offsetY,
+        );
+      }).toList();
 
       // Create path for masking
       final path = Path();
@@ -506,8 +506,8 @@ class ROIPainter extends CustomPainter {
         canvas.save();
 
         // Create a path covering the entire canvas
-        final fullPath =
-            Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+        final fullPath = Path()
+          ..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
 
         // Subtract the selection path to create inverse clip
         final overlayPath = Path.combine(
@@ -524,20 +524,18 @@ class ROIPainter extends CustomPainter {
       }
 
       // Draw the path outline
-      final pathPaint =
-          Paint()
-            ..color = const Color(0xFF2E7D32)
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 4
-            ..strokeCap = StrokeCap.round
-            ..strokeJoin = StrokeJoin.round;
+      final pathPaint = Paint()
+        ..color = AppTheme.pepperGold
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round;
       canvas.drawPath(path, pathPaint);
 
       // Draw path points as dots for visual feedback
-      final dotPaint =
-          Paint()
-            ..color = const Color(0xFF4CAF50)
-            ..style = PaintingStyle.fill;
+      final dotPaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
 
       for (final point in displayPath) {
         canvas.drawCircle(point, 6, dotPaint);
@@ -545,15 +543,14 @@ class ROIPainter extends CustomPainter {
 
       // Draw start point with special marker
       if (displayPath.isNotEmpty) {
-        final startPaint =
-            Paint()
-              ..color = Colors.white
-              ..style = PaintingStyle.fill;
+        final startPaint = Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.fill;
         canvas.drawCircle(displayPath.first, 8, startPaint);
         canvas.drawCircle(
           displayPath.first,
           6,
-          Paint()..color = const Color(0xFF2E7D32),
+          Paint()..color = AppTheme.pepperGold,
         );
       }
 
@@ -563,7 +560,7 @@ class ROIPainter extends CustomPainter {
           text: const TextSpan(
             text: '✓ Plant Selected',
             style: TextStyle(
-              color: Color(0xFF2E7D32),
+              color: AppTheme.forestGreen,
               fontSize: 16,
               fontWeight: FontWeight.bold,
               backgroundColor: Colors.white,
@@ -588,7 +585,7 @@ class ROIPainter extends CustomPainter {
             fontWeight: FontWeight.bold,
             shadows: [
               Shadow(
-                color: Color(0xFF2E7D32),
+                color: AppTheme.pepperGold,
                 blurRadius: 4,
                 offset: Offset(0, 1),
               ),
@@ -643,7 +640,7 @@ class ThreeBounceLoader extends StatelessWidget {
                 children: [
                   const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      Color(0xFF2E7D32),
+                      AppTheme.pepperGold,
                     ),
                     strokeWidth: 4,
                   ),

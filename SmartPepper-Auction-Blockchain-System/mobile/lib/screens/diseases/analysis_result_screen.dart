@@ -1,11 +1,12 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartpepper_mobile/models/disease_location.dart';
+import 'package:smartpepper_mobile/config/theme.dart';
+import '../../localization/app_localizations.dart';
+import '../../services/disease_api_service.dart';
 import 'image_upload_screen.dart';
 import 'spread_forecasting_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -29,6 +30,7 @@ class AnalysisResultScreen extends StatefulWidget {
 class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
   bool _isSavingLocation = false;
   int _currentCarouselIndex = 0;
+  final DiseaseApiService _apiService = DiseaseApiService();
 
   @override
   void initState() {
@@ -43,26 +45,56 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
     final counts = widget.analysisResult['counts'] as Map<String, dynamic>;
 
     bool hasDisease = false;
-    String primaryDisease = 'Unknown';
+    String primaryDisease = 'Healthy';
+    int healthyCount = 0;
 
     for (var entry in counts.entries) {
-      if (entry.key.toLowerCase() != 'healthy leaves' &&
-          entry.key.toLowerCase() != 'healthy' &&
-          entry.value > 0) {
+      if (entry.key.toLowerCase() == 'healthy leaves' ||
+          entry.key.toLowerCase() == 'healthy') {
+        healthyCount += (entry.value as int);
+      } else if (entry.value > 0) {
         hasDisease = true;
-        if (primaryDisease == 'Unknown' ||
-            entry.value > counts[primaryDisease]) {
+        if (primaryDisease == 'Healthy' ||
+            entry.value > (counts[primaryDisease] ?? 0)) {
           primaryDisease = entry.key;
         }
       }
     }
 
-    if (hasDisease && widget.currentPosition != null) {
-      await _saveDiseaseLocation(primaryDisease, severity);
+    // Save location for both healthy and diseased plants (if GPS available)
+    if (widget.currentPosition != null) {
+      if (hasDisease) {
+        // Save diseased plant location
+        await _saveDiseaseLocation(primaryDisease, severity, isHealthy: false);
+      } else if (healthyCount > 0) {
+        // Save healthy plant location
+        await _saveDiseaseLocation('Healthy', 0.0, isHealthy: true);
+      }
+    } else if (widget.currentPosition == null &&
+        (hasDisease || healthyCount > 0)) {
+      // Detection successful but no GPS location (image from gallery)
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.info_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(context.tr('disease_location_not_saved_gallery')),
+                ),
+              ],
+            ),
+            backgroundColor: AppTheme.warningColor,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 
-  Future<void> _saveDiseaseLocation(String diseaseName, double severity) async {
+  Future<void> _saveDiseaseLocation(String diseaseName, double severity,
+      {bool isHealthy = false}) async {
     if (_isSavingLocation || widget.currentPosition == null) return;
 
     setState(() {
@@ -70,9 +102,6 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
     });
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final locationsJson = prefs.getStringList('disease_locations') ?? [];
-
       final newLocation = DiseaseLocation(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         coordinates: LatLng(
@@ -85,12 +114,16 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
         totalLeaves: widget.analysisResult['total_detected'] ?? 0,
         diseaseCounts: Map<String, int>.from(widget.analysisResult['counts']),
         imagePath: widget.originalImage.path,
+        isHealthy: isHealthy,
       );
 
-      locationsJson.add(jsonEncode(newLocation.toJson()));
-      await prefs.setStringList('disease_locations', locationsJson);
+      await _apiService.saveDiseaseLocation(newLocation);
 
       if (mounted) {
+        final message = isHealthy
+            ? context.tr('disease_healthy_location_saved')
+            : '${context.tr('disease_location_saved')}: $diseaseName';
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -98,14 +131,14 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                 const Icon(Icons.check_circle, color: Colors.white),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text('Disease location saved to map: $diseaseName'),
+                  child: Text(message),
                 ),
               ],
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: AppTheme.sriLankanLeaf,
             duration: const Duration(seconds: 3),
             action: SnackBarAction(
-              label: 'View Map',
+              label: context.tr('disease_view_map'),
               textColor: Colors.white,
               onPressed: () {},
             ),
@@ -116,8 +149,8 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error saving location: $e'),
-            backgroundColor: Colors.red,
+            content: Text('${context.tr('disease_error_saving_location')}: $e'),
+            backgroundColor: AppTheme.errorColor,
           ),
         );
       }
@@ -130,11 +163,11 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
 
   Color _getSeverityColor(double severity) {
     if (severity < 20) {
-      return Colors.green;
-    } else if (severity <= 50) {
-      return Colors.orange;
+      return const Color(0xFF66BB6A); // Light green
+    } else if (severity < 40) {
+      return const Color(0xFFFFA726); // Light orange
     } else {
-      return Colors.red;
+      return const Color(0xFFEF5350); // Light red
     }
   }
 
@@ -149,9 +182,9 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
   }
 
   Color _getHealthColor(double health) {
-    if (health >= 80) return Colors.green;
-    if (health >= 50) return Colors.orange;
-    return Colors.red;
+    if (health >= 80) return const Color(0xFF66BB6A); // Light green
+    if (health >= 50) return const Color(0xFFFFA726); // Light orange
+    return const Color(0xFFEF5350); // Light red
   }
 
   String _getHealthLabel(double health) {
@@ -172,15 +205,22 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
         isHealthScore ? _getHealthLabel(score) : _getSeverityLabel(score);
 
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [cardColor.withOpacity(0.1), Colors.white],
+            colors: [
+              const Color(0xFFE8F5E9), // Light green
+              const Color(0xFFF1F8E9), // Very light green
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
+          ),
+          border: Border.all(
+            color: cardColor.withOpacity(0.4),
+            width: 2,
           ),
         ),
         padding: const EdgeInsets.all(24.0),
@@ -192,9 +232,10 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      color: cardColor,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -220,38 +261,56 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
             ),
             const SizedBox(height: 20),
             CircularPercentIndicator(
-              radius: 70.0,
-              lineWidth: 12.0,
+              radius: 75.0,
+              lineWidth: 14.0,
               percent: score / 100,
-              center: Text(
-                '${score.toStringAsFixed(1)}%',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: cardColor,
-                ),
+              center: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${score.toStringAsFixed(1)}%',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: cardColor,
+                    ),
+                  ),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: cardColor.withOpacity(0.8),
+                    ),
+                  ),
+                ],
               ),
               progressColor: cardColor,
-              backgroundColor: Colors.grey[300]!,
+              backgroundColor: cardColor.withOpacity(0.2),
               circularStrokeCap: CircularStrokeCap.round,
             ),
             const Spacer(),
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
+                color: cardColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: cardColor.withOpacity(0.3),
+                  width: 1,
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.eco, color: Color(0xFF2E7D32), size: 18),
+                  Icon(Icons.eco, color: cardColor, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    'Total Leaves Detected: $totalLeaves',
-                    style: const TextStyle(
+                    '${context.tr('disease_total_detected')} $totalLeaves',
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
+                      color: cardColor,
                     ),
                   ),
                 ],
@@ -268,8 +327,8 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
     final severity = (widget.analysisResult['severity'] as num).toDouble();
     final diseaseSpecificSeverity =
         widget.analysisResult['disease_specific_severity']
-            as Map<String, dynamic>? ??
-        {};
+                as Map<String, dynamic>? ??
+            {};
     final totalLeaves = widget.analysisResult['total_detected'] ?? 0;
     final counts = widget.analysisResult['counts'] as Map<String, dynamic>;
 
@@ -278,7 +337,7 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
     // Whole Tree Severity Card
     severityCards.add(
       _buildSeverityCard(
-        title: 'Whole Tree Severity',
+        title: context.tr('disease_whole_tree_severity'),
         score: severity,
         isHealthScore: false,
         totalLeaves: totalLeaves,
@@ -290,7 +349,7 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
       if ((diseaseSeverity as num).toDouble() > 0) {
         severityCards.add(
           _buildSeverityCard(
-            title: '$disease Severity',
+            title: '$disease ${context.tr('disease_severity')}',
             score: diseaseSeverity.toDouble(),
             isHealthScore: false,
             totalLeaves: totalLeaves,
@@ -300,24 +359,12 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
     });
 
     return Scaffold(
+      backgroundColor: AppTheme.forestGreen,
       appBar: AppBar(
-        title: const Text('Analysis Results'),
+        title: Text(context.tr('disease_analysis_results')),
+        backgroundColor: AppTheme.forestGreen,
+        foregroundColor: AppTheme.pepperGold,
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              // Navigate back to home with fresh image upload screen
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) => const ImageUploadScreen(),
-                ),
-                (route) => false,
-              );
-            },
-            tooltip: 'Back to Home',
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -329,7 +376,7 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
               if (widget.currentPosition != null)
                 Card(
                   elevation: 4,
-                  color: Colors.green[50],
+                  color: Colors.white.withOpacity(0.9),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -337,9 +384,9 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.location_on,
-                          color: Colors.green,
+                          color: AppTheme.forestGreen,
                           size: 28,
                         ),
                         const SizedBox(width: 12),
@@ -347,9 +394,9 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Location Captured',
-                                style: TextStyle(
+                              Text(
+                                context.tr('disease_location_captured_label'),
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                 ),
@@ -398,10 +445,9 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                       height: _currentCarouselIndex == index ? 12 : 8,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color:
-                            _currentCarouselIndex == index
-                                ? const Color(0xFF2E7D32)
-                                : Colors.grey[400],
+                        color: _currentCarouselIndex == index
+                            ? const Color(0xFF2E7D32)
+                            : Colors.grey[400],
                       ),
                     ),
                   ),
@@ -423,14 +469,16 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                         children: [
                           Icon(
                             Icons.analytics,
-                            color: Theme.of(context).primaryColor,
+                            color: AppTheme.pepperGold,
+                            size: 28,
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            'Detailed Analysis',
-                            style: TextStyle(
+                          Text(
+                            context.tr('disease_detailed_analysis'),
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
+                              color: AppTheme.pepperGold,
                             ),
                           ),
                         ],
@@ -451,8 +499,8 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                           iconColor = Colors.green;
                           bgColor = Colors.green[50]!;
                         } else if (disease.toLowerCase().contains(
-                          'uncertain',
-                        )) {
+                              'uncertain',
+                            )) {
                           icon = Icons.help_outline;
                           iconColor = Colors.orange;
                           bgColor = Colors.orange[50]!;
@@ -490,7 +538,7 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      '$count ${count == 1 ? 'leaf' : 'leaves'} detected',
+                                      '$count ${count == 1 ? context.tr('disease_leaf_detected') : context.tr('disease_leaves_detected')}',
                                       style: TextStyle(
                                         color: Colors.grey[700],
                                         fontSize: 14,
@@ -531,20 +579,19 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder:
-                                    (context) => SpreadForecastingScreen(
-                                      analysisResult: widget.analysisResult,
-                                    ),
+                                builder: (context) => SpreadForecastingScreen(
+                                  analysisResult: widget.analysisResult,
+                                ),
                               ),
                             );
                           },
                           icon: const Icon(Icons.timeline, size: 20),
-                          label: const Text(
-                            'Spread Forecast',
-                            style: TextStyle(fontSize: 16),
+                          label: Text(
+                            context.tr('disease_forecast_spread'),
+                            style: const TextStyle(fontSize: 16),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange[700],
+                            backgroundColor: const Color(0xFF2E7D32),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
@@ -567,7 +614,7 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
                             );
                           },
                           icon: const Icon(Icons.restart_alt),
-                          label: const Text('Analyze Another Image'),
+                          label: Text(context.tr('disease_analyze_another')),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             backgroundColor: const Color(0xFF2E7D32),
