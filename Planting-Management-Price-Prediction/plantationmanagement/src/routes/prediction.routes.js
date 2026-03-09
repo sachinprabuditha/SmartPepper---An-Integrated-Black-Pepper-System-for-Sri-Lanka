@@ -10,5 +10,6 @@ const router = express.Router();
 // So it is PUBLIC.
 
 router.post('/predict', predictionController.predict);
+router.get('/weather/:district', predictionController.getLatestWeather);
 
 export default router;

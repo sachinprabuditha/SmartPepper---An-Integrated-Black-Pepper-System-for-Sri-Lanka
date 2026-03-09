@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { startWeatherJob } from './services/weatherService.js';
 
 
 dotenv.config();
@@ -31,6 +32,10 @@ app.use('/api/chat', chatRoutes);
 import predictionRoutes from './routes/prediction.routes.js';
 app.use('/api/prediction', predictionRoutes);
 
+import exchangeRoutes from './routes/exchangeRoutes.js';
+app.use('/api/exchange', exchangeRoutes);
+
+
 
 
 import knowledgebaseRoutes from './routes/knowledgebase.routes.js';
@@ -46,10 +51,18 @@ app.get('/', (req, res) => {
     res.send('Plantation Management Backend is running!');
 });
 
+import { preloadModel } from './services/prediction.service.js';
+
 // Database connection test
 const startServer = async () => {
     try {
         console.log('Firebase (Firestore) initialized via config.');
+
+        // 1. Start Weather Data Cron Job
+        startWeatherJob();
+
+        // 2. Preload Heavy ML Models
+        await preloadModel();
 
         app.listen(port, "0.0.0.0", () => {
             console.log(`Server running on port ${port}`);
