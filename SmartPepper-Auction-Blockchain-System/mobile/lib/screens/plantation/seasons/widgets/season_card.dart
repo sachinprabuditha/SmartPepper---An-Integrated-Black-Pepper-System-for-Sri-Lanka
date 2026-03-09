@@ -4,6 +4,7 @@ import 'package:provider/provider.dart' as vanilla_provider;
 import '../models/season_model.dart';
 import '../../plantation/controllers/plantation_controller.dart';
 import '../../../../providers/language_provider.dart';
+import '../../../../localization/app_localizations.dart';
 
 class SeasonCard extends ConsumerWidget {
   final SeasonModel season;
@@ -21,16 +22,15 @@ class SeasonCard extends ConsumerWidget {
     final lang = languageProvider.locale.languageCode;
     final farmAsync = ref.watch(farmProvider(season.farmId));
 
-    final harvestSeasonLabel = lang == 'en' ? 'Harvest Season' : 'අස්වනු කන්නය';
-    final endedLabel = lang == 'en' ? 'Ended' : 'අවසන්';
-    final activeLabel = lang == 'en' ? 'Active' : 'සක්‍රිය';
-    final farmLabel = lang == 'en' ? 'Farm' : 'ගොවිපල';
-    final districtLabel = lang == 'en' ? 'District' : 'දිස්ත්‍රික්කය';
-    final periodLabel = lang == 'en' ? 'Period' : 'කාලය';
-    final loadingFarmLabel =
-        lang == 'en' ? 'Loading farm...' : 'ගොවිපල පූරණය වෙමින්...';
-    final loadingLabel = lang == 'en' ? 'Loading...' : 'පූරණය වෙමින්...';
-    final naLabel = lang == 'en' ? 'N/A' : 'නැත';
+    final harvestSeasonLabel = context.tr('plantation_harvest_season');
+    final endedLabel = context.tr('plantation_ended');
+    final activeLabel = context.tr('plantation_active');
+    final farmLabel = context.tr('plantation_farm');
+    final districtLabel = context.tr('plantation_district');
+    final periodLabel = context.tr('plantation_period');
+    final loadingFarmLabel = context.tr('plantation_loading_farm');
+    final loadingLabel = context.tr('common_loading');
+    final naLabel = context.tr('plantation_na');
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

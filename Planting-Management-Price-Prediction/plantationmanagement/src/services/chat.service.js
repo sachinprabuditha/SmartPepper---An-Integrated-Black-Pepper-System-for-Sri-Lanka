@@ -61,6 +61,8 @@ export const processMessage = async (
     // =============================
     // 2️⃣ Save user message
     // =============================
+    console.log(`\n[CHAT] User: "${message}"`);
+
     await chatRepo.addMessage(
         userId,
         conversationId,
@@ -99,6 +101,8 @@ export const processMessage = async (
             conversationId
         );
 
+    console.log(`[MEM] Loaded Firestore Summary: ${memory ? `"${memory}"` : "None"}`);
+
     const history =
         await chatRepo.getRecentMessages(
             userId,
@@ -118,7 +122,7 @@ export const processMessage = async (
                 message
             );
     } catch (err) {
-        console.warn("Semantic retrieval skipped");
+        console.error("❌ Semantic retrieval error:", err.message);
     }
 
     // =============================
@@ -153,7 +157,7 @@ export const processMessage = async (
         );
 
     if (compressionBatch.length >= 10) {
-
+        console.log(`[COMPRESS] Triggered: Content length ${compressionBatch.length}. Summarizing...`);
         try {
             const newMemory =
                 await summarizeConversation(
@@ -166,25 +170,31 @@ export const processMessage = async (
                 conversationId,
                 newMemory
             );
+            console.log("✅ New summary created and saved to Firestore");
         } catch (err) {
-            console.warn("Memory compression skipped");
+            console.warn("⚠️ Memory compression failed:", err.message);
         }
+    } else {
+        console.log(`[COMPRESS] Skipped: Only ${compressionBatch.length} messages in history`);
     }
 
     // =============================
     // ⭐ Store Semantic Memory
     // =============================
     try {
-
         const extracted =
             await extractMemory(message);
 
         if (extracted) {
+            console.log(`[EXTRACT] New Permanent Fact Found: "${extracted}"`);
             await saveMemory(userId, extracted);
+            console.log("✅ Saved to Semantic Memory (Qdrant)");
+        } else {
+            console.log("[EXTRACT] No permanent facts found in this message.");
         }
 
     } catch (err) {
-        console.warn("Semantic memory save skipped");
+        console.error("❌ Semantic memory save error:", err.message);
     }
 
     return {

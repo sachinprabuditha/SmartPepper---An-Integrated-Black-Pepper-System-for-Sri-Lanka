@@ -7,11 +7,11 @@ import 'package:provider/provider.dart' as vanilla_provider;
 import '../seasons/controllers/season_controller.dart';
 import '../seasons/models/season_model.dart';
 import '../sessions/controllers/session_controller.dart';
+import '../../../../localization/app_localizations.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../../providers/language_provider.dart';
 import '../../../../widgets/loading_spinner.dart';
 import '../../../../widgets/empty_state.dart';
-import '../../../../widgets/language_picker_button.dart';
 import '../../../../config/theme.dart';
 
 class YieldAnalyticsPage extends ConsumerStatefulWidget {
@@ -76,7 +76,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
 
     try {
       // Refresh all session providers to get the latest data from backend
-      final results = await Future.wait(seasons.map((s) => ref.refresh(sessionsProvider(s.id).future)));
+      final results = await Future.wait(
+          seasons.map((s) => ref.refresh(sessionsProvider(s.id).future)));
 
       double totalYield = 0;
       int totalSessions = 0;
@@ -112,9 +113,7 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
     if (_userId == null) {
       return Scaffold(
         body: LoadingSpinner(
-          message: lang == 'en'
-              ? 'Initializing analytics...'
-              : 'විශ්ලේෂණ පූරණය වෙමින්...',
+          message: context.tr('yield_analytics_initializing'),
         ),
       );
     }
@@ -123,9 +122,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(lang == 'en' ? 'Yield Analytics' : 'අස්වැන්න විශ්ලේෂණ'),
+        title: Text(context.tr('yield_analytics_title')),
         actions: [
-          const LanguagePickerButton(iconColor: AppTheme.pepperGold),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _refreshData(_userId!),
@@ -139,9 +137,7 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
             if (seasons.isEmpty) {
               return Center(
                 child: EmptyState(
-                  message: lang == 'en'
-                      ? 'No yield data recorded yet.'
-                      : 'තවම අස්වැන්න දත්ත වාර්තා වී නැත.',
+                  message: context.tr('yield_analytics_no_data'),
                   icon: Icons.analytics_outlined,
                 ),
               );
@@ -149,7 +145,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
 
             // Sort seasons for trend chart
             final sortedSeasons = [...seasons]..sort((a, b) {
-                if (a.startYear != b.startYear) return a.startYear.compareTo(b.startYear);
+                if (a.startYear != b.startYear)
+                  return a.startYear.compareTo(b.startYear);
                 return a.startMonth.compareTo(b.startMonth);
               });
 
@@ -175,7 +172,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
               _selectedSeasonId = sortedSeasons.last.id;
             }
 
-            final averageYieldPerSeason = seasons.isEmpty ? 0.0 : _totalLifetimeYield / seasons.length;
+            final averageYieldPerSeason =
+                seasons.isEmpty ? 0.0 : _totalLifetimeYield / seasons.length;
 
             return SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -183,7 +181,7 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (_loadingAggregated) 
+                  if (_loadingAggregated)
                     const Padding(
                       padding: EdgeInsets.only(bottom: 16.0),
                       child: LinearProgressIndicator(),
@@ -200,9 +198,7 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
                   const SizedBox(height: 32),
                   _buildSectionHeader(
                     context,
-                    lang == 'en'
-                        ? 'Season Yield Trend (kg)'
-                        : 'කන්න අස්වැන්න ප්‍රවණතාව (කි.ග්‍රෑ.)',
+                    context.tr('yield_analytics_season_trend'),
                     Icons.show_chart,
                   ),
                   const SizedBox(height: 16),
@@ -210,9 +206,7 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
                   const SizedBox(height: 32),
                   _buildSectionHeader(
                     context,
-                    lang == 'en'
-                        ? 'Season Comparison (kg)'
-                        : 'කන්න සංසන්දනය (කි.ග්‍රෑ.)',
+                    context.tr('yield_analytics_season_comparison'),
                     Icons.bar_chart,
                   ),
                   const SizedBox(height: 16),
@@ -220,15 +214,16 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
                   const SizedBox(height: 32),
                   _buildSectionHeader(
                     context,
-                    lang == 'en'
-                        ? 'Harvest Distribution in ${_selectedSeasonId != null ? seasons.firstWhere((s) => s.id == _selectedSeasonId).seasonName : "Selected Season"}'
-                        : 'අස්වනු බෙදාහැරීම: ${_selectedSeasonId != null ? seasons.firstWhere((s) => s.id == _selectedSeasonId).seasonName : "තෝරාගත් කන්නය"}',
+                    _selectedSeasonId != null
+                        ? '${context.tr('yield_analytics_harvest_distribution')}: ${seasons.firstWhere((s) => s.id == _selectedSeasonId).seasonName}'
+                        : context.tr('yield_analytics_harvest_distribution'),
                     Icons.pie_chart_outline,
                   ),
                   const SizedBox(height: 16),
                   _buildSeasonSelector(seasons),
                   const SizedBox(height: 16),
-                  if (_selectedSeasonId != null) _buildDistributionChart(context, _selectedSeasonId!),
+                  if (_selectedSeasonId != null)
+                    _buildDistributionChart(context, _selectedSeasonId!),
                   const SizedBox(height: 24),
                   _buildBestWorstCard(context, lang, bestSeason, worstSeason),
                   const SizedBox(height: 32),
@@ -237,13 +232,11 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
             );
           },
           loading: () => LoadingSpinner(
-            message: lang == 'en'
-                ? 'Calculating yield statistics...'
-                : 'අස්වැන්න සංඛ්‍යාලේඛන ගණනය කරමින්...',
+            message: context.tr('yield_analytics_calculating'),
           ),
           error: (error, stack) => Center(
             child: Text(
-              '${lang == 'en' ? 'Error' : 'දෝෂය'}: ${error.toString()}',
+              '${context.tr('common_error')}: ${error.toString()}',
               style: const TextStyle(color: Colors.red),
             ),
           ),
@@ -252,7 +245,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, IconData icon) {
+  Widget _buildSectionHeader(
+      BuildContext context, String title, IconData icon) {
     return Row(
       children: [
         Icon(icon, color: AppTheme.pepperGold, size: 24),
@@ -293,36 +287,36 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
           children: [
             _buildSummaryCard(
               context,
-              lang == 'en' ? 'Total Seasons' : 'මුළු කන්න',
+              context.tr('yield_analytics_total_seasons'),
               totalSeasons.toString(),
               Icons.calendar_today,
               Colors.blue,
             ),
             _buildSummaryCard(
               context,
-              lang == 'en' ? 'Total Sessions' : 'මුළු වාර',
+              context.tr('yield_analytics_total_sessions'),
               sessionCount,
               Icons.history,
               Colors.teal,
             ),
             _buildSummaryCard(
               context,
-              lang == 'en' ? 'Lifetime Yield' : 'ජීවිත කාලීන අස්වැන්න',
+              context.tr('yield_analytics_lifetime_yield'),
               '${totalYield.toStringAsFixed(1)} kg',
               Icons.balance,
               Colors.orange,
             ),
             _buildSummaryCard(
               context,
-              lang == 'en' ? 'Avg / Season' : 'සාමාන්‍යය / කන්නය',
+              context.tr('yield_analytics_avg_per_season'),
               '${avgYield.toStringAsFixed(1)} kg',
               Icons.functions,
               Colors.purple,
             ),
             _buildSummaryCard(
               context,
-              lang == 'en' ? 'Best Season' : 'හොඳම කන්නය',
-              best?.seasonName ?? (lang == 'en' ? 'N/A' : 'නැත'),
+              context.tr('yield_analytics_best_season'),
+              best?.seasonName ?? context.tr('plantation_na'),
               Icons.emoji_events,
               Colors.amber,
             ),
@@ -332,7 +326,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
     );
   }
 
-  Widget _buildSummaryCard(BuildContext context, String title, String value, IconData icon, Color color) {
+  Widget _buildSummaryCard(BuildContext context, String title, String value,
+      IconData icon, Color color) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -347,8 +342,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
               title,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w600,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w700,
                   ),
             ),
             const SizedBox(height: 4),
@@ -357,7 +352,7 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
                 value,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.pepperGold,
+                      color: Colors.white,
                     ),
               ),
             ),
@@ -367,7 +362,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
     );
   }
 
-  Widget _buildLineChart(BuildContext context, List<SeasonModel> sortedSeasons) {
+  Widget _buildLineChart(
+      BuildContext context, List<SeasonModel> sortedSeasons) {
     if (sortedSeasons.isEmpty) return const SizedBox.shrink();
 
     return Container(
@@ -376,7 +372,9 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)
+        ],
       ),
       child: LineChart(
         LineChartData(
@@ -384,8 +382,10 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
           minX: -0.5,
           maxX: sortedSeasons.length == 1 ? 0.5 : sortedSeasons.length - 0.5,
           titlesData: FlTitlesData(
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
@@ -439,14 +439,20 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)
+        ],
       ),
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
-          maxY: seasons.isEmpty 
-              ? 100 
-              : (seasons.map((e) => _seasonYields[e.id] ?? 0).reduce((a, b) => a > b ? a : b) * 1.2).clamp(100, double.infinity),
+          maxY: seasons.isEmpty
+              ? 100
+              : (seasons
+                          .map((e) => _seasonYields[e.id] ?? 0)
+                          .reduce((a, b) => a > b ? a : b) *
+                      1.2)
+                  .clamp(100, double.infinity),
           barTouchData: BarTouchData(enabled: true),
           titlesData: FlTitlesData(
             show: true,
@@ -472,13 +478,16 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
                 reservedSize: 28,
               ),
             ),
-            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
           gridData: const FlGridData(show: false),
           borderData: FlBorderData(show: false),
-            barGroups: seasons.asMap().entries.map((e) {
+          barGroups: seasons.asMap().entries.map((e) {
             return BarChartGroupData(
               x: e.key,
               barRods: [
@@ -486,7 +495,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
                   toY: _seasonYields[e.value.id] ?? 0,
                   color: AppTheme.pepperGold,
                   width: 16,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(4)),
                 ),
               ],
             );
@@ -511,7 +521,7 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
         child: DropdownButton<String>(
           value: _selectedSeasonId,
           isExpanded: true,
-          hint: Text(lang == 'en' ? 'Select Season' : 'කන්නය තෝරන්න'),
+          hint: Text(context.tr('yield_analytics_select_season')),
           items: seasons.map((s) {
             return DropdownMenuItem(
               value: s.id,
@@ -534,25 +544,19 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
     return sessionsAsync.when(
       data: (sessions) {
         if (sessions.isEmpty) {
-          final languageProvider =
-              vanilla_provider.Provider.of<LanguageProvider>(context);
-          final lang = languageProvider.locale.languageCode;
           return Card(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Center(
-                child: Text(
-                  lang == 'en'
-                      ? 'No sessions recorded for this season.'
-                      : 'මෙම කන්නය සඳහා වාර කිසිවක් වාර්තා වී නැත.',
-                ),
+                child: Text(context.tr('yield_analytics_no_sessions_season')),
               ),
             ),
           );
         }
 
         // Sort sessions by date (oldest first)
-        final sortedSessions = [...sessions]..sort((a, b) => a.date.compareTo(b.date));
+        final sortedSessions = [...sessions]
+          ..sort((a, b) => a.date.compareTo(b.date));
 
         return Column(
           children: [
@@ -562,12 +566,18 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.05), blurRadius: 10)
+                ],
               ),
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
-                  maxY: sessions.map((e) => e.yieldKg).reduce((a, b) => a > b ? a : b) * 1.2,
+                  maxY: sessions
+                          .map((e) => e.yieldKg)
+                          .reduce((a, b) => a > b ? a : b) *
+                      1.2,
                   titlesData: FlTitlesData(
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
@@ -578,7 +588,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
                             return Padding(
                               padding: const EdgeInsets.only(top: 8.0),
                               child: Text(
-                                DateFormat('MM/dd').format(sortedSessions[index].date),
+                                DateFormat('MM/dd')
+                                    .format(sortedSessions[index].date),
                                 style: const TextStyle(
                                   fontSize: 8,
                                   color: Colors.black87,
@@ -590,9 +601,12 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
                         },
                       ),
                     ),
-                    leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    leftTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
                   ),
                   gridData: const FlGridData(show: false),
                   borderData: FlBorderData(show: false),
@@ -604,7 +618,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
                           toY: e.value.yieldKg,
                           color: Colors.blueAccent,
                           width: 12,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(4)),
                         ),
                       ],
                     );
@@ -615,20 +630,10 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
           ],
         );
       },
-      loading: () {
-        final languageProvider =
-            vanilla_provider.Provider.of<LanguageProvider>(context);
-        final lang = languageProvider.locale.languageCode;
-        return LoadingSpinner(
-          message: lang == 'en' ? 'Loading sessions...' : 'වාර පූරණය වෙමින්...',
-        );
-      },
-      error: (e, _) {
-        final languageProvider =
-            vanilla_provider.Provider.of<LanguageProvider>(context);
-        final lang = languageProvider.locale.languageCode;
-        return Text('${lang == 'en' ? 'Error' : 'දෝෂය'}: $e');
-      },
+      loading: () => LoadingSpinner(
+        message: context.tr('plantation_loading_sessions'),
+      ),
+      error: (e, _) => Text('${context.tr('common_error')}: $e'),
     );
   }
 
@@ -648,16 +653,16 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
           children: [
             _buildHighlightRow(
               context,
-              lang == 'en' ? '🏆 Best Season' : '🏆 හොඳම කන්නය',
-              best?.seasonName ?? (lang == 'en' ? 'N/A' : 'නැත'),
+              '🏆 ${context.tr('yield_analytics_best_season')}',
+              best?.seasonName ?? context.tr('plantation_na'),
               '${_seasonYields[best?.id ?? '']?.toStringAsFixed(1) ?? '0.0'} kg',
               Colors.amber[800]!,
             ),
             const Divider(height: 32),
             _buildHighlightRow(
               context,
-              lang == 'en' ? '⚠️ Lowest Season' : '⚠️ අඩුම කන්නය',
-              worst?.seasonName ?? (lang == 'en' ? 'N/A' : 'නැත'),
+              '⚠️ ${context.tr('yield_analytics_lowest_season')}',
+              worst?.seasonName ?? context.tr('plantation_na'),
               '${_seasonYields[worst?.id ?? '']?.toStringAsFixed(1) ?? '0.0'} kg',
               Colors.red[800]!,
             ),
@@ -667,7 +672,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
     );
   }
 
-  Widget _buildHighlightRow(BuildContext context, String title, String name, String yield, Color color) {
+  Widget _buildHighlightRow(BuildContext context, String title, String name,
+      String yield, Color color) {
     return Row(
       children: [
         Expanded(
@@ -676,12 +682,16 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
             children: [
               Text(
                 title,
-                style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                    color: color, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 4),
               Text(
                 name,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -693,7 +703,7 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
+                  color: Colors.white,
                 ),
           ),
         ),

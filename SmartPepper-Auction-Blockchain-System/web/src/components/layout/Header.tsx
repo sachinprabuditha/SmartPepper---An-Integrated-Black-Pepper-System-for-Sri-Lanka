@@ -62,19 +62,27 @@ export function Header() {
             >
               Auctions
             </Link>
-            
+
             {isAuthenticated ? (
               <>
                 {/* Role-specific links */}
                 {user?.role === 'farmer' && (
-                  <Link
-                    href="/create"
-                    className="text-white/90 hover:text-pepper-gold font-medium transition-colors"
-                  >
-                    Create Auction
-                  </Link>
+                  <>
+                    <Link
+                      href="/create"
+                      className="text-white/90 hover:text-pepper-gold font-medium transition-colors"
+                    >
+                      Create Auction
+                    </Link>
+                    <Link
+                      href="/dashboard/farmer/quality-grading"
+                      className="text-white/90 hover:text-pepper-gold font-medium transition-colors"
+                    >
+                      My Quality Grading
+                    </Link>
+                  </>
                 )}
-                
+
                 <Link
                   href={`/dashboard/${user?.role}`}
                   className="text-white/90 hover:text-pepper-gold font-medium transition-colors"
@@ -97,7 +105,7 @@ export function Header() {
                       <ChevronDown className="w-4 h-4" />
                     </div>
                   </button>
-                  
+
                   {userMenuOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2">
                       <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
@@ -139,7 +147,7 @@ export function Header() {
                 </Link>
               </>
             )}
-            
+
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -152,7 +160,7 @@ export function Header() {
                 <Sun className="w-5 h-5" />
               )}
             </button>
-            
+
             <div className="border-l border-gray-300 dark:border-gray-600 pl-4">
               <ConnectButton />
             </div>
@@ -185,7 +193,7 @@ export function Header() {
                   </span>
                 </div>
               )}
-              
+
               <Link
                 href="/auctions"
                 className="text-white/90 hover:text-pepper-gold font-medium py-2"
@@ -193,19 +201,28 @@ export function Header() {
               >
                 Auctions
               </Link>
-              
+
               {isAuthenticated ? (
                 <>
                   {user?.role === 'farmer' && (
-                    <Link
-                      href="/create"
-                      className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium py-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Create Auction
-                    </Link>
+                    <>
+                      <Link
+                        href="/create"
+                        className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Create Auction
+                      </Link>
+                      <Link
+                        href="/dashboard/farmer/quality-grading"
+                        className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        My Quality Grading
+                      </Link>
+                    </>
                   )}
-                  
+
                   <Link
                     href={`/dashboard/${user?.role}`}
                     className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium py-2"
@@ -240,7 +257,7 @@ export function Header() {
                   </Link>
                 </>
               )}
-              
+
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
@@ -258,7 +275,7 @@ export function Header() {
                   </>
                 )}
               </button>
-              
+
               <div className="pt-3 mt-3 border-t border-gray-200 dark:border-gray-700">
                 <ConnectButton />
               </div>

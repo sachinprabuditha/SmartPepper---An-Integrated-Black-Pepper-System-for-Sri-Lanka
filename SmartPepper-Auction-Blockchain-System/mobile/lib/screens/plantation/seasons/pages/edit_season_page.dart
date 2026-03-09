@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart' as vanilla_provider;
 import '../controllers/season_controller.dart';
 import '../../plantation/controllers/plantation_controller.dart';
+import '../../../../localization/app_localizations.dart';
 import '../../../../providers/language_provider.dart';
-import '../../../../widgets/language_picker_button.dart';
 import '../../../../widgets/primary_button.dart';
 import '../../../../widgets/input_field.dart';
 import '../../../../widgets/dropdown_field.dart';
@@ -28,7 +28,8 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
   int? _endYear;
 
   final List<int> _months = List.generate(12, (index) => index + 1);
-  final List<int> _years = List.generate(10, (index) => DateTime.now().year - 5 + index);
+  final List<int> _years =
+      List.generate(10, (index) => DateTime.now().year - 5 + index);
 
   @override
   void initState() {
@@ -58,16 +59,9 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
             );
 
         if (mounted) {
-          final languageProvider =
-              vanilla_provider.Provider.of<LanguageProvider>(context, listen: false);
-          final lang = languageProvider.locale.languageCode;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                lang == 'en'
-                    ? 'Season updated successfully'
-                    : 'කන්නය සාර්ථකව යාවත්කාලීන විය',
-              ),
+              content: Text(context.tr('plantation_season_updated_success')),
               backgroundColor: Colors.green,
             ),
           );
@@ -88,15 +82,15 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
 
   @override
   Widget build(BuildContext context) {
-    final languageProvider = vanilla_provider.Provider.of<LanguageProvider>(context);
+    final languageProvider =
+        vanilla_provider.Provider.of<LanguageProvider>(context);
     final lang = languageProvider.locale.languageCode;
     final seasonAsync = ref.watch(seasonProvider(widget.seasonId));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(lang == 'en' ? 'Edit Season' : 'කන්නය සංස්කරණය කරන්න'),
+        title: Text(context.tr('plantation_edit_season')),
         actions: const [
-          LanguagePickerButton(),
           SizedBox(width: 8),
         ],
       ),
@@ -126,23 +120,24 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
                             return Card(
                               color: Colors.orange,
                               child: Padding(
-                                padding: EdgeInsets.all(16.0),
+                                padding: const EdgeInsets.all(16.0),
                                 child: Text(
-                                  lang == 'en'
-                                      ? 'No farms available.'
-                                      : 'ගොවිපල කිසිවක් නොමැත.',
-                                  style: TextStyle(color: Colors.white),
+                                  context.tr('plantation_no_farms_available'),
+                                  style: const TextStyle(color: Colors.white),
                                 ),
                               ),
                             );
                           }
                           return DropdownField<String>(
-                            label: lang == 'en' ? 'Farm' : 'ගොවිපල',
+                            label: context.tr('plantation_farm'),
                             value: _selectedFarmId,
-                            items: farms.map((farm) => DropdownMenuItem(
-                              value: farm.id,
-                              child: Text('${farm.farmName} (${farm.district.get(lang)})'),
-                            )).toList(),
+                            items: farms
+                                .map((farm) => DropdownMenuItem(
+                                      value: farm.id,
+                                      child: Text(
+                                          '${farm.farmName} (${farm.district.get(lang)})'),
+                                    ))
+                                .toList(),
                             onChanged: (value) {
                               setState(() {
                                 _selectedFarmId = value;
@@ -156,7 +151,7 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
-                              '${lang == 'en' ? 'Error loading farms' : 'ගොවිපල පූරණය කිරීමේ දෝෂයක්'}: $error',
+                              '${context.tr('plantation_error_loading_farms')}: $error',
                             ),
                           ),
                         ),
@@ -165,7 +160,7 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
                   ),
                   const SizedBox(height: 16),
                   InputField(
-                    label: lang == 'en' ? 'Season Name' : 'කන්න නම',
+                    label: context.tr('plantation_season_name'),
                     controller: _seasonNameController,
                   ),
                   const SizedBox(height: 16),
@@ -173,7 +168,7 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
                     children: [
                       Expanded(
                         child: DropdownField<int>(
-                          label: lang == 'en' ? 'Start Month' : 'ආරම්භ මාසය',
+                          label: context.tr('plantation_start_month'),
                           value: _startMonth,
                           items: _months
                               .map((month) => DropdownMenuItem(
@@ -191,7 +186,7 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
                       const SizedBox(width: 16),
                       Expanded(
                         child: DropdownField<int>(
-                          label: lang == 'en' ? 'Start Year' : 'ආරම්භ වර්ෂය',
+                          label: context.tr('plantation_start_year'),
                           value: _startYear,
                           items: _years
                               .map((year) => DropdownMenuItem(
@@ -213,7 +208,7 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
                     children: [
                       Expanded(
                         child: DropdownField<int>(
-                          label: lang == 'en' ? 'End Month' : 'අවසන් මාසය',
+                          label: context.tr('plantation_end_month'),
                           value: _endMonth,
                           items: _months
                               .map((month) => DropdownMenuItem(
@@ -231,7 +226,7 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
                       const SizedBox(width: 16),
                       Expanded(
                         child: DropdownField<int>(
-                          label: lang == 'en' ? 'End Year' : 'අවසන් වර්ෂය',
+                          label: context.tr('plantation_end_year'),
                           value: _endYear,
                           items: _years
                               .map((year) => DropdownMenuItem(
@@ -250,7 +245,7 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
                   ),
                   const SizedBox(height: 32),
                   PrimaryButton(
-                    text: lang == 'en' ? 'Update Season' : 'කන්නය යාවත්කාලීන කරන්න',
+                    text: context.tr('plantation_update_season'),
                     onPressed: _handleSubmit,
                   ),
                 ],
@@ -260,7 +255,7 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(
-          child: Text('Error: ${error.toString()}'),
+          child: Text('${context.tr('common_error')}: ${error.toString()}'),
         ),
       ),
     );
@@ -284,4 +279,3 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
     return months[month - 1];
   }
 }
-

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart' as vanilla_provider;
 import '../models/session_model.dart';
 import '../../../../providers/language_provider.dart';
+import '../../../../localization/app_localizations.dart';
 
 class SessionCard extends StatelessWidget {
   final SessionModel session;
@@ -20,9 +21,9 @@ class SessionCard extends StatelessWidget {
         vanilla_provider.Provider.of<LanguageProvider>(context);
     final lang = languageProvider.locale.languageCode;
 
-    final yieldLabel = lang == 'en' ? 'Yield' : 'අස්වැන්න';
-    final areaLabel = lang == 'en' ? 'Area' : 'ප්‍රදේශය';
-    final yieldHaLabel = lang == 'en' ? 'Yield/Ha' : 'අස්වැන්න/හෙක්';
+    final yieldLabel = context.tr('plantation_yield');
+    final areaLabel = context.tr('plantation_area_ha');
+    final yieldHaLabel = context.tr('plantation_yield_ha');
 
     final dateFormat = DateFormat('MMM dd, yyyy', lang);
     

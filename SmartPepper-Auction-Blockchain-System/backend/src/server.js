@@ -19,6 +19,7 @@ const adminRoutes = require('./routes/admin');
 const governanceRoutes = require('./routes/governance');
 const escrowRoutes = require('./routes/escrow');
 const notificationsRoutes = require('./routes/notifications');
+const qualityGradingRoutes = require('./routes/qualityGrading');
 const { startAuctionStatusMonitor } = require('./services/auctionStatusService');
 
 // Load NFT routes with error handling
@@ -74,6 +75,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/governance', governanceRoutes);
 app.use('/api/escrow', escrowRoutes);
 app.use('/api/traceability', require('./routes/traceability'));
+app.use('/api/quality-grading', qualityGradingRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -123,7 +125,7 @@ async function initialize() {
         host: process.env.REDIS_HOST || 'localhost',
         port: process.env.REDIS_PORT || 6379
       });
-      
+
       await redisClient.connect();
       logger.info('✅ Redis connected - Real-time WebSocket features enabled');
     } catch (redisError) {
@@ -182,16 +184,16 @@ async function initialize() {
         methods: ['GET', 'POST']
       }
     });
-    
+
     // Make io available to routes and services
     app.set('io', io);
     global.io = io; // Make available to finalization service
-    
+
     // Initialize WebSocket (works with or without Redis)
     const auctionSocket = new AuctionWebSocket(io, redisClient);
     auctionSocket.initialize();
     app.set('auctionSocket', auctionSocket); // Make available to routes
-    
+
     if (redisClient) {
       logger.info('✅ WebSocket server initialized with Redis caching');
     } else {

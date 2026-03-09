@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import sequelize from './config/db.js';
+
 
 dotenv.config();
 
@@ -10,6 +10,11 @@ const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
 
 import authRoutes from './routes/auth.routes.js';
 app.use('/api/auth', authRoutes);
@@ -23,14 +28,18 @@ app.use('/api/agronomy', agronomyRoutes); // Matches /api/agronomy/districts
 import chatRoutes from './routes/chat.routes.js';
 app.use('/api/chat', chatRoutes);
 
-import harvestRoutes from './routes/harvest.routes.js';
-app.use('/api', harvestRoutes); // Matches /api/seasons/user/:userId
-
 import predictionRoutes from './routes/prediction.routes.js';
 app.use('/api/prediction', predictionRoutes);
 
-import adminRoutes from './routes/admin.routes.js';
-app.use('/api/admin/pepperknowledge', adminRoutes);
+
+
+import knowledgebaseRoutes from './routes/knowledgebase.routes.js';
+import agricultureRoutes from './routes/agriculture.routes.js';
+app.use('/api/kb', knowledgebaseRoutes);
+app.use('/api/agriculture', agricultureRoutes);
+
+import harvestRoutes from './routes/harvest.routes.js';
+app.use('/api', harvestRoutes); // Matches /api/seasons/user/:userId - broad mount moved to end
 
 // Test route
 app.get('/', (req, res) => {
@@ -40,9 +49,7 @@ app.get('/', (req, res) => {
 // Database connection test
 const startServer = async () => {
     try {
-        // SQL Connection removed as we migrated to Firestore
-        // await sequelize.authenticate();
-        console.log('Database connection (Firestore) initialized via config.');
+        console.log('Firebase (Firestore) initialized via config.');
 
         app.listen(port, "0.0.0.0", () => {
             console.log(`Server running on port ${port}`);

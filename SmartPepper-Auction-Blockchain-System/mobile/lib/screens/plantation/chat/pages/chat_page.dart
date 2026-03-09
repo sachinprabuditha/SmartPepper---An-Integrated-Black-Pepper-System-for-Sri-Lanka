@@ -51,8 +51,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
-    final activeConversationId =
-        ref.read(activeConversationProvider);
+    final activeConversationId = ref.read(activeConversationProvider);
 
     _controller.clear();
 
@@ -122,14 +121,23 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
     return Scaffold(
       drawer: const ConversationSidebar(),
-
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              ),
+            ),
+          ],
         ),
+        leadingWidth: 100, // Enough width for two icons
         title: const Text('AI Assistant'),
         backgroundColor: AppTheme.forestGreen,
         foregroundColor: Colors.white,
@@ -141,8 +149,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
               return DropdownButtonHideUnderline(
                 child: DropdownButton<String?>(
                   dropdownColor: AppTheme.deepEmerald,
-                  icon:
-                      const Icon(Icons.arrow_drop_down, color: Colors.white),
+                  icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
                   value: _selectedFarmId,
                   hint: const Text("Mode: Guide",
                       style: TextStyle(color: Colors.white70)),
@@ -176,14 +183,12 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           const SizedBox(width: 16),
         ],
       ),
-
       body: Column(
         children: [
           /// MODE INDICATOR
           Container(
             width: double.infinity,
-            padding:
-                const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
             color: _selectedFarmId == null
                 ? Colors.blueGrey[100]
                 : Colors.green[100],
@@ -233,14 +238,12 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     final isUser = msg.isUser;
 
     return Align(
-      alignment:
-          isUser ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 6),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color:
-              isUser ? AppTheme.pepperGold : Colors.grey.shade200,
+          color: isUser ? AppTheme.pepperGold : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(14),
         ),
         constraints: BoxConstraints(
@@ -258,9 +261,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             ),
 
             /// SOURCES
-            if (!isUser &&
-                msg.sources != null &&
-                msg.sources!.isNotEmpty)
+            if (!isUser && msg.sources != null && msg.sources!.isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(top: 10),
                 padding: const EdgeInsets.all(8),
@@ -273,9 +274,8 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                   children: [
                     const Text(
                       "Sources",
-                      style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     ...msg.sources!.map(
@@ -340,8 +340,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               ),
               onSubmitted: (_) => _sendMessage(),
             ),
