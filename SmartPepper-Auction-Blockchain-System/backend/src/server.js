@@ -140,6 +140,26 @@ async function initialize() {
       logger.warn('Blockchain service initialization failed (continuing without blockchain):', blockchainError.message);
     }
 
+    // Initialize Exchange Rate Service (real-time rates from CoinGecko API)
+    try {
+      const exchangeRateService = require('./services/exchangeRateService');
+      const currencyConverter = require('./utils/currencyConverter');
+      
+      await exchangeRateService.initialize();
+      currencyConverter.setExchangeRateService(exchangeRateService);
+      
+      logger.info('✅ Exchange Rate Service initialized (CoinGecko API)');
+      
+      const status = exchangeRateService.getStatus();
+      logger.info('💱 Live exchange rates:', {
+        ethToUsd: status.rates.ethToUsd,
+        ethToLkr: status.rates.ethToLkr,
+        updateInterval: status.updateInterval
+      });
+    } catch (exchangeRateError) {
+      logger.warn('⚠️ Exchange Rate Service initialization failed (using fallback rates):', exchangeRateError.message);
+    }
+
     // Initialize auction finalization service
     try {
       const auctionFinalizationService = require('./services/auctionFinalizationService');

@@ -4,10 +4,12 @@ const logger = require('./logger');
 /**
  * Currency Converter Utility
  * Handles conversion between LKR, ETH, and USD
+ * Now uses ExchangeRateService for real-time rates from CoinGecko API
  */
 class CurrencyConverter {
   constructor() {
-    this.rates = {
+    // Fallback rates (used only if exchange rate service is unavailable)
+    this.fallbackRates = {
       'LKR_TO_ETH': 0.0000031,
       'ETH_TO_LKR': 322580.65,
       'USD_TO_ETH': 0.00032,
@@ -15,14 +17,48 @@ class CurrencyConverter {
       'LKR_TO_USD': 0.0031,
       'USD_TO_LKR': 322.58
     };
+    this.rates = { ...this.fallbackRates };
     this.lastUpdate = null;
+    this.exchangeRateService = null;
   }
 
   /**
-   * Load exchange rates from Firebase
+   * Initialize with exchange rate service
+   */
+  setExchangeRateService(service) {
+    this.exchangeRateService = service;
+    logger.info('Currency converter linked to exchange rate service');
+  }
+
+  /**
+   * Load exchange rates from Firebase and Exchange Rate Service
    */
   async loadRates() {
     try {
+      // First, try to get rates from the live exchange rate service
+      if (this.exchangeRateService) {
+        const liveRates = this.exchangeRateService.getRates();
+        
+        if (liveRates.ethToUsd && liveRates.ethToLkr && liveRates.usdToLkr) {
+          this.rates = {
+            'ETH_TO_USD': liveRates.ethToUsd,
+            'USD_TO_ETH': 1 / liveRates.ethToUsd,
+            'ETH_TO_LKR': liveRates.ethToLkr,
+            'LKR_TO_ETH': 1 / liveRates.ethToLkr,
+            'USD_TO_LKR': liveRates.usdToLkr,
+            'LKR_TO_USD': 1 / liveRates.usdToLkr
+          };
+          this.lastUpdate = liveRates.lastUpdate;
+          logger.info('Exchange rates loaded from live API', {
+            ethToUsd: liveRates.ethToUsd,
+            ethToLkr: liveRates.ethToLkr,
+            lastUpdate: this.lastUpdate
+          });
+          return;
+        }
+      }
+
+      // Fallback: Load from Firebase
       const firestore = admin.firestore();
       const snapshot = await firestore.collection('exchange_rates')
         .where('is_active', '==', true)
@@ -38,11 +74,12 @@ class CurrencyConverter {
         this.lastUpdate = new Date();
         logger.info('Exchange rates loaded from Firebase', { count: snapshot.size });
       } else {
-        logger.info('No exchange rates in Firebase, using default rates');
+        logger.info('No exchange rates available, using fallback rates');
+        this.rates = { ...this.fallbackRates };
       }
     } catch (error) {
-      logger.warn('Failed to load exchange rates from Firebase, using defaults:', error.message);
-      // Continue with default rates
+      logger.warn('Failed to load exchange rates, using fallback:', error.message);
+      this.rates = { ...this.fallbackRates };
     }
   }
 

@@ -885,5 +885,96 @@ router.post('/users/:userId/reject', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/admin/exchange-rates/status
+ * Get current exchange rate service status
+ */
+router.get('/exchange-rates/status', async (req, res) => {
+  try {
+    const exchangeRateService = require('../services/exchangeRateService');
+    const status = exchangeRateService.getStatus();
+    
+    res.json({
+      success: true,
+      status
+    });
+  } catch (error) {
+    logger.error('Error fetching exchange rate status:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch exchange rate status',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/admin/exchange-rates/update
+ * Force immediate update of exchange rates
+ */
+router.post('/exchange-rates/update', async (req, res) => {
+  try {
+    const exchangeRateService = require('../services/exchangeRateService');
+    
+    logger.info('Admin triggered exchange rate update');
+    
+    const rates = await exchangeRateService.forceUpdate();
+    
+    res.json({
+      success: true,
+      message: 'Exchange rates updated successfully',
+      rates: {
+        ethToUsd: rates.ethToUsd,
+        ethToLkr: rates.ethToLkr,
+        usdToLkr: rates.usdToLkr,
+        lastUpdate: exchangeRateService.getRates().lastUpdate
+      }
+    });
+  } catch (error) {
+    logger.error('Error updating exchange rates:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update exchange rates',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/admin/exchange-rates/history
+ * Get exchange rate history from Firebase
+ */
+router.get('/exchange-rates/history', async (req, res) => {
+  try {
+    const { limit = 50 } = req.query;
+    
+    const snapshot = await db.collection('exchange_rates')
+      .orderBy('updated_at', 'desc')
+      .limit(parseInt(limit))
+      .get();
+    
+    const history = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...convertTimestamps(data)
+      };
+    });
+    
+    res.json({
+      success: true,
+      count: history.length,
+      history
+    });
+  } catch (error) {
+    logger.error('Error fetching exchange rate history:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch exchange rate history',
+      details: error.message
+    });
+  }
+});
+
 module.exports = router;
 

@@ -118,6 +118,30 @@ router.get('/', async (req, res) => {
           auctionData.quantity = lotData.quantity;
           auctionData.quality = lotData.quality;
           auctionData.origin = lotData.origin;
+          auctionData.farm_location = lotData.farm_location;
+          auctionData.lot_pictures = lotData.lot_pictures || [];
+          
+          // Fetch farmer details for farmer name
+          if (lotData.farmer_id) {
+            const farmerDoc = await firestore.collection('users').doc(lotData.farmer_id).get();
+            if (farmerDoc.exists) {
+              const farmerData = farmerDoc.data();
+              auctionData.farmer_name = farmerData.name || 'Unknown Farmer';
+            }
+          }
+          
+          // If no farmer found by ID, try by wallet address
+          if (!auctionData.farmer_name && auctionData.farmer_address) {
+            const farmerSnapshot = await firestore.collection('users')
+              .where('wallet_address_lower', '==', auctionData.farmer_address.toLowerCase())
+              .limit(1)
+              .get();
+            
+            if (!farmerSnapshot.empty) {
+              const farmerData = farmerSnapshot.docs[0].data();
+              auctionData.farmer_name = farmerData.name || 'Unknown Farmer';
+            }
+          }
         }
       }
       

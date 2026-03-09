@@ -86,10 +86,50 @@ router.get('/', async (req, res) => {
       return convertTimestamps({ id: doc.id, ...data });
     });
 
+    // Fetch farmer names for all lots
+    for (let lot of lots) {
+      let farmerData = null;
+      
+      // Try to find farmer by ID first
+      if (lot.farmer_id) {
+        try {
+          const farmerDoc = await firestore.collection('users').doc(lot.farmer_id).get();
+          if (farmerDoc.exists) {
+            farmerData = farmerDoc.data();
+          }
+        } catch (error) {
+          logger.error('Error fetching farmer by ID:', error);
+        }
+      }
+      
+      // If no farmer found by ID, try by wallet address
+      if (!farmerData && lot.farmer_address) {
+        try {
+          const farmerSnapshot = await firestore.collection('users')
+            .where('wallet_address_lower', '==', lot.farmer_address.toLowerCase())
+            .limit(1)
+            .get();
+          
+          if (!farmerSnapshot.empty) {
+            farmerData = farmerSnapshot.docs[0].data();
+          }
+        } catch (error) {
+          logger.error('Error fetching farmer by wallet:', error);
+        }
+      }
+      
+      // Add farmer name to lot
+      if (farmerData) {
+        lot.farmer_name = farmerData.name || 'Unknown Farmer';
+      } else {
+        lot.farmer_name = 'Unknown Farmer';
+      }
+    }
+
     logger.info('Query results:', { 
       count,
       lotsReturned: lots.length,
-      firstLot: lots[0] ? { lot_id: lots[0].lot_id, farmer: lots[0].farmer_address } : null
+      firstLot: lots[0] ? { lot_id: lots[0].lot_id, farmer: lots[0].farmer_address, farmer_name: lots[0].farmer_name } : null
     });
 
     res.json({
@@ -108,7 +148,7 @@ router.get('/', async (req, res) => {
 
 /**
  * GET /api/lots/:lotId
- * Get lot details
+ * Get lot details with farmer information
  */
 router.get('/:lotId', async (req, res) => {
   try {
@@ -129,6 +169,41 @@ router.get('/:lotId', async (req, res) => {
 
     const lotDoc = lotsSnap.docs[0];
     const lot = convertTimestamps({ id: lotDoc.id, ...lotDoc.data() });
+
+    // Fetch farmer details
+    let farmerData = null;
+    
+    if (lot.farmer_id) {
+      const farmerDoc = await firestore.collection('users').doc(lot.farmer_id).get();
+      if (farmerDoc.exists) {
+        farmerData = farmerDoc.data();
+        logger.info('Found farmer by ID:', { farmer_id: lot.farmer_id, name: farmerData.name });
+      }
+    }
+    
+    // If no farmer found by ID, try by wallet address
+    if (!farmerData && lot.farmer_address) {
+      const farmerSnapshot = await firestore.collection('users')
+        .where('wallet_address_lower', '==', lot.farmer_address.toLowerCase())
+        .limit(1)
+        .get();
+      
+      if (!farmerSnapshot.empty) {
+        farmerData = farmerSnapshot.docs[0].data();
+        logger.info('Found farmer by wallet:', { wallet: lot.farmer_address, name: farmerData.name });
+      } else {
+        logger.warn('No farmer found for wallet:', lot.farmer_address);
+      }
+    }
+    
+    // Add farmer details to lot if found
+    if (farmerData) {
+      lot.farmer_name = farmerData.name || 'Unknown Farmer';
+      lot.farmer_email = farmerData.email;
+      lot.farmer_phone = farmerData.phone;
+    } else {
+      logger.warn('No farmer data available for lot:', lotId);
+    }
 
     res.json({
       success: true,
