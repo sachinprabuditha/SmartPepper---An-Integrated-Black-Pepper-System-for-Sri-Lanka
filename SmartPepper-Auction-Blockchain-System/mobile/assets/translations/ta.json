@@ -1,7 +1,6 @@
 {
   "app_name": "ஸ்மார்ட்பெப்பர்",
   "app_tagline": "பிளாக்செயின் இயக்கப்பட்ட மிளகு ஏற்றுமதி அமைப்பு",
-  
   "common_ok": "சரி",
   "common_cancel": "ரத்து செய்",
   "common_confirm": "உறுதிப்படுத்து",
@@ -21,7 +20,6 @@
   "common_next": "அடுத்து",
   "common_yes": "ஆம்",
   "common_no": "இல்லை",
-  
   "auth_login": "உள்நுழை",
   "auth_logout": "வெளியேறு",
   "auth_register": "பதிவு செய்",
@@ -41,7 +39,6 @@
   "auth_farmer": "விவசாயி",
   "auth_exporter": "ஏற்றுமதியாளர்",
   "auth_admin": "நிர்வாகி",
-  
   "nav_home": "முகப்பு",
   "nav_lots": "தொகுதிகள்",
   "nav_auctions": "ஏலங்கள்",
@@ -49,7 +46,6 @@
   "nav_settings": "அமைப்புகள்",
   "nav_wallet": "பணப்பை",
   "nav_notifications": "அறிவிப்புகள்",
-  
   "lot_title": "மிளகு தொகுதிகள்",
   "lot_create": "புதிய தொகுதியை உருவாக்கு",
   "lot_my_lots": "எனது தொகுதிகள்",
@@ -75,7 +71,6 @@
   "lot_scan_qr": "QR குறியீட்டை ஸ்கேன் செய்",
   "lot_traceability": "கண்காணிப்பு",
   "lot_farm_details": "பண்ணை விவரங்கள்",
-  
   "auction_title": "ஏலங்கள்",
   "auction_live": "நேரடி ஏலங்கள்",
   "auction_upcoming": "வரவிருக்கும் ஏலங்கள்",
@@ -101,7 +96,6 @@
   "auction_settle": "ஏலத்தை தீர்வு செய்",
   "auction_winning_bid": "வெற்றி ஏலம்",
   "auction_total_bids": "மொத்த ஏலங்கள்",
-  
   "compliance_title": "இணக்கம்",
   "compliance_check": "இணக்க சோதனை",
   "compliance_status": "இணக்க நிலை",
@@ -117,7 +111,6 @@
   "compliance_eu": "ஐரோப்பிய யூனியன் தரநிலைகள்",
   "compliance_fda": "FDA தேவைகள்",
   "compliance_halal": "ஹலால் சான்றிதழ்",
-  
   "payment_title": "கொடுப்பனவு",
   "payment_escrow": "எஸ்க்ரோ",
   "payment_amount": "தொகை",
@@ -131,7 +124,6 @@
   "payment_deposit": "வைப்பு",
   "payment_history": "கொடுப்பனவு வரலாறு",
   "payment_transaction_id": "பரிவர்த்தனை அடையாளம்",
-  
   "shipment_title": "அனுப்புதல்",
   "shipment_details": "அனுப்புதல் விவரங்கள்",
   "shipment_tracking": "கண்காணிப்பு",
@@ -144,7 +136,6 @@
   "shipment_in_transit": "போக்குவரத்தில்",
   "shipment_delivered": "வழங்கப்பட்டது",
   "shipment_customs_clearance": "சுங்க அனுமதி",
-  
   "profile_title": "சுயவிவரம்",
   "profile_edit": "சுயவிவரத்தைத் திருத்து",
   "profile_farmer_info": "விவசாயி தகவல்",
@@ -157,7 +148,6 @@
   "profile_verified": "சரிபார்க்கப்பட்டது",
   "profile_unverified": "சரிபார்க்கப்படவில்லை",
   "profile_documents": "ஆவணங்கள்",
-  
   "settings_title": "அமைப்புகள்",
   "settings_language": "மொழி",
   "settings_select_language": "மொழியைத் தேர்ந்தெடு",
@@ -174,7 +164,6 @@
   "settings_terms": "விதிமுறைகள் & நிபந்தனைகள்",
   "settings_privacy": "தனியுரிமைக் கொள்கை",
   "settings_support": "ஆதரவு",
-  
   "notification_new_bid": "உங்கள் ஏலத்தில் புதிய ஏலம் வைக்கப்பட்டுள்ளது",
   "notification_auction_won": "வாழ்த்துக்கள்! நீங்கள் ஏலத்தை வென்றீர்கள்",
   "notification_auction_sold": "ஏலம் வெற்றிகரமாக முடிந்தது",
@@ -186,7 +175,6 @@
   "notification_compliance_approved": "இணக்க சோதனை தேர்ச்சி",
   "notification_compliance_rejected": "இணக்க சோதனை தோல்வி",
   "notification_shipment_update": "அனுப்புதல் நிலை புதுப்பிக்கப்பட்டது",
-  
   "error_network": "பிணைய பிழை. உங்கள் இணைப்பை சரிபார்க்கவும்",
   "error_invalid_input": "தவறான உள்ளீடு. உங்கள் தரவை சரிபார்க்கவும்",
   "error_authentication": "அங்கீகாரம் தோல்வி",
@@ -194,28 +182,23 @@
   "error_not_found": "வளம் கிடைக்கவில்லை",
   "error_server": "சர்வர் பிழை. பின்னர் மீண்டும் முயற்சிக்கவும்",
   "error_blockchain": "பிளாக்செயின் பரிவர்த்தனை தோல்வி",
-  
   "success_lot_created": "தொகுதி வெற்றிகரமாக உருவாக்கப்பட்டது",
   "success_auction_created": "ஏலம் வெற்றிகரமாக உருவாக்கப்பட்டது",
   "success_bid_placed": "ஏலம் வெற்றிகரமாக வைக்கப்பட்டது",
   "success_payment_completed": "கொடுப்பனவு வெற்றிகரமாக நிறைவடைந்தது",
   "success_profile_updated": "சுயவிவரம் வெற்றிகரமாக புதுப்பிக்கப்பட்டது",
   "success_settings_saved": "அமைப்புகள் சேமிக்கப்பட்டன",
-  
   "confirm_delete_lot": "இந்த தொகுதியை நீக்க விரும்புகிறீர்களா?",
   "confirm_place_bid": "இந்த ஏலத்தை வைக்க விரும்புகிறீர்களா?",
   "confirm_end_auction": "இந்த ஏலத்தை முடிக்க விரும்புகிறீர்களா?",
   "confirm_logout": "வெளியேற விரும்புகிறீர்களா?",
-  
   "blockchain_connecting": "பிளாக்செயினுடன் இணைக்கிறது...",
   "blockchain_transaction_pending": "பரிவர்த்தனை நிலுவையில்...",
   "blockchain_transaction_confirmed": "பரிவர்த்தனை உறுதிப்படுத்தப்பட்டது",
   "blockchain_view_on_explorer": "எக்ஸ்ப்ளோரரில் பார்",
-  
   "qr_scan_instruction": "தொகுதி விவரங்களைப் பார்க்க QR குறியீட்டை ஸ்கேன் செய்யவும்",
   "qr_scan_failed": "QR குறியீட்டை ஸ்கேன் செய்ய தோல்வி",
   "qr_generate": "QR குறியீட்டை உருவாக்கு",
-  
   "dashboard_welcome": "வரவேற்கிறோம்",
   "dashboard_total_lots": "மொத்த தொகுதிகள்",
   "dashboard_active_auctions": "செயலில் உள்ள ஏலங்கள்",
@@ -223,10 +206,16 @@
   "dashboard_pending_payments": "நிலுவையில் உள்ள கொடுப்பனவுகள்",
   "dashboard_recent_activity": "சமீபத்திய செயல்பாடுகள்",
   "dashboard_statistics": "புள்ளிவிவரங்கள்",
-  
   "empty_no_lots": "தொகுதிகள் இல்லை",
   "empty_no_auctions": "ஏலங்கள் இல்லை",
   "empty_no_bids": "இன்னும் ஏலங்கள் இல்லை",
   "empty_no_notifications": "அறிவிப்புகள் இல்லை",
-  "empty_no_transactions": "பரிவர்த்தனைகள் இல்லை"
+  "empty_no_transactions": "பரிவர்த்தனைகள் இல்லை",
+  "price_analytics_title": "Price Analytics",
+  "price_analytics_no_data": "இந்த மாவட்டத்திற்கு கணிப்பு தரவு இல்லை.",
+  "price_analytics_gr1": "தரம் 1 (GR-1)",
+  "price_analytics_gr2": "தரம் 2 (GR-2)",
+  "price_analytics_white": "வெள்ளை மிளகு",
+  "price_analytics_historical_7d": "கடந்த 7 நாட்களின் விலை போக்கு",
+  "plantation_price_analytics": "Price Analytics"
 }

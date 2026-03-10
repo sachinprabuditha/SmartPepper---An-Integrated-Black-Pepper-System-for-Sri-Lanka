@@ -4680,6 +4680,72 @@
         "ta": "எ.கா. 50.5"
     },
     {
+        "key": "price_analytics_title",
+        "en": "Price Analytics",
+        "si": "මිල විශ්ලේෂණය",
+        "ta": "விலை பகுப்பாய்வு"
+    },
+    {
+        "key": "price_analytics_no_data",
+        "en": "No predicted data for this district.",
+        "si": "මෙම දිස්ත්‍රික්කය සඳහා දත්ත නොමැත.",
+        "ta": "இந்த மாவட்டத்திற்கு கணிப்பு தரவு இல்லை."
+    },
+    {
+        "key": "price_analytics_gr1",
+        "en": "Grade 1 (GR-1)",
+        "si": "1 වන ශ්‍රේණිය (GR-1)",
+        "ta": "தரம் 1 (GR-1)"
+    },
+    {
+        "key": "price_analytics_gr2",
+        "en": "Grade 2 (GR-2)",
+        "si": "2 වන ශ්‍රේණිය (GR-2)",
+        "ta": "தரம் 2 (GR-2)"
+    },
+    {
+        "key": "price_analytics_white",
+        "en": "White Pepper",
+        "si": "සුදු ගම්මිරිස්",
+        "ta": "வெள்ளை மிளகு"
+    },
+    {
+        "key": "price_analytics_historical_7d",
+        "en": "Past 7 Days Price Trend",
+        "si": "පසුගිය දින 7 මිල ප්‍රවණතාවය",
+        "ta": "கடந்த 7 நாட்களின் விலை போக்கு"
+    },
+    {
+        "key": "plantation_price_analytics",
+        "en": "Price Analytics",
+        "si": "මිල විශ්ලේෂණය",
+        "ta": "விலை பகுப்பாய்வு"
+    },
+    {
+        "key": "plantation_yield_analytics",
+        "en": "Yield Analytics",
+        "si": "අස්වනු විශ්ලේෂණය",
+        "ta": "விளைச்சல் பகுப்பாய்வு"
+    },
+    {
+        "key": "price_analytics_chart_type",
+        "en": "Chart Type",
+        "si": "ප්‍රස්ථාර වර්ගය",
+        "ta": "வரைபட வகை"
+    },
+    {
+        "key": "price_analytics_bar",
+        "en": "Bar",
+        "si": "තීරූ",
+        "ta": "பார்"
+    },
+    {
+        "key": "price_analytics_line",
+        "en": "Line",
+        "si": "රේඛීය",
+        "ta": "வரி"
+    },
+    {
         "key": "agronomy_all_suitable_soils",
         "en": "All Suitable Soils",
         "si": "සියලුම සුදුසු පස",
