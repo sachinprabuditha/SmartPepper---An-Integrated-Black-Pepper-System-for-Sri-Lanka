@@ -38,6 +38,7 @@ import '../screens/plantation/seasons/seasons_screen.dart';
 import '../screens/plantation/predictions/price_prediction_screen.dart';
 import '../screens/plantation/chat/ai_chat_screen.dart';
 import '../screens/plantation/yield_analytics/yield_analytics_page.dart';
+import '../screens/plantation/price_analytics/price_analytics_page.dart';
 import '../screens/plantation/plantation/models/farm_record_model.dart';
 import '../screens/plantation/plantation/models/farm_task_model.dart';
 import '../screens/diseases/image_upload_screen.dart';
@@ -233,6 +234,11 @@ class AppRouter {
       ),
 
       // Plantation feature routes
+      GoRoute(
+        path: '/plantation/price-analytics',
+        name: 'priceAnalytics',
+        builder: (context, state) => const PriceAnalyticsPage(),
+      ),
       GoRoute(
         path: '/plantation/farms',
         name: 'plantationFarms',

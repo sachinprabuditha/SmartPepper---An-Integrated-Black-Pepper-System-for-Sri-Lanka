@@ -11,5 +11,6 @@ const router = express.Router();
 
 router.post('/predict', predictionController.predict);
 router.get('/weather/:district', predictionController.getLatestWeather);
+router.get('/analytics/:district', predictionController.getPriceAnalytics);
 
 export default router;

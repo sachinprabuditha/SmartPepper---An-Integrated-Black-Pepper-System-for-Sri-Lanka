@@ -57,6 +57,12 @@ class PlantationManagementDashboard extends StatelessWidget {
         route: '/plantation/price-prediction',
       ),
       _FeatureCard(
+        label: context.tr('plantation_price_analytics'),
+        icon: Icons.auto_graph,
+        color: const Color(0xFFC2185B),
+        route: '/plantation/price-analytics',
+      ),
+      _FeatureCard(
         label: context.tr('plantation_yield_analytics'),
         icon: Icons.analytics_outlined,
         color: const Color(0xFF00897B),
