@@ -1,46 +1,37 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import '../models/session_model.dart';
 import '../services/session_service.dart';
-import '../../plantation/controllers/plantation_controller.dart';
 
-final sessionServiceProvider = Provider<SessionService>((ref) {
-  return SessionService(ref.read(plantationApiClientProvider));
-});
-
-final sessionsProvider = FutureProvider.family<List<SessionModel>, String>((ref, seasonId) async {
-  final service = ref.read(sessionServiceProvider);
-  return await service.getSessionsBySeasonId(seasonId);
-});
-
-final sessionProvider = FutureProvider.family<SessionModel, String>((ref, sessionId) async {
-  final service = ref.read(sessionServiceProvider);
-  return await service.getSessionById(sessionId);
-});
-
-final sessionControllerProvider = StateNotifierProvider.family<SessionController, AsyncValue<List<SessionModel>>, String>((ref, seasonId) {
-  return SessionController(ref.read(sessionServiceProvider), seasonId, ref);
-});
-
-class SessionController extends StateNotifier<AsyncValue<List<SessionModel>>> {
+class SessionController extends ChangeNotifier {
   final SessionService _sessionService;
-  final String _seasonId;
-  final Ref _ref;
 
-  SessionController(this._sessionService, this._seasonId, this._ref) : super(const AsyncValue.loading()) {
-    fetchSessions();
-  }
+  List<SessionModel> _sessions = [];
+  bool _isLoading = false;
+  String? _error;
 
-  Future<void> fetchSessions() async {
-    state = const AsyncValue.loading();
+  SessionController(this._sessionService);
+
+  List<SessionModel> get sessions => _sessions;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+
+  Future<void> fetchSessions(String seasonId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
     try {
-      final sessions = await _sessionService.getSessionsBySeasonId(_seasonId);
-      state = AsyncValue.data(sessions);
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
+      _sessions = await _sessionService.getSessionsBySeasonId(seasonId);
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
   Future<SessionModel> createSession({
+    required String seasonId,
     required String sessionName,
     required DateTime date,
     required double yieldKg,
@@ -49,22 +40,17 @@ class SessionController extends StateNotifier<AsyncValue<List<SessionModel>>> {
   }) async {
     try {
       final session = await _sessionService.createSession(
-        seasonId: _seasonId,
+        seasonId: seasonId,
         sessionName: sessionName,
         date: date,
         yieldKg: yieldKg,
         areaHarvested: areaHarvested,
         notes: notes,
       );
-      
-      // Refresh the list
-      if (state.hasValue) {
-        final currentSessions = state.value ?? [];
-        state = AsyncValue.data([...currentSessions, session]);
-      } else {
-        await fetchSessions();
-      }
-      
+
+      _sessions.add(session);
+      notifyListeners();
+
       return session;
     } catch (e) {
       rethrow;
@@ -88,20 +74,13 @@ class SessionController extends StateNotifier<AsyncValue<List<SessionModel>>> {
         areaHarvested: areaHarvested,
         notes: notes,
       );
-      
-      // Refresh the list
-      if (state.hasValue) {
-        final currentSessions = state.value ?? [];
-        final index = currentSessions.indexWhere((s) => s.id == sessionId);
-        if (index != -1) {
-          currentSessions[index] = updatedSession;
-          state = AsyncValue.data([...currentSessions]);
-        }
+
+      final index = _sessions.indexWhere((s) => s.id == sessionId);
+      if (index != -1) {
+        _sessions[index] = updatedSession;
+        notifyListeners();
       }
 
-      // Invalidate the specific session provider to ensure EditSessionPage gets fresh data
-      _ref.invalidate(sessionProvider(sessionId));
-      
       return updatedSession;
     } catch (e) {
       rethrow;
@@ -111,18 +90,11 @@ class SessionController extends StateNotifier<AsyncValue<List<SessionModel>>> {
   Future<void> deleteSession(String sessionId) async {
     try {
       await _sessionService.deleteSession(sessionId);
-      
-      // Refresh the list
-      if (state.hasValue) {
-        final currentSessions = state.value ?? [];
-        state = AsyncValue.data(currentSessions.where((s) => s.id != sessionId).toList());
-      }
 
-      // Invalidate the specific session provider
-      _ref.invalidate(sessionProvider(sessionId));
+      _sessions.removeWhere((s) => s.id == sessionId);
+      notifyListeners();
     } catch (e) {
       rethrow;
     }
   }
 }
-

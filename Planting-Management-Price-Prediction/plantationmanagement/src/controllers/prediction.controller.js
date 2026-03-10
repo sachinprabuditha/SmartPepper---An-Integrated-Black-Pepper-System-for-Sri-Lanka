@@ -50,7 +50,7 @@ export const getLatestWeather = async (req, res) => {
         const todayStr = new Date().toISOString().split('T')[0];
         const docId = `${district}_${todayStr}`;
 
-        let docRef = await db.collection('district_weather_features').doc(docId).get();
+        let docRef = await db.collection('daily_weather_forecast').doc(docId).get();
 
         // If data isn't in Firestore (e.g. server was off at 2 AM), fetch it on-demand
         if (!docRef.exists) {
@@ -59,7 +59,7 @@ export const getLatestWeather = async (req, res) => {
             await updateWeatherFeatures();
 
             // Try getting the document again after the fetch
-            docRef = await db.collection('district_weather_features').doc(docId).get();
+            docRef = await db.collection('daily_weather_forecast').doc(docId).get();
 
             if (!docRef.exists) {
                 return res.status(404).json({ success: false, message: `No weather data found for district: ${district} today, even after on-demand fetch.` });

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../config/theme.dart';
@@ -9,15 +8,14 @@ import 'models/prediction_output_model.dart';
 import 'services/prediction_service.dart';
 import 'services/exchange_service.dart';
 
-class PricePredictionScreen extends ConsumerStatefulWidget {
+class PricePredictionScreen extends StatefulWidget {
   const PricePredictionScreen({super.key});
 
   @override
-  ConsumerState<PricePredictionScreen> createState() =>
-      _PricePredictionScreenState();
+  State<PricePredictionScreen> createState() => _PricePredictionScreenState();
 }
 
-class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
+class _PricePredictionScreenState extends State<PricePredictionScreen> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers
@@ -43,6 +41,9 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
   // Weather fetching state
   bool _isFetchingWeather = false;
 
+  late final PredictionService _predictionService;
+  late final ExchangeService _exchangeService;
+
   // Constants
   final List<String> _locations = const [
     'Colombo',
@@ -61,6 +62,8 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
   @override
   void initState() {
     super.initState();
+    _predictionService = PredictionService();
+    _exchangeService = ExchangeService();
   }
 
   Future<void> _fetchLatestWeather(String location) async {
@@ -70,8 +73,7 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
     });
 
     try {
-      final service = ref.read(predictionServiceProvider);
-      final weatherInfo = await service.getLatestWeather(location);
+      final weatherInfo = await _predictionService.getLatestWeather(location);
 
       if (!mounted) return;
 
@@ -112,8 +114,7 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
     });
 
     try {
-      final exchangeService = ref.read(exchangeServiceProvider);
-      final rateData = await exchangeService.getUSDToLKR();
+      final rateData = await _exchangeService.getUSDToLKR();
 
       if (!mounted) return;
       setState(() {
@@ -192,8 +193,7 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
         grade: _grade!,
       );
 
-      final service = ref.read(predictionServiceProvider);
-      final result = await service.predictPrice(input);
+      final result = await _predictionService.predictPrice(input);
 
       if (!mounted) return;
       setState(() {
@@ -604,7 +604,7 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
                                         Text(
                                           context.tr(
                                               'price_prediction_estimated_value'),
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 14,
                                             color: Colors.black54,
                                           ),

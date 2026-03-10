@@ -37,6 +37,12 @@ export const updateWeatherFeatures = async () => {
         const todayStr = endDate;
         const batch = db.batch();
 
+        // Delete existing data
+        const snapshot = await db.collection('daily_weather_forecast').get();
+        snapshot.docs.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+
         for (let idx = 0; idx < DISTRICTS.length; idx++) {
             const districtData = DISTRICTS[idx];
             // Results array index corresponds to the requested coordinates
@@ -71,7 +77,7 @@ export const updateWeatherFeatures = async () => {
                 const docId = `${districtData.district}_${todayStr}`;
                 featureData.id = docId;
 
-                const docRef = db.collection('district_weather_features').doc(docId);
+                const docRef = db.collection('daily_weather_forecast').doc(docId);
                 batch.set(docRef, featureData);
             }
         }
@@ -88,15 +94,34 @@ export const updateWeatherFeatures = async () => {
 /**
  * Initializes the cron scheduler to run the weather update job daily.
  */
-export const startWeatherJob = () => {
-    // Schedule to run every day at 2 AM
-    cron.schedule('0 2 * * *', () => {
+export const startWeatherJob = async () => {
+    // Schedule to run every day at 2:00 PM
+    cron.schedule('0 14 * * *', () => {
         console.log('[WeatherService] Cron job triggered - Updating weather features');
         updateWeatherFeatures();
     });
-    console.log('[WeatherService] Cron job scheduled to run daily at 2 AM');
+    console.log('[WeatherService] Cron job scheduled to run daily at 2:00 PM');
 
-    // Optionally trigger immediately on startup if needed, but the prompt says 2 AM daily.
-    // Uncomment the following line to run it once on startup for initial population.
-    // updateWeatherFeatures();
+    // Check if today's data exists on startup
+    try {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const snapshot = await db.collection('daily_weather_forecast').limit(1).get();
+
+        let needsUpdate = true;
+        if (!snapshot.empty) {
+            const docData = snapshot.docs[0].data();
+            if (docData.date === todayStr) {
+                needsUpdate = false;
+            }
+        }
+
+        if (needsUpdate) {
+            console.log(`[WeatherService] Today's data (${todayStr}) not found or collection is empty. Running update on startup.`);
+            updateWeatherFeatures();
+        } else {
+            console.log(`[WeatherService] Today's data (${todayStr}) already exists. Skipping startup update.`);
+        }
+    } catch (err) {
+        console.error('[WeatherService] Error checking startup data:', err);
+    }
 };

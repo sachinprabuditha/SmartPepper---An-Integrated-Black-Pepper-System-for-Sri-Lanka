@@ -1,43 +1,32 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import '../models/season_model.dart';
 import '../services/season_service.dart';
-import '../../plantation/controllers/plantation_controller.dart';
 
-final seasonServiceProvider = Provider<SeasonService>((ref) {
-  return SeasonService(ref.read(plantationApiClientProvider));
-});
-
-final seasonsProvider = FutureProvider.family<List<SeasonModel>, String>((ref, userId) async {
-  final service = ref.read(seasonServiceProvider);
-  return await service.getSeasonsByUserId(userId);
-});
-
-final seasonsByFarmProvider = FutureProvider.family<List<SeasonModel>, String>((ref, farmId) async {
-  final service = ref.read(seasonServiceProvider);
-  return await service.getSeasonsByFarmId(farmId);
-});
-
-final seasonProvider = FutureProvider.family<SeasonModel, String>((ref, seasonId) async {
-  final service = ref.read(seasonServiceProvider);
-  return await service.getSeasonById(seasonId);
-});
-
-final seasonControllerProvider = StateNotifierProvider<SeasonController, AsyncValue<List<SeasonModel>>>((ref) {
-  return SeasonController(ref.read(seasonServiceProvider));
-});
-
-class SeasonController extends StateNotifier<AsyncValue<List<SeasonModel>>> {
+class SeasonController extends ChangeNotifier {
   final SeasonService _seasonService;
 
-  SeasonController(this._seasonService) : super(const AsyncValue.data([]));
+  List<SeasonModel> _seasons = [];
+  bool _isLoading = false;
+  String? _error;
+
+  SeasonController(this._seasonService);
+
+  List<SeasonModel> get seasons => _seasons;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
 
   Future<void> fetchSeasons(String userId) async {
-    state = const AsyncValue.loading();
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
     try {
-      final seasons = await _seasonService.getSeasonsByUserId(userId);
-      state = AsyncValue.data(seasons);
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
+      _seasons = await _seasonService.getSeasonsByUserId(userId);
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -60,13 +49,10 @@ class SeasonController extends StateNotifier<AsyncValue<List<SeasonModel>>> {
         farmId: farmId,
         createdBy: createdBy,
       );
-      
-      // Refresh the list
-      if (state.hasValue) {
-        final currentSeasons = state.value ?? [];
-        state = AsyncValue.data([...currentSeasons, season]);
-      }
-      
+
+      _seasons.add(season);
+      notifyListeners();
+
       return season;
     } catch (e) {
       rethrow;
@@ -92,32 +78,25 @@ class SeasonController extends StateNotifier<AsyncValue<List<SeasonModel>>> {
         endYear: endYear,
         farmId: farmId,
       );
-      
-      // Refresh the list
-      if (state.hasValue) {
-        final currentSeasons = state.value ?? [];
-        final index = currentSeasons.indexWhere((s) => s.id == seasonId);
-        if (index != -1) {
-          currentSeasons[index] = updatedSeason;
-          state = AsyncValue.data([...currentSeasons]);
-        }
+
+      final index = _seasons.indexWhere((s) => s.id == seasonId);
+      if (index != -1) {
+        _seasons[index] = updatedSeason;
+        notifyListeners();
       }
-      
+
       return updatedSeason;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<void> deleteSeason(String seasonId, String userId) async {
+  Future<void> deleteSeason(String seasonId) async {
     try {
       await _seasonService.deleteSeason(seasonId);
-      
-      // Refresh the list
-      if (state.hasValue) {
-        final currentSeasons = state.value ?? [];
-        state = AsyncValue.data(currentSeasons.where((s) => s.id != seasonId).toList());
-      }
+
+      _seasons.removeWhere((s) => s.id == seasonId);
+      notifyListeners();
     } catch (e) {
       rethrow;
     }
@@ -126,22 +105,17 @@ class SeasonController extends StateNotifier<AsyncValue<List<SeasonModel>>> {
   Future<void> endSeason(String seasonId) async {
     try {
       await _seasonService.endSeason(seasonId);
-      
-      // We don't necessarily need to refresh the list here if we are on the details page, 
+
+      // We don't necessarily need to refresh the list here if we are on the details page,
       // but it's good practice to ensure list consistency if we go back.
       // The details page should invalidate itself.
-      if (state.hasValue) {
-        final currentSeasons = state.value ?? [];
-        final index = currentSeasons.indexWhere((s) => s.id == seasonId);
-        if (index != -1) {
-          // We might not have the full updated object, but we know the status changed.
-          // Ideally we fetch the updated season or manually update the status in the local object.
-          // For simplicity, we can trust the details page reload or just let the list refresh next time.
-        }
+      final index = _seasons.indexWhere((s) => s.id == seasonId);
+      if (index != -1) {
+        // Just notify listeners to trigger a rebuild
+        notifyListeners();
       }
     } catch (e) {
       rethrow;
     }
   }
 }
-

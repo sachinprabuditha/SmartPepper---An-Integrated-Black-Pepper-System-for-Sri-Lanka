@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { startWeatherJob } from './services/weatherService.js';
+import { initPredictionJob } from './services/predictionCron.service.js';
 
 
 dotenv.config();
@@ -61,7 +62,10 @@ const startServer = async () => {
         // 1. Start Weather Data Cron Job
         startWeatherJob();
 
-        // 2. Preload Heavy ML Models
+        // 2. Start Price Prediction Cron Job
+        initPredictionJob();
+
+        // 3. Preload Heavy ML Models
         await preloadModel();
 
         app.listen(port, "0.0.0.0", () => {

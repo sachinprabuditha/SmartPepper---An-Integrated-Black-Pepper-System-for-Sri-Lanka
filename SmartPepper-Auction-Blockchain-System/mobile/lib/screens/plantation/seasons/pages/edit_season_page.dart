@@ -1,26 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:provider/provider.dart' as vanilla_provider;
+import 'package:provider/provider.dart';
+import '../models/season_model.dart';
+import '../services/season_service.dart';
 import '../controllers/season_controller.dart';
-import '../../plantation/controllers/plantation_controller.dart';
+import '../../plantation/models/farm_record_model.dart';
+import '../../plantation/services/plantation_service.dart';
+import '../../services/plantation_api_client.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../../providers/language_provider.dart';
 import '../../../../widgets/primary_button.dart';
 import '../../../../widgets/input_field.dart';
 import '../../../../widgets/dropdown_field.dart';
 
-class EditSeasonPage extends ConsumerStatefulWidget {
+class EditSeasonPage extends StatefulWidget {
   final String seasonId;
 
   const EditSeasonPage({super.key, required this.seasonId});
 
   @override
-  ConsumerState<EditSeasonPage> createState() => _EditSeasonPageState();
+  State<EditSeasonPage> createState() => _EditSeasonPageState();
 }
 
-class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
+class _EditSeasonPageState extends State<EditSeasonPage> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _seasonNameController;
+  late Future<SeasonModel> _seasonFuture;
+  late Future<List<FarmRecord>> _farmsFuture;
+  late SeasonService _seasonService;
+  late PlantationService _plantationService;
+  late SeasonController _seasonController;
+
   String? _selectedFarmId;
   int? _startMonth;
   int? _startYear;
@@ -35,6 +44,13 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
   void initState() {
     super.initState();
     _seasonNameController = TextEditingController();
+    final apiClient = PlantationApiClient();
+    _seasonService = SeasonService(apiClient);
+    _plantationService = PlantationService(apiClient);
+    _seasonController = SeasonController(_seasonService);
+
+    _seasonFuture = _seasonService.getSeasonById(widget.seasonId);
+    _farmsFuture = _plantationService.getFarms();
   }
 
   @override
@@ -46,17 +62,17 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
   Future<void> _handleSubmit() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await ref.read(seasonControllerProvider.notifier).updateSeason(
-              seasonId: widget.seasonId,
-              seasonName: _seasonNameController.text.trim().isNotEmpty
-                  ? _seasonNameController.text.trim()
-                  : null,
-              startMonth: _startMonth,
-              startYear: _startYear,
-              endMonth: _endMonth,
-              endYear: _endYear,
-              farmId: _selectedFarmId,
-            );
+        await _seasonController.updateSeason(
+          seasonId: widget.seasonId,
+          seasonName: _seasonNameController.text.trim().isNotEmpty
+              ? _seasonNameController.text.trim()
+              : null,
+          startMonth: _startMonth,
+          startYear: _startYear,
+          endMonth: _endMonth,
+          endYear: _endYear,
+          farmId: _selectedFarmId,
+        );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -82,10 +98,8 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
 
   @override
   Widget build(BuildContext context) {
-    final languageProvider =
-        vanilla_provider.Provider.of<LanguageProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
     final lang = languageProvider.locale.languageCode;
-    final seasonAsync = ref.watch(seasonProvider(widget.seasonId));
 
     return Scaffold(
       appBar: AppBar(
@@ -94,9 +108,26 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
           SizedBox(width: 8),
         ],
       ),
-      body: seasonAsync.when(
-        data: (season) {
-          _seasonNameController.text = season.seasonName;
+      body: FutureBuilder<SeasonModel>(
+        future: _seasonFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                  '${context.tr('common_error')}: ${snapshot.error.toString()}'),
+            );
+          } else if (!snapshot.hasData) {
+            return const Center(child: Text('No Data'));
+          }
+
+          final season = snapshot.data!;
+          // Initialize controllers only once when data is loaded
+          if (_seasonNameController.text.isEmpty &&
+              season.seasonName.isNotEmpty) {
+            _seasonNameController.text = season.seasonName;
+          }
           _selectedFarmId ??= season.farmId;
           _startMonth ??= season.startMonth;
           _startYear ??= season.startYear;
@@ -111,50 +142,52 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Farm Selection
-                  Consumer(
-                    builder: (context, ref, child) {
-                      final farmsAsync = ref.watch(farmsProvider);
-                      return farmsAsync.when(
-                        data: (farms) {
-                          if (farms.isEmpty) {
-                            return Card(
-                              color: Colors.orange,
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Text(
-                                  context.tr('plantation_no_farms_available'),
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            );
-                          }
-                          return DropdownField<String>(
-                            label: context.tr('plantation_farm'),
-                            value: _selectedFarmId,
-                            items: farms
-                                .map((farm) => DropdownMenuItem(
-                                      value: farm.id,
-                                      child: Text(
-                                          '${farm.farmName} (${farm.district.get(lang)})'),
-                                    ))
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedFarmId = value;
-                              });
-                            },
-                          );
-                        },
-                        loading: () => const LinearProgressIndicator(),
-                        error: (error, stack) => Card(
+                  FutureBuilder<List<FarmRecord>>(
+                    future: _farmsFuture,
+                    builder: (context, farmsSnapshot) {
+                      if (farmsSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const LinearProgressIndicator();
+                      } else if (farmsSnapshot.hasError) {
+                        return Card(
                           color: Colors.red[100],
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
-                              '${context.tr('plantation_error_loading_farms')}: $error',
+                              '${context.tr('plantation_error_loading_farms')}: ${farmsSnapshot.error}',
                             ),
                           ),
-                        ),
+                        );
+                      } else if (!farmsSnapshot.hasData ||
+                          farmsSnapshot.data!.isEmpty) {
+                        return Card(
+                          color: Colors.orange,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              context.tr('plantation_no_farms_available'),
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        );
+                      }
+
+                      final farms = farmsSnapshot.data!;
+                      return DropdownField<String>(
+                        label: context.tr('plantation_farm'),
+                        value: _selectedFarmId,
+                        items: farms
+                            .map((farm) => DropdownMenuItem(
+                                  value: farm.id,
+                                  child: Text(
+                                      '${farm.farmName} (${farm.district.get(lang)})'),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedFarmId = value;
+                          });
+                        },
                       );
                     },
                   ),
@@ -253,10 +286,6 @@ class _EditSeasonPageState extends ConsumerState<EditSeasonPage> {
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Text('${context.tr('common_error')}: ${error.toString()}'),
-        ),
       ),
     );
   }
