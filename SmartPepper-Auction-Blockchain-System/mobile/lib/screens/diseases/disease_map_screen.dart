@@ -121,7 +121,7 @@ class _DiseaseMapScreenState extends State<DiseaseMapScreen> {
                 color: AppTheme.deepEmerald.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Column(
+              child:const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
@@ -131,8 +131,8 @@ class _DiseaseMapScreenState extends State<DiseaseMapScreen> {
                         size: 16,
                         color: AppTheme.pepperGold,
                       ),
-                      const SizedBox(width: 8),
-                      const Expanded(
+                       SizedBox(width: 8),
+                       Expanded(
                         child: Text(
                           'Disease Tracking Info:',
                           style: TextStyle(

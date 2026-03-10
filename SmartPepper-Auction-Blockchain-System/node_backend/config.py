@@ -21,7 +21,7 @@ DEBUG_ROOT = os.path.join(BASE_DIR, "debug_crops")
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # YOLO Configuration with defaults
-YOLO_CONFIDENCE = float(os.getenv('YOLO_CONFIDENCE', '0.25'))
+YOLO_CONFIDENCE = float(os.getenv('YOLO_CONFIDENCE', '0.35'))
 YOLO_IOU = float(os.getenv('YOLO_IOU', '0.35'))
 YOLO_IMAGE_SIZE = int(os.getenv('YOLO_IMAGE_SIZE', '1024'))
 
@@ -31,8 +31,8 @@ MAX_LEAF_AREA = int(os.getenv('MAX_LEAF_AREA', '500000'))
 CROP_PADDING = float(os.getenv('CROP_PADDING', '0.15'))
 MASK_THRESHOLD = float(os.getenv('MASK_THRESHOLD', '0.05'))
 # Increased dilation for better edge capture (important for footrot detection on leaf edges)
-DILATION_KERNEL_SIZE = int(os.getenv('DILATION_KERNEL_SIZE', '7'))
-DILATION_ITERATIONS = int(os.getenv('DILATION_ITERATIONS', '7'))
+DILATION_KERNEL_SIZE = int(os.getenv('DILATION_KERNEL_SIZE', '9'))
+DILATION_ITERATIONS = int(os.getenv('DILATION_ITERATIONS', '10'))
 
 # Load Class Names
 if os.path.exists(LABELS_PATH):
