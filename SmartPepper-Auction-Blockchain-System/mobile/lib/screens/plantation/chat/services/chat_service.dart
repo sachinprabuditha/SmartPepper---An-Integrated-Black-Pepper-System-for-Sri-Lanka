@@ -1,10 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/plantation_api_client.dart';
 import '../models/chat_model.dart';
-
-final chatServiceProvider = Provider<ChatService>((ref) {
-  return ChatService(PlantationApiClient());
-});
 
 class ChatService {
   final PlantationApiClient _client;
@@ -16,7 +11,6 @@ class ChatService {
     String? conversationId,
     String? activeFarmId,
   }) async {
-
     final body = {
       "message": message,
       "conversationId": conversationId,

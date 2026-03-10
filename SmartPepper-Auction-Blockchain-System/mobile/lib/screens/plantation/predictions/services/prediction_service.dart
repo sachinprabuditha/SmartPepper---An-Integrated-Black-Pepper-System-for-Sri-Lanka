@@ -1,19 +1,15 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../services/plantation_api_client.dart';
 import '../models/prediction_input_model.dart';
 import '../models/prediction_output_model.dart';
 import '../../agronomy/models/api_response_model.dart';
 
-final predictionServiceProvider = Provider<PredictionService>((ref) {
-  return PredictionService(PlantationApiClient());
-});
-
 class PredictionService {
   final PlantationApiClient _client;
 
-  PredictionService(this._client);
+  PredictionService([PlantationApiClient? client])
+      : _client = client ?? PlantationApiClient();
 
   Future<PredictionOutput> predictPrice(PredictionInput input) async {
     try {

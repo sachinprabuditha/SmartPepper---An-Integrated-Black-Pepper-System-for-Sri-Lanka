@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart' as vanilla_provider;
+import 'package:provider/provider.dart';
 
 import '../seasons/controllers/season_controller.dart';
 import '../seasons/models/season_model.dart';
@@ -13,15 +12,18 @@ import '../../../../providers/language_provider.dart';
 import '../../../../widgets/loading_spinner.dart';
 import '../../../../widgets/empty_state.dart';
 import '../../../../config/theme.dart';
+import '../seasons/services/season_service.dart';
+import '../sessions/services/session_service.dart';
+import '../services/plantation_api_client.dart';
 
-class YieldAnalyticsPage extends ConsumerStatefulWidget {
+class YieldAnalyticsPage extends StatefulWidget {
   const YieldAnalyticsPage({super.key});
 
   @override
-  ConsumerState<YieldAnalyticsPage> createState() => _YieldAnalyticsPageState();
+  State<YieldAnalyticsPage> createState() => _YieldAnalyticsPageState();
 }
 
-class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
+class _YieldAnalyticsPageState extends State<YieldAnalyticsPage> {
   String? _selectedSeasonId;
   String? _userId;
   bool _initialized = false; // becomes true after first auto-fetch triggers
@@ -32,17 +34,22 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
   int _totalSessionsCount = 0;
   bool _loadingAggregated = false;
 
+  late SeasonController _seasonController;
+  late SessionController _sessionController;
+
   @override
   void initState() {
     super.initState();
+    final apiClient = PlantationApiClient();
+    _seasonController = SeasonController(SeasonService(apiClient));
+    _sessionController = SessionController(SessionService(apiClient));
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final auth =
-        vanilla_provider.Provider.of<AuthProvider>(context, listen: false);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
     final userId = auth.user?.id;
 
     // AuthProvider may become ready AFTER this screen is first built.
@@ -63,8 +70,8 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
   }
 
   Future<void> _refreshData(String userId) async {
-    await ref.read(seasonControllerProvider.notifier).fetchSeasons(userId);
-    final seasons = ref.read(seasonControllerProvider).value ?? [];
+    await _seasonController.fetchSeasons(userId);
+    final seasons = _seasonController.seasons;
     if (seasons.isNotEmpty) {
       await _loadAggregatedData(seasons);
     }
@@ -75,20 +82,19 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
     setState(() => _loadingAggregated = true);
 
     try {
-      // Refresh all session providers to get the latest data from backend
-      final results = await Future.wait(
-          seasons.map((s) => ref.refresh(sessionsProvider(s.id).future)));
-
       double totalYield = 0;
       int totalSessions = 0;
       Map<String, double> seasonYields = {};
 
       for (int i = 0; i < seasons.length; i++) {
-        final sessions = results[i];
-        double sYield = sessions.fold(0.0, (sum, s) => sum + s.yieldKg);
+        await _sessionController.fetchSessions(seasons[i].id);
+        final sessionsForSeason = List.of(_sessionController.sessions);
+
+        double sYield =
+            sessionsForSeason.fold(0.0, (sum, s) => sum + s.yieldKg);
         seasonYields[seasons[i].id] = sYield;
         totalYield += sYield;
-        totalSessions += sessions.length;
+        totalSessions += sessionsForSeason.length;
       }
 
       if (mounted) {
@@ -106,8 +112,7 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final languageProvider =
-        vanilla_provider.Provider.of<LanguageProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
     final lang = languageProvider.locale.languageCode;
 
     if (_userId == null) {
@@ -118,127 +123,145 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
       );
     }
 
-    final seasonsAsync = ref.watch(seasonControllerProvider);
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: _seasonController),
+        ChangeNotifierProvider.value(value: _sessionController),
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(context.tr('yield_analytics_title')),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () => _refreshData(_userId!),
+            ),
+          ],
+        ),
+        body: RefreshIndicator(
+          onRefresh: () => _refreshData(_userId!),
+          child: Consumer<SeasonController>(
+            builder: (context, seasonController, child) {
+              if (seasonController.isLoading) {
+                return LoadingSpinner(
+                  message: context.tr('yield_analytics_calculating'),
+                );
+              }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.tr('yield_analytics_title')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => _refreshData(_userId!),
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () => _refreshData(_userId!),
-        child: seasonsAsync.when(
-          data: (seasons) {
-            if (seasons.isEmpty) {
-              return Center(
-                child: EmptyState(
-                  message: context.tr('yield_analytics_no_data'),
-                  icon: Icons.analytics_outlined,
+              if (seasonController.error != null) {
+                return Center(
+                  child: Text(
+                    '${context.tr('common_error')}: ${seasonController.error}',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                );
+              }
+
+              final seasons = seasonController.seasons;
+
+              if (seasons.isEmpty) {
+                return Center(
+                  child: EmptyState(
+                    message: context.tr('yield_analytics_no_data'),
+                    icon: Icons.analytics_outlined,
+                  ),
+                );
+              }
+
+              // Sort seasons for trend chart
+              final sortedSeasons = [...seasons]..sort((a, b) {
+                  if (a.startYear != b.startYear)
+                    return a.startYear.compareTo(b.startYear);
+                  return a.startMonth.compareTo(b.startMonth);
+                });
+
+              SeasonModel? bestSeason;
+              SeasonModel? worstSeason;
+              double bestYield = -1;
+              double worstYield = double.maxFinite;
+
+              for (final season in seasons) {
+                final yieldVal = _seasonYields[season.id] ?? 0;
+                if (yieldVal > bestYield) {
+                  bestYield = yieldVal;
+                  bestSeason = season;
+                }
+                if (yieldVal < worstYield) {
+                  worstYield = yieldVal;
+                  worstSeason = season;
+                }
+              }
+
+              // Set default selected season if not set
+              if (_selectedSeasonId == null && seasons.isNotEmpty) {
+                _selectedSeasonId = sortedSeasons.last.id;
+                // Make sure we load the sessions for this season right away if needed
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    _sessionController.fetchSessions(_selectedSeasonId!);
+                  }
+                });
+              }
+
+              final averageYieldPerSeason =
+                  seasons.isEmpty ? 0.0 : _totalLifetimeYield / seasons.length;
+
+              return SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (_loadingAggregated)
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 16.0),
+                        child: LinearProgressIndicator(),
+                      ),
+                    _buildSummaryGrid(
+                      context,
+                      lang,
+                      seasons.length,
+                      _totalLifetimeYield,
+                      averageYieldPerSeason,
+                      bestSeason,
+                      _totalSessionsCount.toString(),
+                    ),
+                    const SizedBox(height: 32),
+                    _buildSectionHeader(
+                      context,
+                      context.tr('yield_analytics_season_trend'),
+                      Icons.show_chart,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildLineChart(context, sortedSeasons),
+                    const SizedBox(height: 32),
+                    _buildSectionHeader(
+                      context,
+                      context.tr('yield_analytics_season_comparison'),
+                      Icons.bar_chart,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildBarChart(context, sortedSeasons),
+                    const SizedBox(height: 32),
+                    _buildSectionHeader(
+                      context,
+                      _selectedSeasonId != null
+                          ? '${context.tr('yield_analytics_harvest_distribution')}: ${seasons.firstWhere((s) => s.id == _selectedSeasonId).seasonName}'
+                          : context.tr('yield_analytics_harvest_distribution'),
+                      Icons.pie_chart_outline,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSeasonSelector(seasons),
+                    const SizedBox(height: 16),
+                    if (_selectedSeasonId != null)
+                      _buildDistributionChart(context, _selectedSeasonId!),
+                    const SizedBox(height: 24),
+                    _buildBestWorstCard(context, lang, bestSeason, worstSeason),
+                    const SizedBox(height: 32),
+                  ],
                 ),
               );
-            }
-
-            // Sort seasons for trend chart
-            final sortedSeasons = [...seasons]..sort((a, b) {
-                if (a.startYear != b.startYear)
-                  return a.startYear.compareTo(b.startYear);
-                return a.startMonth.compareTo(b.startMonth);
-              });
-
-            SeasonModel? bestSeason;
-            SeasonModel? worstSeason;
-            double bestYield = -1;
-            double worstYield = double.maxFinite;
-
-            for (final season in seasons) {
-              final yieldVal = _seasonYields[season.id] ?? 0;
-              if (yieldVal > bestYield) {
-                bestYield = yieldVal;
-                bestSeason = season;
-              }
-              if (yieldVal < worstYield) {
-                worstYield = yieldVal;
-                worstSeason = season;
-              }
-            }
-
-            // Set default selected season if not set
-            if (_selectedSeasonId == null && seasons.isNotEmpty) {
-              _selectedSeasonId = sortedSeasons.last.id;
-            }
-
-            final averageYieldPerSeason =
-                seasons.isEmpty ? 0.0 : _totalLifetimeYield / seasons.length;
-
-            return SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (_loadingAggregated)
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 16.0),
-                      child: LinearProgressIndicator(),
-                    ),
-                  _buildSummaryGrid(
-                    context,
-                    lang,
-                    seasons.length,
-                    _totalLifetimeYield,
-                    averageYieldPerSeason,
-                    bestSeason,
-                    _totalSessionsCount.toString(),
-                  ),
-                  const SizedBox(height: 32),
-                  _buildSectionHeader(
-                    context,
-                    context.tr('yield_analytics_season_trend'),
-                    Icons.show_chart,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildLineChart(context, sortedSeasons),
-                  const SizedBox(height: 32),
-                  _buildSectionHeader(
-                    context,
-                    context.tr('yield_analytics_season_comparison'),
-                    Icons.bar_chart,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildBarChart(context, sortedSeasons),
-                  const SizedBox(height: 32),
-                  _buildSectionHeader(
-                    context,
-                    _selectedSeasonId != null
-                        ? '${context.tr('yield_analytics_harvest_distribution')}: ${seasons.firstWhere((s) => s.id == _selectedSeasonId).seasonName}'
-                        : context.tr('yield_analytics_harvest_distribution'),
-                    Icons.pie_chart_outline,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildSeasonSelector(seasons),
-                  const SizedBox(height: 16),
-                  if (_selectedSeasonId != null)
-                    _buildDistributionChart(context, _selectedSeasonId!),
-                  const SizedBox(height: 24),
-                  _buildBestWorstCard(context, lang, bestSeason, worstSeason),
-                  const SizedBox(height: 32),
-                ],
-              ),
-            );
-          },
-          loading: () => LoadingSpinner(
-            message: context.tr('yield_analytics_calculating'),
-          ),
-          error: (error, stack) => Center(
-            child: Text(
-              '${context.tr('common_error')}: ${error.toString()}',
-              style: const TextStyle(color: Colors.red),
-            ),
+            },
           ),
         ),
       ),
@@ -507,10 +530,6 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
   }
 
   Widget _buildSeasonSelector(List<SeasonModel> seasons) {
-    final languageProvider =
-        vanilla_provider.Provider.of<LanguageProvider>(context);
-    final lang = languageProvider.locale.languageCode;
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
@@ -532,6 +551,9 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
             setState(() {
               _selectedSeasonId = value;
             });
+            if (value != null) {
+              _sessionController.fetchSessions(value);
+            }
           },
         ),
       ),
@@ -539,10 +561,21 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
   }
 
   Widget _buildDistributionChart(BuildContext context, String seasonId) {
-    final sessionsAsync = ref.watch(sessionControllerProvider(seasonId));
+    return Consumer<SessionController>(
+      builder: (context, sessionController, child) {
+        if (sessionController.isLoading) {
+          return LoadingSpinner(
+            message: context.tr('plantation_loading_sessions'),
+          );
+        }
 
-    return sessionsAsync.when(
-      data: (sessions) {
+        if (sessionController.error != null) {
+          return Text(
+              '${context.tr('common_error')}: ${sessionController.error}');
+        }
+
+        final sessions = sessionController.sessions;
+
         if (sessions.isEmpty) {
           return Card(
             child: Padding(
@@ -630,10 +663,6 @@ class _YieldAnalyticsPageState extends ConsumerState<YieldAnalyticsPage> {
           ],
         );
       },
-      loading: () => LoadingSpinner(
-        message: context.tr('plantation_loading_sessions'),
-      ),
-      error: (e, _) => Text('${context.tr('common_error')}: $e'),
     );
   }
 

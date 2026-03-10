@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:provider/provider.dart' as vanilla_provider;
+import 'package:provider/provider.dart';
 import '../models/season_model.dart';
-import '../../plantation/controllers/plantation_controller.dart';
+import '../../plantation/models/farm_record_model.dart';
+import '../../plantation/services/plantation_service.dart';
+import '../../services/plantation_api_client.dart';
 import '../../../../providers/language_provider.dart';
 import '../../../../localization/app_localizations.dart';
 
-class SeasonCard extends ConsumerWidget {
+class SeasonCard extends StatefulWidget {
   final SeasonModel season;
   final VoidCallback onTap;
 
@@ -17,10 +18,24 @@ class SeasonCard extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final languageProvider = vanilla_provider.Provider.of<LanguageProvider>(context);
+  State<SeasonCard> createState() => _SeasonCardState();
+}
+
+class _SeasonCardState extends State<SeasonCard> {
+  late Future<FarmRecord> _farmFuture;
+  late PlantationService _plantationService;
+
+  @override
+  void initState() {
+    super.initState();
+    _plantationService = PlantationService(PlantationApiClient());
+    _farmFuture = _plantationService.getFarmById(widget.season.farmId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
     final lang = languageProvider.locale.languageCode;
-    final farmAsync = ref.watch(farmProvider(season.farmId));
 
     final harvestSeasonLabel = context.tr('plantation_harvest_season');
     final endedLabel = context.tr('plantation_ended');
@@ -43,7 +58,7 @@ class SeasonCard extends ConsumerWidget {
         ),
       ),
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onTap,
         borderRadius: BorderRadius.circular(20),
         child: Container(
           decoration: BoxDecoration(
@@ -71,13 +86,19 @@ class SeasonCard extends ConsumerWidget {
                         gradient: LinearGradient(
                           colors: [
                             Theme.of(context).colorScheme.primary,
-                            Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                            Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.7),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -96,16 +117,20 @@ class SeasonCard extends ConsumerWidget {
                         children: [
                           Text(
                             harvestSeasonLabel,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey[600],
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey[600],
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            season.seasonName,
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            widget.season.seasonName,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.grey[800],
                                 ),
@@ -117,18 +142,27 @@ class SeasonCard extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: season.status == 'season-end' ? Colors.red[50] : Colors.green[50],
+                        color: widget.season.status == 'season-end'
+                            ? Colors.red[50]
+                            : Colors.green[50],
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: season.status == 'season-end' ? Colors.red[200]! : Colors.green[200]!,
+                          color: widget.season.status == 'season-end'
+                              ? Colors.red[200]!
+                              : Colors.green[200]!,
                         ),
                       ),
                       child: Text(
-                        season.status == 'season-end' ? endedLabel : activeLabel,
+                        widget.season.status == 'season-end'
+                            ? endedLabel
+                            : activeLabel,
                         style: TextStyle(
-                          color: season.status == 'season-end' ? Colors.red[700] : Colors.green[700],
+                          color: widget.season.status == 'season-end'
+                              ? Colors.red[700]
+                              : Colors.green[700],
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -144,157 +178,186 @@ class SeasonCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
                 // Farm Information with better styling
-                farmAsync.when(
-                  data: (farm) => Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.green[50],
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: Colors.green[200]!,
-                        width: 1,
+                FutureBuilder<FarmRecord>(
+                  future: _farmFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              loadingFarmLabel,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: Colors.grey[600],
+                                    fontSize: 13,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    if (snapshot.hasError || !snapshot.hasData) {
+                      return const SizedBox.shrink();
+                    }
+
+                    final farm = snapshot.data!;
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green[50],
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Colors.green[200]!,
+                          width: 1,
+                        ),
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.green[100],
-                            borderRadius: BorderRadius.circular(8),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.green[100],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.agriculture,
+                              size: 18,
+                              color: Colors.green[700],
+                            ),
                           ),
-                          child: Icon(
-                            Icons.agriculture,
-                            size: 18,
-                            color: Colors.green[700],
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  farmLabel,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: Colors.grey[600],
+                                        fontSize: 11,
+                                      ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  farm.farmName,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green[800],
+                                      ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                // Location and Period in a grid layout
+                FutureBuilder<FarmRecord>(
+                  future: _farmFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: _buildInfoItem(
+                              context,
+                              Icons.location_on,
+                              districtLabel,
+                              loadingLabel,
+                              Colors.blue,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildInfoItem(
+                              context,
+                              Icons.access_time,
+                              periodLabel,
+                              widget.season.period,
+                              Colors.orange,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    if (snapshot.hasError || !snapshot.hasData) {
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: _buildInfoItem(
+                              context,
+                              Icons.location_on,
+                              districtLabel,
+                              naLabel,
+                              Colors.blue,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildInfoItem(
+                              context,
+                              Icons.access_time,
+                              periodLabel,
+                              widget.season.period,
+                              Colors.orange,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    final farm = snapshot.data!;
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: _buildInfoItem(
+                            context,
+                            Icons.location_on,
+                            districtLabel,
+                            farm.district.get(lang),
+                            Colors.blue,
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                farmLabel,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Colors.grey[600],
-                                      fontSize: 11,
-                                    ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                farm.farmName,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green[800],
-                                    ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                          child: _buildInfoItem(
+                            context,
+                            Icons.access_time,
+                            periodLabel,
+                            widget.season.period,
+                            Colors.orange,
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                  loading: () => Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          loadingFarmLabel,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[600],
-                                fontSize: 13,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  error: (_, __) => const SizedBox.shrink(),
-                ),
-                const SizedBox(height: 16),
-                // Location and Period in a grid layout
-                farmAsync.when(
-                  data: (farm) => Row(
-                    children: [
-                      Expanded(
-                        child: _buildInfoItem(
-                          context,
-                          Icons.location_on,
-                          districtLabel,
-                          farm.district.get(lang),
-                          Colors.blue,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildInfoItem(
-                          context,
-                          Icons.access_time,
-                          periodLabel,
-                          season.period,
-                          Colors.orange,
-                        ),
-                      ),
-                    ],
-                  ),
-                  loading: () => Row(
-                    children: [
-                      Expanded(
-                        child: _buildInfoItem(
-                          context,
-                          Icons.location_on,
-                          districtLabel,
-                          loadingLabel,
-                          Colors.blue,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildInfoItem(
-                          context,
-                          Icons.access_time,
-                          periodLabel,
-                          season.period,
-                          Colors.orange,
-                        ),
-                      ),
-                    ],
-                  ),
-                  error: (_, __) => Row(
-                    children: [
-                      Expanded(
-                        child: _buildInfoItem(
-                          context,
-                          Icons.location_on,
-                          districtLabel,
-                          naLabel,
-                          Colors.blue,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildInfoItem(
-                          context,
-                          Icons.access_time,
-                          periodLabel,
-                          season.period,
-                          Colors.orange,
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -304,7 +367,8 @@ class SeasonCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoItem(BuildContext context, IconData icon, String label, String value, Color iconColor) {
+  Widget _buildInfoItem(BuildContext context, IconData icon, String label,
+      String value, Color iconColor) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(

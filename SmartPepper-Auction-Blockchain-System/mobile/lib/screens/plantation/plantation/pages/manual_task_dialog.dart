@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:provider/provider.dart' as vanilla_provider;
 import '../../../../localization/app_localizations.dart';
 import '../../../../widgets/input_field.dart';
 import '../../../../utils/validators.dart';
-import '../../../../providers/language_provider.dart';
 
-class ManualTaskDialog extends ConsumerStatefulWidget {
+class ManualTaskDialog extends StatefulWidget {
   final String farmId;
 
   const ManualTaskDialog({
@@ -15,10 +12,10 @@ class ManualTaskDialog extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ManualTaskDialog> createState() => _ManualTaskDialogState();
+  State<ManualTaskDialog> createState() => _ManualTaskDialogState();
 }
 
-class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
+class _ManualTaskDialogState extends State<ManualTaskDialog> {
   final _formKey = GlobalKey<FormState>();
   final _taskNameController = TextEditingController();
   final _instructionsController = TextEditingController();
@@ -85,7 +82,9 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                       context.tr('plantation_add_manual_task'),
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
                           ),
                     ),
                   ),
@@ -108,15 +107,18 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                     children: [
                       Text(
                         context.tr('manual_task_dialog_task_details'),
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       const SizedBox(height: 16),
                       InputField(
                         label: context.tr('manual_task_dialog_task_name'),
                         controller: _taskNameController,
-                        validator: (value) => Validators.required(value, fieldName: context.tr('manual_task_dialog_task_name')),
+                        validator: (value) => Validators.required(value,
+                            fieldName:
+                                context.tr('manual_task_dialog_task_name')),
                       ),
                       const SizedBox(height: 16),
                       // Priority Dropdown
@@ -124,7 +126,8 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                         value: _priority,
                         decoration: InputDecoration(
                           labelText: context.tr('manual_task_dialog_priority'),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 16),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -135,9 +138,12 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.arrow_downward, size: 16, color: Colors.green),
+                                const Icon(Icons.arrow_downward,
+                                    size: 16, color: Colors.green),
                                 const SizedBox(width: 8),
-                                Flexible(child: Text(context.tr('manual_task_dialog_low'))),
+                                Flexible(
+                                    child: Text(
+                                        context.tr('manual_task_dialog_low'))),
                               ],
                             ),
                           ),
@@ -146,9 +152,12 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.remove, size: 16, color: Colors.yellow[700]),
+                                Icon(Icons.remove,
+                                    size: 16, color: Colors.yellow[700]),
                                 const SizedBox(width: 8),
-                                Flexible(child: Text(context.tr('manual_task_dialog_medium'))),
+                                Flexible(
+                                    child: Text(context
+                                        .tr('manual_task_dialog_medium'))),
                               ],
                             ),
                           ),
@@ -157,9 +166,12 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.arrow_upward, size: 16, color: Colors.orange),
+                                const Icon(Icons.arrow_upward,
+                                    size: 16, color: Colors.orange),
                                 const SizedBox(width: 8),
-                                Flexible(child: Text(context.tr('manual_task_dialog_high'))),
+                                Flexible(
+                                    child: Text(
+                                        context.tr('manual_task_dialog_high'))),
                               ],
                             ),
                           ),
@@ -168,9 +180,12 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.warning, size: 16, color: Colors.red),
+                                const Icon(Icons.warning,
+                                    size: 16, color: Colors.red),
                                 const SizedBox(width: 8),
-                                Flexible(child: Text(context.tr('manual_task_dialog_emergency'))),
+                                Flexible(
+                                    child: Text(context
+                                        .tr('manual_task_dialog_emergency'))),
                               ],
                             ),
                           ),
@@ -186,9 +201,12 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                       DropdownButtonFormField<String?>(
                         value: _selectedPhase,
                         decoration: InputDecoration(
-                          labelText: context.tr('manual_task_dialog_phase_optional'),
-                          hintText: context.tr('manual_task_dialog_default_maintenance'),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          labelText:
+                              context.tr('manual_task_dialog_phase_optional'),
+                          hintText: context
+                              .tr('manual_task_dialog_default_maintenance'),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 16),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -196,12 +214,25 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                         items: [
                           DropdownMenuItem<String?>(
                             value: null,
-                            child: Text(context.tr('manual_task_dialog_none_default')),
+                            child: Text(
+                                context.tr('manual_task_dialog_none_default')),
                           ),
-                          DropdownMenuItem(value: 'Landscaping', child: Text(context.tr('manual_task_dialog_landscaping'))),
-                          DropdownMenuItem(value: 'Planting', child: Text(context.tr('manual_task_dialog_planting'))),
-                          DropdownMenuItem(value: 'Maintenance', child: Text(context.tr('manual_task_dialog_maintenance'))),
-                          DropdownMenuItem(value: 'Harvesting', child: Text(context.tr('manual_task_dialog_harvesting'))),
+                          DropdownMenuItem(
+                              value: 'Landscaping',
+                              child: Text(context
+                                  .tr('manual_task_dialog_landscaping'))),
+                          DropdownMenuItem(
+                              value: 'Planting',
+                              child: Text(
+                                  context.tr('manual_task_dialog_planting'))),
+                          DropdownMenuItem(
+                              value: 'Maintenance',
+                              child: Text(context
+                                  .tr('manual_task_dialog_maintenance'))),
+                          DropdownMenuItem(
+                              value: 'Harvesting',
+                              child: Text(
+                                  context.tr('manual_task_dialog_harvesting'))),
                         ],
                         onChanged: (value) {
                           setState(() {
@@ -222,7 +253,8 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                             ),
                             validator: (value) {
                               if (_dueDate == null) {
-                                return context.tr('manual_task_dialog_please_select_due_date');
+                                return context.tr(
+                                    'manual_task_dialog_please_select_due_date');
                               }
                               return null;
                             },
@@ -231,9 +263,11 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                       ),
                       const SizedBox(height: 16),
                       InputField(
-                        label: context.tr('manual_task_dialog_instructions_optional'),
+                        label: context
+                            .tr('manual_task_dialog_instructions_optional'),
                         controller: _instructionsController,
-                        hint: context.tr('manual_task_dialog_instructions_hint'),
+                        hint:
+                            context.tr('manual_task_dialog_instructions_hint'),
                         maxLines: 4,
                       ),
                       const SizedBox(height: 16),
@@ -273,7 +307,8 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
                     icon: const Icon(Icons.add_task),
                     label: Text(context.tr('manual_task_dialog_create_task')),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
                     ),
                   ),
                 ],
@@ -304,7 +339,8 @@ class _ManualTaskDialogState extends ConsumerState<ManualTaskDialog> {
     } else if (_dueDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(context.tr('manual_task_dialog_please_select_due_date')),
+          content:
+              Text(context.tr('manual_task_dialog_please_select_due_date')),
           backgroundColor: Colors.red,
         ),
       );

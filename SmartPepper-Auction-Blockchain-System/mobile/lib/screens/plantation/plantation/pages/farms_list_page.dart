@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart' as vanilla_provider;
+import 'package:provider/provider.dart';
 import 'dart:developer' as developer;
+import '../../services/plantation_api_client.dart';
+import '../services/plantation_service.dart';
 import '../controllers/plantation_controller.dart';
 import '../models/farm_record_model.dart';
 import '../../../../widgets/loading_spinner.dart';
@@ -11,179 +12,203 @@ import '../../../../widgets/primary_button.dart';
 import '../../../../providers/language_provider.dart';
 import '../../../../localization/app_localizations.dart';
 
-class FarmsListPage extends ConsumerStatefulWidget {
+class FarmsListPage extends StatefulWidget {
   const FarmsListPage({super.key});
 
   @override
-  ConsumerState<FarmsListPage> createState() => _FarmsListPageState();
+  State<FarmsListPage> createState() => _FarmsListPageState();
 }
 
-class _FarmsListPageState extends ConsumerState<FarmsListPage> {
+class _FarmsListPageState extends State<FarmsListPage> {
+  late Future<List<FarmRecord>> _farmsFuture;
+  late PlantationController _controller;
+
   @override
   void initState() {
     super.initState();
+    _controller =
+        PlantationController(PlantationService(PlantationApiClient()));
     // Refresh farms list when page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.invalidate(farmsProvider);
+      _refreshFarms();
     });
   }
 
   Future<void> _refreshFarms() async {
-    ref.invalidate(farmsProvider);
+    setState(() {
+      _farmsFuture = _controller.fetchFarms();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     developer.log('FarmsListPage: Building...');
-    
-    final languageProvider = vanilla_provider.Provider.of<LanguageProvider>(context);
-    final lang = languageProvider.locale.languageCode;
-    
-    try {
-      final farmsAsync = ref.watch(farmsProvider);
-      
-      return Scaffold(
-      appBar: AppBar(
-        title: Text(context.tr('plantation_my_farms')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refreshFarms,
-            tooltip: context.tr('plantation_refresh'),
-          ),
-        ],
-      ),
-      body: farmsAsync.when(
-        data: (farms) {
-          if (farms.isEmpty) {
-            return EmptyState(
-              message: context.tr('plantation_no_farms_yet'),
-              icon: Icons.agriculture_outlined,
-              action: PrimaryButton(
-                text: context.tr('plantation_start_plantation'),
-                onPressed: () async {
-                  final result = await context.pushNamed('plantationSetup');
-                  if (result != null && mounted) {
-                    _refreshFarms();
-                  }
-                },
-              ),
-            );
-          }
 
-          return RefreshIndicator(
-            onRefresh: _refreshFarms,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                // Header section with summary
-                SliverToBoxAdapter(
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context).colorScheme.primary,
-                          Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: SafeArea(
-                      bottom: false,
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.agriculture,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  context.tr('plantation_total_farms'),
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: Colors.white.withOpacity(0.9),
-                                        fontSize: 12,
-                                      ),
-                                ),
-                                Text(
-                                  '${farms.length}',
-                                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final lang = languageProvider.locale.languageCode;
+
+    try {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(context.tr('plantation_my_farms')),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _refreshFarms,
+              tooltip: context.tr('plantation_refresh'),
+            ),
+          ],
+        ),
+        body: FutureBuilder<List<FarmRecord>>(
+          future: _farmsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return LoadingSpinner(
+                  message: context.tr('plantation_loading_farms'));
+            } else if (snapshot.hasError) {
+              developer.log('FarmsListPage: Error state - ${snapshot.error}',
+                  error: snapshot.error);
+              return RefreshIndicator(
+                onRefresh: _refreshFarms,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: EmptyState(
+                    message:
+                        '${context.tr('plantation_error_loading_farms')}: ${snapshot.error.toString()}',
+                    icon: Icons.error_outline,
+                    action: ElevatedButton(
+                      onPressed: _refreshFarms,
+                      child: Text(context.tr('common_retry')),
                     ),
                   ),
                 ),
-                // Farms list
-                SliverPadding(
-                  padding: const EdgeInsets.only(top: 16, bottom: 80),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final farm = farms[index];
-                        return _buildFarmCard(context, ref, farm, lang);
-                      },
-                      childCount: farms.length,
-                    ),
+              );
+            } else if (snapshot.hasData) {
+              final farms = snapshot.data!;
+              if (farms.isEmpty) {
+                return EmptyState(
+                  message: context.tr('plantation_no_farms_yet'),
+                  icon: Icons.agriculture_outlined,
+                  action: PrimaryButton(
+                    text: context.tr('plantation_start_plantation'),
+                    onPressed: () async {
+                      final result = await context.pushNamed('plantationSetup');
+                      if (result != null && mounted) {
+                        _refreshFarms();
+                      }
+                    },
                   ),
+                );
+              }
+
+              return RefreshIndicator(
+                onRefresh: _refreshFarms,
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    // Header section with summary
+                    SliverToBoxAdapter(
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Theme.of(context).colorScheme.primary,
+                              Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.8),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: SafeArea(
+                          bottom: false,
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.agriculture,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      context.tr('plantation_total_farms'),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color:
+                                                Colors.white.withOpacity(0.9),
+                                            fontSize: 12,
+                                          ),
+                                    ),
+                                    Text(
+                                      '${farms.length}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineMedium
+                                          ?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Farms list
+                    SliverPadding(
+                      padding: const EdgeInsets.only(top: 16, bottom: 80),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final farm = farms[index];
+                            return _buildFarmCard(context, farm, lang);
+                          },
+                          childCount: farms.length,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        },
-        loading: () => LoadingSpinner(message: context.tr('plantation_loading_farms')),
-        error: (error, stack) {
-          developer.log('FarmsListPage: Error state - $error', error: error, stackTrace: stack);
-          return RefreshIndicator(
-            onRefresh: _refreshFarms,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: EmptyState(
-                message: '${context.tr('plantation_error_loading_farms')}: ${error.toString()}',
-                icon: Icons.error_outline,
-                action: ElevatedButton(
-                  onPressed: _refreshFarms,
-                  child: Text(context.tr('common_retry')),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'farms_list_fab',
-        onPressed: () async {
-          final result = await context.pushNamed('plantationSetup');
-          if (result != null && mounted) {
-            _refreshFarms();
-          }
-        },
-        icon: const Icon(Icons.add),
-        label: Text(context.tr('plantation_start_plantation')),
-      ),
-    );
+              );
+            }
+            return const SizedBox();
+          },
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          heroTag: 'farms_list_fab',
+          onPressed: () async {
+            final result = await context.pushNamed('plantationSetup');
+            if (result != null && mounted) {
+              _refreshFarms();
+            }
+          },
+          icon: const Icon(Icons.add),
+          label: Text(context.tr('plantation_start_plantation')),
+        ),
+      );
     } catch (e, stackTrace) {
-      developer.log('FarmsListPage: Error in build - $e', error: e, stackTrace: stackTrace);
+      developer.log('FarmsListPage: Error in build - $e',
+          error: e, stackTrace: stackTrace);
       return Scaffold(
         appBar: AppBar(
           title: const Text('My Farms'),
@@ -221,9 +246,10 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
     }
   }
 
-  Widget _buildFarmCard(BuildContext context, WidgetRef ref, FarmRecord farm, String lang) {
-    final dateFormat = '${farm.farmStartDate.day}/${farm.farmStartDate.month}/${farm.farmStartDate.year}';
-    
+  Widget _buildFarmCard(BuildContext context, FarmRecord farm, String lang) {
+    final dateFormat =
+        '${farm.farmStartDate.day}/${farm.farmStartDate.month}/${farm.farmStartDate.year}';
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 3,
@@ -235,18 +261,16 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
         ),
       ),
       child: InkWell(
-                      onTap: () {
-                      context.pushNamed(
-                        'farmDetails',
-                        pathParameters: {'farmId': farm.id},
-                      ).then((result) {
-                        if (result == true) {
-                          // Invalidate all related providers
-                          ref.invalidate(farmsProvider);
-                          ref.invalidate(farmProvider(farm.id));
-                        }
-                      });
-                    },
+        onTap: () {
+          context.pushNamed(
+            'farmDetails',
+            pathParameters: {'farmId': farm.id},
+          ).then((result) {
+            if (result == true) {
+              _refreshFarms();
+            }
+          });
+        },
         borderRadius: BorderRadius.circular(20),
         child: Container(
           decoration: BoxDecoration(
@@ -274,13 +298,19 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                         gradient: LinearGradient(
                           colors: [
                             Theme.of(context).colorScheme.primary,
-                            Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                            Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.7),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -299,16 +329,20 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                         children: [
                           Text(
                             context.tr('plantation_farm'),
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey[600],
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey[600],
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             farm.farmName,
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.grey[800],
                                 ),
@@ -325,59 +359,59 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                       ),
                       onSelected: (value) async {
                         if (value == 'edit') {
-                           final farmDetails = await ref
-                               .read(plantationControllerProvider.notifier)
-                               .fetchFarmById(farm.id);
-                           if (context.mounted) {
-                             final result = await context.pushNamed<bool>(
-                               'editFarm',
-                               extra: farmDetails,
-                             );
-                             if (result == true && mounted) {
-                               ref.invalidate(farmsProvider);
-                               ref.invalidate(farmProvider(farm.id));
-                             }
-                           }
+                          final farmDetails =
+                              await _controller.fetchFarmById(farm.id);
+                          if (context.mounted) {
+                            final result = await context.pushNamed<bool>(
+                              'editFarm',
+                              extra: farmDetails,
+                            );
+                            if (result == true && mounted) {
+                              _refreshFarms();
+                            }
+                          }
                         } else if (value == 'delete') {
-                           final confirm = await showDialog<bool>(
-                             context: context,
-                             builder: (ctx) => AlertDialog(
-                               title: Text(context.tr('plantation_delete_farm')),
-                               content: Text(context.tr('plantation_confirm_delete_farm')),
-                               actions: [
-                                 TextButton(
-                                   onPressed: () => Navigator.pop(ctx, false),
-                                   child: Text(context.tr('common_cancel')),
-                                 ),
-                                 TextButton(
-                                   onPressed: () => Navigator.pop(ctx, true),
-                                   child: Text(
-                                     context.tr('common_delete'),
-                                     style: const TextStyle(color: Colors.red),
-                                   ),
-                                 ),
-                               ],
-                             ),
-                           );
-                           if (confirm == true) {
-                             try {
-                               await ref
-                                   .read(plantationControllerProvider.notifier)
-                                   .deleteFarm(farm.id);
-                               _refreshFarms();
-                             } catch (e) {
-                               if (context.mounted) {
-                                 ScaffoldMessenger.of(context).showSnackBar(
-                                   SnackBar(content: Text('Error: $e')),
-                                 );
-                               }
-                             }
-                           }
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text(context.tr('plantation_delete_farm')),
+                              content: Text(
+                                  context.tr('plantation_confirm_delete_farm')),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: Text(context.tr('common_cancel')),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: Text(
+                                    context.tr('common_delete'),
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirm == true) {
+                            try {
+                              await _controller.deleteFarm(farm.id);
+                              _refreshFarms();
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Error: $e')),
+                                );
+                              }
+                            }
+                          }
                         }
                       },
                       itemBuilder: (ctx) => [
                         const PopupMenuItem(value: 'edit', child: Text('Edit')),
-                        const PopupMenuItem(value: 'delete', child: Text('Delete', style: TextStyle(color: Colors.red))),
+                        const PopupMenuItem(
+                            value: 'delete',
+                            child: Text('Delete',
+                                style: TextStyle(color: Colors.red))),
                       ],
                     ),
                   ],
@@ -464,7 +498,10 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                           children: [
                             Text(
                               context.tr('plantation_started'),
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
                                     color: Colors.grey[600],
                                     fontSize: 11,
                                   ),
@@ -472,7 +509,10 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
                             const SizedBox(height: 2),
                             Text(
                               dateFormat,
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.blue[800],
                                   ),
@@ -496,7 +536,8 @@ class _FarmsListPageState extends ConsumerState<FarmsListPage> {
     );
   }
 
-  Widget _buildInfoItem(BuildContext context, IconData icon, String label, String value, Color iconColor) {
+  Widget _buildInfoItem(BuildContext context, IconData icon, String label,
+      String value, Color iconColor) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(

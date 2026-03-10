@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/conversation_provider.dart';
-import '../providers/message_provider.dart';
+import 'package:provider/provider.dart';
+import '../providers/chat_provider.dart';
 
-class ConversationSidebar extends ConsumerWidget {
+class ConversationSidebar extends StatelessWidget {
   const ConversationSidebar({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final conversationsAsync =
-        ref.watch(conversationsProvider);
+  Widget build(BuildContext context) {
+    final chatProvider = Provider.of<ChatProvider>(context);
 
     return Drawer(
       child: Column(
@@ -26,9 +24,7 @@ class ConversationSidebar extends ConsumerWidget {
             leading: const Icon(Icons.add),
             title: const Text("New Chat"),
             onTap: () {
-              ref.read(activeConversationProvider.notifier).state = null;
-              ref.read(messagesProvider.notifier).clear();
-
+              chatProvider.startNewChat();
               Navigator.pop(context);
             },
           ),
@@ -37,35 +33,29 @@ class ConversationSidebar extends ConsumerWidget {
 
           /// CHAT LIST
           Expanded(
-            child: conversationsAsync.when(
-              data: (conversations) => ListView.builder(
-                itemCount: conversations.length,
-                itemBuilder: (context, index) {
-                  final convo = conversations[index];
+            child: chatProvider.isLoadingConversations
+                ? const Center(child: CircularProgressIndicator())
+                : chatProvider.conversationsError != null
+                    ? Center(child: Text(chatProvider.conversationsError!))
+                    : ListView.builder(
+                        itemCount: chatProvider.conversations.length,
+                        itemBuilder: (context, index) {
+                          final convo = chatProvider.conversations[index];
 
-                  return ListTile(
-                    leading: const Icon(Icons.chat_bubble_outline),
-                    title: Text(
-                      convo.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    onTap: () {
-                      ref
-                          .read(activeConversationProvider.notifier)
-                          .state = convo.id;
-                      ref
-                          .read(messagesProvider.notifier)
-                          .loadMessages(convo.id);
-                      Navigator.pop(context);
-                    },
-                  );
-                },
-              ),
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text(e.toString())),
-            ),
+                          return ListTile(
+                            leading: const Icon(Icons.chat_bubble_outline),
+                            title: Text(
+                              convo.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            onTap: () {
+                              chatProvider.loadMessages(convo.id);
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
+                      ),
           ),
         ],
       ),

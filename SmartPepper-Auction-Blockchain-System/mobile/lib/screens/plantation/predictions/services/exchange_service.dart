@@ -1,10 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/plantation_api_client.dart';
-
-final exchangeServiceProvider = Provider<ExchangeService>((ref) {
-  return ExchangeService(PlantationApiClient());
-});
 
 class ExchangeRateData {
   final String base;
@@ -41,7 +36,8 @@ class ExchangeRateData {
 class ExchangeService {
   final PlantationApiClient _client;
 
-  ExchangeService(this._client);
+  ExchangeService([PlantationApiClient? client])
+      : _client = client ?? PlantationApiClient();
 
   /**
    * Fetches the USD to LKR exchange rate from the backend

@@ -1,29 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../config/theme.dart';
+import '../../services/plantation_api_client.dart';
+import '../../plantation/services/plantation_service.dart';
 import '../models/chat_model.dart';
-import '../services/chat_service.dart';
 import '../widgets/conversation_sidebar.dart';
-import '../providers/conversation_provider.dart';
-import '../providers/message_provider.dart';
+import '../providers/chat_provider.dart';
 
 // Farm Logic
 import '../../plantation/controllers/plantation_controller.dart';
+import '../../plantation/models/farm_record_model.dart';
 
-class ChatPage extends ConsumerStatefulWidget {
+class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
 
   @override
-  ConsumerState<ChatPage> createState() => _ChatPageState();
+  State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends ConsumerState<ChatPage> {
+class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  bool _isLoading = false;
+  List<FarmRecord> _farms = [];
+  bool _isLoadingFarms = true;
   String? _selectedFarmId;
+  late PlantationController _plantationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _plantationController =
+        PlantationController(PlantationService(PlantationApiClient()));
+    _loadFarms();
+  }
+
+  Future<void> _loadFarms() async {
+    try {
+      final farms = await _plantationController.fetchFarms();
+      if (mounted) {
+        setState(() {
+          _farms = farms;
+          _isLoadingFarms = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingFarms = false;
+        });
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -51,61 +80,12 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
-    final activeConversationId = ref.read(activeConversationProvider);
-
     _controller.clear();
-
-    /// Add user message instantly
-    ref.read(messagesProvider.notifier).add(
-          ChatMessage(
-            text: text,
-            isUser: true,
-            timestamp: DateTime.now(),
-          ),
-        );
-
-    setState(() => _isLoading = true);
     _scrollToBottom();
 
-    try {
-      final chatService = ref.read(chatServiceProvider);
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    await chatProvider.sendMessage(text, _selectedFarmId);
 
-      final response = await chatService.sendMessage(
-        text,
-        conversationId: activeConversationId,
-        activeFarmId: _selectedFarmId,
-      );
-
-      /// update active conversation automatically
-      final isNewConversation = activeConversationId == null;
-      ref.read(activeConversationProvider.notifier).state =
-          response.conversationId;
-
-      if (isNewConversation) {
-        ref.invalidate(conversationsProvider);
-      }
-
-      /// add assistant message
-      ref.read(messagesProvider.notifier).add(
-            ChatMessage(
-              text: response.reply,
-              isUser: false,
-              timestamp: DateTime.now(),
-              sources: response.sources,
-              suggestions: response.suggestions,
-            ),
-          );
-    } catch (e) {
-      ref.read(messagesProvider.notifier).add(
-            ChatMessage(
-              text: "Error: $e",
-              isUser: false,
-              timestamp: DateTime.now(),
-            ),
-          );
-    }
-
-    setState(() => _isLoading = false);
     _scrollToBottom();
   }
 
@@ -114,10 +94,8 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   /// ===============================
   @override
   Widget build(BuildContext context) {
-    final farmsAsync = ref.watch(farmsProvider);
-
-    /// ⭐ messages now come from provider
-    final messages = ref.watch(messagesProvider);
+    final chatProvider = Provider.of<ChatProvider>(context);
+    final messages = chatProvider.messages;
 
     return Scaffold(
       drawer: const ConversationSidebar(),
@@ -142,44 +120,37 @@ class _ChatPageState extends ConsumerState<ChatPage> {
         backgroundColor: AppTheme.forestGreen,
         foregroundColor: Colors.white,
         actions: [
-          farmsAsync.when(
-            data: (farms) {
-              if (farms.isEmpty) return const SizedBox.shrink();
-
-              return DropdownButtonHideUnderline(
-                child: DropdownButton<String?>(
-                  dropdownColor: AppTheme.deepEmerald,
-                  icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                  value: _selectedFarmId,
-                  hint: const Text("Mode: Guide",
-                      style: TextStyle(color: Colors.white70)),
-                  items: [
-                    const DropdownMenuItem<String?>(
-                      value: null,
+          if (!_isLoadingFarms && _farms.isNotEmpty)
+            DropdownButtonHideUnderline(
+              child: DropdownButton<String?>(
+                dropdownColor: AppTheme.deepEmerald,
+                icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                value: _selectedFarmId,
+                hint: const Text("Mode: Guide",
+                    style: TextStyle(color: Colors.white70)),
+                items: [
+                  const DropdownMenuItem<String?>(
+                    value: null,
+                    child: Text(
+                      "Mode: Guide (General)",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  ..._farms.map(
+                    (f) => DropdownMenuItem<String?>(
+                      value: f.id,
                       child: Text(
-                        "Mode: Guide (General)",
-                        style: TextStyle(color: Colors.white),
+                        "Mode: ${f.farmName}",
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
-                    ...farms.map(
-                      (f) => DropdownMenuItem<String?>(
-                        value: f.id,
-                        child: Text(
-                          "Mode: ${f.farmName}",
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    )
-                  ],
-                  onChanged: (value) {
-                    setState(() => _selectedFarmId = value);
-                  },
-                ),
-              );
-            },
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
-          ),
+                  )
+                ],
+                onChanged: (value) {
+                  setState(() => _selectedFarmId = value);
+                },
+              ),
+            ),
           const SizedBox(width: 16),
         ],
       ),
@@ -218,12 +189,6 @@ class _ChatPageState extends ConsumerState<ChatPage> {
               },
             ),
           ),
-
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: CircularProgressIndicator(),
-            ),
 
           _buildInputArea(),
         ],

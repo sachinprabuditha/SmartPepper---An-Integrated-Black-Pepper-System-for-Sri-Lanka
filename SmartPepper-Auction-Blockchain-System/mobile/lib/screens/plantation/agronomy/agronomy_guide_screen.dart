@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'models/district_model.dart';
 import 'models/soil_type_model.dart';
 import 'models/guide_step_model.dart';
@@ -10,22 +10,8 @@ import '../../../../../widgets/empty_state.dart';
 import '../../../../../providers/language_provider.dart';
 import '../../../../../localization/app_localizations.dart';
 import '../../../../../config/theme.dart';
-import 'package:provider/provider.dart' as vanilla_provider;
 
-// ─── Providers ────────────────────────────────────────────────────────────────
-
-final _agronomyServiceProvider = Provider<AgronomyService>(
-  (ref) => AgronomyService(),
-);
-
-final _districtsProvider = FutureProvider<List<District>>((ref) async {
-  return ref.read(_agronomyServiceProvider).fetchAllDistricts();
-});
-
-final _soilsByDistrictProvider =
-    FutureProvider.family<List<SoilType>, String>((ref, districtId) async {
-  return ref.read(_agronomyServiceProvider).fetchSoilsByDistrict(districtId);
-});
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 class _DistrictSoilKey {
   final String districtId;
@@ -45,34 +31,37 @@ class _DistrictSoilKey {
   int get hashCode => districtId.hashCode ^ soilTypeId.hashCode;
 }
 
-final _allGuidesByDistrictAndSoilProvider =
-    FutureProvider.family<List<AgronomyGuideResponse>, _DistrictSoilKey>(
-        (ref, key) async {
-  return ref
-      .read(_agronomyServiceProvider)
-      .searchGuides(key.districtId, key.soilTypeId);
-});
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-class AgronomyGuideScreen extends ConsumerStatefulWidget {
+class AgronomyGuideScreen extends StatefulWidget {
   const AgronomyGuideScreen({super.key});
 
   @override
-  ConsumerState<AgronomyGuideScreen> createState() =>
-      _AgronomyGuideScreenState();
+  State<AgronomyGuideScreen> createState() => _AgronomyGuideScreenState();
 }
 
-class _AgronomyGuideScreenState extends ConsumerState<AgronomyGuideScreen> {
+class _AgronomyGuideScreenState extends State<AgronomyGuideScreen> {
+  final AgronomyService _agronomyService = AgronomyService();
+
   District? _selectedDistrict;
   SoilType? _selectedSoilType;
   bool _hasSearched = false;
   _DistrictSoilKey? _cachedGuidesKey;
 
+  // Future variables
+  late Future<List<District>> _districtsFuture;
+  Future<List<SoilType>>? _soilsFuture;
+  Future<List<AgronomyGuideResponse>>? _guidesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _districtsFuture = _agronomyService.fetchAllDistricts();
+  }
+
   String get _lang {
     if (!mounted) return 'en';
-    return vanilla_provider.Provider.of<LanguageProvider>(context,
-            listen: false)
+    return Provider.of<LanguageProvider>(context, listen: false)
         .locale
         .languageCode;
   }
@@ -89,24 +78,30 @@ class _AgronomyGuideScreenState extends ConsumerState<AgronomyGuideScreen> {
       _hasSearched = true;
       _cachedGuidesKey =
           _DistrictSoilKey(_selectedDistrict!.id, _selectedSoilType?.id);
+      _guidesFuture = _agronomyService.searchGuides(
+          _cachedGuidesKey!.districtId, _cachedGuidesKey!.soilTypeId);
     });
   }
 
   void _handleRefresh() {
-    ref.invalidate(_districtsProvider);
-    if (_selectedDistrict != null) {
-      ref.invalidate(_soilsByDistrictProvider(_selectedDistrict!.id));
-    }
-    if (_hasSearched && _cachedGuidesKey != null) {
-      ref.invalidate(_allGuidesByDistrictAndSoilProvider(_cachedGuidesKey!));
-    }
+    setState(() {
+      _districtsFuture = _agronomyService.fetchAllDistricts();
+      if (_selectedDistrict != null) {
+        _soilsFuture =
+            _agronomyService.fetchSoilsByDistrict(_selectedDistrict!.id);
+      }
+      if (_hasSearched && _cachedGuidesKey != null) {
+        _guidesFuture = _agronomyService.searchGuides(
+            _cachedGuidesKey!.districtId, _cachedGuidesKey!.soilTypeId);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     // The UI listens to languageProvider changes inherently if it's placed here,
     // but the global picker handles the state change itself.
-    vanilla_provider.Provider.of<LanguageProvider>(context);
+    Provider.of<LanguageProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -230,185 +225,210 @@ class _AgronomyGuideScreenState extends ConsumerState<AgronomyGuideScreen> {
   // ─── Dropdowns ──────────────────────────────────────────────────────────────
 
   Widget _buildDistrictDropdown() {
-    final districtsAsync = ref.watch(_districtsProvider);
-    return districtsAsync.when(
-      data: (districts) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12)),
-        child: DropdownButtonFormField<District>(
-          value: _selectedDistrict,
-          isExpanded: true,
-          hint: Text(
-            context.tr('agronomy_select_district'),
-            style: const TextStyle(color: Colors.white70),
-          ),
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            prefixIcon: Icon(Icons.location_on, color: AppTheme.pepperGold),
-            hintText: context.tr('agronomy_select_district'),
-            hintStyle: const TextStyle(color: Colors.white70),
-          ),
-          dropdownColor: AppTheme.deepEmerald,
-          style: const TextStyle(color: Colors.white),
-          icon: Icon(Icons.arrow_drop_down,
-              color: Theme.of(context).colorScheme.primary),
-          items: districts
-              .map((d) => DropdownMenuItem(
-                  value: d,
-                  child: Text(d.name.get(_lang),
-                      style: const TextStyle(color: Colors.white))))
-              .toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedDistrict = value;
-              _selectedSoilType = null;
-              _hasSearched = false;
-              _cachedGuidesKey = null;
-            });
-            if (value != null) {
-              ref.invalidate(_soilsByDistrictProvider(value.id));
-            }
-          },
-        ),
-      ),
-      loading: () => const Padding(
-          padding: EdgeInsets.all(16),
-          child: Center(child: CircularProgressIndicator())),
-      error: (e, _) => Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(context.tr('plantation_error_loading_districts') + ': $e',
-              style: const TextStyle(color: Colors.red))),
+    return FutureBuilder<List<District>>(
+      future: _districtsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: CircularProgressIndicator()));
+        } else if (snapshot.hasError) {
+          return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                  context.tr('plantation_error_loading_districts') +
+                      ': ${snapshot.error}',
+                  style: const TextStyle(color: Colors.red)));
+        } else if (snapshot.hasData) {
+          final districts = snapshot.data!;
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12)),
+            child: DropdownButtonFormField<District>(
+              value: _selectedDistrict,
+              isExpanded: true,
+              hint: Text(
+                context.tr('agronomy_select_district'),
+                style: const TextStyle(color: Colors.white70),
+              ),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                prefixIcon: Icon(Icons.location_on, color: AppTheme.pepperGold),
+                hintText: context.tr('agronomy_select_district'),
+                hintStyle: const TextStyle(color: Colors.white70),
+              ),
+              dropdownColor: AppTheme.deepEmerald,
+              style: const TextStyle(color: Colors.white),
+              icon: Icon(Icons.arrow_drop_down,
+                  color: Theme.of(context).colorScheme.primary),
+              items: districts
+                  .map((d) => DropdownMenuItem(
+                      value: d,
+                      child: Text(d.name.get(_lang),
+                          style: const TextStyle(color: Colors.white))))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedDistrict = value;
+                  _selectedSoilType = null;
+                  _hasSearched = false;
+                  _cachedGuidesKey = null;
+                });
+                if (value != null) {
+                  setState(() {
+                    _soilsFuture =
+                        _agronomyService.fetchSoilsByDistrict(value.id);
+                  });
+                }
+              },
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 
   Widget _buildSoilTypeDropdown() {
-    if (_selectedDistrict == null) return const SizedBox.shrink();
-    final soilsAsync =
-        ref.watch(_soilsByDistrictProvider(_selectedDistrict!.id));
-    return soilsAsync.when(
-      data: (soils) {
-        if (soils.isEmpty) {
-          return Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
-                borderRadius: BorderRadius.circular(12)),
-            child: Row(children: [
-              Icon(Icons.info_outline, color: Colors.orange[800]),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  context.tr('agronomy_no_soil_for_district'),
-                  style: TextStyle(color: Colors.grey[800], fontSize: 13),
+    if (_selectedDistrict == null || _soilsFuture == null)
+      return const SizedBox.shrink();
+    return FutureBuilder<List<SoilType>>(
+      future: _soilsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: CircularProgressIndicator()));
+        } else if (snapshot.hasError) {
+          return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text('Error loading soil types: ${snapshot.error}',
+                  style: const TextStyle(color: Colors.red)));
+        } else if (snapshot.hasData) {
+          final soils = snapshot.data!;
+          if (soils.isEmpty) {
+            return Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(12)),
+              child: Row(children: [
+                Icon(Icons.info_outline, color: Colors.orange[800]),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    context.tr('agronomy_no_soil_for_district'),
+                    style: TextStyle(color: Colors.grey[800], fontSize: 13),
+                  ),
                 ),
+              ]),
+            );
+          }
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12)),
+            child: DropdownButtonFormField<SoilType>(
+              value: _selectedSoilType,
+              isExpanded: true,
+              hint: Text(
+                context.tr('agronomy_select_soil_optional'),
+                style: const TextStyle(color: Colors.white70),
               ),
-            ]),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                prefixIcon: Icon(Icons.landscape, color: AppTheme.pepperGold),
+                hintText: context.tr('agronomy_select_soil_optional'),
+                hintStyle: const TextStyle(color: Colors.white70),
+              ),
+              dropdownColor: AppTheme.deepEmerald,
+              style: const TextStyle(color: Colors.white),
+              icon: Icon(Icons.arrow_drop_down,
+                  color: Theme.of(context).colorScheme.primary),
+              items: [
+                DropdownMenuItem<SoilType>(
+                  value: null,
+                  child: Text(context.tr('agronomy_all_soil_types'),
+                      style: const TextStyle(color: Colors.white)),
+                ),
+                ...soils.map((s) => DropdownMenuItem(
+                    value: s,
+                    child: Text(s.typeName.get(_lang),
+                        style: const TextStyle(color: Colors.white)))),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _selectedSoilType = value;
+                  _hasSearched = false;
+                  _cachedGuidesKey = null;
+                });
+              },
+            ),
           );
         }
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12)),
-          child: DropdownButtonFormField<SoilType>(
-            value: _selectedSoilType,
-            isExpanded: true,
-            hint: Text(
-              context.tr('agronomy_select_soil_optional'),
-              style: const TextStyle(color: Colors.white70),
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              prefixIcon: Icon(Icons.landscape, color: AppTheme.pepperGold),
-              hintText: context.tr('agronomy_select_soil_optional'),
-              hintStyle: const TextStyle(color: Colors.white70),
-            ),
-            dropdownColor: AppTheme.deepEmerald,
-            style: const TextStyle(color: Colors.white),
-            icon: Icon(Icons.arrow_drop_down,
-                color: Theme.of(context).colorScheme.primary),
-            items: [
-              DropdownMenuItem<SoilType>(
-                value: null,
-                child: Text(context.tr('agronomy_all_soil_types'),
-                    style: const TextStyle(color: Colors.white)),
-              ),
-              ...soils.map((s) => DropdownMenuItem(
-                  value: s,
-                  child: Text(s.typeName.get(_lang),
-                      style: const TextStyle(color: Colors.white)))),
-            ],
-            onChanged: (value) {
-              setState(() {
-                _selectedSoilType = value;
-                _hasSearched = false;
-                _cachedGuidesKey = null;
-              });
-            },
-          ),
-        );
+        return const SizedBox.shrink();
       },
-      loading: () => const Padding(
-          padding: EdgeInsets.all(16),
-          child: Center(child: CircularProgressIndicator())),
-      error: (e, _) => Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text('Error loading soil types: $e',
-              style: const TextStyle(color: Colors.red))),
     );
   }
 
   // ─── Guide Content ───────────────────────────────────────────────────────────
 
   Widget _buildGuidesContentSliver() {
-    if (!_hasSearched || _cachedGuidesKey == null) {
+    if (!_hasSearched || _guidesFuture == null) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
-    final guidesAsync =
-        ref.watch(_allGuidesByDistrictAndSoilProvider(_cachedGuidesKey!));
-    return guidesAsync.when(
-      data: (guides) {
-        if (guides.isEmpty) {
+    return FutureBuilder<List<AgronomyGuideResponse>>(
+      future: _guidesFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return SliverFillRemaining(
             hasScrollBody: false,
-            child: EmptyState(
-              message: context.tr('agronomy_no_guides_found'),
-              icon: Icons.search_off,
+            child: LoadingSpinner(
+                message: context.tr('agronomy_searching_guides')),
+          );
+        } else if (snapshot.hasError) {
+          return SliverFillRemaining(
+            hasScrollBody: false,
+            child: _buildErrorState(snapshot.error.toString()),
+          );
+        } else if (snapshot.hasData) {
+          final guides = snapshot.data!;
+          if (guides.isEmpty) {
+            return SliverFillRemaining(
+              hasScrollBody: false,
+              child: EmptyState(
+                message: context.tr('agronomy_no_guides_found'),
+                icon: Icons.search_off,
+              ),
+            );
+          }
+          // Deduplicate by varietyId
+          final seenVarieties = <String>{};
+          final uniqueGuides = <AgronomyGuideResponse>[];
+          for (final guide in guides) {
+            if (!seenVarieties.contains(guide.varietyId)) {
+              seenVarieties.add(guide.varietyId);
+              uniqueGuides.add(guide);
+            }
+          }
+          return SliverPadding(
+            padding: const EdgeInsets.only(bottom: 80),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => Padding(
+                  padding: EdgeInsets.fromLTRB(16, index == 0 ? 16 : 8, 16, 8),
+                  child: _buildGuideCard(uniqueGuides[index]),
+                ),
+                childCount: uniqueGuides.length,
+              ),
             ),
           );
         }
-        // Deduplicate by varietyId
-        final seenVarieties = <String>{};
-        final uniqueGuides = <AgronomyGuideResponse>[];
-        for (final guide in guides) {
-          if (!seenVarieties.contains(guide.varietyId)) {
-            seenVarieties.add(guide.varietyId);
-            uniqueGuides.add(guide);
-          }
-        }
-        return SliverPadding(
-          padding: const EdgeInsets.only(bottom: 80),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => Padding(
-                padding: EdgeInsets.fromLTRB(16, index == 0 ? 16 : 8, 16, 8),
-                child: _buildGuideCard(uniqueGuides[index]),
-              ),
-              childCount: uniqueGuides.length,
-            ),
-          ),
-        );
+        return const SliverToBoxAdapter(child: SizedBox.shrink());
       },
-      loading: () => SliverFillRemaining(
-        hasScrollBody: false,
-        child: LoadingSpinner(message: context.tr('agronomy_searching_guides')),
-      ),
-      error: (e, _) => SliverFillRemaining(
-        hasScrollBody: false,
-        child: _buildErrorState(e.toString()),
-      ),
     );
   }
 
