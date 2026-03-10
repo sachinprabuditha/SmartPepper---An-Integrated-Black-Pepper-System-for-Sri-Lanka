@@ -343,6 +343,35 @@ class ApiService {
     }
   }
 
+  // Quality Grading
+  Future<Map<String, dynamic>> saveQualityGrading(Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.post('/quality-grading', data: data);
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData.containsKey('error')) {
+          throw Exception(errorData['error']);
+        } else if (errorData is Map && errorData.containsKey('message')) {
+          throw Exception(errorData['message']);
+        }
+      }
+      throw Exception('Network error. Please check your connection.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getQualityGradingHistory() async {
+    try {
+      final response = await _dio.get('/quality-grading/history');
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Generic HTTP methods
   Future<dynamic> get(String endpoint,
       {Map<String, dynamic>? queryParameters}) async {
@@ -487,6 +516,64 @@ class ApiService {
     try {
       final response = await _dio.post('/auctions/$auctionId/settle');
       return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Pepper Varieties endpoints
+  Future<List<Map<String, dynamic>>> getPepperVarieties() async {
+    try {
+      final response = await _dio.get('/pepper-varieties');
+      if (response.data['success'] == true) {
+        final List<dynamic> data = response.data['data'] ?? [];
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception(
+            response.data['error'] ?? 'Failed to fetch pepper varieties');
+      }
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData.containsKey('error')) {
+          throw Exception(errorData['error']);
+        } else if (errorData is Map && errorData.containsKey('message')) {
+          throw Exception(errorData['message']);
+        }
+      }
+      throw Exception('Network error. Please check your connection.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Get simplified pepper variety names for dropdown
+  /// Returns a list with id, name (localized), nameEn, and nameSi
+  Future<List<Map<String, dynamic>>> getPepperVarietyNames({
+    String language = 'en',
+  }) async {
+    try {
+      final response = await _dio.get(
+        '/pepper-varieties/simple/names',
+        queryParameters: {'lang': language},
+      );
+      if (response.data['success'] == true) {
+        final List<dynamic> data = response.data['data'] ?? [];
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception(
+            response.data['error'] ?? 'Failed to fetch variety names');
+      }
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData.containsKey('error')) {
+          throw Exception(errorData['error']);
+        } else if (errorData is Map && errorData.containsKey('message')) {
+          throw Exception(errorData['message']);
+        }
+      }
+      throw Exception('Network error. Please check your connection.');
     } catch (e) {
       rethrow;
     }

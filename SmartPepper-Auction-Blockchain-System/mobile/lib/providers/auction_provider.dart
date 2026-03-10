@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../services/api_service.dart';
 import '../services/socket_service.dart';
 import '../services/blockchain_service.dart';
+import '../services/notification_service.dart';
 
 class Auction {
   final String id;
@@ -10,6 +11,7 @@ class Auction {
   final String lotId;
   final String farmerAddress;
   final double startingPrice;
+  final double? startingPriceLkr; // LKR equivalent of starting price
   final double currentBid;
   final double? currentBidLkr; // LKR equivalent of current bid
   final String? highestBidder;
@@ -18,6 +20,8 @@ class Auction {
   final String status;
   final String? variety;
   final double? quantity;
+  final String? quality;
+  final int bidderCount;
   final String? blockchainTxHash;
   final bool compliancePassed;
 
@@ -28,6 +32,7 @@ class Auction {
     required this.lotId,
     required this.farmerAddress,
     required this.startingPrice,
+    this.startingPriceLkr,
     required this.currentBid,
     this.currentBidLkr,
     this.highestBidder,
@@ -36,6 +41,8 @@ class Auction {
     required this.status,
     this.variety,
     this.quantity,
+    this.quality,
+    this.bidderCount = 0,
     this.blockchainTxHash,
     this.compliancePassed = false,
   });
@@ -61,6 +68,10 @@ class Auction {
               json['reserve_price']?.toString() ??
               '0') ??
           0.0,
+      startingPriceLkr: double.tryParse(json['price_lkr']?.toString() ??
+          json['starting_price_lkr']?.toString() ??
+          json['startingPriceLkr']?.toString() ??
+          '0'),
       currentBid: double.tryParse(json['current_bid']?.toString() ??
               json['currentBid']?.toString() ??
               '0') ??
@@ -81,6 +92,11 @@ class Auction {
       status: json['status']?.toString() ?? 'created',
       variety: json['variety']?.toString(),
       quantity: double.tryParse(json['quantity']?.toString() ?? '0'),
+      quality: json['quality']?.toString(),
+      bidderCount: int.tryParse(json['bid_count']?.toString() ??
+              json['bidderCount']?.toString() ??
+              '0') ??
+          0,
       blockchainTxHash: json['blockchain_tx_hash']?.toString(),
       compliancePassed:
           json['compliance_passed'] == true || json['compliancePassed'] == true,
@@ -92,16 +108,19 @@ class AuctionProvider with ChangeNotifier {
   final ApiService apiService;
   final SocketService socketService;
   final BlockchainService blockchainService;
+  final NotificationService? notificationService;
 
   List<Auction> _auctions = [];
   Auction? _currentAuction;
   bool _loading = false;
   String? _error;
+  String? _farmerAddress;
 
   AuctionProvider({
     required this.apiService,
     required this.socketService,
     required this.blockchainService,
+    this.notificationService,
   }) {
     _initializeSocket();
   }
@@ -119,6 +138,9 @@ class AuctionProvider with ChangeNotifier {
     socketService.onNewBid((data) {
       print('📥 New bid received: $data');
       _updateCurrentAuction(data);
+
+      // Notify farmer if this bid is for their auction
+      _notifyFarmerOfNewBid(data);
     });
 
     socketService.onAuctionEnd((data) {
@@ -134,11 +156,22 @@ class AuctionProvider with ChangeNotifier {
 
     try {
       print('🔍 Fetching auctions for farmer: $farmerAddress');
+      // Store farmer address for notification filtering
+      _farmerAddress = farmerAddress;
+
       final response =
           await apiService.getAuctions(farmerAddress: farmerAddress);
       print('✅ Received ${response.length} auctions from API');
       _auctions = response.map((json) => Auction.fromJson(json)).toList();
       print('✅ Parsed ${_auctions.length} auction objects');
+
+      // Auto-join all active auction rooms for real-time bid notifications
+      for (var auction in _auctions) {
+        if (auction.status == 'active' || auction.status == 'live') {
+          print('🔔 Joining auction room: ${auction.auctionId}');
+          socketService.joinAuction(auction.auctionId);
+        }
+      }
 
       // Debug: Log parsed auction IDs
       for (var auction in _auctions) {
@@ -256,6 +289,61 @@ class AuctionProvider with ChangeNotifier {
         status: 'ended',
       );
       notifyListeners();
+    }
+  }
+
+  void _notifyFarmerOfNewBid(dynamic data) {
+    // Only send notification if NotificationService is available
+    if (notificationService == null) return;
+
+    try {
+      final bidAuctionId = data['auctionId']?.toString();
+      if (bidAuctionId == null) {
+        print('⚠️ No auctionId in bid data');
+        return;
+      }
+
+      print(
+          '🔍 Checking if bid is for farmer\'s auction. Bid auctionId: $bidAuctionId, Farmer: $_farmerAddress');
+
+      // Check if this bid is for one of the farmer's auctions
+      final farmerAuction = _auctions.firstWhere(
+        (auction) =>
+            (auction.id == bidAuctionId || auction.auctionId == bidAuctionId) &&
+            auction.farmerAddress == _farmerAddress,
+        orElse: () => _auctions.first, // Will cause check below to fail
+      );
+
+      // If we found a matching auction owned by this farmer
+      if (farmerAuction.farmerAddress == _farmerAddress &&
+          (farmerAuction.id == bidAuctionId ||
+              farmerAuction.auctionId == bidAuctionId)) {
+        // Parse bid amounts
+        final bidAmountEth =
+            double.tryParse(data['amount']?.toString() ?? '0') ?? 0.0;
+        final bidAmountLkr =
+            double.tryParse(data['amountLkr']?.toString() ?? '0') ??
+                (bidAmountEth * 322580.65); // Fallback conversion
+        final bidderCount =
+            int.tryParse(data['bidCount']?.toString() ?? '1') ?? 1;
+
+        print(
+            '🔔 Sending notification to farmer for bid on auction ${bidAuctionId}');
+        print(
+            '   💰 Amount: ${bidAmountLkr.toStringAsFixed(2)} LKR (${bidAmountEth.toStringAsFixed(4)} ETH)');
+        print('   👥 Bidders: $bidderCount');
+
+        // Trigger notification
+        notificationService!.notifyBidUpdate(
+          lotId: farmerAuction.lotId,
+          newBid: bidAmountLkr,
+          bidderCount: bidderCount,
+        );
+      } else {
+        print('ℹ️ Bid not for current farmer\'s auction');
+      }
+    } catch (e) {
+      print('⚠️ Error notifying farmer of new bid: $e');
     }
   }
 

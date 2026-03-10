@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart' hide Provider, Consumer, ChangeNotifierProvider;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -19,6 +18,7 @@ import 'services/notification_service.dart';
 import 'services/offline_sync_service.dart';
 import 'services/ipfs_service.dart';
 import 'localization/app_localizations.dart';
+import 'utils/notification_navigation_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,8 +63,7 @@ void main() async {
   print('🚀 App initialization complete');
 
   runApp(
-    ProviderScope(
-      child: MultiProvider(
+    MultiProvider(
       providers: [
         // Provide service instances
         Provider<ApiService>.value(value: apiService),
@@ -95,28 +94,52 @@ void main() async {
           ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, AuctionProvider>(
-          create: (_) => AuctionProvider(
+          create: (context) => AuctionProvider(
             apiService: apiService,
             socketService: socketService,
             blockchainService: blockchainService,
+            notificationService: context.read<NotificationService>(),
           ),
-          update: (_, auth, previous) =>
+          update: (context, auth, previous) =>
               previous ??
               AuctionProvider(
                 apiService: apiService,
                 socketService: socketService,
                 blockchainService: blockchainService,
+                notificationService: context.read<NotificationService>(),
               ),
         ),
       ],
       child: const SmartPepperApp(),
-      ),
     ),
   );
 }
 
-class SmartPepperApp extends StatelessWidget {
+class SmartPepperApp extends StatefulWidget {
   const SmartPepperApp({super.key});
+
+  @override
+  State<SmartPepperApp> createState() => _SmartPepperAppState();
+}
+
+class _SmartPepperAppState extends State<SmartPepperApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Set up notification tap callback after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setupNotificationCallback();
+    });
+  }
+
+  void _setupNotificationCallback() {
+    final notificationService = context.read<NotificationService>();
+    notificationService.onNotificationTap = (payload) {
+      if (mounted) {
+        NotificationNavigationHelper.handleNotificationTap(context, payload);
+      }
+    };
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,9 @@
 import cv2
 import numpy as np
+from config import (
+    MIN_LEAF_AREA, MAX_LEAF_AREA, CROP_PADDING, MASK_THRESHOLD,
+    DILATION_KERNEL_SIZE, DILATION_ITERATIONS
+)
 
 def preprocess(image, size=(224, 224)):
     # Convert BGR to RGB as ResNet expects RGB formatting for ImageNet specific means/stds
@@ -25,11 +29,12 @@ def extract_crops(results, frame):
             mask = mask_data.cpu().numpy()
             mask = cv2.resize(mask, (w, h), interpolation=cv2.INTER_LINEAR)
 
-            binary_mask = (mask > 0.1).astype(np.uint8) * 255
+            # Use configurable mask threshold (better edge preservation for footrot)
+            binary_mask = (mask > MASK_THRESHOLD).astype(np.uint8) * 255
 
-            # Small dilation around the cropped leaf
-            kernel = np.ones((5, 5), np.uint8)
-            binary_mask = cv2.dilate(binary_mask, kernel, iterations=4)
+            # Configurable dilation for edge capture
+            kernel = np.ones((DILATION_KERNEL_SIZE, DILATION_KERNEL_SIZE), np.uint8)
+            binary_mask = cv2.dilate(binary_mask, kernel, iterations=DILATION_ITERATIONS)
 
             # ---------- WHITE BACKGROUND ----------
             white_bg = np.ones_like(frame) * 255
@@ -47,20 +52,20 @@ def extract_crops(results, frame):
             # Small padding buffer based on bounding box size
             box_w = xs.max() - xs.min()
             box_h = ys.max() - ys.min()
+            box_area = box_w * box_h
             
-            # Filter out very small detections (likely background noise/artifacts)
-            # Increased from 3000 to 12000 for strict filtering
-            if box_w * box_h < 12000:
+            # Area-based filtering with configurable thresholds
+            if box_area < MIN_LEAF_AREA or box_area > MAX_LEAF_AREA:
                 continue
                 
-            # Filter out extreme aspect ratios (e.g. branches, stems, wires)
-            # A typical leaf shape usually falls between 0.3 and 3.0
+            # Aspect ratio filtering (typical pepper leaves)
             aspect_ratio = float(box_w) / float(box_h)
-            if aspect_ratio < 0.3 or aspect_ratio > 3.0:
+            if aspect_ratio < 0.4 or aspect_ratio > 2.5:
                 continue
                 
-            pad_x = int(box_w * 0.06)
-            pad_y = int(box_h * 0.06)
+            # Configurable padding for edge disease detection (e.g., footrot)
+            pad_x = int(box_w * CROP_PADDING)
+            pad_y = int(box_h * CROP_PADDING)
 
             x1m = max(0, xs.min() - pad_x)
             x2m = min(w, xs.max() + pad_x)

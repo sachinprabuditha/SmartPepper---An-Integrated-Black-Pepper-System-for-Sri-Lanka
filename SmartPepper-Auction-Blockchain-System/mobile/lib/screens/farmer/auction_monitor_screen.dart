@@ -6,9 +6,11 @@ import '../../providers/auth_provider.dart';
 import '../../models/lot.dart';
 import '../../services/socket_service.dart';
 import '../../services/api_service.dart';
+import '../../services/notification_service.dart';
 import '../../config/theme.dart';
-import 'package:go_router/go_router.dart';
 import '../../localization/app_localizations.dart';
+import 'settlement_tracking_screen.dart';
+import 'payment_history_screen.dart';
 
 /// Auction monitoring screen for farmers to track their lots in auctions
 /// Farmers can see live bid updates, bidder count, and time remaining
@@ -97,6 +99,7 @@ class _FarmerAuctionMonitorScreenState
 
   void _setupRealtimeUpdates() {
     final socketService = context.read<SocketService>();
+    final notificationService = context.read<NotificationService>();
 
     // Listen for bid updates (backend emits 'new_bid')
     socketService.on('new_bid', (data) {
@@ -132,6 +135,14 @@ class _FarmerAuctionMonitorScreenState
               blockchainTxHash: _auction!.blockchainTxHash,
               compliancePassed: _auction!.compliancePassed,
             );
+
+            // Show notification for new bid
+            notificationService.notifyBidUpdate(
+              lotId: _auction!.lotId,
+              newBid:
+                  _auction!.currentBidLkr ?? _auction!.currentBid * 322580.65,
+              bidderCount: 1,
+            );
           }
         });
       }
@@ -146,6 +157,11 @@ class _FarmerAuctionMonitorScreenState
           data['auctionId'].toString() == _auction?.auctionId) {
         setState(() {
           if (_auction != null) {
+            final finalPrice =
+                double.tryParse(data['finalPrice']?.toString() ?? '0') ??
+                    _auction!.currentBid;
+            final winnerAddress = data['winnerAddress']?.toString();
+
             _auction = Auction(
               id: _auction!.id,
               auctionId: _auction!.auctionId,
@@ -153,11 +169,8 @@ class _FarmerAuctionMonitorScreenState
               lotId: _auction!.lotId,
               farmerAddress: _auction!.farmerAddress,
               startingPrice: _auction!.startingPrice,
-              currentBid:
-                  double.tryParse(data['finalPrice']?.toString() ?? '0') ??
-                      _auction!.currentBid,
-              highestBidder:
-                  data['winnerAddress']?.toString() ?? _auction!.highestBidder,
+              currentBid: finalPrice,
+              highestBidder: winnerAddress ?? _auction!.highestBidder,
               startTime: _auction!.startTime,
               endTime: _auction!.endTime,
               status: 'ended',
@@ -166,6 +179,22 @@ class _FarmerAuctionMonitorScreenState
               blockchainTxHash: _auction!.blockchainTxHash,
               compliancePassed: _auction!.compliancePassed,
             );
+
+            // Show appropriate notification based on whether auction has winner
+            if (winnerAddress != null && winnerAddress.isNotEmpty) {
+              // Auction sold - notify farmer
+              notificationService.notifyAuctionSold(
+                auctionId: _auction!.auctionId,
+                finalPrice: finalPrice,
+                winnerAddress: winnerAddress,
+              );
+            } else {
+              // No sale - suggest re-listing
+              notificationService.notifyAuctionNoSale(
+                auctionId: _auction!.auctionId,
+                variety: _auction!.variety ?? 'Pepper',
+              );
+            }
           }
         });
 
@@ -177,6 +206,44 @@ class _FarmerAuctionMonitorScreenState
     // Listen for auction joined confirmation
     socketService.on('auction_joined', (data) {
       print('✅ Successfully joined auction room: ${data['auctionId']}');
+    });
+
+    // Listen for settlement complete event
+    socketService.on('auction_settled', (data) {
+      print('💰 Received auction_settled event: $data');
+      if (!mounted) return;
+
+      if (data['auctionId'] == widget.auctionId ||
+          data['auctionId'].toString() == _auction?.auctionId) {
+        final finalAmount =
+            double.tryParse(data['finalAmount']?.toString() ?? '0') ?? 0.0;
+        final farmerEarnings = finalAmount * 0.98; // 98% after 2% platform fee
+
+        notificationService.notifyAuctionSettled(
+          auctionId: widget.auctionId,
+          finalAmount: finalAmount,
+          farmerEarnings: farmerEarnings,
+        );
+      }
+    });
+
+    // Listen for payment received event
+    socketService.on('payment_received', (data) {
+      print('💸 Received payment_received event: $data');
+      if (!mounted) return;
+
+      if (data['auctionId'] == widget.auctionId ||
+          data['auctionId'].toString() == _auction?.auctionId) {
+        final amount =
+            double.tryParse(data['amount']?.toString() ?? '0') ?? 0.0;
+        final currency = data['currency']?.toString() ?? 'ETH';
+
+        notificationService.notifyPaymentReceived(
+          auctionId: widget.auctionId,
+          amount: amount,
+          currency: currency,
+        );
+      }
     });
 
     // Join auction room for real-time updates
@@ -202,6 +269,90 @@ class _FarmerAuctionMonitorScreenState
         });
       }
     });
+  }
+
+  Widget _buildActionButtons() {
+    final auction = _auction;
+    if (auction == null) return const SizedBox.shrink();
+
+    final now = DateTime.now();
+    final isEnded = now.isAfter(auction.endTime) ||
+        auction.status == 'ended' ||
+        auction.status == 'settled' ||
+        auction.status == 'finalized';
+
+    if (!isEnded) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          // View Settlement Status Button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettlementTrackingScreen(
+                      auctionId: widget.auctionId,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.receipt_long),
+              label: Text(
+                AppLocalizations.of(context)
+                    .translate('view_settlement_status'),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.forestGreen,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 2,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Payment History Button
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PaymentHistoryScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.history),
+              label: Text(
+                AppLocalizations.of(context).translate('payment_history'),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppTheme.forestGreen,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                side: BorderSide(color: AppTheme.forestGreen, width: 2),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showAuctionEndDialog(String? winnerName, dynamic finalPrice) {
@@ -373,6 +524,11 @@ class _FarmerAuctionMonitorScreenState
 
               // Bidding activity
               _buildBiddingActivityCard(),
+              const SizedBox(height: 20),
+
+              // Action buttons for ended auctions
+              if (_auction!.status == 'ended' || _auction!.status == 'settled')
+                _buildActionButtons(),
             ],
           ),
         ),

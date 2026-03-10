@@ -1,17 +1,38 @@
 import os
 import json
 import torch
+from dotenv import load_dotenv
+
+# Load environment variables (optional - will use defaults if not present)
+load_dotenv()
 
 # Directory setup
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_FOLDER = os.path.join(BASE_DIR, "models")
-# Updated to use newly trained YOLO segmentation model
-YOLO_PATH = r'C:\Users\nipun\Desktop\Pepper_Project\Training_Results\pepper_leaf_no_overfit\weights\best.pt'
+
+# YOLO Model Path - use relative path by default, can be overridden by .env
+YOLO_MODEL_PATH = os.getenv('YOLO_MODEL_PATH', './models/best.pt')
+YOLO_PATH = YOLO_MODEL_PATH if os.path.isabs(YOLO_MODEL_PATH) else os.path.join(BASE_DIR, YOLO_MODEL_PATH)
+
 LABELS_PATH = os.path.join(MODEL_FOLDER, "labels.json")
 DEBUG_ROOT = os.path.join(BASE_DIR, "debug_crops")
 
 # Hardware config
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# YOLO Configuration with defaults
+YOLO_CONFIDENCE = float(os.getenv('YOLO_CONFIDENCE', '0.25'))
+YOLO_IOU = float(os.getenv('YOLO_IOU', '0.35'))
+YOLO_IMAGE_SIZE = int(os.getenv('YOLO_IMAGE_SIZE', '1024'))
+
+# Filtering thresholds
+MIN_LEAF_AREA = int(os.getenv('MIN_LEAF_AREA', '15000'))
+MAX_LEAF_AREA = int(os.getenv('MAX_LEAF_AREA', '500000'))
+CROP_PADDING = float(os.getenv('CROP_PADDING', '0.15'))
+MASK_THRESHOLD = float(os.getenv('MASK_THRESHOLD', '0.05'))
+# Increased dilation for better edge capture (important for footrot detection on leaf edges)
+DILATION_KERNEL_SIZE = int(os.getenv('DILATION_KERNEL_SIZE', '7'))
+DILATION_ITERATIONS = int(os.getenv('DILATION_ITERATIONS', '7'))
 
 # Load Class Names
 if os.path.exists(LABELS_PATH):

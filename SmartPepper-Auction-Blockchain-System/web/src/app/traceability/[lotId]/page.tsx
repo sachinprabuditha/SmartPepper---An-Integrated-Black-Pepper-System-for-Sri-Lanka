@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  Link2, 
-  Award, 
-  Settings, 
-  FileCheck, 
+import {
+  Clock,
+  CheckCircle,
+  XCircle,
+  Link2,
+  Award,
+  Settings,
+  FileCheck,
   Gavel,
   TrendingUp,
   Copy,
@@ -63,7 +63,7 @@ export default function TraceabilityPage() {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
       const response = await fetch(`${apiUrl}/api/traceability/${lotId}`);
       const result = await response.json();
-      
+
       if (result.success) {
         setData(result);
       } else {
@@ -133,7 +133,7 @@ export default function TraceabilityPage() {
             <ArrowLeft className="w-5 h-5" />
             <span>Back</span>
           </button>
-          
+
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-3xl font-bold mb-2">Blockchain Traceability</h1>
@@ -142,7 +142,7 @@ export default function TraceabilityPage() {
                 Complete audit trail with {data.statistics.blockchain_transactions} blockchain transactions
               </p>
             </div>
-            
+
             <button
               onClick={exportData}
               className="flex items-center space-x-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
@@ -225,11 +225,10 @@ function TabButton({ active, onClick, icon, label }: any) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center space-x-2 px-4 py-4 border-b-2 transition-colors ${
-        active
+      className={`flex items-center space-x-2 px-4 py-4 border-b-2 transition-colors ${active
           ? 'border-green-600 text-green-600'
           : 'border-transparent text-gray-600 hover:text-gray-900'
-      }`}
+        }`}
     >
       {icon}
       <span className="font-medium">{label}</span>
@@ -339,7 +338,7 @@ function ProcessingView({ data, copyToClipboard }: any) {
             <Settings className="w-6 h-6 text-green-600" />
             <h3 className="text-lg font-semibold">{stage.stage_name}</h3>
           </div>
-          
+
           <div className="space-y-2 text-sm">
             <InfoRow label="Type" value={stage.stage_type} />
             <InfoRow label="Location" value={stage.location || 'N/A'} />
@@ -379,7 +378,7 @@ function CertificatesView({ data }: any) {
               </div>
             )}
           </div>
-          
+
           <div className="space-y-2 text-sm">
             <InfoRow label="Certificate Number" value={cert.cert_number} />
             <InfoRow label="Issued By" value={cert.issued_by} />
@@ -403,7 +402,7 @@ function ComplianceView({ data, copyToClipboard }: any) {
     <div className="grid grid-cols-1 gap-6">
       {data.compliance_checks.map((check: any, index: number) => {
         const isPassed = check.passed === true;
-        
+
         return (
           <div key={index} className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-4">
@@ -416,11 +415,10 @@ function ComplianceView({ data, copyToClipboard }: any) {
                   )}
                 </div>
               </div>
-              <div className={`px-4 py-2 rounded-full text-sm font-medium ${
-                isPassed
+              <div className={`px-4 py-2 rounded-full text-sm font-medium ${isPassed
                   ? 'bg-green-100 text-green-800'
                   : 'bg-red-100 text-red-800'
-              }`}>
+                }`}>
                 {isPassed ? 'PASSED' : 'FAILED'}
               </div>
             </div>
@@ -431,8 +429,8 @@ function ComplianceView({ data, copyToClipboard }: any) {
               <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="text-sm font-medium text-gray-700 mb-2">Details:</div>
                 <div className="text-sm text-gray-600">
-                  {typeof check.details === 'string' 
-                    ? check.details 
+                  {typeof check.details === 'string'
+                    ? check.details
                     : JSON.stringify(check.details, null, 2)}
                 </div>
               </div>
@@ -453,7 +451,7 @@ function BlockchainView({ data, copyToClipboard }: any) {
           <Link2 className="w-6 h-6 text-green-600" />
           <span>NFT Passport Information</span>
         </h3>
-        
+
         <div className="space-y-3">
           <BlockchainRow
             label="Lot ID"
@@ -495,7 +493,7 @@ function BlockchainView({ data, copyToClipboard }: any) {
         <div className="space-y-2 text-sm">
           <InfoRow label="Total Transactions" value={data.blockchain_info.total_transactions} />
           <InfoRow label="Network" value="Hardhat Local (Chain ID: 1337)" />
-          <InfoRow label="RPC URL" value="http://192.168.8.151:8545" />
+          <InfoRow label="RPC URL" value="http://192.168.1.153:8545" />
         </div>
       </div>
     </div>
@@ -508,9 +506,8 @@ function BlockchainRow({ label, value, copyToClipboard }: any) {
       <div className="text-sm text-gray-600 mb-1">{label}</div>
       <div
         onClick={() => copyToClipboard && copyToClipboard(value, label)}
-        className={`p-3 bg-gray-50 rounded-lg font-mono text-sm ${
-          copyToClipboard ? 'cursor-pointer hover:bg-gray-100' : ''
-        }`}
+        className={`p-3 bg-gray-50 rounded-lg font-mono text-sm ${copyToClipboard ? 'cursor-pointer hover:bg-gray-100' : ''
+          }`}
       >
         <div className="flex items-center justify-between">
           <span className="break-all">

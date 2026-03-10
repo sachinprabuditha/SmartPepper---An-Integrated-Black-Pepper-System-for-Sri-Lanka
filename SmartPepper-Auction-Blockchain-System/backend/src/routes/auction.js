@@ -3,6 +3,7 @@ const router = express.Router();
 const admin = require('firebase-admin');
 const BlockchainService = require('../services/blockchainService');
 const ComplianceService = require('../services/complianceService');
+const notificationService = require('../services/notificationService');
 const currencyConverter = require('../utils/currencyConverter');
 const logger = require('../utils/logger');
 const { v4: uuidv4 } = require('uuid');
@@ -921,6 +922,23 @@ router.post('/:id/bid', async (req, res) => {
       });
     }
 
+    // Create notification for farmer
+    try {
+      const farmerId = await notificationService.getFarmerIdFromWallet(auction.farmer_address);
+      if (farmerId) {
+        await notificationService.notifyBidPlaced(
+          farmerId,
+          id,
+          bidderName || 'Anonymous',
+          bidInLkr.toFixed(2),
+          (auction.bid_count || 0) + 1
+        );
+        logger.info('Notification created for farmer', { farmerId, auctionId: id });
+      }
+    } catch (notifError) {
+      logger.error('Failed to create bid notification:', notifError);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Bid placed successfully',
@@ -1481,15 +1499,49 @@ router.post('/:id/settle', async (req, res) => {
       farmerPayout
     });
 
-    // Broadcast settlement via WebSocket
-    const io = req.app.get('io');
-    if (io) {
-      io.to(`auction-${id}`).emit('auction-settled', {
-        auctionId: id,
+    // Broadcast settlement via WebSocket using AuctionWebSocket class
+    const auctionSocket = req.app.get('auctionSocket');
+    if (auctionSocket) {
+      await auctionSocket.broadcastAuctionSettled(id, {
         status: 'settled',
         finalAmount,
         winner: escrow.depositor_address
       });
+      
+      // Also broadcast payment received event for farmer
+      await auctionSocket.broadcastPaymentReceived(id, {
+        amount: farmerPayout,
+        currency: 'ETH',
+        recipient: auction.farmer_address
+      });
+    }
+
+    // Create notifications for farmer
+    try {
+      const farmerId = await notificationService.getFarmerIdFromWallet(auction.farmer_address);
+      if (farmerId) {
+        // Convert amounts to LKR for notifications
+        const finalAmountLkr = await currencyConverter.convertToLkr(finalAmount);
+        const farmerEarningsLkr = await currencyConverter.convertToLkr(farmerPayout);
+        
+        await notificationService.notifyAuctionSettled(
+          farmerId,
+          id,
+          finalAmountLkr.toFixed(2),
+          farmerEarningsLkr.toFixed(2)
+        );
+        
+        await notificationService.notifyPaymentReceived(
+          farmerId,
+          id,
+          farmerPayout.toFixed(4),
+          'ETH'
+        );
+        
+        logger.info('Settlement notifications created for farmer', { farmerId, auctionId: id });
+      }
+    } catch (notifError) {
+      logger.error('Failed to create settlement notifications:', notifError);
     }
 
     res.json({
@@ -1655,11 +1707,44 @@ router.post('/:id/finalize', async (req, res) => {
 
     logger.info('Manual finalization requested for auction:', id);
 
+    // Check auction status first
+    const auctionDoc = await firestore.collection('auctions').doc(id).get();
+    
+    if (!auctionDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Auction not found'
+      });
+    }
+
+    const auction = auctionDoc.data();
+    
+    // Check if already finalized
+    if (auction.finalized) {
+      return res.json({
+        success: true,
+        alreadyFinalized: true,
+        message: 'Auction is already finalized',
+        status: auction.status,
+        settlementStatus: auction.settlement_status,
+        winner: auction.winner_address,
+        finalPrice: auction.final_price
+      });
+    }
+
+    // Check if auction has ended
+    if (auction.status !== 'ended') {
+      return res.status(400).json({
+        success: false,
+        error: `Auction cannot be finalized - current status: ${auction.status}`
+      });
+    }
+
     const result = await auctionFinalizationService.finalizeEndedAuctions([id]);
 
     res.json({
       success: true,
-      message: 'Finalization triggered',
+      message: 'Auction finalized successfully',
       result
     });
   } catch (error) {
