@@ -8,8 +8,7 @@ export const predict = async (req, res) => {
 
         // Map camelCase from frontend to PascalCase for service
         const request = {
-            UsdBuyRate: body.usdBuyRate || body.UsdBuyRate,
-            UsdSellRate: body.usdSellRate || body.UsdSellRate,
+            UsdRate: body.usdRate || body.UsdRate,
             Temperature: body.temperature || body.Temperature,
             Precipitation: body.precipitation || body.Precipitation,
             Date: body.date || body.Date,

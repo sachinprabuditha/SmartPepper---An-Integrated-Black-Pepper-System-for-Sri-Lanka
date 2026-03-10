@@ -21,8 +21,7 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers
-  final _usdBuyController = TextEditingController();
-  final _usdSellController = TextEditingController();
+  final _usdRateController = TextEditingController();
   final _tempController = TextEditingController();
   final _precipController = TextEditingController();
   final _dateController = TextEditingController();
@@ -118,8 +117,7 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
 
       if (!mounted) return;
       setState(() {
-        _usdBuyController.text = rateData.buyRate.toStringAsFixed(2);
-        _usdSellController.text = rateData.sellRate.toStringAsFixed(2);
+        _usdRateController.text = rateData.rate.toStringAsFixed(2);
         _isFetchingRates = false;
       });
 
@@ -141,8 +139,7 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
 
   @override
   void dispose() {
-    _usdBuyController.dispose();
-    _usdSellController.dispose();
+    _usdRateController.dispose();
     _tempController.dispose();
     _precipController.dispose();
     _dateController.dispose();
@@ -187,8 +184,7 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
 
     try {
       final input = PredictionInput(
-        usdBuyRate: double.parse(_usdBuyController.text),
-        usdSellRate: double.parse(_usdSellController.text),
+        usdRate: double.parse(_usdRateController.text),
         temperature: double.parse(_tempController.text),
         precipitation: double.parse(_precipController.text),
         date: _selectedDate!,
@@ -282,26 +278,11 @@ class _PricePredictionScreenState extends ConsumerState<PricePredictionScreen> {
                 ],
               ),
               const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildNumberField(
-                      context,
-                      _usdBuyController,
-                      context.tr('price_prediction_usd_buy'),
-                      context.tr('price_prediction_enter_rate'),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildNumberField(
-                      context,
-                      _usdSellController,
-                      context.tr('price_prediction_usd_sell'),
-                      context.tr('price_prediction_enter_rate'),
-                    ),
-                  ),
-                ],
+              _buildNumberField(
+                context,
+                _usdRateController,
+                'USD Rate',
+                context.tr('price_prediction_enter_rate'),
               ),
               const SizedBox(height: 16),
               _buildSectionTitle(context.tr('price_prediction_location')),

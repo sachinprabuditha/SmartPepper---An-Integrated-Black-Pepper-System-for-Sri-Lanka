@@ -1,6 +1,5 @@
 class PredictionInput {
-  final double usdBuyRate;
-  final double usdSellRate;
+  final double usdRate;
   final double temperature;
   final double precipitation;
   final DateTime date;
@@ -8,8 +7,7 @@ class PredictionInput {
   final String grade;
 
   PredictionInput({
-    required this.usdBuyRate,
-    required this.usdSellRate,
+    required this.usdRate,
     required this.temperature,
     required this.precipitation,
     required this.date,
@@ -19,8 +17,7 @@ class PredictionInput {
 
   Map<String, dynamic> toJson() {
     return {
-      'usdBuyRate': usdBuyRate,
-      'usdSellRate': usdSellRate,
+      'usdRate': usdRate,
       'temperature': temperature,
       'precipitation': precipitation,
       'date': date.toIso8601String(),
@@ -29,4 +26,3 @@ class PredictionInput {
     };
   }
 }
-
