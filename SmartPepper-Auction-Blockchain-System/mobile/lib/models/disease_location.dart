@@ -9,6 +9,7 @@ class DiseaseLocation {
   final int totalLeaves;
   final Map<String, int> diseaseCounts;
   final String? imagePath;
+  final bool isHealthy;
 
   DiseaseLocation({
     required this.id,
@@ -19,6 +20,7 @@ class DiseaseLocation {
     required this.totalLeaves,
     required this.diseaseCounts,
     this.imagePath,
+    this.isHealthy = false,
   });
 
 
@@ -33,6 +35,7 @@ class DiseaseLocation {
       'totalLeaves': totalLeaves,
       'diseaseCounts': diseaseCounts,
       'imagePath': imagePath,
+      'isHealthy': isHealthy,
     };
   }
 
@@ -47,10 +50,17 @@ class DiseaseLocation {
       totalLeaves: json['totalLeaves'],
       diseaseCounts: Map<String, int>.from(json['diseaseCounts']),
       imagePath: json['imagePath'],
+      isHealthy: json['isHealthy'] ?? false,
     );
   }
 
   BitmapDescriptor getMarkerColor() {
+    // Healthy plants get a bright green marker
+    if (isHealthy) {
+      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
+    }
+    
+    // Diseased plants get color-coded by severity
     if (severity >= 70) {
       return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
     } else if (severity >= 40) {
@@ -63,6 +73,7 @@ class DiseaseLocation {
   }
 
   String getSeverityLevel() {
+    if (isHealthy) return 'Healthy';
     if (severity >= 70) return 'Critical';
     if (severity >= 40) return 'High';
     if (severity >= 20) return 'Moderate';

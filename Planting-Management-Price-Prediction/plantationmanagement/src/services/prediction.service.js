@@ -17,14 +17,24 @@ const OrderedLocations = [
 
 let session = null;
 
-const getSession = async () => {
+export const preloadModel = async () => {
     if (!session) {
         try {
+            console.log(`[PredictionService] Preloading ONNX model into memory...`);
             session = await onnx.InferenceSession.create(modelPath);
+            console.log(`[PredictionService] ONNX model successfully preloaded.`);
         } catch (error) {
-            console.error('Failed to load ONNX model:', error);
+            console.error('[PredictionService] Failed to preload ONNX model:', error);
             throw new Error(`Model not found at ${modelPath}`);
         }
+    }
+    return session;
+};
+
+const getSession = async () => {
+    if (!session) {
+        console.warn(`[PredictionService] Model was not preloaded. Loading lazily...`);
+        return await preloadModel();
     }
     return session;
 };
@@ -32,13 +42,11 @@ const getSession = async () => {
 export const predictPrice = async (request) => {
     const inputs = [];
 
-    // 1. USD_Buy_Rate
-    inputs.push(request.UsdBuyRate);
-    // 2. USD_Sell_Rate
-    inputs.push(request.UsdSellRate);
-    // 3. Temperature
+    // 1. USD_Rate
+    inputs.push(request.UsdRate);
+    // 2. Temperature
     inputs.push(request.Temperature);
-    // 4. Precipitation
+    // 3. Precipitation
     inputs.push(request.Precipitation);
 
     // Parse Date

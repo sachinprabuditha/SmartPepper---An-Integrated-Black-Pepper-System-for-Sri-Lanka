@@ -9,6 +9,7 @@ const openai = new OpenAI({
 const qdrant = new QdrantClient({
     url: process.env.QDRANT_URL,
     apiKey: process.env.QDRANT_API_KEY,
+    checkCompatibility: false,
 });
 
 const COLLECTION = "farmer_memory";

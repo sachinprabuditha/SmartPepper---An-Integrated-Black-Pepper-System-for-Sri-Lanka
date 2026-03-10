@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
@@ -7,12 +8,18 @@ const fs = require('fs');
 
 const { calculateForecast } = require('./remedies');
 const { runPythonInference } = require('./inference_bridge');
+const { initializeFirebase } = require('./firebase');
+const diseaseLocationsRoutes = require('./disease_locations_routes');
+
+// Initialize Firebase
+initializeFirebase();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
+app.use(express.json()); // Add JSON parsing middleware
 app.use(compression({
     level: 6,
     threshold: 500,
@@ -26,7 +33,7 @@ app.use(compression({
 
 // Setup Multer for parsing multipart/form-data
 // We'll store files temporarily, process them, then delete them to save space.
-const uploadDir = path.join(__dirname, 'uploads');
+const uploadDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
 }
@@ -42,7 +49,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 50 * 1024 * 1024 } // 50MB max file size
+    limits: { fileSize: parseInt(process.env.MAX_FILE_SIZE) || 52428800 } // 50MB default
 });
 
 app.post('/predict', upload.any(), async (req, res) => {
@@ -111,6 +118,9 @@ app.post('/predict', upload.any(), async (req, res) => {
         return res.status(500).json({ status: "error", message: error.message });
     }
 });
+
+// Disease locations API routes
+app.use('/api/disease-locations', diseaseLocationsRoutes);
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log("🌿 PEPPER LEAF DISEASE DETECTION SERVER MODULAR (Node.js)");

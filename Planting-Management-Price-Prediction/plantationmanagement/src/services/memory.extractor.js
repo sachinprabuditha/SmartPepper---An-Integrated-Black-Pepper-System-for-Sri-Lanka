@@ -33,10 +33,13 @@ KEEP if message contains:
 - farmer decisions
 - farming practices
 
+IMPORTANT INSTRUCTION:
+If a message contains BOTH a question AND a factual statement about the farm (e.g., "I have 2 hectares, what should I plant?"), you MUST extract the factual statement ("Farm has 2 hectares") and ignore the question. Do not skip the entire message just because it ends with a question mark.
+
 IGNORE:
 - greetings
 - thanks
-- short questions
+- purely questions with no background facts
 - temporary chat
 
 Return JSON ONLY:

@@ -9,6 +9,7 @@ const openai = new OpenAI({
 const qdrant = new QdrantClient({
     url: process.env.QDRANT_URL,
     apiKey: process.env.QDRANT_API_KEY,
+    checkCompatibility: false,
 });
 
 /**
@@ -122,17 +123,27 @@ export const askPepperRAG = async ({
     // =============================
     // 2️⃣ Vector Search
     // =============================
-    const vectorResults = await qdrant.search(
-        "pepper_knowledge",
-        {
-            vector: {
-                name: "dense",   // ⭐ REQUIRED
-                vector: embedding.data[0].embedding,
-            },
-            limit: 12,
-            with_payload: true
-        }
-    );
+    let vectorResults = [];
+    try {
+        vectorResults = await qdrant.search(
+            "pepper_knowledge",
+            {
+                vector: {
+                    name: "dense",   // ⭐ REQUIRED
+                    vector: embedding.data[0].embedding,
+                },
+                limit: 12,
+                with_payload: true
+            }
+        );
+    } catch (err) {
+        console.error("❌ Qdrant vector search error:", err.message);
+        return {
+            reply: "The agriculture knowledgebase is currently unreachable (Qdrant cluster is suspended). Please log into your Qdrant Cloud Console and wake up the cluster. I can still chat based on your history though!",
+            sources: [],
+            suggestions: []
+        };
+    }
 
     // =============================
     // 3️⃣ Hybrid rerank

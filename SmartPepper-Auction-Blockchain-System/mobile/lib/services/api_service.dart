@@ -343,6 +343,35 @@ class ApiService {
     }
   }
 
+  // Quality Grading
+  Future<Map<String, dynamic>> saveQualityGrading(Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.post('/quality-grading', data: data);
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData.containsKey('error')) {
+          throw Exception(errorData['error']);
+        } else if (errorData is Map && errorData.containsKey('message')) {
+          throw Exception(errorData['message']);
+        }
+      }
+      throw Exception('Network error. Please check your connection.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getQualityGradingHistory() async {
+    try {
+      final response = await _dio.get('/quality-grading/history');
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Generic HTTP methods
   Future<dynamic> get(String endpoint,
       {Map<String, dynamic>? queryParameters}) async {

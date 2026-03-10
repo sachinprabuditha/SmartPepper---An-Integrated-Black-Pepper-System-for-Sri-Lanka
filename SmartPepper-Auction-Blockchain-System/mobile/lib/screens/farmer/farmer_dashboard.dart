@@ -319,6 +319,23 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                 ],
               ),
 
+              const SizedBox(height: 12),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildActionCard(
+                      icon: Icons.science,
+                      label: context.tr('grading_title'),
+                      color: Colors.teal,
+                      onTap: () => context.push('/farmer/quality-grading'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(child: SizedBox()), // Placeholder for alignment
+                ],
+              ),
+
               const SizedBox(height: 24),
 
               // AI Assistant Banner
@@ -664,7 +681,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF1565C0), Color(0xFF0D47A1)],
+            colors: [AppTheme.forestGreen, Color(0xFF2E7D32)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

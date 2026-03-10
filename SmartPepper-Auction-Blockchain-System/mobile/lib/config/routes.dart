@@ -11,6 +11,8 @@ import '../screens/farmer/create_lot_screen.dart';
 import '../screens/farmer/my_lots_screen.dart';
 import '../screens/farmer/notifications_screen.dart';
 import '../screens/farmer/auction_monitor_screen.dart';
+import '../screens/farmer/quality_grading_screen.dart';
+import '../screens/farmer/quality_grading_history_screen.dart';
 import '../screens/exporter/browse_lots_screen.dart';
 import '../screens/exporter/my_bids_screen.dart';
 import '../screens/exporter/won_auctions_screen.dart';
@@ -100,6 +102,16 @@ class AppRouter {
         path: '/farmer/notifications',
         name: 'farmerNotifications',
         builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/farmer/quality-grading',
+        name: 'qualityGrading',
+        builder: (context, state) => const QualityGradingScreen(),
+      ),
+      GoRoute(
+        path: '/farmer/quality-grading/history',
+        name: 'qualityGradingHistory',
+        builder: (context, state) => const QualityGradingHistoryScreen(),
       ),
       GoRoute(
         path: '/farmer/auction/:auctionId',

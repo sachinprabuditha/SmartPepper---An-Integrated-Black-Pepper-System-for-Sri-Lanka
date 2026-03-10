@@ -47,7 +47,7 @@ export default function AdminDashboard() {
       loadDashboardData();
       loadPendingSettlements();
       checkSystemHealth();
-      
+
       // Refresh health every 30 seconds
       const healthInterval = setInterval(checkSystemHealth, 30000);
       // Refresh settlements every minute
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
 
   const checkSystemHealth = async () => {
     const startTime = Date.now();
-    
+
     // Check Backend API
     try {
       const backendStart = Date.now();
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
       // Load system stats
       const lotsResponse = await lotApi.getAll({ limit: 100 });
       const auctionsResponse = await auctionApi.getAll({ limit: 100 });
-      
+
       // Load user counts
       const usersResponse = await adminApi.getUsers({});
       const pendingUsersResponse = await adminApi.getPendingUsers();
@@ -533,24 +533,22 @@ export default function AdminDashboard() {
                 {recentActivity.map((activity: any, index: number) => (
                   <div
                     key={index}
-                    className={`flex items-center space-x-3 ${
-                      index < recentActivity.length - 1 ? 'pb-3 border-b border-gray-100' : ''
-                    }`}
+                    className={`flex items-center space-x-3 ${index < recentActivity.length - 1 ? 'pb-3 border-b border-gray-100' : ''
+                      }`}
                   >
                     <div
-                      className={`w-2 h-2 rounded-full ${
-                        activity.color === 'green'
-                          ? 'bg-green-500'
-                          : activity.color === 'blue'
+                      className={`w-2 h-2 rounded-full ${activity.color === 'green'
+                        ? 'bg-green-500'
+                        : activity.color === 'blue'
                           ? 'bg-blue-500'
                           : activity.color === 'yellow'
-                          ? 'bg-yellow-500'
-                          : activity.color === 'orange'
-                          ? 'bg-orange-500'
-                          : activity.color === 'red'
-                          ? 'bg-red-500'
-                          : 'bg-purple-500'
-                      }`}
+                            ? 'bg-yellow-500'
+                            : activity.color === 'orange'
+                              ? 'bg-orange-500'
+                              : activity.color === 'red'
+                                ? 'bg-red-500'
+                                : 'bg-purple-500'
+                        }`}
                     ></div>
                     <div className="flex-1">
                       <p className="text-sm text-gray-900">{activity.description}</p>
@@ -569,22 +567,20 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600">Backend API</span>
-                  <span className={`font-medium ${
-                    systemHealth.backend.status === 'healthy' ? 'text-green-600' :
+                  <span className={`font-medium ${systemHealth.backend.status === 'healthy' ? 'text-green-600' :
                     systemHealth.backend.status === 'warning' ? 'text-yellow-600' :
-                    systemHealth.backend.status === 'error' ? 'text-red-600' :
-                    'text-gray-400'
-                  }`}>
+                      systemHealth.backend.status === 'error' ? 'text-red-600' :
+                        'text-gray-400'
+                    }`}>
                     {systemHealth.backend.label}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full transition-all ${
-                      systemHealth.backend.status === 'healthy' ? 'bg-green-600' :
+                  <div
+                    className={`h-2 rounded-full transition-all ${systemHealth.backend.status === 'healthy' ? 'bg-green-600' :
                       systemHealth.backend.status === 'warning' ? 'bg-yellow-600' :
-                      'bg-red-600'
-                    }`}
+                        'bg-red-600'
+                      }`}
                     style={{ width: `${systemHealth.backend.percentage}%` }}
                   ></div>
                 </div>
@@ -592,22 +588,20 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600">Database</span>
-                  <span className={`font-medium ${
-                    systemHealth.database.status === 'healthy' ? 'text-green-600' :
+                  <span className={`font-medium ${systemHealth.database.status === 'healthy' ? 'text-green-600' :
                     systemHealth.database.status === 'warning' ? 'text-yellow-600' :
-                    systemHealth.database.status === 'error' ? 'text-red-600' :
-                    'text-gray-400'
-                  }`}>
+                      systemHealth.database.status === 'error' ? 'text-red-600' :
+                        'text-gray-400'
+                    }`}>
                     {systemHealth.database.label}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full transition-all ${
-                      systemHealth.database.status === 'healthy' ? 'bg-green-600' :
+                  <div
+                    className={`h-2 rounded-full transition-all ${systemHealth.database.status === 'healthy' ? 'bg-green-600' :
                       systemHealth.database.status === 'warning' ? 'bg-yellow-600' :
-                      'bg-red-600'
-                    }`}
+                        'bg-red-600'
+                      }`}
                     style={{ width: `${systemHealth.database.percentage}%` }}
                   ></div>
                 </div>
@@ -615,22 +609,20 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600">Blockchain Sync</span>
-                  <span className={`font-medium ${
-                    systemHealth.blockchain.status === 'healthy' ? 'text-green-600' :
+                  <span className={`font-medium ${systemHealth.blockchain.status === 'healthy' ? 'text-green-600' :
                     systemHealth.blockchain.status === 'warning' ? 'text-yellow-600' :
-                    systemHealth.blockchain.status === 'error' ? 'text-red-600' :
-                    'text-gray-400'
-                  }`}>
+                      systemHealth.blockchain.status === 'error' ? 'text-red-600' :
+                        'text-gray-400'
+                    }`}>
                     {systemHealth.blockchain.label}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full transition-all ${
-                      systemHealth.blockchain.status === 'healthy' ? 'bg-green-600' :
+                  <div
+                    className={`h-2 rounded-full transition-all ${systemHealth.blockchain.status === 'healthy' ? 'bg-green-600' :
                       systemHealth.blockchain.status === 'warning' ? 'bg-yellow-600' :
-                      'bg-red-600'
-                    }`}
+                        'bg-red-600'
+                      }`}
                     style={{ width: `${systemHealth.blockchain.percentage}%` }}
                   ></div>
                 </div>
@@ -638,22 +630,20 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600">WebSocket</span>
-                  <span className={`font-medium ${
-                    systemHealth.websocket.status === 'healthy' ? 'text-green-600' :
+                  <span className={`font-medium ${systemHealth.websocket.status === 'healthy' ? 'text-green-600' :
                     systemHealth.websocket.status === 'warning' ? 'text-yellow-600' :
-                    systemHealth.websocket.status === 'error' ? 'text-red-600' :
-                    'text-gray-400'
-                  }`}>
+                      systemHealth.websocket.status === 'error' ? 'text-red-600' :
+                        'text-gray-400'
+                    }`}>
                     {systemHealth.websocket.label}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full transition-all ${
-                      systemHealth.websocket.status === 'healthy' ? 'bg-green-600' :
+                  <div
+                    className={`h-2 rounded-full transition-all ${systemHealth.websocket.status === 'healthy' ? 'bg-green-600' :
                       systemHealth.websocket.status === 'warning' ? 'bg-yellow-600' :
-                      'bg-red-600'
-                    }`}
+                        'bg-red-600'
+                      }`}
                     style={{ width: `${systemHealth.websocket.percentage}%` }}
                   ></div>
                 </div>
@@ -698,6 +688,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
