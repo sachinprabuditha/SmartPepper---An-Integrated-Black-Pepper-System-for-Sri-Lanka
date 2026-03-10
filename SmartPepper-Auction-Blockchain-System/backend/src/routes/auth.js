@@ -546,4 +546,103 @@ router.put('/profile', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/auth/connect-wallet
+ * Connect/update wallet address for authenticated user
+ */
+router.post('/connect-wallet', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: 'No token provided'
+      });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const { walletAddress } = req.body;
+
+    if (!walletAddress) {
+      return res.status(400).json({
+        success: false,
+        error: 'Wallet address is required'
+      });
+    }
+
+    // Validate wallet address format (basic check for Ethereum address)
+    if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid wallet address format'
+      });
+    }
+
+    const firestore = db.getDb();
+    const userRef = firestore.collection('users').doc(decoded.userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    const userData = userDoc.data();
+
+    // Check if this wallet is already connected to another account
+    const existingWalletSnap = await firestore.collection('users')
+      .where('wallet_address_lower', '==', walletAddress.toLowerCase())
+      .limit(1)
+      .get();
+
+    if (!existingWalletSnap.empty) {
+      const existingUser = existingWalletSnap.docs[0];
+      
+      // Allow if it's the same user updating their wallet
+      if (existingUser.id !== decoded.userId) {
+        return res.status(409).json({
+          success: false,
+          error: 'This wallet address is already connected to another account'
+        });
+      }
+    }
+
+    // Update wallet address
+    await userRef.update({
+      wallet_address: walletAddress,
+      wallet_address_lower: walletAddress.toLowerCase(),
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    logger.info('Wallet connected successfully', {
+      userId: decoded.userId,
+      walletAddress,
+      previousWallet: userData.wallet_address || 'none'
+    });
+
+    res.json({
+      success: true,
+      message: 'Wallet connected successfully',
+      walletAddress
+    });
+  } catch (error) {
+    logger.error('Connect wallet error:', error);
+
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid token'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to connect wallet'
+    });
+  }
+});
+
 module.exports = router;

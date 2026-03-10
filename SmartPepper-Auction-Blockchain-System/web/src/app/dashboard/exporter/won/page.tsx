@@ -33,6 +33,9 @@ interface WonAuction {
   myHighestBid: string;
   myHighestBidLkr: string;
   myBids: Bid[];
+  escrowDeposited?: boolean;
+  settlementStatus?: string;
+  escrowDepositDate?: string;
 }
 
 // Helper function to safely format date with distance
@@ -289,7 +292,7 @@ export default function WonAuctionsPage() {
 
                   {/* Payment & Delivery Status */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    {auction.status === 'settled' ? (
+                    {auction.status === 'settled' || auction.settlementStatus === 'settled' ? (
                       <>
                         <div className="border border-green-200 dark:border-green-800 rounded-lg p-4">
                           <div className="flex items-center gap-2 mb-2">
@@ -310,6 +313,32 @@ export default function WonAuctionsPage() {
                           </div>
                           <span className="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                             Ready for Shipment
+                          </span>
+                        </div>
+                      </>
+                    ) : auction.escrowDeposited || auction.settlementStatus === 'escrow_received' ? (
+                      <>
+                        <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl">✅</span>
+                            <span className="font-semibold text-gray-900 dark:text-white">Escrow Status</span>
+                          </div>
+                          <span className="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                            ✅ Escrow Deposited
+                          </span>
+                          <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                            {auction.escrowDepositDate 
+                              ? `Deposited ${safeFormatDistanceToNow(auction.escrowDepositDate)}`
+                              : 'Escrow successfully deposited'}
+                          </p>
+                        </div>
+                        <div className="border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl">⏳</span>
+                            <span className="font-semibold text-gray-900 dark:text-white">Settlement Status</span>
+                          </div>
+                          <span className="px-3 py-1 text-sm font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                            Awaiting Final Settlement
                           </span>
                         </div>
                       </>
