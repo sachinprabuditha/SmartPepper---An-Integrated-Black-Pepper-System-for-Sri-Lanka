@@ -62,6 +62,26 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
   double _lkrToEthRate =
       0.0000031; // Default: 1 LKR ≈ 0.0000031 ETH (~320 LKR per USD, ~3100 USD per ETH)
 
+  // Price Prediction State
+  String? _selectedDistrict;
+  Map<String, dynamic>? _pricePrediction;
+  bool _loadingPricePrediction = false;
+  double? _suggestedPricePerKg;
+  double? _suggestedTotalPrice;
+
+  // Available Districts (matching the trained districts in prediction model)
+  final List<String> _availableDistricts = [
+    'Colombo',
+    'Galle',
+    'Hambantota',
+    'Kandy',
+    'Kegalle',
+    'Kurunegala',
+    'Matale',
+    'Matara',
+    'Monaragala',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -165,6 +185,73 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     _reservePriceController.dispose();
     _quantityController.dispose();
     super.dispose();
+  }
+
+  /// Fetch price prediction for the selected district
+  Future<void> _fetchPricePrediction() async {
+    if (_selectedDistrict == null) return;
+
+    setState(() {
+      _loadingPricePrediction = true;
+      _pricePrediction = null;
+      _suggestedPricePerKg = null;
+      _suggestedTotalPrice = null;
+    });
+
+    try {
+      // Fetch latest price prediction for the district
+      final response = await _apiService.get('/price-predictions/latest',
+          queryParameters: {'district': _selectedDistrict});
+
+      if (response['success'] == true && response['predictions'] != null) {
+        final predictions = response['predictions'] as List;
+
+        if (predictions.isNotEmpty) {
+          // Get average of all grades for the district
+          double totalAvgPrice = 0;
+          int count = 0;
+
+          for (var prediction in predictions) {
+            if (prediction['averagePrice'] != null) {
+              totalAvgPrice += (prediction['averagePrice'] as num).toDouble();
+              count++;
+            }
+          }
+
+          if (count > 0) {
+            final avgPricePerKg = totalAvgPrice / count;
+
+            setState(() {
+              _pricePrediction = response;
+              _suggestedPricePerKg =
+                  avgPricePerKg * 0.95; // 95% of average as reserve price
+
+              // Calculate total price if quantity is entered
+              if (_quantityController.text.isNotEmpty) {
+                final quantity = double.tryParse(_quantityController.text) ?? 0;
+                if (quantity > 0) {
+                  _suggestedTotalPrice = _suggestedPricePerKg! * quantity;
+                }
+              }
+            });
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not fetch price prediction: $e'),
+            backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _loadingPricePrediction = false);
+      }
+    }
   }
 
   /// Check if the lot is eligible for auction creation
@@ -1005,75 +1092,738 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     );
   }
 
+  /// Show district selector bottom sheet
+  void _showDistrictSelector() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.7,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppTheme.forestGreen.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.location_city,
+                        color: AppTheme.forestGreen,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Select Your District',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Choose your pepper cultivation area',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              // Districts Grid
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 2.0,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: _availableDistricts.length,
+                  itemBuilder: (context, index) {
+                    final district = _availableDistricts[index];
+                    final isSelected = _selectedDistrict == district;
+
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          _selectedDistrict = district;
+                          _pricePrediction = null;
+                          _suggestedPricePerKg = null;
+                          _suggestedTotalPrice = null;
+                        });
+
+                        Navigator.pop(context);
+                        _fetchPricePrediction();
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: isSelected
+                              ? LinearGradient(
+                                  colors: [
+                                    AppTheme.forestGreen,
+                                    AppTheme.forestGreen.withOpacity(0.8),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                )
+                              : null,
+                          color: isSelected ? null : Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected
+                                ? AppTheme.forestGreen
+                                : Colors.grey[300]!,
+                            width: isSelected ? 2 : 1,
+                          ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color:
+                                        AppTheme.forestGreen.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Stack(
+                          children: [
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.location_on,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : AppTheme.forestGreen,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    district,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.w600,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.black87,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (isSelected)
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.check_circle,
+                                    color: AppTheme.forestGreen,
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildReservePriceField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextFormField(
-          controller: _reservePriceController,
-          style: const TextStyle(color: Colors.black87, fontSize: 16),
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          onChanged: (value) {
-            setState(() {}); // Refresh to show ETH conversion
-          },
-          decoration: InputDecoration(
-            labelText: 'Reserve Price (LKR) *',
-            labelStyle: const TextStyle(color: Colors.black87),
-            hintText: 'Min: $_minReservePrice, Max: $_maxReservePrice LKR',
-            prefixIcon:
-                const Icon(Icons.attach_money, color: AppTheme.forestGreen),
-            suffixText: 'LKR',
-            helperText:
-                'Price range: $_minReservePrice - $_maxReservePrice LKR (per lot)',
-            helperMaxLines: 2,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+        // District Selector with Enhanced UI
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppTheme.forestGreen.withOpacity(0.05),
+                Colors.blue.withOpacity(0.05),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide:
-                  const BorderSide(color: AppTheme.forestGreen, width: 2),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: _selectedDistrict != null
+                  ? AppTheme.forestGreen
+                  : Colors.grey[300]!,
+              width: _selectedDistrict != null ? 2 : 1,
             ),
-            filled: true,
-            fillColor: Colors.white,
           ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter reserve price';
-            }
-            final price = double.tryParse(value);
-            if (price == null || price <= 0) {
-              return 'Please enter a valid price';
-            }
-            // Governance validation
-            if (price < _minReservePrice) {
-              return 'Price must be at least $_minReservePrice LKR';
-            }
-            if (price > _maxReservePrice) {
-              return 'Price cannot exceed $_maxReservePrice LKR';
-            }
-            return null;
-          },
-        ),
-        // Show ETH conversion
-        if (_reservePriceController.text.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 8, left: 12),
-            child: Row(
-              children: [
-                const Icon(Icons.info_outline, size: 16, color: Colors.blue),
-                const SizedBox(width: 6),
-                Text(
-                  'Equivalent: ${((double.tryParse(_reservePriceController.text) ?? 0) * _lkrToEthRate).toStringAsFixed(4)} ETH',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.blue[700],
-                    fontWeight: FontWeight.w500,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.forestGreen.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.location_city,
+                      color: AppTheme.forestGreen,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Select Your District',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.forestGreen,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Get market price insights for your area',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_selectedDistrict != null)
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () => _showDistrictSelector(),
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: _selectedDistrict != null
+                          ? AppTheme.forestGreen.withOpacity(0.3)
+                          : Colors.grey[300]!,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        color: _selectedDistrict != null
+                            ? AppTheme.forestGreen
+                            : Colors.grey[400],
+                        size: 24,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _selectedDistrict ?? 'Tap to select district',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: _selectedDistrict != null
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                            color: _selectedDistrict != null
+                                ? Colors.black87
+                                : Colors.grey[500],
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: Colors.grey[400],
+                      ),
+                    ],
                   ),
                 ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Price Prediction Card
+        if (_selectedDistrict != null &&
+            _pricePrediction != null &&
+            !_loadingPricePrediction)
+          _buildPricePredictionCard(),
+        if (_selectedDistrict != null &&
+            _pricePrediction != null &&
+            !_loadingPricePrediction)
+          const SizedBox(height: 16),
+
+        if (_loadingPricePrediction)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.blue[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.blue[200]!),
+            ),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(Colors.blue[700]!),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Text('Fetching latest market price...'),
               ],
             ),
           ),
+        if (_loadingPricePrediction) const SizedBox(height: 16),
+
+        // Enhanced Reserve Price Field Container
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.amber.withOpacity(0.05),
+                AppTheme.forestGreen.withOpacity(0.05),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: _reservePriceController.text.isNotEmpty
+                  ? (double.tryParse(_reservePriceController.text) != null &&
+                          double.parse(_reservePriceController.text) >=
+                              _minReservePrice &&
+                          double.parse(_reservePriceController.text) <=
+                              _maxReservePrice)
+                      ? AppTheme.forestGreen
+                      : Colors.orange
+                  : Colors.grey[300]!,
+              width: _reservePriceController.text.isNotEmpty ? 2 : 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Row
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.attach_money,
+                      color: AppTheme.forestGreen,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Set Reserve Price',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.forestGreen,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Minimum acceptable bid for your lot',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_reservePriceController.text.isNotEmpty &&
+                      double.tryParse(_reservePriceController.text) != null &&
+                      double.parse(_reservePriceController.text) >=
+                          _minReservePrice &&
+                      double.parse(_reservePriceController.text) <=
+                          _maxReservePrice)
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: const BoxDecoration(
+                        color: Colors.green,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Price Range Indicator
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.arrow_downward,
+                                  size: 14, color: Colors.grey[600]),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Minimum',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'LKR ${_minReservePrice.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 40,
+                      color: Colors.grey[300],
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                'Maximum',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(Icons.arrow_upward,
+                                  size: 14, color: Colors.grey[600]),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'LKR ${_maxReservePrice.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Text Input Field
+              TextFormField(
+                controller: _reservePriceController,
+                style: const TextStyle(
+                  color: Colors.black87,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                onChanged: (value) {
+                  setState(
+                      () {}); // Refresh to show validation & ETH conversion
+                },
+                decoration: InputDecoration(
+                  labelText: 'Enter Your Reserve Price *',
+                  labelStyle: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 14,
+                  ),
+                  hintText:
+                      'e.g., ${(_minReservePrice + (_maxReservePrice - _minReservePrice) / 2).toStringAsFixed(0)}',
+                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  prefixIcon: const Icon(
+                    Icons.currency_exchange,
+                    color: AppTheme.forestGreen,
+                    size: 24,
+                  ),
+                  suffixText: 'LKR',
+                  suffixStyle: const TextStyle(
+                    color: AppTheme.forestGreen,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        const BorderSide(color: AppTheme.forestGreen, width: 2),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Colors.red, width: 2),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Colors.red, width: 2),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter reserve price';
+                  }
+                  final price = double.tryParse(value);
+                  if (price == null || price <= 0) {
+                    return 'Please enter a valid price';
+                  }
+                  // Governance validation
+                  if (price < _minReservePrice) {
+                    return 'Price must be at least ${_minReservePrice.toStringAsFixed(0)} LKR';
+                  }
+                  if (price > _maxReservePrice) {
+                    return 'Price cannot exceed ${_maxReservePrice.toStringAsFixed(0)} LKR';
+                  }
+                  return null;
+                },
+              ),
+
+              // Real-time Validation & ETH Conversion
+              if (_reservePriceController.text.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Builder(
+                  builder: (context) {
+                    final price = double.tryParse(_reservePriceController.text);
+                    final isValid = price != null &&
+                        price >= _minReservePrice &&
+                        price <= _maxReservePrice;
+                    final ethEquivalent = (price ?? 0) * _lkrToEthRate;
+
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isValid
+                            ? Colors.green.withOpacity(0.1)
+                            : Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isValid
+                              ? Colors.green.withOpacity(0.3)
+                              : Colors.orange.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                isValid ? Icons.check_circle : Icons.info,
+                                size: 18,
+                                color: isValid
+                                    ? AppTheme.forestGreen
+                                    : Colors.orange,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  isValid
+                                      ? 'Valid reserve price ✓'
+                                      : price == null
+                                          ? 'Invalid number format'
+                                          : price < _minReservePrice
+                                              ? 'Below minimum allowed price'
+                                              : 'Exceeds maximum allowed price',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: isValid
+                                        ? AppTheme.forestGreen
+                                        : Colors.orange[800],
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: Colors.blue.withOpacity(0.2),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.currency_bitcoin,
+                                        size: 16, color: Colors.blue[700]),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Blockchain Value:',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  '${ethEquivalent.toStringAsFixed(6)} ETH',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.blue[700],
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -1128,6 +1878,17 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
       controller: _quantityController,
       style: const TextStyle(color: Colors.black87, fontSize: 16),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      onChanged: (value) {
+        // Recalculate suggested total price when quantity changes
+        if (_suggestedPricePerKg != null && value.isNotEmpty) {
+          final quantity = double.tryParse(value);
+          if (quantity != null && quantity > 0) {
+            setState(() {
+              _suggestedTotalPrice = _suggestedPricePerKg! * quantity;
+            });
+          }
+        }
+      },
       decoration: InputDecoration(
         labelText: 'Quantity to Auction *',
         labelStyle: const TextStyle(color: Colors.black87),
@@ -1224,6 +1985,308 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // Price Prediction Card Widget
+  Widget _buildPricePredictionCard() {
+    final predictions = _pricePrediction!['predictions'] as List;
+
+    if (predictions.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.orange[50],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.orange[300]!),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.info_outline, color: Colors.orange[700]),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'No price predictions available for this district',
+                style: TextStyle(fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Calculate average price across all grades
+    double totalAvg = 0;
+    int count = 0;
+    for (var pred in predictions) {
+      if (pred['averagePrice'] != null) {
+        totalAvg += (pred['averagePrice'] as num).toDouble();
+        count++;
+      }
+    }
+    final avgPricePerKg = count > 0 ? totalAvg / count : 0.0;
+    final date = predictions.first['date'] ?? '';
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.green[50]!, Colors.blue[50]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.green[900]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.forestGreen,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.trending_up,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Market Price Prediction',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      'Based on ML analysis',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green[400]!),
+                ),
+                child: Text(
+                  date,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.forestGreen,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Location Info
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.location_on,
+                    size: 16, color: AppTheme.forestGreen),
+                const SizedBox(width: 6),
+                Text(
+                  'District: $_selectedDistrict',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Price Information
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Average Price/kg',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'LKR ${avgPricePerKg.toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.forestGreen,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.forestGreen,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Suggested Reserve/kg',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'LKR ${(_suggestedPricePerKg ?? 0).toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          if (_suggestedTotalPrice != null &&
+              _quantityController.text.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.amber[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber[300]!),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.lightbulb_outline,
+                      size: 18, color: Colors.amber[900]),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Suggested Total Reserve Price',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.amber[900],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'LKR ${_suggestedTotalPrice!.toStringAsFixed(0)} for ${_quantityController.text} kg',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amber[900],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '95% of market average for competitive bidding',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey[700],
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 12),
+
+          // Use Suggested Price Button
+          if (_suggestedTotalPrice != null)
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _reservePriceController.text =
+                        _suggestedTotalPrice!.toStringAsFixed(0);
+                  });
+                },
+                icon: const Icon(Icons.auto_fix_high, size: 18),
+                label: const Text('Use Suggested Price'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.forestGreen,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+
+          const SizedBox(height: 8),
+
+          // Refresh Button
+          TextButton.icon(
+            onPressed: _fetchPricePrediction,
+            icon: const Icon(Icons.refresh, size: 16),
+            label: const Text('Refresh Prediction'),
+            style: TextButton.styleFrom(
+              foregroundColor: AppTheme.forestGreen,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            ),
+          ),
+        ],
       ),
     );
   }
