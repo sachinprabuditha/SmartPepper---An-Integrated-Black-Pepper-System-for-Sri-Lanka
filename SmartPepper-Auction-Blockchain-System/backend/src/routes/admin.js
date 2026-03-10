@@ -976,5 +976,362 @@ router.get('/exchange-rates/history', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/admin/auctions/fix-settlement-status
+ * Fix settlement_status for auctions where escrow is deposited but status wasn't updated
+ */
+router.post('/auctions/fix-settlement-status', async (req, res) => {
+  try {
+    logger.info('Fixing settlement status for auctions with deposited escrow...');
+
+    // Find all auctions where escrow_deposited is true but settlement_status is still pending_escrow
+    const snapshot = await db.collection('auctions')
+      .where('escrow_deposited', '==', true)
+      .where('settlement_status', '==', 'pending_escrow')
+      .get();
+
+    if (snapshot.empty) {
+      return res.json({
+        success: true,
+        message: 'No auctions need fixing',
+        fixed: 0
+      });
+    }
+
+    const batch = db.batch();
+    const auctionIds = [];
+
+    snapshot.forEach(doc => {
+      auctionIds.push(doc.id);
+      batch.update(doc.ref, {
+        settlement_status: 'escrow_received',
+        updated_at: admin.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+
+    logger.info(`Fixed settlement status for ${auctionIds.length} auctions`, { auctionIds });
+
+    res.json({
+      success: true,
+      message: `Fixed settlement status for ${auctionIds.length} auction(s)`,
+      fixed: auctionIds.length,
+      auctionIds
+    });
+  } catch (error) {
+    logger.error('Error fixing settlement status:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fix settlement status',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/admin/auctions/mark-blockchain-finalized
+ * Mark auctions as blockchain finalized when escrow is deposited but blockchain_auction_id was missing
+ * This is for auctions created before blockchain integration was properly implemented
+ */
+router.post('/auctions/mark-blockchain-finalized', async (req, res) => {
+  try {
+    const { auctionId } = req.body;
+
+    logger.info('Marking auction as blockchain finalized', { auctionId });
+
+    if (!auctionId) {
+      return res.status(400).json({
+        success: false,
+        error: 'auctionId is required'
+      });
+    }
+
+    const auctionDoc = await db.collection('auctions').doc(String(auctionId)).get();
+
+    if (!auctionDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Auction not found'
+      });
+    }
+
+    const auction = auctionDoc.data();
+
+    // Check if escrow is deposited
+    if (!auction.escrow_deposited) {
+      return res.status(400).json({
+        success: false,
+        error: 'Escrow must be deposited before marking as blockchain finalized'
+      });
+    }
+
+    // Update auction
+    await auctionDoc.ref.update({
+      blockchain_finalized: true,
+      blockchain_finalization_tx: auction.escrow_tx_hash || null,
+      blockchain_finalization_note: 'Manually marked as finalized - auction created before blockchain integration',
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    logger.info(`Marked auction ${auctionId} as blockchain finalized`);
+
+    res.json({
+      success: true,
+      message: 'Auction marked as blockchain finalized',
+      auctionId,
+      blockchainFinalized: true
+    });
+  } catch (error) {
+    logger.error('Error marking auction as blockchain finalized:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to mark auction as blockchain finalized',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/admin/auctions/init-settlement-approval-field
+ * Initialize admin_settlement_approved field for existing auctions
+ * For auctions deposited before this field was added
+ */
+router.post('/auctions/init-settlement-approval-field', async (req, res) => {
+  try {
+    logger.info('Initializing settlement approval field for existing auctions');
+
+    // Find auctions with escrow deposited but missing admin_settlement_approved field
+    const snapshot = await db.collection('auctions')
+      .where('escrow_deposited', '==', true)
+      .where('status', '==', 'ended')
+      .get();
+
+    let updated = 0;
+    let skipped = 0;
+    const batch = db.batch();
+
+    snapshot.docs.forEach(doc => {
+      const auction = doc.data();
+      
+      // Only update if field is missing or undefined
+      if (auction.admin_settlement_approved === undefined || auction.admin_settlement_approved === null) {
+        batch.update(doc.ref, {
+          admin_settlement_approved: false,
+          updated_at: admin.firestore.FieldValue.serverTimestamp()
+        });
+        updated++;
+      } else {
+        skipped++;
+      }
+    });
+
+    if (updated > 0) {
+      await batch.commit();
+    }
+
+    logger.info(`Settlement approval field initialized: ${updated} updated, ${skipped} skipped`);
+
+    res.json({
+      success: true,
+      message: 'Settlement approval field initialized',
+      updated,
+      skipped,
+      total: snapshot.docs.length
+    });
+  } catch (error) {
+    logger.error('Error initializing settlement approval field:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to initialize settlement approval field',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/admin/auctions/:id/approve-settlement
+ * Admin approval for final settlement (after escrow deposited)
+ * This marks the auction as ready for final payment release to farmer
+ */
+router.post('/auctions/:id/approve-settlement', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notes } = req.body;
+
+    logger.info('Admin approving settlement for auction', { auctionId: id });
+
+    const auctionDoc = await db.collection('auctions').doc(id).get();
+
+    if (!auctionDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Auction not found'
+      });
+    }
+
+    const auction = auctionDoc.data();
+
+    // Verify auction is ended
+    if (auction.status !== 'ended') {
+      return res.status(400).json({
+        success: false,
+        error: 'Auction must be ended before settlement approval',
+        currentStatus: auction.status
+      });
+    }
+
+    // Verify escrow is deposited
+    if (!auction.escrow_deposited) {
+      return res.status(400).json({
+        success: false,
+        error: 'Escrow must be deposited before settlement approval'
+      });
+    }
+
+    // Check if already approved
+    if (auction.admin_settlement_approved) {
+      return res.status(400).json({
+        success: false,
+        error: 'Settlement already approved by admin',
+        approvedAt: auction.admin_settlement_approved_at
+      });
+    }
+
+    // Update auction with admin approval
+    await auctionDoc.ref.update({
+      admin_settlement_approved: true,
+      admin_settlement_approved_at: admin.firestore.FieldValue.serverTimestamp(),
+      admin_settlement_notes: notes || 'Approved for final settlement',
+      settlement_status: 'approved_for_settlement',
+      updated_at: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    logger.info(`Admin approved settlement for auction ${id}`);
+
+    // Create notification for farmer
+    try {
+      await db.collection('notifications').add({
+        user_id: auction.farmer_address,
+        user_address: auction.farmer_address,
+        type: 'settlement_approved',
+        title: 'Settlement Approved',
+        message: `Admin has approved settlement for your auction. Payment will be processed shortly.`,
+        auction_id: id,
+        read: false,
+        created_at: admin.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (notifError) {
+      logger.error('Failed to create notification:', notifError);
+    }
+
+    // Create notification for buyer
+    try {
+      const winnerAddress = auction.winner_address || auction.current_bidder;
+      if (winnerAddress) {
+        await db.collection('notifications').add({
+          user_id: winnerAddress,
+          user_address: winnerAddress,
+          type: 'settlement_approved',
+          title: 'Settlement Approved',
+          message: `Admin has approved settlement for auction. Shipment will be arranged soon.`,
+          auction_id: id,
+          read: false,
+          created_at: admin.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    } catch (notifError) {
+      logger.error('Failed to create notification for buyer:', notifError);
+    }
+
+    res.json({
+      success: true,
+      message: 'Settlement approved successfully',
+      auctionId: id,
+      approvedAt: new Date().toISOString()
+    });
+
+  } catch (error) {
+    logger.error('Error approving settlement:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to approve settlement',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/admin/auctions/pending-settlement
+ * Get auctions with escrow deposited pending admin approval
+ */
+router.get('/auctions/pending-settlement', async (req, res) => {
+  try {
+    logger.info('Fetching auctions pending settlement approval');
+
+    const snapshot = await db.collection('auctions')
+      .where('escrow_deposited', '==', true)
+      .where('admin_settlement_approved', '==', false)
+      .where('status', '==', 'ended')
+      .orderBy('end_time', 'desc')
+      .limit(50)
+      .get();
+
+    const auctions = [];
+    for (const doc of snapshot.docs) {
+      const auction = doc.data();
+      
+      // Get lot details
+      let lotDetails = null;
+      if (auction.lot_id) {
+        const lotSnapshot = await db.collection('pepper_lots')
+          .where('lot_id', '==', auction.lot_id)
+          .limit(1)
+          .get();
+        
+        if (!lotSnapshot.empty) {
+          const lot = lotSnapshot.docs[0].data();
+          lotDetails = {
+            variety: lot.variety,
+            quantity: lot.quantity,
+            quality: lot.quality
+          };
+        }
+      }
+
+      auctions.push({
+        auctionId: doc.id,
+        lotId: auction.lot_id,
+        farmerAddress: auction.farmer_address,
+        winnerAddress: auction.winner_address || auction.current_bidder,
+        finalPrice: auction.current_bid,
+        finalPriceLkr: auction.current_bid_lkr,
+        escrowDeposited: auction.escrow_deposited,
+        escrowDepositDate: auction.escrow_deposit_date,
+        endTime: auction.end_time,
+        settlementStatus: auction.settlement_status,
+        lotDetails
+      });
+    }
+
+    logger.info(`Found ${auctions.length} auctions pending settlement approval`);
+
+    res.json({
+      success: true,
+      auctions,
+      total: auctions.length
+    });
+
+  } catch (error) {
+    logger.error('Error fetching pending settlements:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch pending settlements',
+      details: error.message
+    });
+  }
+});
+
 module.exports = router;
+
 

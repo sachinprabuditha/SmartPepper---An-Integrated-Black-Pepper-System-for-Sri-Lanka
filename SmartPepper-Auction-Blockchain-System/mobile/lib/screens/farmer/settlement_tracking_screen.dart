@@ -192,7 +192,14 @@ class _SettlementTrackingScreenState extends State<SettlementTrackingScreen> {
         statusColor = Colors.blue;
         statusIcon = Icons.account_balance_wallet;
         statusText = 'Escrow Received';
-        statusDescription = 'Processing settlement and fund distribution';
+        statusDescription = 'Escrow deposited, awaiting admin approval';
+        break;
+      case 'approved_for_settlement':
+        statusColor = Colors.teal;
+        statusIcon = Icons.verified_user;
+        statusText = 'Approved for Settlement';
+        statusDescription =
+            'Admin approved. Processing final payment distribution';
         break;
       case 'settled':
         statusColor = Colors.green;
@@ -327,9 +334,11 @@ class _SettlementTrackingScreenState extends State<SettlementTrackingScreen> {
               'Escrow Deposit',
               null,
               settlementStatus == 'escrow_received' ||
+                  settlementStatus == 'approved_for_settlement' ||
                   settlementStatus == 'settled',
               Icons.account_balance_wallet,
               settlementStatus == 'escrow_received' ||
+                      settlementStatus == 'approved_for_settlement' ||
                       settlementStatus == 'settled'
                   ? Colors.green
                   : Colors.grey,

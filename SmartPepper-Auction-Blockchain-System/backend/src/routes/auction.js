@@ -671,6 +671,7 @@ router.post('/', async (req, res) => {
       status: initialStatus,
       compliance_passed: true,
       blockchain_tx_hash: blockchainResult.txHash,
+      blockchain_auction_id: blockchainAuctionId,
       template_id: templateId || null,
       min_bid_increment: minBidIncrement,
       admin_approved: !requiresApproval,
@@ -745,6 +746,23 @@ router.post('/:id/bid', async (req, res) => {
       auctionId: id,
       body: req.body
     });
+
+    // Optional: Extract user from JWT token if provided (for auto-wallet linking)
+    let loggedInUserId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const jwt = require('jsonwebtoken');
+        const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+        const decoded = jwt.verify(token, JWT_SECRET);
+        loggedInUserId = decoded.userId;
+        logger.info('Authenticated bid request', { userId: loggedInUserId });
+      } catch (error) {
+        // Token is invalid or expired, but we don't block the bid - it's optional
+        logger.debug('Invalid/expired token in bid request (non-blocking)', { error: error.message });
+      }
+    }
 
     // Validation
     if (!bidderAddress || !amount) {
@@ -900,6 +918,37 @@ router.post('/:id/bid', async (req, res) => {
       eth: bidInEth,
       lkr: bidInLkr
     });
+
+    // Auto-link wallet address to user profile if logged in and wallet not already stored
+    if (loggedInUserId) {
+      try {
+        const userRef = firestore.collection('users').doc(loggedInUserId);
+        const userDoc = await userRef.get();
+        
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          
+          // Only update if wallet address is not already set or is different
+          if (!userData.wallet_address || userData.wallet_address.toLowerCase() !== bidderAddress.toLowerCase()) {
+            await userRef.update({
+              wallet_address: bidderAddress,
+              wallet_address_lower: bidderAddress.toLowerCase(),
+              updated_at: admin.firestore.FieldValue.serverTimestamp()
+            });
+            logger.info('Auto-linked wallet address to user profile', {
+              userId: loggedInUserId,
+              walletAddress: bidderAddress
+            });
+          }
+        }
+      } catch (walletLinkError) {
+        // Non-critical error - log but don't fail the bid
+        logger.warn('Failed to auto-link wallet address', {
+          userId: loggedInUserId,
+          error: walletLinkError.message
+        });
+      }
+    }
 
     // Broadcast bid via WebSocket (include both currencies)
     const io = req.app.get('io');
@@ -1099,49 +1148,62 @@ router.post('/:id/end', async (req, res) => {
 /**
  * GET /api/auctions/bids/user/:userId
  * Get all bids placed by a specific user across all auctions
+ * Query params: 
+ *   - walletAddress: optional, search by wallet address directly
+ *   - limit: max number of results (default: 100)
+ *   - offset: pagination offset (default: 0)
  */
 router.get('/bids/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { limit = 100, offset = 0 } = req.query;
+    const { limit = 100, offset = 0, walletAddress } = req.query;
 
-    logger.info(`Fetching bids for user ID: ${userId}`);
+    logger.info(`Fetching bids for user ID: ${userId}`, { walletAddress });
 
-    // First, get the user's wallet address
-    const userDoc = await firestore.collection('users').doc(userId).get();
+    let searchWalletAddress = null;
 
-    if (!userDoc.exists) {
-      return res.status(404).json({
-        success: false,
-        error: 'User not found'
-      });
+    // If wallet address is provided in query, use it directly
+    if (walletAddress) {
+      searchWalletAddress = walletAddress;
+      logger.info(`Using wallet address from query parameter: ${searchWalletAddress}`);
+    } else {
+      // Otherwise, get the user's wallet address from their profile
+      const userDoc = await firestore.collection('users').doc(userId).get();
+
+      if (!userDoc.exists) {
+        return res.status(404).json({
+          success: false,
+          error: 'User not found'
+        });
+      }
+
+      const userData = userDoc.data();
+      searchWalletAddress = userData.wallet_address;
+
+      if (!searchWalletAddress) {
+        logger.warn(`User ${userId} has no wallet address`);
+        return res.json({
+          success: true,
+          count: 0,
+          auctions: [],
+          message: 'No wallet address connected. Please connect your wallet to place bids and view bid history.',
+          hint: 'You can connect your wallet by placing a bid or using the wallet connection feature.'
+        });
+      }
+
+      logger.info(`Found wallet address for user ${userId}: ${searchWalletAddress}`);
     }
-
-    const userData = userDoc.data();
-    const { wallet_address, name } = userData;
-
-    if (!wallet_address) {
-      logger.warn(`User ${userId} has no wallet address`);
-      return res.json({
-        success: true,
-        count: 0,
-        auctions: [],
-        message: 'No wallet address connected. Please connect your wallet to place bids and view bid history.'
-      });
-    }
-
-    logger.info(`Found wallet address for user ${userId}: ${wallet_address}`);
 
     // Fetch all bids by this user with auction details
     const bidsSnapshot = await firestore.collection('bids')
-      .where('bidder_address_lower', '==', wallet_address.toLowerCase())
+      .where('bidder_address_lower', '==', searchWalletAddress.toLowerCase())
       .orderBy('placed_at', 'desc')
       .limit(parseInt(limit))
       .offset(parseInt(offset))
       .get();
 
     const countSnapshot = await firestore.collection('bids')
-      .where('bidder_address_lower', '==', wallet_address.toLowerCase())
+      .where('bidder_address_lower', '==', searchWalletAddress.toLowerCase())
       .count()
       .get();
 
@@ -1187,7 +1249,10 @@ router.get('/bids/user/:userId', async (req, res) => {
           isLeading,
           myHighestBid: bid.amount,
           myHighestBidLkr: bid.amount_lkr,
-          myBids: []
+          myBids: [],
+          escrowDeposited: auction.escrow_deposited || false,
+          settlementStatus: auction.settlement_status || 'pending',
+          escrowDepositDate: auction.escrow_deposit_date || null
         });
       }
 
@@ -1299,7 +1364,8 @@ router.post('/:id/escrow/lock', async (req, res) => {
     }
 
     // Verify this is the winning bidder
-    if (exporterAddress.toLowerCase() !== auction.highest_bidder?.toLowerCase()) {
+    const winnerAddress = auction.winner_address || auction.current_bidder;
+    if (exporterAddress.toLowerCase() !== winnerAddress?.toLowerCase()) {
       return res.status(403).json({
         success: false,
         error: 'Only winning bidder can lock escrow'
@@ -1467,13 +1533,16 @@ router.post('/:id/settle', async (req, res) => {
     // Update auction status
     await firestore.collection('auctions').doc(id).update({
       status: 'settled',
-      settlement_tx_hash: settlementTxHash
+      settlement_status: 'settled',
+      settlement_tx_hash: settlementTxHash,
+      settled_at: admin.firestore.FieldValue.serverTimestamp()
     });
 
     // Update winning bid status
+    const winnerAddress = auction.winner_address || auction.current_bidder;
     const winningBidSnapshot = await firestore.collection('bids')
       .where('auction_id', '==', id)
-      .where('bidder_address_lower', '==', auction.highest_bidder?.toLowerCase())
+      .where('bidder_address_lower', '==', winnerAddress?.toLowerCase())
       .orderBy('amount', 'desc')
       .limit(1)
       .get();

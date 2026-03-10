@@ -218,7 +218,9 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
           children: [
             Icon(Icons.warning, color: Colors.orange[700]),
             const SizedBox(width: 12),
-            const Text('Auction Eligibility Check'),
+            const Expanded(
+              child: Text('Auction Eligibility Check'),
+            ),
           ],
         ),
         content: Column(
