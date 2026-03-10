@@ -5236,9 +5236,83 @@
         "en": "Skip & Analyze Full Image",
         "si": "මඟහරින්න සහ සම්පූර්ණ රූපය විශ්ලේෂණය කරන්න",
         "ta": "தவிர்த்து முழு படத்தையும் பகுப்பாய்வு செய்யுங்கள்"
+    },
+    {
         "key": "view_settlement_status",
         "en": "View Settlement Status",
         "si": "විසඳුම් තත්ත්වය බලන්න",
         "ta": "தீர்வு நிலையைக் காண்க"
+    },
+    {
+        "key": "grading_title",
+        "en": "Quality Grading",
+        "si": "ගුණාත්මක ශ්‍රේණිගත කිරීම",
+        "ta": "தர மதிப்பீடு"
+    },
+    {
+        "key": "grading_history",
+        "en": "Grading History",
+        "si": "ශ්‍රේණිගත කිරීමේ ඉතිහාසය",
+        "ta": "மதிப்பீட்டு வரலாறு"
+    },
+    {
+        "key": "grading_simulate",
+        "en": "Simulate Grading Analysis",
+        "si": "ශ්‍රේණිගත කිරීමේ විශ්ලේෂණය අනුකරණය කරන්න",
+        "ta": "மதிப்பீட்டு பகுப்பாய்வை உருவகப்படுத்து"
+    },
+    {
+        "key": "grading_sample_density",
+        "en": "Sample Density",
+        "si": "නියැදි ඝනත්වය",
+        "ta": "மாதிரி அடர்த்தி"
+    },
+    {
+        "key": "grading_density_grade",
+        "en": "Density Grade",
+        "si": "ඝනත්ව ශ්‍රේණිය",
+        "ta": "அடர்த்தி தரம்"
+    },
+    {
+        "key": "grading_visual_analysis",
+        "en": "Visual Analysis Classifications",
+        "si": "දෘශ්‍ය විශ්ලේෂණ වර්ගීකරණයන්",
+        "ta": "காட்சி பகுப்பாய்வு வகைப்பாடுகள்"
+    },
+    {
+        "key": "grading_pure",
+        "en": "Pure",
+        "si": "පිරිසිදු",
+        "ta": "தூய"
+    },
+    {
+        "key": "grading_molded",
+        "en": "Molded",
+        "si": "පුස් බැඳුණු",
+        "ta": "அச்சடிக்கப்பட்ட"
+    },
+    {
+        "key": "grading_discolored",
+        "en": "Discolored",
+        "si": "වර්ණවත් නොවන",
+        "ta": "நிறமாற்றப்பட்ட"
+    },
+    {
+        "key": "grading_final_grade",
+        "en": "Final Grade Conclusion",
+        "si": "අවසන් ශ්‍රේණිගත කිරීමේ නිගමනය",
+        "ta": "இறுதி தர முடிவு"
+    },
+    {
+        "key": "grading_save",
+        "en": "Record Offline Result",
+        "si": "නොබැඳි ප්‍රතිඵලය වාර්තා කරන්න",
+        "ta": "ஆஃப்லைன் முடிவைப் பதிவுசெய்"
+    },
+    {
+        "key": "grading_no_history",
+        "en": "No past gradings found.",
+        "si": "අතීත ශ්‍රේණිගත කිරීම් හමු නොවීය.",
+        "ta": "கடந்த மதிப்பீடுகள் எதுவும் காணப்படவில்லை."
     }
 ]
