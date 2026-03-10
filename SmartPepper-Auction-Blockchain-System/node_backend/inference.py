@@ -25,7 +25,7 @@ class InferenceEngine:
         return model
 
     def _load_classifier_folds(self):
-        print("🔄 Loading PyTorch classifier folds...")
+        print(" Loading PyTorch classifier folds...")
         for i in range(1, 6):
             path = os.path.join(MODEL_FOLDER, f"leaf_classifier_fold_{i}.pt")
             if os.path.exists(path):
@@ -34,7 +34,7 @@ class InferenceEngine:
                 model.to(DEVICE)
                 model.eval()
                 self.fold_models.append(model)
-        print(f"✅ Loaded {len(self.fold_models)} classifier models")
+        print(f" Loaded {len(self.fold_models)} classifier models")
 
     def analyze_images(self, frames, timestamp):
         # Run YOLO with configuration from config.py (can be overridden by .env)

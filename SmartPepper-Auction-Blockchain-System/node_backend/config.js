@@ -1,12 +1,13 @@
 const path = require('path');
 const fs = require('fs');
+const API_CONFIG = require('./api-config');
 
 // Directory setup
 const BASE_DIR = path.resolve(__dirname, '..');
-const DEBUG_ROOT = path.join(BASE_DIR, 'debug_crops');
+const DEBUG_ROOT = path.join(BASE_DIR, API_CONFIG.DISEASE.DEBUG_ROOT);
 
-const class_names = ["Footrot", "Pollu_Disease", "Slow-Decline", "healthy leaves"];
-const folders_to_create = [...class_names, "Uncertain"];
+const class_names = API_CONFIG.DISEASE.CLASS_NAMES;
+const folders_to_create = API_CONFIG.DISEASE.DEBUG_FOLDERS;
 
 // Ensure debug directories exist
 folders_to_create.forEach(f => {

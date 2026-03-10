@@ -1,12 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
-import 'package:smartpepper_mobile/config/app_config.dart';
 import 'package:smartpepper_mobile/config/theme.dart';
 import '../../localization/app_localizations.dart';
+import '../../services/disease_api_service.dart';
 import 'analysis_result_screen.dart';
 import 'disease_map_screen.dart';
 import 'roi_selector_screen.dart';
@@ -23,10 +21,8 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
   bool _isLoading = false;
   bool _isPickingImage = false;
   final ImagePicker _picker = ImagePicker();
+  final DiseaseApiService _apiService = DiseaseApiService();
   Position? _currentPosition;
-
-  // Backend URL from centralized config
-  String get apiUrl => AppConfig.predictUrl;
 
   Future<void> _pickImage(ImageSource source) async {
     setState(() {
@@ -216,91 +212,37 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
     });
 
     try {
-      // Create client with larger timeout for reading response body
-      final client = http.Client();
+      // Use centralized API service
+      final jsonResponse = await _apiService.predictDisease(_selectedImages);
 
-      var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+      setState(() {
+        _isLoading = false;
+      });
 
-      // Add all image files
-      for (var file in _selectedImages) {
-        request.files.add(
-          await http.MultipartFile.fromPath('images', file.path),
-        );
-      }
+      if (!mounted) return;
 
-      // Add headers to accept compressed response
-      request.headers['Accept-Encoding'] = 'gzip, deflate';
-
-      // Send request with extended timeout for large images
-      // Processing 300 leaves can take 3-4 minutes
-      var streamedResponse = await client.send(request).timeout(
-        const Duration(seconds: 300), // 5 minutes
-        onTimeout: () {
-          throw Exception(
-            'Request timeout - Server took too long to respond',
-          );
-        },
-      );
-
-      // Read response with even longer timeout for large data transfer
-      print(
-        '📥 Reading response (${streamedResponse.contentLength ?? "unknown"} bytes)...',
-      );
-      var response = await http.Response.fromStream(streamedResponse).timeout(
-        const Duration(seconds: 600), // 10 minutes for reading large response
-        onTimeout: () {
-          throw Exception('Response timeout - Failed to receive complete data');
-        },
-      );
-
-      client.close(); // Close client after receiving response
-
-      if (response.statusCode == 200) {
-        var jsonResponse = json.decode(response.body);
-        print('✅ Response received successfully');
-        print('📊 Total leaves: ${jsonResponse['total_detected']}');
-        print('🌡 Severity: ${jsonResponse['severity']}%');
-
-        setState(() {
-          _isLoading = false;
-        });
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AnalysisResultScreen(
-              analysisResult: jsonResponse,
-              originalImage: _selectedImages.first,
-              currentPosition: _currentPosition,
-            ),
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AnalysisResultScreen(
+            analysisResult: jsonResponse,
+            originalImage: _selectedImages.first,
+            currentPosition: _currentPosition,
           ),
-        );
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-        // Show the actual server error message
-        String errorMsg = 'Server error: ${response.statusCode}\n\n';
-        try {
-          var errorJson = json.decode(response.body);
-          errorMsg +=
-              errorJson['message'] ?? errorJson['error'] ?? response.body;
-        } catch (_) {
-          errorMsg += response.body;
-        }
-        _showErrorDialog(errorMsg);
-      }
+        ),
+      );
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
+
       String errorMsg = 'Connection error: $e\n\n';
       errorMsg += '🔧 Troubleshooting Steps:\n';
       errorMsg += '1. Make sure Node.js backend is running (node app.js)\n';
-      errorMsg += '2. Current URL: $apiUrl\n';
-      errorMsg += '3. Tap Settings ⚙️ to change backend URL\n';
-      errorMsg += '4. Check your device is on the same WiFi\n';
-      errorMsg += '5. Try different URL options in settings\n';
+      errorMsg += '2. Current URL: ${DiseaseApiService.predictUrl}\n';
+      errorMsg += '3. Check your device is on the same WiFi\n';
+      errorMsg +=
+          '4. Verify backend server IP address (${DiseaseApiService.diseaseApiBaseUrl})\n';
       _showErrorDialog(errorMsg);
     }
   }

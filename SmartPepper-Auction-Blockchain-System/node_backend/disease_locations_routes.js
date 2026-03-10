@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getDb } = require('./firebase');
+const API_CONFIG = require('./api-config');
 
 /**
  * GET /api/disease-locations
@@ -11,13 +12,13 @@ router.get('/', async (req, res) => {
         const db = getDb();
         
         if (!db) {
-            return res.status(503).json({
-                status: 'error',
-                message: 'Firebase not configured. Disease location storage requires Firebase.'
+            return res.status(API_CONFIG.STATUS_CODES.SERVICE_UNAVAILABLE).json({
+                status: API_CONFIG.MESSAGES.ERROR,
+                message: API_CONFIG.MESSAGES.FIREBASE_NOT_CONFIGURED
             });
         }
 
-        const snapshot = await db.collection('disease_locations')
+        const snapshot = await db.collection(API_CONFIG.FIREBASE.COLLECTIONS.DISEASE_LOCATIONS)
             .orderBy('detectedDate', 'desc')
             .get();
         
@@ -27,14 +28,14 @@ router.get('/', async (req, res) => {
         }));
         
         return res.json({
-            status: 'success',
+            status: API_CONFIG.MESSAGES.SUCCESS,
             count: locations.length,
             data: locations
         });
     } catch (error) {
         console.error('Error retrieving disease locations:', error);
-        return res.status(500).json({
-            status: 'error',
+        return res.status(API_CONFIG.STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            status: API_CONFIG.MESSAGES.ERROR,
             message: error.message
         });
     }
@@ -59,9 +60,9 @@ router.post('/', async (req, res) => {
 
         // Validate required fields
         if (!latitude || !longitude || !diseaseName || severity === undefined) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Missing required fields: latitude, longitude, diseaseName, severity'
+            return res.status(API_CONFIG.STATUS_CODES.BAD_REQUEST).json({
+                status: API_CONFIG.MESSAGES.ERROR,
+                message: API_CONFIG.MESSAGES.MISSING_REQUIRED_FIELDS
             });
         }
 
@@ -80,18 +81,18 @@ router.post('/', async (req, res) => {
         const db = getDb();
         
         if (!db) {
-            return res.status(503).json({
-                status: 'error',
-                message: 'Firebase not configured. Disease location storage requires Firebase.'
+            return res.status(API_CONFIG.STATUS_CODES.SERVICE_UNAVAILABLE).json({
+                status: API_CONFIG.MESSAGES.ERROR,
+                message: API_CONFIG.MESSAGES.FIREBASE_NOT_CONFIGURED
             });
         }
 
-        const docRef = await db.collection('disease_locations').add(locationData);
+        const docRef = await db.collection(API_CONFIG.FIREBASE.COLLECTIONS.DISEASE_LOCATIONS).add(locationData);
         const savedDoc = await docRef.get();
         
-        return res.status(201).json({
-            status: 'success',
-            message: 'Disease location saved successfully',
+        return res.status(API_CONFIG.STATUS_CODES.CREATED).json({
+            status: API_CONFIG.MESSAGES.SUCCESS,
+            message: API_CONFIG.MESSAGES.LOCATION_SAVED,
             data: {
                 id: savedDoc.id,
                 ...savedDoc.data()
@@ -99,8 +100,8 @@ router.post('/', async (req, res) => {
         });
     } catch (error) {
         console.error('Error saving disease location:', error);
-        return res.status(500).json({
-            status: 'error',
+        return res.status(API_CONFIG.STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            status: API_CONFIG.MESSAGES.ERROR,
             message: error.message
         });
     }
