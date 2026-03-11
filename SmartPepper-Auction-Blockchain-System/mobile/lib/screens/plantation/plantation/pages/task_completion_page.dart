@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:provider/provider.dart' as vanilla_provider;
+import '../../services/plantation_api_client.dart';
+import '../services/plantation_service.dart';
+import 'package:provider/provider.dart';
 import '../controllers/plantation_controller.dart';
 import '../models/farm_task_model.dart';
 import '../../../../localization/app_localizations.dart';
@@ -9,26 +10,29 @@ import '../../../../widgets/dropdown_field.dart';
 import '../../../../utils/validators.dart';
 import '../../../../providers/language_provider.dart';
 
-class TaskCompletionPage extends ConsumerStatefulWidget {
+class TaskCompletionPage extends StatefulWidget {
   final FarmTask task;
 
   const TaskCompletionPage({super.key, required this.task});
 
   @override
-  ConsumerState<TaskCompletionPage> createState() => _TaskCompletionPageState();
+  State<TaskCompletionPage> createState() => _TaskCompletionPageState();
 }
 
-class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
+class _TaskCompletionPageState extends State<TaskCompletionPage> {
   final _formKey = GlobalKey<FormState>();
   final _laborHoursController = TextEditingController();
   final _notesController = TextEditingController();
   final List<InputItemFormData> _items = [];
 
   late FarmTask _currentTask;
+  late PlantationController _controller;
 
   @override
   void initState() {
     super.initState();
+    _controller =
+        PlantationController(PlantationService(PlantationApiClient()));
     _currentTask = widget.task;
 
     if (_currentTask.status == 'Completed' &&
@@ -114,15 +118,14 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
         final laborHours =
             double.tryParse(_laborHoursController.text.trim()) ?? 0;
 
-        final updatedTask =
-            await ref.read(plantationControllerProvider.notifier).completeTask(
-                  taskId: _currentTask.id,
-                  items: items,
-                  laborHours: laborHours,
-                  notes: _notesController.text.trim().isEmpty
-                      ? null
-                      : _notesController.text.trim(),
-                );
+        final updatedTask = await _controller.completeTask(
+          taskId: _currentTask.id,
+          items: items,
+          laborHours: laborHours,
+          notes: _notesController.text.trim().isEmpty
+              ? null
+              : _notesController.text.trim(),
+        );
 
         if (mounted) {
           _updateTaskData(updatedTask);
@@ -150,8 +153,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final languageProvider =
-        vanilla_provider.Provider.of<LanguageProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
     final lang = languageProvider.locale.languageCode;
     final isCompleted = _currentTask.status == 'Completed';
 
@@ -691,19 +693,17 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                             .where((s) => s.trim().isNotEmpty)
                             .toList();
 
-                    final updatedTask = await ref
-                        .read(plantationControllerProvider.notifier)
-                        .updateTaskDetails(
-                          taskId: _currentTask.id,
-                          taskName: taskNameController.text.trim(),
-                          phase: phaseController.text.trim(),
-                          priority: selectedPriority,
-                          dueDate: selectedDate!,
-                          detailedSteps: detailedSteps,
-                          reasonWhy: reasonController.text.trim().isEmpty
-                              ? null
-                              : reasonController.text.trim(),
-                        );
+                    final updatedTask = await _controller.updateTaskDetails(
+                      taskId: _currentTask.id,
+                      taskName: taskNameController.text.trim(),
+                      phase: phaseController.text.trim(),
+                      priority: selectedPriority,
+                      dueDate: selectedDate!,
+                      detailedSteps: detailedSteps,
+                      reasonWhy: reasonController.text.trim().isEmpty
+                          ? null
+                          : reasonController.text.trim(),
+                    );
 
                     if (mounted && context.mounted) {
                       _updateTaskData(updatedTask);
@@ -976,16 +976,15 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
                   }
 
                   try {
-                    final updatedTask = await ref
-                        .read(plantationControllerProvider.notifier)
-                        .updateCompletionDetails(
-                          taskId: _currentTask.id,
-                          items: items,
-                          laborHours: laborHours,
-                          notes: editNotesController.text.trim().isEmpty
-                              ? null
-                              : editNotesController.text.trim(),
-                        );
+                    final updatedTask =
+                        await _controller.updateCompletionDetails(
+                      taskId: _currentTask.id,
+                      items: items,
+                      laborHours: laborHours,
+                      notes: editNotesController.text.trim().isEmpty
+                          ? null
+                          : editNotesController.text.trim(),
+                    );
 
                     if (mounted && context.mounted) {
                       _updateTaskData(updatedTask);
@@ -1056,8 +1055,7 @@ class _TaskCompletionPageState extends ConsumerState<TaskCompletionPage> {
               if (!mounted || !context.mounted) return;
 
               try {
-                await ref
-                    .read(plantationControllerProvider.notifier)
+                await Provider.of<PlantationController>(context, listen: false)
                     .deleteTask(_currentTask.id);
 
                 if (mounted && context.mounted) {

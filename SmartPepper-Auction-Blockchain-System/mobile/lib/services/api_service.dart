@@ -344,7 +344,8 @@ class ApiService {
   }
 
   // Quality Grading
-  Future<Map<String, dynamic>> saveQualityGrading(Map<String, dynamic> data) async {
+  Future<Map<String, dynamic>> saveQualityGrading(
+      Map<String, dynamic> data) async {
     try {
       final response = await _dio.post('/quality-grading', data: data);
       return response.data;
@@ -596,6 +597,82 @@ class ApiService {
         }
       }
       throw Exception('Network error. Please check your connection.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Price Prediction endpoints
+
+  /// Get latest price predictions for all districts and grades
+  /// Optional filters: district, grade
+  Future<Map<String, dynamic>> getLatestPricePredictions({
+    String? district,
+    String? grade,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (district != null && district.isNotEmpty) {
+        queryParams['district'] = district;
+      }
+      if (grade != null && grade.isNotEmpty) {
+        queryParams['grade'] = grade;
+      }
+
+      final response = await _dio.get(
+        '/price-predictions/latest',
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+      );
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Get price prediction for a specific lot based on its district and quality
+  Future<Map<String, dynamic>> getPricePredictionForLot(String lotId) async {
+    try {
+      final response = await _dio.get('/price-predictions/by-lot/$lotId');
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Get historical price predictions
+  Future<Map<String, dynamic>> getHistoricalPricePredictions({
+    String? district,
+    String? grade,
+    int days = 7,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{'days': days};
+      if (district != null && district.isNotEmpty) {
+        queryParams['district'] = district;
+      }
+      if (grade != null && grade.isNotEmpty) {
+        queryParams['grade'] = grade;
+      }
+
+      final response = await _dio.get(
+        '/price-predictions/history',
+        queryParameters: queryParams,
+      );
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Get list of districts with available predictions
+  Future<List<String>> getPredictionDistricts() async {
+    try {
+      final response = await _dio.get('/price-predictions/districts');
+      if (response.data['success'] == true) {
+        final List<dynamic> districts = response.data['districts'] ?? [];
+        return districts.cast<String>();
+      }
+      return [];
     } catch (e) {
       rethrow;
     }

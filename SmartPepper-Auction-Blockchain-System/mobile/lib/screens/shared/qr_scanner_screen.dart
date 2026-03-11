@@ -53,7 +53,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       // Navigate to lot details
       final lotId = qrData['lotId'];
       if (lotId != null && mounted) {
-        context.go('/lot/$lotId');
+        context.push('/lot/$lotId');
       }
     } catch (e) {
       if (mounted) {

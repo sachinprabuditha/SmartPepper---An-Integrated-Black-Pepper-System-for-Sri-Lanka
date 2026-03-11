@@ -6,6 +6,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+const API_CONFIG = require('./api-config');
 const { calculateForecast } = require('./remedies');
 const { runPythonInference } = require('./inference_bridge');
 const { initializeFirebase } = require('./firebase');
@@ -15,14 +16,14 @@ const diseaseLocationsRoutes = require('./disease_locations_routes');
 initializeFirebase();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = API_CONFIG.SERVER.PORT;
 
 // Middleware
 app.use(cors());
 app.use(express.json()); // Add JSON parsing middleware
 app.use(compression({
-    level: 6,
-    threshold: 500,
+    level: API_CONFIG.MIDDLEWARE.COMPRESSION.LEVEL,
+    threshold: API_CONFIG.MIDDLEWARE.COMPRESSION.THRESHOLD,
     filter: (req, res) => {
         if (req.headers['x-no-compression']) {
             return false;
@@ -33,7 +34,7 @@ app.use(compression({
 
 // Setup Multer for parsing multipart/form-data
 // We'll store files temporarily, process them, then delete them to save space.
-const uploadDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads');
+const uploadDir = path.join(__dirname, API_CONFIG.UPLOAD.DIR);
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
 }
@@ -49,10 +50,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: parseInt(process.env.MAX_FILE_SIZE) || 52428800 } // 50MB default
+    limits: { fileSize: API_CONFIG.UPLOAD.MAX_FILE_SIZE }
 });
 
-app.post('/predict', upload.any(), async (req, res) => {
+app.post(API_CONFIG.ENDPOINTS.PREDICT, upload.any(), async (req, res) => {
     try {
         let files = req.files || [];
 
@@ -60,14 +61,14 @@ app.post('/predict', upload.any(), async (req, res) => {
         // (multer.any() captures all files regardless of field name)
 
         if (files.length === 0) {
-            return res.status(400).json({
-                status: "error",
-                message: `No images provided.`
+            return res.status(API_CONFIG.STATUS_CODES.BAD_REQUEST).json({
+                status: API_CONFIG.MESSAGES.ERROR,
+                message: API_CONFIG.MESSAGES.NO_IMAGES
             });
         }
 
-        // Limit to 4 images
-        files = files.slice(0, 4);
+        // Limit to max number of images
+        files = files.slice(0, API_CONFIG.UPLOAD.MAX_FILES);
 
         const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14); // YYYYMMDD_HHMMSS
         console.log(`🔍 Analyzing ${files.length} frames...`);
@@ -86,7 +87,7 @@ app.post('/predict', upload.any(), async (req, res) => {
         }
 
         const response = {
-            status: "success",
+            status: API_CONFIG.MESSAGES.SUCCESS,
             severity: parseFloat((analysisResults.severity || 0).toFixed(2)),
             global_health_score: parseFloat((analysisResults.global_health_score || 0).toFixed(2)),
             disease_specific_severity: analysisResults.disease_specific_severity || {},
@@ -115,14 +116,32 @@ app.post('/predict', upload.any(), async (req, res) => {
             });
         }
 
-        return res.status(500).json({ status: "error", message: error.message });
+        return res.status(API_CONFIG.STATUS_CODES.INTERNAL_SERVER_ERROR).json({ 
+            status: API_CONFIG.MESSAGES.ERROR, 
+            message: error.message 
+        });
     }
 });
 
 // Disease locations API routes
-app.use('/api/disease-locations', diseaseLocationsRoutes);
+app.use(API_CONFIG.BASE_PATHS.API + '/disease-locations', diseaseLocationsRoutes);
 
-app.listen(PORT, '0.0.0.0', () => {
+// Health check endpoint
+app.get(API_CONFIG.ENDPOINTS.HEALTH, (req, res) => {
+    res.json({ 
+        status: API_CONFIG.MESSAGES.SUCCESS, 
+        message: 'Disease Detection API is running',
+        timestamp: new Date().toISOString()
+    });
+});
+
+app.listen(PORT, API_CONFIG.SERVER.HOST, () => {
     console.log("🌿 PEPPER LEAF DISEASE DETECTION SERVER MODULAR (Node.js)");
-    console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
+    console.log(`🚀 Server running on ${API_CONFIG.getServerUrl()}`);
+    console.log(`📍 Environment: ${API_CONFIG.SERVER.ENV}`);
+    console.log(`\n📋 Available Endpoints:`);
+    console.log(`   POST ${API_CONFIG.ENDPOINTS.PREDICT} - Analyze disease from images`);
+    console.log(`   GET  ${API_CONFIG.ENDPOINTS.DISEASE_LOCATIONS} - Get all disease locations`);
+    console.log(`   POST ${API_CONFIG.ENDPOINTS.DISEASE_LOCATIONS} - Save disease location`);
+    console.log(`   GET  ${API_CONFIG.ENDPOINTS.HEALTH} - Health check`);
 });

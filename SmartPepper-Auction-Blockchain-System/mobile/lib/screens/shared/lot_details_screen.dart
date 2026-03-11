@@ -62,6 +62,10 @@ class _LotDetailsScreenState extends State<LotDetailsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF1A2F23),
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: Text(context.tr('label_lot_details')),
         backgroundColor: AppTheme.forestGreen,
         actions: [

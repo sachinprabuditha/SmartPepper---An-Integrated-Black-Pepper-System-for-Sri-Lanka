@@ -35,9 +35,12 @@ router.post('/deposit', async (req, res) => {
       });
     }
 
+    // Convert auctionId to string for Firestore document path
+    const auctionIdStr = String(auctionId);
+
     // Record escrow in database
     const escrowData = {
-      auction_id: auctionId,
+      auction_id: auctionIdStr,
       exporter_address: exporterAddress,
       amount,
       tx_hash: txHash,
@@ -50,11 +53,13 @@ router.post('/deposit', async (req, res) => {
     const docRef = await db.collection('escrow_deposits').add(escrowData);
 
     // Update auction status
-    const auctionRef = db.collection('auctions').doc(auctionId);
+    const auctionRef = db.collection('auctions').doc(auctionIdStr);
     await auctionRef.update({
       escrow_deposited: true,
       escrow_amount: amount,
       escrow_tx_hash: txHash,
+      settlement_status: 'escrow_received',
+      admin_settlement_approved: false,
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     });
 
@@ -128,7 +133,7 @@ router.get('/status/:auctionId', async (req, res) => {
         escrowAmount: auction.escrow_amount,
         escrowTxHash: auction.escrow_tx_hash,
         requiredAmount: auction.current_bid,
-        winner: auction.highest_bidder,
+        winner: auction.winner_address || auction.current_bidder,
         depositDeadline: depositDeadline.toISOString(),
         hoursRemaining,
         isExpired: timeRemaining <= 0,
@@ -154,6 +159,9 @@ router.post('/verify', async (req, res) => {
 
     logger.info('Verifying escrow transaction', { auctionId, txHash });
 
+    // Convert auctionId to string for Firestore queries
+    const auctionIdStr = String(auctionId);
+
     // Get blockchain provider
     const provider = new ethers.JsonRpcProvider(process.env.BLOCKCHAIN_RPC_URL || 'http://localhost:8545');
     
@@ -177,7 +185,7 @@ router.post('/verify', async (req, res) => {
 
     // Update verification status
     const snapshot = await db.collection('escrow_deposits')
-      .where('auction_id', '==', auctionId)
+      .where('auction_id', '==', auctionIdStr)
       .where('tx_hash', '==', txHash)
       .get();
 
@@ -190,7 +198,7 @@ router.post('/verify', async (req, res) => {
     });
     await batch.commit();
 
-    logger.info('Escrow transaction verified', { auctionId, txHash });
+    logger.info('Escrow transaction verified', { auctionId: auctionIdStr, txHash });
 
     res.json({
       success: true,

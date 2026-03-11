@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:provider/provider.dart' as vanilla_provider;
+import 'package:provider/provider.dart';
+import '../../services/plantation_api_client.dart';
+import '../services/plantation_service.dart';
 import '../controllers/plantation_controller.dart';
 import '../models/farm_record_model.dart';
 import '../../../../widgets/input_field.dart';
@@ -9,26 +10,29 @@ import '../../../../utils/validators.dart';
 import '../../../../providers/language_provider.dart';
 import '../../../../localization/app_localizations.dart';
 
-class EditFarmPage extends ConsumerStatefulWidget {
+class EditFarmPage extends StatefulWidget {
   final FarmRecord farm;
 
   const EditFarmPage({super.key, required this.farm});
 
   @override
-  ConsumerState<EditFarmPage> createState() => _EditFarmPageState();
+  State<EditFarmPage> createState() => _EditFarmPageState();
 }
 
-class _EditFarmPageState extends ConsumerState<EditFarmPage> {
+class _EditFarmPageState extends State<EditFarmPage> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _farmNameController;
   late TextEditingController _areaHectaresController;
   late TextEditingController _totalVinesController;
+  late PlantationController _controller;
 
   DateTime? _farmStartDate;
 
   @override
   void initState() {
     super.initState();
+    _controller =
+        PlantationController(PlantationService(PlantationApiClient()));
     _farmNameController = TextEditingController(text: widget.farm.farmName);
     _areaHectaresController =
         TextEditingController(text: widget.farm.areaHectares.toString());
@@ -61,10 +65,10 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
   }
 
   Future<void> _handleSubmit(BuildContext context, String lang) async {
-    if (_formKey.currentState!.validate() &&
-        _farmStartDate != null) {
+    if (_formKey.currentState!.validate() && _farmStartDate != null) {
       try {
-        final areaHectares = double.tryParse(_areaHectaresController.text.trim());
+        final areaHectares =
+            double.tryParse(_areaHectaresController.text.trim());
         final totalVines = int.tryParse(_totalVinesController.text.trim());
 
         if (areaHectares == null || areaHectares <= 0) {
@@ -76,19 +80,15 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
           return;
         }
 
-        await ref.read(plantationControllerProvider.notifier).updateFarm(
-              farmId: widget.farm.id,
-              farmName: _farmNameController.text.trim(),
-              farmStartDate: _farmStartDate,
-              areaHectares: areaHectares,
-              totalVines: totalVines,
-            );
+        await _controller.updateFarm(
+          farmId: widget.farm.id,
+          farmName: _farmNameController.text.trim(),
+          farmStartDate: _farmStartDate,
+          areaHectares: areaHectares,
+          totalVines: totalVines,
+        );
 
         if (mounted) {
-          // Invalidate all related providers to refresh data
-          ref.invalidate(farmProvider(widget.farm.id));
-          ref.invalidate(farmsProvider);
-          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(context.tr('plantation_farm_updated')),
@@ -114,7 +114,7 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
 
   @override
   Widget build(BuildContext context) {
-    final languageProvider = vanilla_provider.Provider.of<LanguageProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
     final lang = languageProvider.locale.languageCode;
 
     return Scaffold(
@@ -131,22 +131,25 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
               InputField(
                 label: context.tr('plantation_farm_name'),
                 controller: _farmNameController,
-                validator: (value) => Validators.required(value, fieldName: context.tr('plantation_farm_name')),
+                validator: (value) => Validators.required(value,
+                    fieldName: context.tr('plantation_farm_name')),
               ),
               const SizedBox(height: 16),
               // Read Only District
               InputField(
                 label: context.tr('plantation_district'),
-                controller: TextEditingController(text: widget.farm.district.get(lang)),
+                controller:
+                    TextEditingController(text: widget.farm.district.get(lang)),
                 readOnly: true,
                 validator: null,
               ),
               const SizedBox(height: 16),
-              
+
               // Read Only Soil Type
               InputField(
                 label: context.tr('plantation_soil_type'),
-                controller: TextEditingController(text: widget.farm.soilType.get(lang)),
+                controller:
+                    TextEditingController(text: widget.farm.soilType.get(lang)),
                 readOnly: true,
                 validator: null,
               ),
@@ -155,7 +158,8 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
               // Read Only Variety
               InputField(
                 label: context.tr('plantation_chosen_variety'),
-                controller: TextEditingController(text: widget.farm.chosenVariety.get(lang)),
+                controller: TextEditingController(
+                    text: widget.farm.chosenVariety.get(lang)),
                 readOnly: true,
                 validator: null,
               ),
@@ -172,14 +176,16 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
                     ),
                     decoration: InputDecoration(
                       labelText: context.tr('plantation_farm_start_date'),
-                      hintText: context.tr('plantation_select_planting_date_short'),
+                      hintText:
+                          context.tr('plantation_select_planting_date_short'),
                       suffixIcon: const Icon(Icons.calendar_today),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     validator: (value) {
-                      if (_farmStartDate == null) return context.tr('plantation_select_farm_start');
+                      if (_farmStartDate == null)
+                        return context.tr('plantation_select_farm_start');
                       return null;
                     },
                   ),
@@ -189,11 +195,14 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
               InputField(
                 label: context.tr('plantation_area_in_hectares'),
                 controller: _areaHectaresController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 validator: (value) {
-                  if (value == null || value.isEmpty) return context.tr('plantation_please_enter_area');
+                  if (value == null || value.isEmpty)
+                    return context.tr('plantation_please_enter_area');
                   final area = double.tryParse(value);
-                  if (area == null || area <= 0) return context.tr('plantation_validation_enter_valid_area');
+                  if (area == null || area <= 0)
+                    return context.tr('plantation_validation_enter_valid_area');
                   return null;
                 },
               ),
@@ -203,9 +212,11 @@ class _EditFarmPageState extends ConsumerState<EditFarmPage> {
                 controller: _totalVinesController,
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == null || value.isEmpty) return context.tr('plantation_please_enter_vines');
+                  if (value == null || value.isEmpty)
+                    return context.tr('plantation_please_enter_vines');
                   final vines = int.tryParse(value);
-                  if (vines == null || vines <= 0) return context.tr('plantation_please_enter_valid_number');
+                  if (vines == null || vines <= 0)
+                    return context.tr('plantation_please_enter_valid_number');
                   return null;
                 },
               ),

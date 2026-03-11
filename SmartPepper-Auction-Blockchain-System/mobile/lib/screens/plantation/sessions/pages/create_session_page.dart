@@ -1,28 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import '../controllers/session_controller.dart';
-import '../../../../localization/app_localizations.dart';
-import '../../../../widgets/primary_button.dart';
+import '../services/session_service.dart';
+import '../../services/plantation_api_client.dart';
 import '../../../../widgets/input_field.dart';
+import '../../../../widgets/primary_button.dart';
+import '../../../../localization/app_localizations.dart';
+import 'package:intl/intl.dart';
 import '../../../../utils/validators.dart';
 
-class CreateSessionPage extends ConsumerStatefulWidget {
+class CreateSessionPage extends StatefulWidget {
   final String seasonId;
 
   const CreateSessionPage({super.key, required this.seasonId});
 
   @override
-  ConsumerState<CreateSessionPage> createState() => _CreateSessionPageState();
+  State<CreateSessionPage> createState() => _CreateSessionPageState();
 }
 
-class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
+class _CreateSessionPageState extends State<CreateSessionPage> {
   final _formKey = GlobalKey<FormState>();
   final _sessionNameController = TextEditingController();
   final _yieldController = TextEditingController();
   final _areaController = TextEditingController();
   final _notesController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
+  late SessionController _sessionController;
+
+  @override
+  void initState() {
+    super.initState();
+    _sessionController =
+        SessionController(SessionService(PlantationApiClient()));
+  }
 
   @override
   void dispose() {
@@ -50,13 +59,16 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
   Future<void> _handleSubmit() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await ref.read(sessionControllerProvider(widget.seasonId).notifier).createSession(
-              sessionName: _sessionNameController.text.trim(),
-              date: _selectedDate,
-              yieldKg: double.parse(_yieldController.text),
-              areaHarvested: double.parse(_areaController.text),
-              notes: _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
-            );
+        await _sessionController.createSession(
+          seasonId: widget.seasonId,
+          sessionName: _sessionNameController.text.trim(),
+          date: _selectedDate,
+          yieldKg: double.parse(_yieldController.text),
+          areaHarvested: double.parse(_areaController.text),
+          notes: _notesController.text.trim().isNotEmpty
+              ? _notesController.text.trim()
+              : null,
+        );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -96,7 +108,8 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
               InputField(
                 label: context.tr('session_name'),
                 controller: _sessionNameController,
-                validator: (value) => Validators.required(value, fieldName: context.tr('session_name')),
+                validator: (value) => Validators.required(value,
+                    fieldName: context.tr('session_name')),
               ),
               const SizedBox(height: 16),
               InkWell(
@@ -117,14 +130,16 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
                 label: context.tr('session_yield_kg'),
                 controller: _yieldController,
                 keyboardType: TextInputType.number,
-                validator: (value) => Validators.number(value, fieldName: context.tr('session_yield_field')),
+                validator: (value) => Validators.number(value,
+                    fieldName: context.tr('session_yield_field')),
               ),
               const SizedBox(height: 16),
               InputField(
                 label: context.tr('session_area_hectares'),
                 controller: _areaController,
                 keyboardType: TextInputType.number,
-                validator: (value) => Validators.number(value, fieldName: context.tr('session_area_field')),
+                validator: (value) => Validators.number(value,
+                    fieldName: context.tr('session_area_field')),
               ),
               const SizedBox(height: 16),
               InputField(
@@ -144,4 +159,3 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
     );
   }
 }
-

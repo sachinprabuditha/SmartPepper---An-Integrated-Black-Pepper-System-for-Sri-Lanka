@@ -1,7 +1,11 @@
 class AppConfig {
   // Backend URL Configuration for physical device on local network
-  // 192.168.1.153 is the internal IP address of the computer running the server
-  static const String backendBaseUrl = 'http://192.168.1.153:5000';
+  // Old configuration (HEAD):
+  // static const String backendBaseUrl = 'http://192.168.1.153:5000';
+
+  // New configuration (Incoming):
+  static const String backendBaseUrl = 'http://192.168.8.173:5005';
+
   static const String predictEndpoint = '/predict';
 
   // Full predict URL

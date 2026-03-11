@@ -42,13 +42,11 @@ const getSession = async () => {
 export const predictPrice = async (request) => {
     const inputs = [];
 
-    // 1. USD_Buy_Rate
-    inputs.push(request.UsdBuyRate);
-    // 2. USD_Sell_Rate
-    inputs.push(request.UsdSellRate);
-    // 3. Temperature
+    // 1. USD_Rate
+    inputs.push(request.UsdRate);
+    // 2. Temperature
     inputs.push(request.Temperature);
-    // 4. Precipitation
+    // 3. Precipitation
     inputs.push(request.Precipitation);
 
     // Parse Date

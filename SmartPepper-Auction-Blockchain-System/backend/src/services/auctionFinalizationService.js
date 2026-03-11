@@ -100,9 +100,13 @@ class AuctionFinalizationService {
       finalized_at: admin.firestore.FieldValue.serverTimestamp(),
       winner_address: auction.current_bidder,
       final_price: auction.current_bid,
-      final_price_lkr: auction.current_bid_lkr || currencyConverter.ethToLkr(parseFloat(auction.current_bid)).toString(),
-      settlement_status: 'pending_escrow'
+      final_price_lkr: auction.current_bid_lkr || currencyConverter.ethToLkr(parseFloat(auction.current_bid)).toString()
     };
+    
+    // Only set settlement_status to pending_escrow if not already at a later stage
+    if (!auction.settlement_status || auction.settlement_status === 'not_started') {
+      updates.settlement_status = 'pending_escrow';
+    }
 
     // Try to finalize on blockchain
     if (auction.blockchain_auction_id) {

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart' as vanilla_provider;
+import '../../services/plantation_api_client.dart';
+import '../services/plantation_service.dart';
 import '../controllers/plantation_controller.dart';
 import '../models/farm_task_model.dart';
 import '../models/farm_record_model.dart';
@@ -11,27 +12,67 @@ import '../../../../providers/language_provider.dart';
 import '../../../../localization/app_localizations.dart';
 import 'manual_task_dialog.dart';
 
-class FarmDetailsPage extends ConsumerWidget {
+class FarmDetailsPage extends StatefulWidget {
   final String farmId;
 
   const FarmDetailsPage({super.key, required this.farmId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final languageProvider =
-        vanilla_provider.Provider.of<LanguageProvider>(context);
-    final lang = languageProvider.locale.languageCode;
+  State<FarmDetailsPage> createState() => _FarmDetailsPageState();
+}
 
-    final farmAsync = ref.watch(farmProvider(farmId));
-    final tasksAsync = ref.watch(farmTasksProvider(farmId));
+class _FarmDetailsPageState extends State<FarmDetailsPage> {
+  FarmRecord? _farm;
+  bool _isLoadingFarm = true;
+  String? _farmError;
+  late Future<List<FarmTask>> _tasksFuture;
+  late PlantationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        PlantationController(PlantationService(PlantationApiClient()));
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() {
+      _isLoadingFarm = true;
+      _farmError = null;
+    });
+
+    try {
+      final farm = await _controller.getFarmById(widget.farmId);
+      if (mounted) {
+        setState(() {
+          _farm = farm;
+          _isLoadingFarm = false;
+        });
+      }
+      _tasksFuture = _controller.getFarmTasks(widget.farmId);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _farmError = e.toString();
+          _isLoadingFarm = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final lang = languageProvider.locale.languageCode;
 
     return Scaffold(
       appBar: AppBar(
-        title: farmAsync.when(
-          data: (farm) => Text(farm.farmName),
-          loading: () => Text(context.tr('plantation_farm_details')),
-          error: (_, __) => Text(context.tr('plantation_farm_details')),
-        ),
+        title: _isLoadingFarm
+            ? Text(context.tr('plantation_farm_details'))
+            : _farmError != null
+                ? Text(context.tr('plantation_farm_details'))
+                : Text(_farm!.farmName),
         actions: [
           const SizedBox(width: 4),
           // Add Manual Task Button in AppBar
@@ -39,8 +80,8 @@ class FarmDetailsPage extends ConsumerWidget {
             icon: const Icon(Icons.add_task),
             tooltip: context.tr('plantation_add_manual_task'),
             onPressed: () {
-              if (farmAsync.hasValue) {
-                _showManualTaskDialog(context, ref, farmAsync.value!, lang);
+              if (_farm != null) {
+                _showManualTaskDialog(context, _farm!, lang);
               }
             },
           ),
@@ -48,17 +89,13 @@ class FarmDetailsPage extends ConsumerWidget {
             icon: const Icon(Icons.edit),
             tooltip: context.tr('plantation_edit_farm'),
             onPressed: () async {
-              if (farmAsync.hasValue) {
-                final farm = farmAsync.value!;
+              if (_farm != null) {
                 final result = await context.pushNamed<bool>(
                   'editFarm',
-                  extra: farm,
+                  extra: _farm,
                 );
                 if (result == true) {
-                  // Invalidate all related providers to refresh data
-                  ref.invalidate(farmProvider(farmId));
-                  ref.invalidate(farmTasksProvider(farmId));
-                  ref.invalidate(farmsProvider);
+                  _loadData();
                 }
               }
             },
@@ -89,9 +126,7 @@ class FarmDetailsPage extends ConsumerWidget {
               );
               if (confirm == true) {
                 try {
-                  await ref
-                      .read(plantationControllerProvider.notifier)
-                      .deleteFarm(farmId);
+                  await _controller.deleteFarm(widget.farmId);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -116,119 +151,126 @@ class FarmDetailsPage extends ConsumerWidget {
           ),
         ],
       ),
-      body: farmAsync.when(
-        data: (farm) {
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(farmProvider(farmId));
-              ref.invalidate(farmTasksProvider(farmId));
-            },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Farm Information Card
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            farm.farmName,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
+      body: _isLoadingFarm
+          ? LoadingSpinner(
+              message: context.tr('plantation_loading_farm_details'))
+          : _farmError != null
+              ? EmptyState(
+                  message:
+                      '${context.tr('plantation_error_loading_farm')}: ${_farmError}',
+                  icon: Icons.error_outline,
+                  action: ElevatedButton(
+                    onPressed: _loadData,
+                    child: Text(context.tr('common_retry')),
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadData,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Farm Information Card
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _farm!.farmName,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                 ),
+                                const SizedBox(height: 16),
+                                _buildInfoRow(
+                                    context,
+                                    context.tr('plantation_district'),
+                                    _farm!.district.get(lang)),
+                                _buildInfoRow(
+                                    context,
+                                    context.tr('plantation_variety'),
+                                    _farm!.chosenVariety.get(lang)),
+                                _buildInfoRow(
+                                    context,
+                                    context.tr('plantation_area'),
+                                    '${_farm!.areaHectares} ${context.tr('plantation_hectares')}'),
+                                _buildInfoRow(
+                                    context,
+                                    context.tr('plantation_total_vines'),
+                                    '${_farm!.totalVines}'),
+                                _buildInfoRow(
+                                  context,
+                                  context.tr('plantation_farm_start_date'),
+                                  '${_farm!.farmStartDate.day}/${_farm!.farmStartDate.month}/${_farm!.farmStartDate.year}',
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 16),
-                          _buildInfoRow(
-                              context,
-                              context.tr('plantation_district'),
-                              farm.district.get(lang)),
-                          _buildInfoRow(
-                              context,
-                              context.tr('plantation_variety'),
-                              farm.chosenVariety.get(lang)),
-                          _buildInfoRow(context, context.tr('plantation_area'),
-                              '${farm.areaHectares} ${context.tr('plantation_hectares')}'),
-                          _buildInfoRow(
-                              context,
-                              context.tr('plantation_total_vines'),
-                              '${farm.totalVines}'),
-                          _buildInfoRow(
-                            context,
-                            context.tr('plantation_farm_start_date'),
-                            '${farm.farmStartDate.day}/${farm.farmStartDate.month}/${farm.farmStartDate.year}',
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  // Tasks Lifecycle Journey
-                  Text(
-                    context.tr('plantation_farm_task_journey'),
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
                         ),
-                  ),
-                  const SizedBox(height: 16),
-                  tasksAsync.when(
-                    data: (tasks) {
-                      if (tasks.isEmpty) {
-                        return EmptyState(
-                          message: context.tr('plantation_no_tasks_scheduled'),
-                          icon: Icons.task_alt,
-                        );
-                      }
+                        const SizedBox(height: 24),
+                        // Tasks Lifecycle Journey
+                        Text(
+                          context.tr('plantation_farm_task_journey'),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                        const SizedBox(height: 16),
+                        FutureBuilder<List<FarmTask>>(
+                          future: _tasksFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return LoadingSpinner(
+                                  message:
+                                      context.tr('plantation_loading_tasks'));
+                            }
 
-                      return _buildPhaseStepper(
-                          context, ref, farm, tasks, lang);
-                    },
-                    loading: () => LoadingSpinner(
-                        message: context.tr('plantation_loading_tasks')),
-                    error: (error, stack) => EmptyState(
-                      message:
-                          '${context.tr('plantation_error_loading_tasks')}: ${error.toString()}',
-                      icon: Icons.error_outline,
-                      action: ElevatedButton(
-                        onPressed: () {
-                          ref.invalidate(farmTasksProvider(farmId));
-                        },
-                        child: Text(context.tr('common_retry')),
-                      ),
+                            if (snapshot.hasError) {
+                              return EmptyState(
+                                message:
+                                    '${context.tr('plantation_error_loading_tasks')}: ${snapshot.error.toString()}',
+                                icon: Icons.error_outline,
+                                action: ElevatedButton(
+                                  onPressed: () {
+                                    _loadData();
+                                  },
+                                  child: Text(context.tr('common_retry')),
+                                ),
+                              );
+                            }
+
+                            final tasks = snapshot.data ?? [];
+
+                            if (tasks.isEmpty) {
+                              return EmptyState(
+                                message:
+                                    context.tr('plantation_no_tasks_scheduled'),
+                                icon: Icons.task_alt,
+                              );
+                            }
+
+                            return _buildPhaseStepper(
+                                context, _farm!, tasks, lang);
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          );
-        },
-        loading: () => LoadingSpinner(
-            message: context.tr('plantation_loading_farm_details')),
-        error: (error, stack) => EmptyState(
-          message:
-              '${context.tr('plantation_error_loading_farm')}: ${error.toString()}',
-          icon: Icons.error_outline,
-          action: ElevatedButton(
-            onPressed: () {
-              ref.invalidate(farmProvider(farmId));
-            },
-            child: Text(context.tr('common_retry')),
-          ),
-        ),
-      ),
+                ),
     );
   }
 
   Future<void> _showManualTaskDialog(
     BuildContext context,
-    WidgetRef ref,
     FarmRecord farm,
     String lang,
   ) async {
@@ -239,17 +281,17 @@ class FarmDetailsPage extends ConsumerWidget {
 
     if (result != null) {
       try {
-        await ref.read(plantationControllerProvider.notifier).createManualTask(
-              farmId: farm.id,
-              taskName: result['taskName'] as String,
-              phase: result['phase'] as String?,
-              dueDate: result['dueDate'] as DateTime,
-              priority: result['priority'] as String,
-              detailedSteps: result['detailedSteps'] as List<String>?,
-              reasonWhy: result['reasonWhy'] as String?,
-            );
+        await _controller.createManualTask(
+          farmId: widget.farmId,
+          taskName: result['taskName'] as String,
+          phase: result['phase'] as String?,
+          dueDate: result['dueDate'] as DateTime,
+          priority: result['priority'] as String,
+          detailedSteps: result['detailedSteps'] as List<String>?,
+          reasonWhy: result['reasonWhy'] as String?,
+        );
 
-        ref.invalidate(farmTasksProvider(farm.id));
+        _loadData();
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -348,7 +390,6 @@ class FarmDetailsPage extends ConsumerWidget {
 
   Widget _buildPhaseStepper(
     BuildContext context,
-    WidgetRef ref,
     FarmRecord farm,
     List<FarmTask> tasks,
     String lang,
@@ -360,7 +401,6 @@ class FarmDetailsPage extends ConsumerWidget {
       children: [
         _buildPhaseSection(
           context,
-          ref,
           farm,
           context.tr('plantation_phase_1'),
           phases[1]!,
@@ -371,7 +411,6 @@ class FarmDetailsPage extends ConsumerWidget {
         const SizedBox(height: 8),
         _buildPhaseSection(
           context,
-          ref,
           farm,
           context.tr('plantation_phase_2'),
           phases[2]!,
@@ -382,7 +421,6 @@ class FarmDetailsPage extends ConsumerWidget {
         const SizedBox(height: 8),
         _buildPhaseSection(
           context,
-          ref,
           farm,
           context.tr('plantation_phase_3'),
           phases[3]!,
@@ -393,7 +431,6 @@ class FarmDetailsPage extends ConsumerWidget {
         const SizedBox(height: 8),
         _buildPhaseSection(
           context,
-          ref,
           farm,
           context.tr('plantation_phase_4'),
           phases[4]!,
@@ -407,7 +444,6 @@ class FarmDetailsPage extends ConsumerWidget {
 
   Widget _buildPhaseSection(
     BuildContext context,
-    WidgetRef ref,
     FarmRecord farm,
     String phaseTitle,
     List<FarmTask> tasks,
@@ -433,7 +469,7 @@ class FarmDetailsPage extends ConsumerWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _buildTaskListForPhase(context, ref, farm, tasks, lang),
+            child: _buildTaskListForPhase(context, farm, tasks, lang),
           ),
         ],
       ),
@@ -492,7 +528,6 @@ class FarmDetailsPage extends ConsumerWidget {
 
   Widget _buildTaskListForPhase(
     BuildContext context,
-    WidgetRef ref,
     FarmRecord farm,
     List<FarmTask> tasks,
     String lang,
@@ -529,7 +564,7 @@ class FarmDetailsPage extends ConsumerWidget {
                 extra: task,
               )
                   .then((_) {
-                ref.invalidate(farmTasksProvider(farm.id));
+                _loadData();
               });
             },
             child: Padding(

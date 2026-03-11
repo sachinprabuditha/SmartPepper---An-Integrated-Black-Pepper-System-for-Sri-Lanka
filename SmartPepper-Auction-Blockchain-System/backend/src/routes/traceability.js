@@ -135,6 +135,39 @@ router.get('/:lotId', async (req, res) => {
       });
     }
 
+    // 6.5. Get Escrow Deposits for auctions
+    let allEscrowDeposits = [];
+    for (const auction of auctions) {
+      const escrowSnapshot = await db.collection('escrow_deposits')
+        .where('auction_id', '==', auction.id)
+        .orderBy('deposited_at', 'desc')
+        .get();
+      
+      escrowSnapshot.forEach(doc => {
+        const escrow = doc.data();
+        allEscrowDeposits.push({
+          ...escrow,
+          auction_id: auction.id
+        });
+      });
+    }
+
+    // 6.6. Get Settlement Records for auctions
+    let allSettlements = [];
+    for (const auction of auctions) {
+      const settlementSnapshot = await db.collection('auction_settlements')
+        .where('auction_id', '==', auction.id)
+        .get();
+      
+      settlementSnapshot.forEach(doc => {
+        const settlement = doc.data();
+        allSettlements.push({
+          ...settlement,
+          auction_id: auction.id
+        });
+      });
+    }
+
     // 7. Get User Information (Farmer)
     let farmerInfo = null;
     if (lot.farmer_address) {
@@ -257,34 +290,57 @@ router.get('/:lotId', async (req, res) => {
         }
       });
 
-      if (auction.status === 'ended' || auction.status === 'settled') {
+      if (auction.status === 'ended' || auction.status === 'settled' || auction.status === 'escrow_locked') {
         timeline.push({
           type: 'auction_ended',
           timestamp: auction.end_time,
           description: 'Auction ended',
           actor: 'System',
           actor_name: 'Auction System',
-          blockchain_tx: null,
+          blockchain_tx: auction.blockchain_finalization_tx,
           data: {
             auction_id: auction.id,
             final_price: auction.current_bid,
-            winner: auction.current_bidder
+            winner: auction.current_bidder,
+            blockchain_finalized: auction.blockchain_finalized
+          }
+        });
+      }
+
+      // Add escrow deposit event if escrow was deposited
+      if (auction.escrow_deposited) {
+        const escrowDeposit = allEscrowDeposits.find(e => e.auction_id === auction.id);
+        timeline.push({
+          type: 'escrow_deposited',
+          timestamp: auction.escrow_deposit_date || escrowDeposit?.deposited_at || auction.updated_at,
+          description: 'Escrow deposited by winner',
+          actor: auction.current_bidder,
+          actor_name: buyerInfo?.name || 'Winner',
+          blockchain_tx: auction.escrow_tx_hash,
+          data: {
+            auction_id: auction.id,
+            amount: auction.escrow_amount || auction.current_bid,
+            exporter_address: auction.current_bidder,
+            settlement_status: auction.settlement_status
           }
         });
       }
 
       if (auction.status === 'settled') {
+        const settlement = allSettlements.find(s => s.auction_id === auction.id);
         timeline.push({
           type: 'auction_settled',
-          timestamp: auction.updated_at || auction.end_time,
-          description: 'Ownership transferred to buyer',
+          timestamp: auction.settled_at || settlement?.created_at || auction.updated_at,
+          description: 'Payment released to farmer',
           actor: auction.current_bidder,
           actor_name: buyerInfo?.name || 'Buyer',
-          blockchain_tx: null,
+          blockchain_tx: auction.settlement_tx_hash || settlement?.settlement_tx_hash,
           data: {
             auction_id: auction.id,
             price_paid: auction.current_bid,
-            new_owner: auction.current_bidder
+            new_owner: auction.current_bidder,
+            farmer_payout: settlement?.farmer_payout,
+            platform_fee: settlement?.platform_fee
           }
         });
       }
@@ -321,6 +377,8 @@ router.get('/:lotId', async (req, res) => {
       compliance_checks: complianceChecks.length,
       auctions: auctions.length,
       total_bids: allBids.length,
+      escrow_deposits: allEscrowDeposits.length,
+      settlements: allSettlements.length,
       blockchain_transactions: timeline.filter(e => e.blockchain_tx).length,
       days_in_system: lot.created_at ? Math.ceil((new Date() - lot.created_at.toDate()) / (1000 * 60 * 60 * 24)) : 0
     };
@@ -402,6 +460,12 @@ router.get('/:lotId', async (req, res) => {
 
       // Bid History
       bids: allBids,
+
+      // Escrow Deposits
+      escrow_deposits: allEscrowDeposits,
+
+      // Settlement Records
+      settlements: allSettlements,
 
       // Complete Timeline
       timeline: timeline,

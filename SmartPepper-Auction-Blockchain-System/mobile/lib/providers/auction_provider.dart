@@ -79,8 +79,10 @@ class Auction {
       currentBidLkr: double.tryParse(json['current_bid_lkr']?.toString() ??
           json['currentBidLkr']?.toString() ??
           '0'),
-      highestBidder: json['highest_bidder']?.toString() ??
-          json['highestBidder']?.toString(),
+      highestBidder: json['current_bidder']?.toString() ??
+          json['highest_bidder']?.toString() ??
+          json['highestBidder']?.toString() ??
+          json['winner_address']?.toString(),
       startTime: DateTime.tryParse(json['start_time']?.toString() ??
               json['startTime']?.toString() ??
               '') ??

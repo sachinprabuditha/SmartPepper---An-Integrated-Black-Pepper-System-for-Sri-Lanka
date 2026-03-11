@@ -724,4 +724,103 @@ router.get('/rules', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/compliance
+ * Get all compliance checks (for admin dashboard)
+ */
+router.get('/', async (req, res) => {
+  try {
+    const { status, lotId, limit = 100 } = req.query;
+
+    logger.info('Fetching compliance checks', { status, lotId, limit });
+
+    // Build query
+    let query = db.collection('compliance_checks');
+
+    // Apply filters
+    if (status) {
+      const passed = status === 'passed';
+      query = query.where('passed', '==', passed);
+    }
+
+    if (lotId) {
+      query = query.where('lot_id', '==', lotId);
+    }
+
+    // Order by most recent
+    query = query.orderBy('checked_at', 'desc').limit(parseInt(limit));
+
+    const snapshot = await query.get();
+    const checks = [];
+
+    // Fetch lot details for each check
+    for (const doc of snapshot.docs) {
+      const checkData = doc.data();
+      
+      // Get lot details
+      let lotDetails = null;
+      if (checkData.lot_id) {
+        const lotSnapshot = await db.collection('pepper_lots')
+          .where('lot_id', '==', checkData.lot_id)
+          .limit(1)
+          .get();
+        
+        if (!lotSnapshot.empty) {
+          const lot = lotSnapshot.docs[0].data();
+          
+          // Get farmer info
+          let farmerName = 'Unknown Farmer';
+          if (lot.farmer_address) {
+            const farmerSnapshot = await db.collection('users')
+              .where('wallet_address', '==', lot.farmer_address)
+              .limit(1)
+              .get();
+            
+            if (!farmerSnapshot.empty) {
+              const farmer = farmerSnapshot.docs[0].data();
+              farmerName = farmer.name || farmer.email || 'Unknown Farmer';
+            }
+          }
+          
+          lotDetails = {
+            variety: lot.variety,
+            quantity: lot.quantity,
+            farmerName: farmerName,
+            quality: lot.quality,
+            origin: lot.origin
+          };
+        }
+      }
+
+      checks.push({
+        id: doc.id,
+        lotId: checkData.lot_id,
+        checkType: checkData.rule_type || 'unknown',
+        status: checkData.passed ? 'passed' : 'failed',
+        result: checkData.rule_name,
+        issues: checkData.passed ? [] : [checkData.details],
+        checkedAt: checkData.checked_at?.toDate?.()?.toISOString() || null,
+        createdAt: checkData.checked_at?.toDate?.()?.toISOString() || new Date().toISOString(),
+        lotDetails
+      });
+    }
+
+    logger.info(`Found ${checks.length} compliance checks`);
+
+    res.json({
+      success: true,
+      checks,
+      total: checks.length
+    });
+
+  } catch (error) {
+    logger.error('Error fetching compliance checks:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch compliance checks',
+      details: error.message
+    });
+  }
+});
+
 module.exports = router;

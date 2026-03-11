@@ -11,6 +11,9 @@ export default function AdminDashboard() {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
+  const [pendingSettlements, setPendingSettlements] = useState<any[]>([]);
+  const [loadingSettlements, setLoadingSettlements] = useState(false);
+  const [approvingSettlement, setApprovingSettlement] = useState<string | null>(null);
   const [stats, setStats] = useState({
     totalUsers: 0,
     pendingApprovals: 0,
@@ -42,17 +45,65 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (user && user.role === 'admin') {
       loadDashboardData();
+      loadPendingSettlements();
       checkSystemHealth();
-      
+
       // Refresh health every 30 seconds
       const healthInterval = setInterval(checkSystemHealth, 30000);
-      return () => clearInterval(healthInterval);
+      // Refresh settlements every minute
+      const settlementsInterval = setInterval(loadPendingSettlements, 60000);
+      return () => {
+        clearInterval(healthInterval);
+        clearInterval(settlementsInterval);
+      };
     }
   }, [user]);
 
+  const loadPendingSettlements = async () => {
+    try {
+      setLoadingSettlements(true);
+      const response = await fetch('http://localhost:3002/api/admin/auctions/pending-settlement');
+      if (response.ok) {
+        const data = await response.json();
+        setPendingSettlements(data.auctions || []);
+      }
+    } catch (error) {
+      console.error('Failed to load pending settlements:', error);
+    } finally {
+      setLoadingSettlements(false);
+    }
+  };
+
+  const handleApproveSettlement = async (auctionId: string) => {
+    if (!confirm('Are you sure you want to approve this settlement? This will allow final payment release to the farmer.')) {
+      return;
+    }
+
+    try {
+      setApprovingSettlement(auctionId);
+      const response = await fetch(`http://localhost:3002/api/admin/auctions/${auctionId}/approve-settlement`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes: 'Approved by admin from dashboard' })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to approve settlement');
+      }
+
+      alert('Settlement approved successfully! Farmer and buyer have been notified.');
+      await loadPendingSettlements();
+    } catch (error: any) {
+      alert(`Failed to approve settlement: ${error.message}`);
+    } finally {
+      setApprovingSettlement(null);
+    }
+  };
+
   const checkSystemHealth = async () => {
     const startTime = Date.now();
-    
+
     // Check Backend API
     try {
       const backendStart = Date.now();
@@ -130,7 +181,7 @@ export default function AdminDashboard() {
       // Load system stats
       const lotsResponse = await lotApi.getAll({ limit: 100 });
       const auctionsResponse = await auctionApi.getAll({ limit: 100 });
-      
+
       // Load user counts
       const usersResponse = await adminApi.getUsers({});
       const pendingUsersResponse = await adminApi.getPendingUsers();
@@ -218,6 +269,97 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Pending Settlements Section */}
+        {pendingSettlements.length > 0 && (
+          <div className="mb-6 bg-green-50 dark:bg-green-900/20 border-2 border-green-400 dark:border-green-700 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="flex-shrink-0">
+                  <svg className="h-7 w-7 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-green-900 dark:text-green-200">
+                    💵 {pendingSettlements.length} Settlement{pendingSettlements.length > 1 ? 's' : ''} Awaiting Approval
+                  </h3>
+                  <p className="text-sm text-green-800 dark:text-green-300">
+                    Escrow has been deposited. Review and approve to release payment to farmers.
+                  </p>
+                </div>
+              </div>
+              {loadingSettlements && <Loader2 className="w-5 h-5 animate-spin text-green-600" />}
+            </div>
+
+            <div className="space-y-3">
+              {pendingSettlements.map((auction) => (
+                <div key={auction.auctionId} className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-green-200 dark:border-green-700">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-lg font-bold text-gray-900 dark:text-white">
+                          Auction #{auction.auctionId}
+                        </span>
+                        {auction.lotDetails && (
+                          <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs font-semibold rounded">
+                            {auction.lotDetails.variety} • {auction.lotDetails.quantity}kg • {auction.lotDetails.quality}
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <div className="text-gray-600 dark:text-gray-400">Final Price</div>
+                          <div className="font-semibold text-gray-900 dark:text-white">
+                            {parseFloat(auction.finalPrice).toFixed(4)} ETH
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            ≈ LKR {parseFloat(auction.finalPriceLkr || 0).toLocaleString()}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-gray-600 dark:text-gray-400">Lot ID</div>
+                          <div className="font-mono text-sm text-gray-900 dark:text-white">{auction.lotId}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-600 dark:text-gray-400">Winner</div>
+                          <div className="font-mono text-xs text-gray-900 dark:text-white">
+                            {auction.winnerAddress?.substring(0, 10)}...
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-gray-600 dark:text-gray-400">Farmer</div>
+                          <div className="font-mono text-xs text-gray-900 dark:text-white">
+                            {auction.farmerAddress?.substring(0, 10)}...
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleApproveSettlement(auction.auctionId)}
+                      disabled={approvingSettlement === auction.auctionId}
+                      className="ml-4 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition disabled:opacity-70 flex items-center gap-2 whitespace-nowrap"
+                    >
+                      {approvingSettlement === auction.auctionId ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Approving...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Approve Settlement
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Quick Actions */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
@@ -289,8 +431,6 @@ export default function AdminDashboard() {
               <div className="font-semibold">Compliance</div>
               <div className="text-sm text-gray-600">Review checks</div>
             </button>
-              <div className="font-semibold text-gray-900 dark:text-white">Compliance</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Review checks</div>
           </div>
         </div>
 
@@ -393,24 +533,22 @@ export default function AdminDashboard() {
                 {recentActivity.map((activity: any, index: number) => (
                   <div
                     key={index}
-                    className={`flex items-center space-x-3 ${
-                      index < recentActivity.length - 1 ? 'pb-3 border-b border-gray-100' : ''
-                    }`}
+                    className={`flex items-center space-x-3 ${index < recentActivity.length - 1 ? 'pb-3 border-b border-gray-100' : ''
+                      }`}
                   >
                     <div
-                      className={`w-2 h-2 rounded-full ${
-                        activity.color === 'green'
-                          ? 'bg-green-500'
-                          : activity.color === 'blue'
+                      className={`w-2 h-2 rounded-full ${activity.color === 'green'
+                        ? 'bg-green-500'
+                        : activity.color === 'blue'
                           ? 'bg-blue-500'
                           : activity.color === 'yellow'
-                          ? 'bg-yellow-500'
-                          : activity.color === 'orange'
-                          ? 'bg-orange-500'
-                          : activity.color === 'red'
-                          ? 'bg-red-500'
-                          : 'bg-purple-500'
-                      }`}
+                            ? 'bg-yellow-500'
+                            : activity.color === 'orange'
+                              ? 'bg-orange-500'
+                              : activity.color === 'red'
+                                ? 'bg-red-500'
+                                : 'bg-purple-500'
+                        }`}
                     ></div>
                     <div className="flex-1">
                       <p className="text-sm text-gray-900">{activity.description}</p>
@@ -429,22 +567,20 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600">Backend API</span>
-                  <span className={`font-medium ${
-                    systemHealth.backend.status === 'healthy' ? 'text-green-600' :
+                  <span className={`font-medium ${systemHealth.backend.status === 'healthy' ? 'text-green-600' :
                     systemHealth.backend.status === 'warning' ? 'text-yellow-600' :
-                    systemHealth.backend.status === 'error' ? 'text-red-600' :
-                    'text-gray-400'
-                  }`}>
+                      systemHealth.backend.status === 'error' ? 'text-red-600' :
+                        'text-gray-400'
+                    }`}>
                     {systemHealth.backend.label}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full transition-all ${
-                      systemHealth.backend.status === 'healthy' ? 'bg-green-600' :
+                  <div
+                    className={`h-2 rounded-full transition-all ${systemHealth.backend.status === 'healthy' ? 'bg-green-600' :
                       systemHealth.backend.status === 'warning' ? 'bg-yellow-600' :
-                      'bg-red-600'
-                    }`}
+                        'bg-red-600'
+                      }`}
                     style={{ width: `${systemHealth.backend.percentage}%` }}
                   ></div>
                 </div>
@@ -452,22 +588,20 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600">Database</span>
-                  <span className={`font-medium ${
-                    systemHealth.database.status === 'healthy' ? 'text-green-600' :
+                  <span className={`font-medium ${systemHealth.database.status === 'healthy' ? 'text-green-600' :
                     systemHealth.database.status === 'warning' ? 'text-yellow-600' :
-                    systemHealth.database.status === 'error' ? 'text-red-600' :
-                    'text-gray-400'
-                  }`}>
+                      systemHealth.database.status === 'error' ? 'text-red-600' :
+                        'text-gray-400'
+                    }`}>
                     {systemHealth.database.label}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full transition-all ${
-                      systemHealth.database.status === 'healthy' ? 'bg-green-600' :
+                  <div
+                    className={`h-2 rounded-full transition-all ${systemHealth.database.status === 'healthy' ? 'bg-green-600' :
                       systemHealth.database.status === 'warning' ? 'bg-yellow-600' :
-                      'bg-red-600'
-                    }`}
+                        'bg-red-600'
+                      }`}
                     style={{ width: `${systemHealth.database.percentage}%` }}
                   ></div>
                 </div>
@@ -475,22 +609,20 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600">Blockchain Sync</span>
-                  <span className={`font-medium ${
-                    systemHealth.blockchain.status === 'healthy' ? 'text-green-600' :
+                  <span className={`font-medium ${systemHealth.blockchain.status === 'healthy' ? 'text-green-600' :
                     systemHealth.blockchain.status === 'warning' ? 'text-yellow-600' :
-                    systemHealth.blockchain.status === 'error' ? 'text-red-600' :
-                    'text-gray-400'
-                  }`}>
+                      systemHealth.blockchain.status === 'error' ? 'text-red-600' :
+                        'text-gray-400'
+                    }`}>
                     {systemHealth.blockchain.label}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full transition-all ${
-                      systemHealth.blockchain.status === 'healthy' ? 'bg-green-600' :
+                  <div
+                    className={`h-2 rounded-full transition-all ${systemHealth.blockchain.status === 'healthy' ? 'bg-green-600' :
                       systemHealth.blockchain.status === 'warning' ? 'bg-yellow-600' :
-                      'bg-red-600'
-                    }`}
+                        'bg-red-600'
+                      }`}
                     style={{ width: `${systemHealth.blockchain.percentage}%` }}
                   ></div>
                 </div>
@@ -498,22 +630,20 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600">WebSocket</span>
-                  <span className={`font-medium ${
-                    systemHealth.websocket.status === 'healthy' ? 'text-green-600' :
+                  <span className={`font-medium ${systemHealth.websocket.status === 'healthy' ? 'text-green-600' :
                     systemHealth.websocket.status === 'warning' ? 'text-yellow-600' :
-                    systemHealth.websocket.status === 'error' ? 'text-red-600' :
-                    'text-gray-400'
-                  }`}>
+                      systemHealth.websocket.status === 'error' ? 'text-red-600' :
+                        'text-gray-400'
+                    }`}>
                     {systemHealth.websocket.label}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full transition-all ${
-                      systemHealth.websocket.status === 'healthy' ? 'bg-green-600' :
+                  <div
+                    className={`h-2 rounded-full transition-all ${systemHealth.websocket.status === 'healthy' ? 'bg-green-600' :
                       systemHealth.websocket.status === 'warning' ? 'bg-yellow-600' :
-                      'bg-red-600'
-                    }`}
+                        'bg-red-600'
+                      }`}
                     style={{ width: `${systemHealth.websocket.percentage}%` }}
                   ></div>
                 </div>
@@ -558,6 +688,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

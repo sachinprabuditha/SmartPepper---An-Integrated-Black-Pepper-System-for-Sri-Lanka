@@ -1,39 +1,8 @@
+import 'package:flutter/material.dart';
+
 import '../models/farm_record_model.dart';
 import '../models/farm_task_model.dart';
 import '../services/plantation_service.dart';
-import '../../agronomy/services/agronomy_service.dart';
-import '../../agronomy/models/district_model.dart';
-import '../../agronomy/models/soil_type_model.dart';
-import '../../agronomy/models/variety_model.dart';
-import '../../services/plantation_api_client.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-final plantationApiClientProvider = Provider<PlantationApiClient>((ref) {
-  return PlantationApiClient();
-});
-
-final plantationServiceProvider = Provider<PlantationService>((ref) {
-  return PlantationService(ref.read(plantationApiClientProvider));
-});
-
-final agronomyServiceProvider = Provider<AgronomyService>((ref) {
-  return AgronomyService();
-});
-
-final allDistrictsProvider = FutureProvider<List<District>>((ref) async {
-  final service = ref.read(agronomyServiceProvider);
-  return await service.fetchAllDistricts();
-});
-
-final soilsByDistrictProvider = FutureProvider.family<List<SoilType>, String>((ref, districtId) async {
-  final service = ref.read(agronomyServiceProvider);
-  return await service.fetchSoilsByDistrict(districtId);
-});
-
-final varietiesByDistrictAndSoilProvider = FutureProvider.family<List<BlackPepperVariety>, DistrictSoilKey>((ref, key) async {
-  final service = ref.read(agronomyServiceProvider);
-  return await service.fetchVarietiesByDistrictAndSoil(key.districtId, key.soilTypeId);
-});
 
 class DistrictSoilKey {
   final String districtId;
@@ -53,29 +22,19 @@ class DistrictSoilKey {
   int get hashCode => districtId.hashCode ^ soilTypeId.hashCode;
 }
 
-final farmsProvider = FutureProvider<List<FarmRecord>>((ref) async {
-  final service = ref.read(plantationServiceProvider);
-  return await service.getFarms();
-});
-
-final farmProvider = FutureProvider.family<FarmRecord, String>((ref, farmId) async {
-  final service = ref.read(plantationServiceProvider);
-  return await service.getFarmById(farmId);
-});
-
-final farmTasksProvider = FutureProvider.family<List<FarmTask>, String>((ref, farmId) async {
-  final service = ref.read(plantationServiceProvider);
-  return await service.getTasksByFarmId(farmId);
-});
-
-final plantationControllerProvider = StateNotifierProvider<PlantationController, AsyncValue<FarmRecord?>>((ref) {
-  return PlantationController(ref.read(plantationServiceProvider));
-});
-
-class PlantationController extends StateNotifier<AsyncValue<FarmRecord?>> {
+class PlantationController extends ChangeNotifier {
   final PlantationService _plantationService;
 
-  PlantationController(this._plantationService) : super(const AsyncValue.data(null));
+  PlantationController(this._plantationService);
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  String? _error;
+  String? get error => _error;
+
+  FarmRecord? _currentFarm;
+  FarmRecord? get currentFarm => _currentFarm;
 
   Future<FarmRecord> startPlantation({
     required String farmName,
@@ -86,7 +45,9 @@ class PlantationController extends StateNotifier<AsyncValue<FarmRecord?>> {
     required double areaHectares,
     required int totalVines,
   }) async {
-    state = const AsyncValue.loading();
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
     try {
       final farmRecord = await _plantationService.startPlantation(
         farmName: farmName,
@@ -97,11 +58,14 @@ class PlantationController extends StateNotifier<AsyncValue<FarmRecord?>> {
         areaHectares: areaHectares,
         totalVines: totalVines,
       );
-      state = AsyncValue.data(farmRecord);
+      _currentFarm = farmRecord;
       return farmRecord;
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
+    } catch (e) {
+      _error = e.toString();
       rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -113,8 +77,18 @@ class PlantationController extends StateNotifier<AsyncValue<FarmRecord?>> {
     return await _plantationService.getFarmById(farmId);
   }
 
+  // Alias for backward compatibility
+  Future<FarmRecord> getFarmById(String farmId) async {
+    return await fetchFarmById(farmId);
+  }
+
   Future<List<FarmTask>> fetchTasksByFarmId(String farmId) async {
     return await _plantationService.getTasksByFarmId(farmId);
+  }
+
+  // Alias for backward compatibility
+  Future<List<FarmTask>> getFarmTasks(String farmId) async {
+    return await fetchTasksByFarmId(farmId);
   }
 
   Future<FarmRecord> updateFarm({

@@ -1,7 +1,6 @@
 {
   "app_name": "ස්මාර්ට්පෙපර්",
   "app_tagline": "බ්ලොක්චේන් සක්‍රිය ගම්මිරිස් අපනයන පද්ධතිය",
-  
   "common_ok": "හරි",
   "common_cancel": "අවලංගු කරන්න",
   "common_confirm": "තහවුරු කරන්න",
@@ -21,7 +20,6 @@
   "common_next": "ඊළඟ",
   "common_yes": "ඔව්",
   "common_no": "නැත",
-  
   "auth_login": "පිවිසෙන්න",
   "auth_logout": "නික්මෙන්න",
   "auth_register": "ලියාපදිංචි වන්න",
@@ -41,7 +39,6 @@
   "auth_farmer": "ගොවියා",
   "auth_exporter": "අපනයනකරු",
   "auth_admin": "පරිපාලක",
-  
   "nav_home": "මුල් පිටුව",
   "nav_lots": "කණ්ඩායම්",
   "nav_auctions": "වෙන්දේසි",
@@ -49,7 +46,6 @@
   "nav_settings": "සැකසුම්",
   "nav_wallet": "මුදල් පසුම්බිය",
   "nav_notifications": "දැනුම්දීම්",
-  
   "lot_title": "ගම්මිරිස් කණ්ඩායම්",
   "lot_create": "නව කණ්ඩායමක් සාදන්න",
   "lot_my_lots": "මගේ කණ්ඩායම්",
@@ -75,7 +71,6 @@
   "lot_scan_qr": "QR කේතය ස්කෑන් කරන්න",
   "lot_traceability": "ලුහුබැඳීම",
   "lot_farm_details": "ගොවිපල විස්තර",
-  
   "auction_title": "වෙන්දේසි",
   "auction_live": "සජීවී වෙන්දේසි",
   "auction_upcoming": "ඉදිරි වෙන්දේසි",
@@ -101,7 +96,6 @@
   "auction_settle": "වෙන්දේසිය සමථයකට පත් කරන්න",
   "auction_winning_bid": "ජයග්‍රහණ ලංසුව",
   "auction_total_bids": "මුළු ලංසු",
-  
   "compliance_title": "අනුකූලතාව",
   "compliance_check": "අනුකූලතා පරීක්ෂාව",
   "compliance_status": "අනුකූලතා තත්ත්වය",
@@ -117,7 +111,6 @@
   "compliance_eu": "යුරෝපීය සංගම් ප්‍රමිති",
   "compliance_fda": "FDA අවශ්‍යතා",
   "compliance_halal": "හලාල් සහතිකය",
-  
   "payment_title": "ගෙවීම",
   "payment_escrow": "එස්ක්‍රෝ",
   "payment_amount": "මුදල",
@@ -131,7 +124,6 @@
   "payment_deposit": "තැන්පත් කරන්න",
   "payment_history": "ගෙවීම් ඉතිහාසය",
   "payment_transaction_id": "ගනුදෙනු හැඳුනුම්පත",
-  
   "shipment_title": "නැව්ගත කිරීම",
   "shipment_details": "නැව්ගත කිරීම් විස්තර",
   "shipment_tracking": "ලුහුබැඳීම",
@@ -144,7 +136,6 @@
   "shipment_in_transit": "ප්‍රවාහනයේ",
   "shipment_delivered": "බෙදා හැර ඇත",
   "shipment_customs_clearance": "රේගු නිෂ්කාශනය",
-  
   "profile_title": "පැතිකඩ",
   "profile_edit": "පැතිකඩ සංස්කරණය කරන්න",
   "profile_farmer_info": "ගොවි තොරතුරු",
@@ -157,7 +148,6 @@
   "profile_verified": "සත්‍යාපිත",
   "profile_unverified": "අසත්‍යාපිත",
   "profile_documents": "ලේඛන",
-  
   "settings_title": "සැකසුම්",
   "settings_language": "භාෂාව",
   "settings_select_language": "භාෂාව තෝරන්න",
@@ -174,7 +164,6 @@
   "settings_terms": "නියමයන් සහ කොන්දේසි",
   "settings_privacy": "රහස්‍යතා ප්‍රතිපත්තිය",
   "settings_support": "සහාය",
-  
   "notification_new_bid": "ඔබේ වෙන්දේසියට නව ලංසුවක් තැබූවා",
   "notification_auction_won": "සුභපැතුම්! ඔබ වෙන්දේසිය ජයගත්තා",
   "notification_auction_sold": "වෙන්දේසිය සාර්ථකව නිම කෙරුණා",
@@ -186,7 +175,6 @@
   "notification_compliance_approved": "අනුකූලතා පරීක්ෂාව සමත්",
   "notification_compliance_rejected": "අනුකූලතා පරීක්ෂාව අසමත්",
   "notification_shipment_update": "නැව්ගත කිරීම් තත්ත්වය යාවත්කාලීන කළා",
-  
   "error_network": "ජාල දෝෂයකි. ඔබේ සම්බන්ධතාවය පරීක්ෂා කරන්න",
   "error_invalid_input": "වලංගු නොවන ආදානය. ඔබේ දත්ත පරීක්ෂා කරන්න",
   "error_authentication": "සත්‍යාපනය අසාර්ථක විය",
@@ -194,28 +182,23 @@
   "error_not_found": "සම්පත හමු නොවිණි",
   "error_server": "සේවාදායක දෝෂයකි. පසුව නැවත උත්සාහ කරන්න",
   "error_blockchain": "බ්ලොක්චේන් ගනුදෙනුව අසාර්ථක විය",
-  
   "success_lot_created": "කණ්ඩායම සාර්ථකව සාදන ලදී",
   "success_auction_created": "වෙන්දේසිය සාර්ථකව සාදන ලදී",
   "success_bid_placed": "ලංසුව සාර්ථකව තබන ලදී",
   "success_payment_completed": "ගෙවීම සාර්ථකව සම්පූර්ණ කළා",
   "success_profile_updated": "පැතිකඩ සාර්ථකව යාවත්කාලීන කළා",
   "success_settings_saved": "සැකසුම් සුරකින ලදී",
-  
   "confirm_delete_lot": "ඔබට මෙම කණ්ඩායම මැකීමට අවශ්‍ය බව විශ්වාසද?",
   "confirm_place_bid": "ඔබට මෙම ලංසුව තැබීමට අවශ්‍ය බව විශ්වාසද?",
   "confirm_end_auction": "ඔබට මෙම වෙන්දේසිය අවසන් කිරීමට අවශ්‍ය බව විශ්වාසද?",
   "confirm_logout": "ඔබට නික්මෙන්න අවශ්‍ය බව විශ්වාසද?",
-  
   "blockchain_connecting": "බ්ලොක්චේන් වෙත සම්බන්ධ වෙමින්...",
   "blockchain_transaction_pending": "ගනුදෙනුව පොරොත්තුවෙන්...",
   "blockchain_transaction_confirmed": "ගනුදෙනුව තහවුරු කළා",
   "blockchain_view_on_explorer": "එක්ස්ප්ලෝරර් හි බලන්න",
-  
   "qr_scan_instruction": "කණ්ඩායම් විස්තර බැලීමට QR කේතය ස්කෑන් කරන්න",
   "qr_scan_failed": "QR කේතය ස්කෑන් කිරීම අසාර්ථක විය",
   "qr_generate": "QR කේතය උත්පාදනය කරන්න",
-  
   "dashboard_welcome": "සාදරයෙන් පිළිගනිමු",
   "dashboard_total_lots": "මුළු කණ්ඩායම්",
   "dashboard_active_auctions": "ක්‍රියාකාරී වෙන්දේසි",
@@ -223,10 +206,20 @@
   "dashboard_pending_payments": "පොරොත්තු ගෙවීම්",
   "dashboard_recent_activity": "මෑත ක්‍රියාකාරකම්",
   "dashboard_statistics": "සංඛ්‍යාලේඛන",
-  
   "empty_no_lots": "කණ්ඩායම් නොමැත",
   "empty_no_auctions": "වෙන්දේසි නොමැත",
   "empty_no_bids": "තවම ලංසු නැත",
   "empty_no_notifications": "දැනුම්දීම් නැත",
-  "empty_no_transactions": "ගනුදෙනු නැත"
+  "empty_no_transactions": "ගනුදෙනු නැත",
+  "price_analytics_title": "මිල විශ්ලේෂණය",
+  "price_analytics_no_data": "මෙම දිස්ත්‍රික්කය සඳහා දත්ත නොමැත.",
+  "price_analytics_gr1": "1 වන ශ්‍රේණිය (GR-1)",
+  "price_analytics_gr2": "2 වන ශ්‍රේණිය (GR-2)",
+  "price_analytics_white": "සුදු ගම්මිරිස්",
+  "price_analytics_historical_7d": "පසුගිය දින 7 මිල ප්‍රවණතාවය",
+  "plantation_price_analytics": "මිල විශ්ලේෂණය",
+  "plantation_yield_analytics": "අස්වනු විශ්ලේෂණය",
+  "price_analytics_chart_type": "ප්‍රස්ථාර වර්ගය",
+  "price_analytics_bar": "තීරූ",
+  "price_analytics_line": "රේඛීය"
 }
