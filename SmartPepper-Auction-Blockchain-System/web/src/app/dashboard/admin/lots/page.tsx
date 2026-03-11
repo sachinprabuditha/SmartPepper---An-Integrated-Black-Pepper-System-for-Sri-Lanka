@@ -43,15 +43,15 @@ export default function ManageLotsPage() {
   const fetchLots = async () => {
     try {
       setLoading(true);
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.8.116:3002' || 'http://192.168.8.151:3002';
-      
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.8.116:3002' || 'http://192.168.1.153:3002';
+
       // Fetch from admin endpoint for pending lots if filter is 'pending'
-      const endpoint = filterCompliance === 'pending' 
+      const endpoint = filterCompliance === 'pending'
         ? `${API_BASE}/api/admin/lots/pending`
         : `${API_BASE}/api/lots`;
-      
+
       const response = await fetch(endpoint);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch lots');
       }
@@ -67,8 +67,8 @@ export default function ManageLotsPage() {
 
   const filteredLots = lots.filter(lot => {
     const matchesSearch = (lot.lot_id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (lot.farmer_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (lot.variety || '').toLowerCase().includes(searchTerm.toLowerCase());
+      (lot.farmer_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (lot.variety || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || lot.status === filterStatus;
     const matchesCompliance = filterCompliance === 'all' || lot.compliance_status === filterCompliance;
     return matchesSearch && matchesStatus && matchesCompliance;
@@ -257,12 +257,11 @@ export default function ManageLotsPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          lot.status === 'available' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                          lot.status === 'in_auction' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                          lot.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                          'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-                        }`}>
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${lot.status === 'available' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                            lot.status === 'in_auction' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                              lot.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                                'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                          }`}>
                           {lot.status.replace('_', ' ')}
                         </span>
                       </td>

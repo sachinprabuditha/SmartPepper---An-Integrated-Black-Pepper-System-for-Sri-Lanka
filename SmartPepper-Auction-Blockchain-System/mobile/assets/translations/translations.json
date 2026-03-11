@@ -5305,9 +5305,9 @@
     },
     {
         "key": "grading_save",
-        "en": "Record Offline Result",
-        "si": "නොබැඳි ප්‍රතිඵලය වාර්තා කරන්න",
-        "ta": "ஆஃப்லைன் முடிவைப் பதிவுசெய்"
+        "en": "Save Result",
+        "si": "ප්‍රතිඵලය සුරකින්න",
+        "ta": "முடிவைச் சேமிக்கவும்"
     },
     {
         "key": "grading_no_history",

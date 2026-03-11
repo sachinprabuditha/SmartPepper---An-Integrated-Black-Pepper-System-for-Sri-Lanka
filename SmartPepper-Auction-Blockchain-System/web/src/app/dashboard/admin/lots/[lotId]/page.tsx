@@ -42,8 +42,8 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
   const [showCertificateModal, setShowCertificateModal] = useState(false);
   const [certificateUrl, setCertificateUrl] = useState<string>('');
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.116:3002' || 'http://192.168.8.116:3002' || 'http://192.168.8.151:3002';
-  
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.116:3002' || 'http://192.168.8.116:3002' || 'http://192.168.1.153:3002';
+
   // Use multiple IPFS gateways for redundancy
   const IPFS_GATEWAYS = [
     'http://localhost:8080/ipfs',
@@ -62,7 +62,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
       setLoading(true);
       const response = await fetch(`${API_BASE}/api/admin/lots/${params.lotId}`);
       const data = await response.json();
-      
+
       if (data.success) {
         setLot(data.lot);
       } else {
@@ -79,20 +79,20 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
   const getIPFSUrl = (url: string, gatewayIndex: number = 0) => {
     if (!url) return '';
     if (url.startsWith('http')) return url;
-    
+
     const gateway = IPFS_GATEWAYS[gatewayIndex] || IPFS_GATEWAYS[0];
-    
+
     if (url.startsWith('ipfs://')) {
       return url.replace('ipfs://', `${gateway}/`);
     }
     return `${gateway}/${url}`;
   };
-  
+
   // Get all possible gateway URLs for an image
   const getAllIPFSUrls = (url: string): string[] => {
     if (!url) return [];
     if (url.startsWith('http')) return [url];
-    
+
     const cid = url.startsWith('ipfs://') ? url.replace('ipfs://', '') : url;
     return IPFS_GATEWAYS.map(gateway => `${gateway}/${cid}`);
   };
@@ -121,7 +121,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
 
   const approveLot = async () => {
     if (!confirm('Are you sure you want to approve this lot?')) return;
-    
+
     try {
       setProcessing(true);
       const response = await fetch(`${API_BASE}/api/admin/lots/${params.lotId}/compliance`, {
@@ -133,12 +133,12 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
           adminName: 'Admin'
         })
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         let message = '✅ Lot approved successfully!\n\n';
-        
+
         if (data.blockchainTxHash) {
           message += `✓ Blockchain Updated\nTransaction: ${data.blockchainTxHash.substring(0, 20)}...\n\n`;
           message += 'The compliance status has been recorded on the blockchain.';
@@ -153,7 +153,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
           message += 'The lot has been approved in the database. The blockchain update may have failed or is processing. ';
           message += 'Check backend logs for more details.';
         }
-        
+
         alert(message);
         router.push('/dashboard/admin/lots');
       } else {
@@ -172,12 +172,12 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
       alert('Please provide a rejection reason');
       return;
     }
-    
+
     if (rejectionReason.trim().length < 10) {
       alert('Rejection reason must be at least 10 characters');
       return;
     }
-    
+
     try {
       setProcessing(true);
       const response = await fetch(`${API_BASE}/api/admin/lots/${params.lotId}/compliance`, {
@@ -190,12 +190,12 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
           adminName: 'Admin'
         })
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         let message = '❌ Lot rejected successfully\n\n';
-        
+
         if (data.blockchainTxHash) {
           message += `✓ Blockchain Updated\nTransaction: ${data.blockchainTxHash.substring(0, 20)}...\n\n`;
           message += 'The rejection has been recorded on the blockchain.';
@@ -205,7 +205,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
           message += `Error: ${data.blockchainError}\n\n`;
           message += 'The lot status has been updated in the database, but the blockchain transaction failed.';
         }
-        
+
         alert(message);
         router.push('/dashboard/admin/lots');
       } else {
@@ -485,8 +485,8 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                 </h2>
                 <div className="grid grid-cols-3 gap-4">
                   {lot.lot_pictures.map((url, index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className="relative h-64 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 cursor-pointer hover:opacity-90 transition-opacity"
                       onClick={() => setSelectedImage(getIPFSUrl(url))}
                     >
@@ -512,8 +512,8 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                 </h2>
                 <div className="grid grid-cols-3 gap-4">
                   {lot.certificate_images.map((url, index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className="relative h-64 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 cursor-pointer hover:opacity-90 transition-opacity"
                       onClick={() => setSelectedImage(getIPFSUrl(url))}
                     >
@@ -579,7 +579,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                   <FileText className="w-6 h-6 text-purple-600" />
                   IPFS Resources
                 </h3>
-                
+
                 <div className="space-y-6">
                   {/* Image Gallery */}
                   {(lot.lot_pictures?.length > 0 || lot.certificate_images?.length > 0) && (
@@ -588,11 +588,11 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                         <ImageIcon className="w-5 h-5" />
                         Image Gallery
                       </h4>
-                      
+
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {/* Lot Pictures */}
                         {lot.lot_pictures?.map((url, index) => (
-                          <div 
+                          <div
                             key={`lot-${index}`}
                             className="group relative aspect-square rounded-lg overflow-hidden bg-white dark:bg-gray-600 shadow-md hover:shadow-xl transition-all cursor-pointer transform hover:scale-105"
                             onClick={() => setSelectedImage(getIPFSUrl(url))}
@@ -615,10 +615,10 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                             </div>
                           </div>
                         ))}
-                        
+
                         {/* Certificate Images */}
                         {lot.certificate_images?.map((url, index) => (
-                          <div 
+                          <div
                             key={`cert-${index}`}
                             className="group relative aspect-square rounded-lg overflow-hidden bg-white dark:bg-gray-600 shadow-md hover:shadow-xl transition-all cursor-pointer transform hover:scale-105"
                             onClick={() => setSelectedImage(getIPFSUrl(url))}
@@ -652,7 +652,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                         <FileText className="w-5 h-5" />
                         Documents & Metadata
                       </h4>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {lot.metadata_uri && (
                           <button
@@ -678,7 +678,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                             </div>
                           </button>
                         )}
-                        
+
                         {lot.certificate_ipfs_url && (
                           <button
                             onClick={() => lot.certificate_ipfs_url && viewCertificate(lot.certificate_ipfs_url)}
@@ -704,7 +704,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                           </button>
                         )}
                       </div>
-                      
+
                       {/* Additional Info */}
                       <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                         <p className="text-xs text-blue-800 dark:text-blue-300 flex items-center gap-2">
@@ -737,7 +737,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                 <XCircle className="w-6 h-6" />
               </button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto max-h-[calc(80vh-80px)]">
               {loadingMetadata ? (
                 <div className="flex items-center justify-center py-12">
@@ -751,7 +751,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
                       {JSON.stringify(metadataContent, null, 2)}
                     </pre>
                   </div>
-                  
+
                   <div className="flex gap-3">
                     <button
                       onClick={() => {
@@ -916,7 +916,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
 
       {/* Image Lightbox */}
       {selectedImage && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4 z-50"
           onClick={() => setSelectedImage(null)}
         >

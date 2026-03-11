@@ -1,7 +1,9 @@
-import 'dart:math';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
+import 'package:camera/camera.dart';
 import '../../services/api_service.dart';
 import '../../config/theme.dart';
 import '../../localization/app_localizations.dart';
@@ -14,59 +16,514 @@ class QualityGradingScreen extends StatefulWidget {
 }
 
 class _QualityGradingScreenState extends State<QualityGradingScreen> {
-  final _random = Random();
   bool _isAnalyzing = false;
   bool _isSaving = false;
+  bool _isTaring = false;
+  bool _isConnected = false;
+  bool _isLightOn = false;
+  bool _isTogglingLight = false;
+  bool _isMotorOn = false;
+  bool _isTogglingMotor = false;
+  double _motorSpeed = 50.0; // 1 to 100 scale for speed (maps to delays)
+  double _liveWeight = 0.0;
+  Timer? _pollingTimer;
+
+  final TextEditingController _ipController = TextEditingController(text: "192.168.1.100");
 
   // Simulation Metrics
   double? _density;
   double? _weight;
+  double? _capturedWeight;
   Map<String, double>? _visuals;
   String? _finalGrade;
 
-  void _runSimulation() async {
+  CameraController? _cameraController;
+  Timer? _captureTimer;
+  bool _isAutoGrading = false;
+  int _preCaptureDelay = 5;
+  int _countdown = 5;
+  
+  int _totalPure = 0;
+  int _totalMolded = 0;
+  int _totalDiscolored = 0;
+  int _totalSeedsParsed = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
+  }
+
+  Future<void> _initializeCamera() async {
+    try {
+      final cameras = await availableCameras();
+      if (cameras.isNotEmpty) {
+        _cameraController = CameraController(
+          cameras.first,
+          ResolutionPreset.medium,
+          enableAudio: false,
+        );
+        await _cameraController!.initialize();
+        if (mounted) setState(() {});
+      }
+    } catch (e) {
+      debugPrint("Camera initialization error: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    _captureTimer?.cancel();
+    _cameraController?.dispose();
+    _ipController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _connectToScale() async {
+    final ip = _ipController.text.trim();
+    if (ip.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter the scale IP address.')),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isTaring = true); // Using tare state as generic loading
+
+    try {
+      final dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 5)));
+      final res = await dio.get('http://$ip/weight');
+      if (res.statusCode == 200) {
+        if (mounted) {
+          setState(() {
+            _isConnected = true;
+          });
+          _startPolling();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to connect to scale: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isTaring = false);
+    }
+  }
+
+  void _disconnectFromScale() {
+    _pollingTimer?.cancel();
     setState(() {
+      _isConnected = false;
+      _liveWeight = 0.0;
+      _isLightOn = false;
+      _isMotorOn = false;
+    });
+  }
+
+  void _startPolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      if (!_isConnected || !mounted) {
+        timer.cancel();
+        return;
+      }
+      final ip = _ipController.text.trim();
+      try {
+        final dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 2)));
+        final res = await dio.get('http://$ip/weight');
+        if (res.data != null && res.data is Map) {
+          if (mounted) {
+            setState(() {
+              _liveWeight = double.tryParse(res.data['weight'].toString()) ?? 0.0;
+            });
+          }
+        }
+      } catch (e) {
+        // Optionally handle polling error (e.g. disconnect)
+      }
+    });
+  }
+
+  void _captureCurrentWeight() {
+    setState(() {
+      _capturedWeight = _liveWeight;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Weight locked: ${_liveWeight.toStringAsFixed(1)}g', style: const TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  Future<void> _calibrateScale() async {
+    if (!_isConnected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Connect to scale first!')));
+      return;
+    }
+    final ip = _ipController.text.trim();
+    if (ip.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter the scale IP address.')),
+        );
+      }
+      return;
+    }
+
+    // Ask user for known weight
+    final TextEditingController weightController = TextEditingController();
+    final double? knownWeight = await showDialog<double>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Calibrate Scale'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Place a known weight on the scale, then enter its weight in grams:'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: weightController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  labelText: 'Known Weight (g)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final val = double.tryParse(weightController.text);
+                Navigator.pop(context, val);
+              },
+              child: const Text('Calibrate'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (knownWeight == null || knownWeight <= 0) return;
+
+    setState(() => _isTaring = true); // Using same loading state for simplicity
+
+    try {
+      final dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 10)));
+      await dio.get('http://$ip/calibrate', queryParameters: {'weight': knownWeight});
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Scale calibrated to ${knownWeight}g successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to calibrate scale: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isTaring = false);
+    }
+  }
+
+  Future<void> _toggleMotor() async {
+    if (!_isConnected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Connect to scale first!')));
+      return;
+    }
+    
+    final ip = _ipController.text.trim();
+    if (ip.isEmpty) return;
+
+    setState(() => _isTogglingMotor = true);
+
+    try {
+      final dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 15)));
+      int stepDelay = 3000 - ((_motorSpeed - 1) * (2500 / 99)).toInt();
+      final endpoint = _isMotorOn ? '/motor/off' : '/motor/on';
+      
+      final res = await dio.get('http://$ip$endpoint', queryParameters: {'speed': stepDelay});
+      if (res.statusCode == 200) {
+        if (mounted) {
+          setState(() {
+            _isMotorOn = !_isMotorOn;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to toggle motor: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isTogglingMotor = false);
+    }
+  }
+
+  Future<void> _updateMotorSpeed() async {
+    if (!_isConnected || !_isMotorOn) return;
+    
+    final ip = _ipController.text.trim();
+    if (ip.isEmpty) return;
+
+    try {
+      final dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 5)));
+      int stepDelay = 3000 - ((_motorSpeed - 1) * (2500 / 99)).toInt();
+      // Send speed update if motor is currently on
+      await dio.get('http://$ip/motor/speed', queryParameters: {'speed': stepDelay});
+    } catch (e) {
+      // Ignore background speed update errors
+    }
+  }
+
+  Future<void> _toggleLight() async {
+    if (!_isConnected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Connect to scale first!')));
+      return;
+    }
+    
+    final ip = _ipController.text.trim();
+    if (ip.isEmpty) return;
+
+    setState(() => _isTogglingLight = true);
+
+    try {
+      final dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 5)));
+      final endpoint = _isLightOn ? '/light/off' : '/light/on';
+      final res = await dio.get('http://$ip$endpoint');
+      
+      if (res.statusCode == 200) {
+        if (mounted) {
+          setState(() {
+            _isLightOn = !_isLightOn;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to toggle light: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isTogglingLight = false);
+    }
+  }
+
+  Future<void> _tareScale() async {
+    if (!_isConnected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Connect to scale first!')));
+      return;
+    }
+    final ip = _ipController.text.trim();
+    if (ip.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter the scale IP address.')),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isTaring = true);
+
+    try {
+      final dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 5)));
+      await dio.get('http://$ip/tare');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Scale tared successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to connect to scale: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isTaring = false);
+    }
+  }
+
+  void _startAutomatedGrading() async {
+    if (!_isConnected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please connect to the scale first.')),
+      );
+      return;
+    }
+
+    if (_cameraController == null || !_cameraController!.value.isInitialized) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Camera not ready. Please grant permissions.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isAutoGrading = true;
       _isAnalyzing = true;
+      _totalPure = 0;
+      _totalMolded = 0;
+      _totalDiscolored = 0;
+      _totalSeedsParsed = 0;
+      _countdown = _preCaptureDelay;
       _density = null;
       _visuals = null;
       _finalGrade = null;
     });
 
-    // Simulate machine action delay
-    await Future.delayed(const Duration(seconds: 2));
+    // 1. Turn on Light
+    if (!_isLightOn) await _toggleLight();
+    // 2. Turn on Motor
+    if (!_isMotorOn) await _toggleMotor();
 
-    if (!mounted) return;
+    // Ensure phone flash is OFF
+    try {
+      if (_cameraController != null && _cameraController!.value.isInitialized) {
+        await _cameraController!.setFlashMode(FlashMode.off);
+      }
+    } catch (e) {
+      debugPrint("Could not set flash mode: $e");
+    }
 
-    // 1. Simulate Samples
-    final weight = 400 + _random.nextInt(250).toDouble(); // 400 - 650g
-    final density = weight; // g/L typically
+    // 3. Pre-Capture Countdown
+    for (int i = _preCaptureDelay; i > 0; i--) {
+      if (!mounted || !_isAutoGrading) return;
+      setState(() => _countdown = i);
+      await Future.delayed(const Duration(seconds: 1));
+    }
 
-    // 2. Simulate Classification Distribution
-    double pureProb = 60 + _random.nextInt(35).toDouble(); // 60 - 95%
-    double leftOver = 100 - pureProb;
-    double moldProb = _random.nextDouble() * leftOver;
-    double discProb = leftOver - moldProb;
+    // 4. Start Capture Timer — skip tick if previous capture still running
+    _captureTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+       if (!mounted || !_isAutoGrading) {
+         timer.cancel();
+         return;
+       }
+       // Guard: skip this tick if previous processing is still running
+       if (_isProcessingFrame) return;
+       await _processCameraFrame();
+    });
+  }
 
-    // 3. Logic: Final Grading Decision
-    String grade = 'Grade D (Low Density / Waste)';
-    if (density >= 570 && pureProb >= 90) {
-      grade = 'Grade A (Premium High Density)';
-    } else if (density >= 550 && pureProb >= 80) {
-      grade = 'Grade B (Standard High Quality)';
-    } else if (density >= 500 && pureProb >= 70) {
-      grade = 'Grade C (Lightweight / Industrial)';
+  bool _isProcessingFrame = false;
+
+  Future<void> _processCameraFrame() async {
+    if (_isProcessingFrame) return;  // extra safety guard
+    if (_cameraController == null || !_cameraController!.value.isInitialized) return;
+    _isProcessingFrame = true;
+    try {
+      final XFile imageFile = await _cameraController!.takePicture();
+      final apiService = context.read<ApiService>();
+      final result = await apiService.analyzeGradingImage(imageFile.path);
+      
+      if (mounted && result['success'] == true) {
+        final data = result['data'];
+        final total = (data['totalSeeds'] ?? 0) as int;
+        // Ignore suspiciously huge counts (sanity check: > 900 = probably empty belt noise)
+        if (total > 0 && total <= 900) {
+          final breakdown = data['breakdown'] as Map<String, dynamic>? ?? {};
+          setState(() {
+            _totalSeedsParsed += total;
+            _totalPure += (breakdown['pure'] as num? ?? 0).toInt();
+            _totalMolded += (breakdown['molded'] as num? ?? 0).toInt();
+            _totalDiscolored += (breakdown['discolored'] as num? ?? 0).toInt();
+            
+            _visuals = {
+              'pure': double.parse((_totalPure / _totalSeedsParsed * 100).toStringAsFixed(1)),
+              'molded': double.parse((_totalMolded / _totalSeedsParsed * 100).toStringAsFixed(1)),
+              'discolored': double.parse((_totalDiscolored / _totalSeedsParsed * 100).toStringAsFixed(1)),
+            };
+          });
+        } else if (total > 900) {
+          debugPrint('[Grading] Ignoring suspiciously large count: $total (likely empty belt noise)');
+        }
+      }
+    } catch (e) {
+      debugPrint('Frame processing error: $e');
+    } finally {
+      _isProcessingFrame = false;
+    }
+  }
+
+  Future<void> _stopAutomatedGrading() async {
+    _captureTimer?.cancel();
+    if (_isMotorOn) await _toggleMotor();
+    if (_isLightOn) await _toggleLight();
+
+    // Turn off phone flash
+    try {
+      if (_cameraController != null && _cameraController!.value.isInitialized) {
+        await _cameraController!.setFlashMode(FlashMode.off);
+      }
+    } catch (e) {
+      debugPrint("Could not turn off flash: $e");
     }
 
     setState(() {
-      _weight = weight;
-      _density = density;
-      _visuals = {
-        'pure': double.parse(pureProb.toStringAsFixed(1)),
-        'molded': double.parse(moldProb.toStringAsFixed(1)),
-        'discolored': double.parse(discProb.toStringAsFixed(1)),
-      };
-      _finalGrade = grade;
+      _isAutoGrading = false;
       _isAnalyzing = false;
+      
+      final finalWeight = _capturedWeight ?? _liveWeight;
+
+      if (_totalSeedsParsed == 0) {
+        _density = finalWeight;
+        _weight = finalWeight;
+        _finalGrade = 'Grade D (Low Density / Waste) - No Seeds Evaluated';
+      } else {
+        _weight = finalWeight;
+        _density = finalWeight;
+        double pureProb = (_totalPure / _totalSeedsParsed) * 100;
+        
+        String grade = 'Grade D (Low Density / Waste)';
+        if (_density! >= 570 && pureProb >= 90) {
+          grade = 'Grade A (Premium High Density)';
+        } else if (_density! >= 550 && pureProb >= 80) {
+          grade = 'Grade B (Standard High Quality)';
+        } else if (_density! >= 500 && pureProb >= 70) {
+          grade = 'Grade C (Lightweight / Industrial)';
+        }
+        _finalGrade = grade;
+      }
     });
   }
 
@@ -171,11 +628,190 @@ class _QualityGradingScreenState extends State<QualityGradingScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'IOT Sensor Connected', // English placeholder
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 14,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        _isConnected ? Icons.wifi : Icons.wifi_off,
+                        color: _isConnected ? Colors.greenAccent : Colors.redAccent,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _isConnected ? 'Scale Connected' : 'Scale Disconnected',
+                        style: TextStyle(
+                          color: _isConnected ? Colors.greenAccent : Colors.redAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (_isConnected) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      'Live: ${_liveWeight.toStringAsFixed(1)} g',
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    if (_capturedWeight != null)
+                      Text(
+                        'Locked: ${_capturedWeight!.toStringAsFixed(1)} g',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.amberAccent,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    ElevatedButton.icon(
+                      onPressed: (_liveWeight > 0 && !_isAnalyzing) ? _captureCurrentWeight : null,
+                      icon: const Icon(Icons.lock),
+                      label: Text(_capturedWeight == null ? 'Lock Weight for Grading' : 'Update Locked Weight'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: AppTheme.forestGreen,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Hardware Controls Area
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade200),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4)),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text('Device Connection', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.forestGreen)),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _ipController,
+                          enabled: !_isConnected,
+                          decoration: const InputDecoration(
+                            labelText: 'IP Address',
+                            hintText: '192.168.1.100',
+                            prefixIcon: Icon(Icons.wifi, size: 20),
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                          ),
+                          keyboardType: TextInputType.url,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton(
+                        onPressed: _isTaring || _isAnalyzing ? null : (_isConnected ? _disconnectFromScale : _connectToScale),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isConnected ? Colors.red : AppTheme.forestGreen,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: _isTaring && !_isConnected
+                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          : Text(_isConnected ? 'Disconnect' : 'Connect'),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 32),
+                  
+                  const Text('Scale & Environment', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: (!_isConnected || _isTaring || _isAnalyzing) ? null : _tareScale,
+                          icon: _isTaring ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.exposure_zero),
+                          label: Text(_isTaring ? 'Working...' : 'Tare'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.orange[800],
+                            side: BorderSide(color: Colors.orange[800]!),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: (!_isConnected || _isTaring || _isAnalyzing) ? null : _calibrateScale,
+                          icon: const Icon(Icons.settings),
+                          label: const Text('Calibrate'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.blue[800],
+                            side: BorderSide(color: Colors.blue[800]!),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: (!_isConnected || _isTogglingLight || _isAnalyzing) ? null : _toggleLight,
+                    icon: _isTogglingLight 
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) 
+                      : Icon(_isLightOn ? Icons.lightbulb : Icons.lightbulb_outline, color: _isLightOn ? Colors.amber[700] : null),
+                    label: Text(_isLightOn ? 'Turn Light OFF' : 'Turn Light ON'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: _isLightOn ? Colors.amber[800] : Colors.grey[700],
+                      side: BorderSide(color: (_isLightOn ? Colors.amber[800] : Colors.grey[400])!),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                  
+                  const Divider(height: 32),
+                  const Text('Conveyor Motor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.speed, color: Colors.grey, size: 20),
+                      Expanded(
+                        child: Slider(
+                          value: _motorSpeed,
+                          min: 1,
+                          max: 100,
+                          divisions: 99,
+                          label: '${_motorSpeed.round()}%',
+                          onChanged: !_isConnected ? null : (value) {
+                            setState(() => _motorSpeed = value);
+                          },
+                          onChangeEnd: !_isConnected ? null : (value) => _updateMotorSpeed(),
+                        ),
+                      ),
+                      Text('${_motorSpeed.round()}%', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: (!_isConnected || _isTogglingMotor || _isAnalyzing) ? null : _toggleMotor,
+                      icon: _isTogglingMotor 
+                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) 
+                        : Icon(_isMotorOn ? Icons.stop : Icons.play_arrow),
+                      label: Text(_isMotorOn ? 'Turn Motor OFF' : 'Turn Motor ON'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _isMotorOn ? Colors.red : AppTheme.forestGreen,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
                     ),
                   ),
                 ],
@@ -279,26 +915,91 @@ class _QualityGradingScreenState extends State<QualityGradingScreen> {
 
             const SizedBox(height: 40),
 
+            if (_cameraController != null && _cameraController!.value.isInitialized)
+              Container(
+                height: 300,
+                width: double.infinity,
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.black,
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4))],
+                ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Center(
+                      child: AspectRatio(
+                        aspectRatio: 1 / _cameraController!.value.aspectRatio,
+                        child: CameraPreview(_cameraController!),
+                      ),
+                    ),
+                    if (_isAutoGrading)
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(color: Colors.red.withOpacity(0.9), borderRadius: BorderRadius.circular(20)),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.circle, color: Colors.white, size: 12),
+                              const SizedBox(width: 8),
+                              Text(
+                                _countdown > 0 ? "STARTING IN $_countdown..." : "LIVE SCAN", 
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.2)
+                              ),
+                            ],
+                          )
+                        )
+                      ),
+                  ]
+                )
+              ),
+
+             if (_isAutoGrading || _visuals != null) ...[
+               const SizedBox(height: 16),
+               if (_visuals != null)
+                 SingleChildScrollView(
+                   scrollDirection: Axis.horizontal,
+                   child: Row(
+                     mainAxisAlignment: MainAxisAlignment.center,
+                     children: [
+                       _buildLiveStatBadge('Pure', '${_visuals!['pure']}%', AppTheme.pepperGold),
+                       const SizedBox(width: 8),
+                       _buildLiveStatBadge('Molded', '${_visuals!['molded']}%', Colors.red[400]!),
+                       const SizedBox(width: 8),
+                       _buildLiveStatBadge('Discolored', '${_visuals!['discolored']}%', Colors.orange[400]!),
+                     ],
+                   ),
+                 )
+               else
+                 const Text(
+                   'Waiting for seeds...',
+                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey),
+                   textAlign: TextAlign.center,
+                 ),
+               const SizedBox(height: 16),
+             ],
+
             // Actions
             ElevatedButton(
-              onPressed: _isAnalyzing || _isSaving ? null : _runSimulation,
+              onPressed: _isConnected && !_isSaving ? (_isAutoGrading ? _stopAutomatedGrading : _startAutomatedGrading) : null,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: AppTheme.forestGreen,
+                backgroundColor: _isAutoGrading ? Colors.red : AppTheme.forestGreen,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: _isAnalyzing
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : Text(
-                      context.tr('grading_simulate'),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+              child: Text(
+                _isAutoGrading ? 'Stop Automated Grading' : 'Start Automated Grading',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ),
             
             if (_density != null) ...[
@@ -411,6 +1112,25 @@ class _QualityGradingScreenState extends State<QualityGradingScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildLiveStatBadge(String label, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        border: Border.all(color: color.withOpacity(0.5)),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.circle, color: color, size: 10),
+          const SizedBox(width: 6),
+          Text('$label: $value', style: TextStyle(color: color, fontWeight: FontWeight.bold)),
+        ],
+      ),
     );
   }
 }

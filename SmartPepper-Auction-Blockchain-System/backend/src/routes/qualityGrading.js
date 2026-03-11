@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const { authenticate } = require('../middleware/auth');
 const db = require('../db/firebase');
+const { analyzeGradingImage } = require('../ml/imageAnalyzer');
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Utility to calculate final grade
 // Rules: 
@@ -58,6 +62,31 @@ router.post('/', authenticate, async (req, res) => {
     } catch (error) {
         console.error('Save quality grading error:', error);
         return res.status(500).json({ success: false, error: 'Failed to save quality grading data' });
+    }
+});
+
+// Route: Analyze an image for quality grading using ML model
+// @route POST /api/quality-grading/analyze
+// @access Private (Farmer only)
+router.post('/analyze', authenticate, upload.single('image'), async (req, res) => {
+    try {
+        if (req.user.role !== 'farmer') {
+            return res.status(403).json({ success: false, error: 'Only farmers can analyze images' });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ success: false, error: 'No image uploaded' });
+        }
+
+        const result = await analyzeGradingImage(req.file.buffer);
+
+        return res.status(200).json({
+            success: true,
+            data: result
+        });
+    } catch (error) {
+        console.error('Analyze grading image error:', error);
+        return res.status(500).json({ success: false, error: 'Failed to analyze image' });
     }
 });
 

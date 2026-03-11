@@ -372,6 +372,28 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>> analyzeGradingImage(String filePath) async {
+    try {
+      FormData formData = FormData.fromMap({
+        'image': await MultipartFile.fromFile(filePath),
+      });
+      final response = await _dio.post('/quality-grading/analyze', data: formData);
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData.containsKey('error')) {
+          throw Exception(errorData['error']);
+        } else if (errorData is Map && errorData.containsKey('message')) {
+          throw Exception(errorData['message']);
+        }
+      }
+      throw Exception('Network error. Failed to analyze grading image.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Generic HTTP methods
   Future<dynamic> get(String endpoint,
       {Map<String, dynamic>? queryParameters}) async {
