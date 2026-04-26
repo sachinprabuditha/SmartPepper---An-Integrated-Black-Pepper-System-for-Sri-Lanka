@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SmartPepper: A Blockchain-Enabled Real-Time Auction System for Verified Black Pepper Exports">
+    <title>SmartPepper - Blockchain Pepper Auction System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .tagline {
+            font-size: 1.1em;
+            opacity: 0.95;
+            margin-bottom: 30px;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 12px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.1);
+        }
+
+        .feature-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .research-info {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .research-info p {
+            margin: 8px 0;
+            color: #555;
+        }
+
+        .research-info strong {
+            color: #667eea;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .main-content {
+                padding: 30px 20px;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🌶️</div>
+            <h1>SmartPepper</h1>
+            <p class="tagline">A Blockchain-Enabled Real-Time Auction System for Verified Black Pepper Exports</p>
+        </header>
+
+        <main class="main-content">
+            <section class="section">
+                <h2>Overview</h2>
+                <p>SmartPepper addresses critical challenges faced by smallholder black pepper farmers in Sri Lanka and other producing nations. By integrating blockchain-backed traceability, transparent auctions, and automated compliance validation, we empower farmers to sell directly to exporters while ensuring regulatory adherence and building trust in the supply chain.</p>
+            </section>
+
+            <section class="section">
+                <h2>Core Features</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>🔗 Blockchain Traceability</h3>
+                        <p>Immutable digital passport for each pepper lot from farm to export, preventing fraud and building buyer confidence.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>⚡ Real-Time Auctions</h3>
+                        <p>WebSocket-powered live bidding with sub-300ms latency enabling transparent price discovery and fair competition.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>✅ Compliance Automation</h3>
+                        <p>Rule engine validates export regulations, certifications, and packaging standards before listing and shipment.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🎫 Smart Contracts</h3>
+                        <p>Automated escrow and settlement with secure payment release post-delivery and ownership transfer.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📱 Mobile-First Design</h3>
+                        <p>Flutter-based farmer app enabling lot registration, certification upload, and real-time bid tracking.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🌐 Web Dashboard</h3>
+                        <p>React/Next.js exporter portal for browsing lots, live bidding, compliance verification, and analytics.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Technology Stack</h2>
+                <p><strong>Blockchain:</strong> Solidity Smart Contracts, Hardhat, Ethereum (Sepolia testnet)</p>
+                <p><strong>Backend:</strong> Node.js, Express, Firebase, Redis, IPFS</p>
+                <p><strong>Real-Time:</strong> WebSocket for live auction updates</p>
+                <p><strong>Frontend:</strong> Flutter (Mobile), React/Next.js (Web)</p>
+            </section>
+
+            <section class="section">
+                <h2>Research Context</h2>
+                <div class="research-info">
+                    <p><strong>Student:</strong> Prabuditha K. S. (IT22594686)</p>
+                    <p><strong>Institution:</strong> Sri Lanka Institute of Information Technology</p>
+                    <p><strong>Program:</strong> B.Sc. (Hons) in Information Technology - Software Engineering</p>
+                    <p><strong>Project ID:</strong> 25-26J-501</p>
+                    <p><strong>Supervisor:</strong> Ms. Hansi De Silva</p>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Get Started</h2>
+                <div class="cta-buttons">
+                    <a href="https://github.com/yourusername/SmartPepper" class="btn btn-primary">View Repository</a>
+                    <a href="https://github.com/yourusername/SmartPepper/blob/main/SmartPepper-Auction-Blockchain-System/README.md" class="btn btn-secondary">Documentation</a>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025-2026 SmartPepper Research Project. Built with Blockchain, Auctions & Compliance Automation.</p>
+        </footer>
+    </div>
+</body>
+</html>
