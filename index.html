@@ -3,286 +3,810 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SmartPepper: A Blockchain-Enabled Real-Time Auction System for Verified Black Pepper Exports">
-    <title>SmartPepper - Blockchain Pepper Auction System</title>
+    <title>SmartPepper - An Integrated Black Pepper System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #10b981; /* Emerald green */
+            --primary-dark: #047857;
+            --secondary: #0f172a; /* Slate 900 */
+            --accent: #3b82f6;
+            --bg-color: #f8fafc;
+            --text-main: #334155;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-color);
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 0 24px;
         }
 
-        header {
-            text-align: center;
-            color: white;
-            margin-bottom: 60px;
-            animation: fadeInDown 0.8s ease;
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 16px 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .logo {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        .tagline {
-            font-size: 1.1em;
-            opacity: 0.95;
-            margin-bottom: 30px;
-        }
-
-        .main-content {
-            background: white;
-            border-radius: 12px;
-            padding: 50px 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .section {
-            margin-bottom: 40px;
-        }
-
-        .section h2 {
-            color: #667eea;
-            font-size: 1.8em;
-            margin-bottom: 15px;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-
-        .feature-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.1);
-        }
-
-        .feature-card h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        .feature-card p {
-            color: #666;
-            font-size: 0.95em;
-            line-height: 1.5;
-        }
-
-        .cta-buttons {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-dark);
             display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            font-size: 1rem;
+            color: var(--text-main);
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
         }
 
         .btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 6px;
-            font-size: 1em;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
+            padding: 12px 28px;
+            border-radius: 50px;
             font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
             display: inline-block;
+            border: none;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
+            color: var(--white);
+            box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--white);
         }
 
-        .btn-secondary {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 100px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.1) 0%, transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.1) 0%, transparent 40%);
         }
 
-        .btn-secondary:hover {
-            background: #667eea;
-            color: white;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2310b981" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+            z-index: -1;
         }
 
-        .research-info {
-            background: #f0f4ff;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-
-        .research-info p {
-            margin: 8px 0;
-            color: #555;
-        }
-
-        .research-info strong {
-            color: #667eea;
-        }
-
-        footer {
+        .hero-content {
             text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary-dark);
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--secondary) 0%, #334155 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        /* Section Global */
+        section {
+            padding: 100px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.125rem;
+        }
+
+        /* About / Problem */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+        }
+
+        .problem-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 40px 32px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .problem-card:hover::before {
+            opacity: 1;
+        }
+
+        .problem-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .problem-card:hover .problem-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .problem-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .problem-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Components Grid */
+        .components-section {
+            background: var(--secondary);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .components-section .section-header h2 {
+            color: var(--white);
+        }
+
+        .components-section .section-header p {
+            color: #94a3b8;
+        }
+
+        .comp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 32px;
+        }
+
+        .comp-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .comp-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(16, 185, 129, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .comp-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .comp-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: rgba(255,255,255,0.1);
+            font-family: 'Outfit', sans-serif;
+            line-height: 1;
+        }
+
+        .comp-title h3 {
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-bottom: 8px;
+        }
+
+        .comp-developer {
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .comp-desc {
+            color: #cbd5e1;
+            margin-bottom: 24px;
+            font-size: 1rem;
+        }
+
+        .comp-features {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .comp-features li {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .comp-features li i {
+            color: var(--primary);
+            margin-top: 4px;
+            font-size: 0.8rem;
+        }
+
+        /* Team */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+        }
+
+        .team-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 32px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .team-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            margin-top: 60px;
-            opacity: 0.9;
-            font-size: 0.9em;
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            border: 4px solid rgba(16, 185, 129, 0.2);
         }
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
+        .team-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+
+        .team-role {
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+
+        .team-id {
+            display: inline-block;
+            background: var(--bg-color);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            background: #020617;
+            color: #94a3b8;
+            padding: 80px 0 40px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-brand .logo {
+            color: var(--white);
+            margin-bottom: 24px;
+        }
+
+        .footer-brand p {
+            max-width: 400px;
+            margin-bottom: 24px;
+        }
+
+        .footer-title {
+            color: var(--white);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+
+        @keyframes fadeIn {
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
+        @media (max-width: 992px) {
+            .comp-grid {
+                grid-template-columns: 1fr;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
             }
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
+            .hero h1 {
+                font-size: 3rem;
             }
-
-            .main-content {
-                padding: 30px 20px;
+            .nav-links {
+                display: none;
             }
-
-            .cta-buttons {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                text-align: center;
+            .comp-features {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">🌶️</div>
-            <h1>SmartPepper</h1>
-            <p class="tagline">A Blockchain-Enabled Real-Time Auction System for Verified Black Pepper Exports</p>
-        </header>
 
-        <main class="main-content">
-            <section class="section">
-                <h2>Overview</h2>
-                <p>SmartPepper addresses critical challenges faced by smallholder black pepper farmers in Sri Lanka and other producing nations. By integrating blockchain-backed traceability, transparent auctions, and automated compliance validation, we empower farmers to sell directly to exporters while ensuring regulatory adherence and building trust in the supply chain.</p>
-            </section>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-leaf"></i> SmartPepper
+            </a>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#problem">Challenges</a></li>
+                <li><a href="#components">System Modules</a></li>
+                <li><a href="#team">Team</a></li>
+            </ul>
+            <a href="#components" class="btn btn-primary" style="padding: 10px 24px;">Explore System</a>
+        </div>
+    </nav>
 
-            <section class="section">
-                <h2>Core Features</h2>
-                <div class="features">
-                    <div class="feature-card">
-                        <h3>🔗 Blockchain Traceability</h3>
-                        <p>Immutable digital passport for each pepper lot from farm to export, preventing fraud and building buyer confidence.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>⚡ Real-Time Auctions</h3>
-                        <p>WebSocket-powered live bidding with sub-300ms latency enabling transparent price discovery and fair competition.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>✅ Compliance Automation</h3>
-                        <p>Rule engine validates export regulations, certifications, and packaging standards before listing and shipment.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>🎫 Smart Contracts</h3>
-                        <p>Automated escrow and settlement with secure payment release post-delivery and ownership transfer.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>📱 Mobile-First Design</h3>
-                        <p>Flutter-based farmer app enabling lot registration, certification upload, and real-time bid tracking.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>🌐 Web Dashboard</h3>
-                        <p>React/Next.js exporter portal for browsing lots, live bidding, compliance verification, and analytics.</p>
-                    </div>
+    <!-- Hero -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content fade-in">
+                <div class="hero-badge">Research Project 25-26J-501 • SLIIT</div>
+                <h1>Empowering Sri Lanka's <br><span>Black Pepper Industry</span></h1>
+                <p>A comprehensive, AI and Blockchain-driven ecosystem designed to revolutionize disease detection, quality grading, market access, and supply chain transparency.</p>
+                <div class="hero-cta">
+                    <a href="#components" class="btn btn-primary">Discover the Solution</a>
+                    <a href="#problem" class="btn btn-outline">Understanding the Problem</a>
                 </div>
-            </section>
+            </div>
+        </div>
+    </section>
 
-            <section class="section">
-                <h2>Technology Stack</h2>
-                <p><strong>Blockchain:</strong> Solidity Smart Contracts, Hardhat, Ethereum (Sepolia testnet)</p>
-                <p><strong>Backend:</strong> Node.js, Express, Firebase, Redis, IPFS</p>
-                <p><strong>Real-Time:</strong> WebSocket for live auction updates</p>
-                <p><strong>Frontend:</strong> Flutter (Mobile), React/Next.js (Web)</p>
-            </section>
+    <!-- Problem Statement -->
+    <section id="problem">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>Industry Challenges</h2>
+                <p>Sri Lanka's pepper industry faces several critical challenges that affect sustainability and global competitiveness.</p>
+            </div>
 
-            <section class="section">
-                <h2>Research Context</h2>
-                <div class="research-info">
-                    <p><strong>Student:</strong> Prabuditha K. S. (IT22594686)</p>
-                    <p><strong>Institution:</strong> Sri Lanka Institute of Information Technology</p>
-                    <p><strong>Program:</strong> B.Sc. (Hons) in Information Technology - Software Engineering</p>
-                    <p><strong>Project ID:</strong> 25-26J-501</p>
-                    <p><strong>Supervisor:</strong> Ms. Hansi De Silva</p>
+            <div class="problem-grid">
+                <div class="problem-card fade-in delay-1">
+                    <div class="problem-icon">
+                        <i class="fa-solid fa-virus"></i>
+                    </div>
+                    <h3>Biosafety Risks</h3>
+                    <p>Diseases like Leaf Fall or Foot Rot often go undetected until catastrophic crop loss occurs, with a severe lack of early warning systems.</p>
                 </div>
-            </section>
 
-            <section class="section">
-                <h2>Get Started</h2>
-                <div class="cta-buttons">
-                    <a href="https://github.com/yourusername/SmartPepper" class="btn btn-primary">View Repository</a>
-                    <a href="https://github.com/yourusername/SmartPepper/blob/main/SmartPepper-Auction-Blockchain-System/README.md" class="btn btn-secondary">Documentation</a>
+                <div class="problem-card fade-in delay-2">
+                    <div class="problem-icon">
+                        <i class="fa-solid fa-scale-unbalanced"></i>
+                    </div>
+                    <h3>Subjective Grading</h3>
+                    <p>Manual quality assessment leads to disputes and unfair compensation. Grading outcomes are inconsistent due to human judgment.</p>
                 </div>
-            </section>
-        </main>
 
-        <footer>
-            <p>&copy; 2025-2026 SmartPepper Research Project. Built with Blockchain, Auctions & Compliance Automation.</p>
-        </footer>
-    </div>
+                <div class="problem-card fade-in delay-3">
+                    <div class="problem-icon">
+                        <i class="fa-solid fa-chart-line-down"></i>
+                    </div>
+                    <h3>Economic Volatility</h3>
+                    <p>Farmers lack access to real-time market prices, resulting in high-quality yields often being sold at suboptimal rates to intermediaries.</p>
+                </div>
+
+                <div class="problem-card fade-in delay-1">
+                    <div class="problem-icon">
+                        <i class="fa-solid fa-link-slash"></i>
+                    </div>
+                    <h3>Supply Chain Opacity</h3>
+                    <p>There is no standardized digital record for traceability, making it difficult to meet modern sustainability and global transparency standards.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Components -->
+    <section id="components" class="components-section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>The Integrated Solution</h2>
+                <p>SmartPepper is comprised of four powerful, inter-connected modules built using cutting-edge technologies.</p>
+            </div>
+
+            <div class="comp-grid">
+                <!-- Component 1 -->
+                <div class="comp-card fade-in delay-1">
+                    <div class="comp-header">
+                        <div class="comp-number">01</div>
+                        <div class="comp-title">
+                            <h3>Disease Detection & Analysis</h3>
+                            <div class="comp-developer">Lahiru J W A N • AI/Mobile</div>
+                        </div>
+                    </div>
+                    <p class="comp-desc">An all-in-one AI mobile app that provides automated, location-aware disease detection, severity estimation, remedy recommendations, and disease spread forecasting.</p>
+                    <ul class="comp-features">
+                        <li><i class="fa-solid fa-check"></i> Multi-Class ML Detection</li>
+                        <li><i class="fa-solid fa-check"></i> Severity Prediction</li>
+                        <li><i class="fa-solid fa-check"></i> Geolocation Mapping</li>
+                        <li><i class="fa-solid fa-check"></i> Spread Forecasting</li>
+                    </ul>
+                </div>
+
+                <!-- Component 2 -->
+                <div class="comp-card fade-in delay-2">
+                    <div class="comp-header">
+                        <div class="comp-number">02</div>
+                        <div class="comp-title">
+                            <h3>IoT Automated Grading</h3>
+                            <div class="comp-developer">Premasiri J G P L • IoT/Hardware</div>
+                        </div>
+                    </div>
+                    <p class="comp-desc">A low-cost, real-time grading system combining physical density measurement (Gram-Liter) and computer vision assessment to meet international export standards.</p>
+                    <ul class="comp-features">
+                        <li><i class="fa-solid fa-check"></i> Load-cell Density Test</li>
+                        <li><i class="fa-solid fa-check"></i> Conveyor Automation</li>
+                        <li><i class="fa-solid fa-check"></i> ML Visual Classification</li>
+                        <li><i class="fa-solid fa-check"></i> Web Control Interface</li>
+                    </ul>
+                </div>
+
+                <!-- Component 3 -->
+                <div class="comp-card fade-in delay-1">
+                    <div class="comp-header">
+                        <div class="comp-number">03</div>
+                        <div class="comp-title">
+                            <h3>Price & Plantation Management</h3>
+                            <div class="comp-developer">Liyanage S K R • ML/NLP</div>
+                        </div>
+                    </div>
+                    <p class="comp-desc">An intelligent system offering price predictions, yield valuation, seasonal data analytics, and a RAG-based AI chat assistant for agronomy guidance.</p>
+                    <ul class="comp-features">
+                        <li><i class="fa-solid fa-check"></i> Market Price Forecasting</li>
+                        <li><i class="fa-solid fa-check"></i> RAG AI Chat Assistant</li>
+                        <li><i class="fa-solid fa-check"></i> Bluetooth Scale Integration</li>
+                        <li><i class="fa-solid fa-check"></i> Seasonal Trend Analytics</li>
+                    </ul>
+                </div>
+
+                <!-- Component 4 -->
+                <div class="comp-card fade-in delay-2">
+                    <div class="comp-header">
+                        <div class="comp-number">04</div>
+                        <div class="comp-title">
+                            <h3>Blockchain Auction System</h3>
+                            <div class="comp-developer">Prabuditha K. S • Web3/Fullstack</div>
+                        </div>
+                    </div>
+                    <p class="comp-desc">A decentralized, transparent auction platform using Ethereum smart contracts, NFT-based digital passports, and IPFS for immutable supply chain records.</p>
+                    <ul class="comp-features">
+                        <li><i class="fa-solid fa-check"></i> Smart Contract Escrow</li>
+                        <li><i class="fa-solid fa-check"></i> Real-time Live Bidding</li>
+                        <li><i class="fa-solid fa-check"></i> NFT Digital Passports</li>
+                        <li><i class="fa-solid fa-check"></i> IPFS Document Storage</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team -->
+    <section id="team">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>Research Team</h2>
+                <p>Guided by Ms. Hansi de Silva and Ms. Ishara Weerathunga at SLIIT.</p>
+            </div>
+
+            <div class="team-grid">
+                <div class="team-card fade-in delay-1">
+                    <div class="team-avatar">L</div>
+                    <h3>Lahiru J W A N</h3>
+                    <div class="team-role">Software Engineering</div>
+                    <div class="team-id">IT22589286</div>
+                </div>
+
+                <div class="team-card fade-in delay-2">
+                    <div class="team-avatar">P</div>
+                    <h3>Premasiri J G P L</h3>
+                    <div class="team-role">Software Engineering</div>
+                    <div class="team-id">IT22588500</div>
+                </div>
+
+                <div class="team-card fade-in delay-3">
+                    <div class="team-avatar">S</div>
+                    <h3>Liyanage S K R</h3>
+                    <div class="team-role">Software Engineering</div>
+                    <div class="team-id">IT22583178</div>
+                </div>
+
+                <div class="team-card fade-in delay-1">
+                    <div class="team-avatar">P</div>
+                    <h3>Prabuditha K. S</h3>
+                    <div class="team-role">Software Engineering</div>
+                    <div class="team-id">IT22594686</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="logo">
+                        <i class="fa-solid fa-leaf"></i> SmartPepper
+                    </a>
+                    <p>A comprehensive academic research project developed at Sri Lanka Institute of Information Technology (SLIIT) aiming to digitize and elevate the national black pepper industry.</p>
+                </div>
+                
+                <div>
+                    <h4 class="footer-title">Modules</h4>
+                    <ul class="footer-links">
+                        <li><a href="#components">Disease Detection</a></li>
+                        <li><a href="#components">Automated Grading</a></li>
+                        <li><a href="#components">Price Prediction</a></li>
+                        <li><a href="#components">Blockchain Auction</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-title">Project Info</h4>
+                    <ul class="footer-links">
+                        <li><span>ID: 25-26J-501</span></li>
+                        <li><span>Academic Year: 2025-2026</span></li>
+                        <li><span>Institution: SLIIT</span></li>
+                        <li><a href="https://github.com/sachinprabuditha/SmartPepper---An-Integrated-Black-Pepper-System-for-Sri-Lanka" target="_blank">GitHub Repository</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025-2026 SmartPepper Research Team. All rights reserved.</p>
+                <p>Licensed under MIT License</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach((element) => {
+            element.style.animationPlayState = 'paused';
+            observer.observe(element);
+        });
+
+        // Sticky Navbar effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+            } else {
+                navbar.style.boxShadow = 'none';
+                navbar.style.background = 'rgba(255, 255, 255, 0.85)';
+            }
+        });
+    </script>
 </body>
 </html>
