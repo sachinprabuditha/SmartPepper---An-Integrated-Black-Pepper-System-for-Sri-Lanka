@@ -9,7 +9,7 @@ class DiseaseApiService {
 
   // Disease detection backend runs on port 5000
   // Update this IP address to match your computer's IP
-  static const String diseaseApiBaseUrl = 'http://192.168.8.197:5000';
+  static const String diseaseApiBaseUrl = 'http://192.168.8.173:5005';
 
   // API Endpoints
   static const String predictEndpoint = '/predict';
@@ -85,7 +85,7 @@ class DiseaseApiService {
 
       print('Sending request to server...');
       var streamedResponse = await client.send(request).timeout(
-        const Duration(seconds: 300), 
+        const Duration(seconds: 300),
         onTimeout: () {
           throw Exception('Request timeout - Server took too long to respond');
         },
@@ -100,7 +100,7 @@ class DiseaseApiService {
         },
       );
 
-      client.close(); 
+      client.close();
 
       if (response.statusCode == 200) {
         final jsonResponse = Map<String, dynamic>.from(

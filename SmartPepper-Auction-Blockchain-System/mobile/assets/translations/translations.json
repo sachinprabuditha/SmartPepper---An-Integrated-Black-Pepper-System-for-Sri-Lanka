@@ -4170,10 +4170,10 @@
         "ta": "தொழிலாளர் மணிநேரம்"
     },
     {
-        "key": "task_completion_notes_optional",
-        "en": "Notes (Optional)",
-        "si": "සටහන් (අත්‍යවශ්‍ය නොවේ)",
-        "ta": "குறிப்புகள் (விரும்பினால்)"
+        "key": "task_completion_notes_1",
+        "en": "Notes",
+        "si": "සටහන්",
+        "ta": "குறிப்புகள்"
     },
     {
         "key": "task_completion_edit_task",

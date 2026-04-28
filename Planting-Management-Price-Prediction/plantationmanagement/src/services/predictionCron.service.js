@@ -4,6 +4,10 @@ import { DISTRICTS } from '../utils/districts.js';
 import { getUSDToLKR } from './exchangeService.js';
 import { predictPrice } from './prediction.service.js';
 
+/** Returns today's date string (YYYY-MM-DD) in Sri Lanka time (Asia/Colombo). */
+const getSriLankaDateStr = () =>
+    new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Colombo' });
+
 const GRADES = ['GR-1', 'GR-2', 'WHITE'];
 const TRAINED_DISTRICTS = [
     "Colombo", "Galle", "Hambantota", "Kandy", "Kegalle",
@@ -21,7 +25,7 @@ export const runPredictionJob = async () => {
     console.log(`[PredictionCron] Starting price prediction job at ${new Date().toISOString()}`);
 
     try {
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = getSriLankaDateStr();
 
         // 1. Fetch current USD to LKR rate
         let usdRate = 300; // Fallback
@@ -62,9 +66,9 @@ export const runPredictionJob = async () => {
 
         // 4. Clean up previous collection (Keep last 7 days including today)
         try {
-            const sixDaysAgo = new Date();
-            sixDaysAgo.setDate(sixDaysAgo.getDate() - 6);
-            const cutoffDateStr = sixDaysAgo.toISOString().split('T')[0];
+            const sixDaysAgoSL = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' }));
+            sixDaysAgoSL.setDate(sixDaysAgoSL.getDate() - 6);
+            const cutoffDateStr = sixDaysAgoSL.toLocaleDateString('en-CA', { timeZone: 'Asia/Colombo' });
 
             // Using direct string comparison since dates are formatted as YYYY-MM-DD
             const oldDocs = await db.collection('previous_price_predictions')
@@ -146,16 +150,16 @@ export const runPredictionJob = async () => {
 };
 
 export const initPredictionJob = async () => {
-    // Schedule to run every day at 2:30 PM
-    cron.schedule('30 14 * * *', () => {
+    // Schedule to run every day at 4:30 AM Sri Lanka time
+    cron.schedule('30 4 * * *', () => {
         console.log('[PredictionCron] Cron job triggered - Running price predictions');
         runPredictionJob();
-    });
-    console.log('[PredictionCron] Cron job scheduled to run daily at 2:30 PM');
+    }, { timezone: 'Asia/Colombo' });
+    console.log('[PredictionCron] Cron job scheduled to run daily at 4:30 AM (Asia/Colombo)');
 
     // Check if today's data exists on startup
     try {
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = getSriLankaDateStr();
         const snapshot = await db.collection('daily_price_predictions').where('date', '==', todayStr).limit(1).get();
 
         let needsUpdate = true;

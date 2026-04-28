@@ -12,12 +12,12 @@ const db = admin.firestore();
  */
 const convertTimestamps = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
-  
+
   const converted = Array.isArray(obj) ? [] : {};
-  
+
   for (const key in obj) {
     const value = obj[key];
-    
+
     // Check if it's a Firestore Timestamp
     if (value && typeof value === 'object' && '_seconds' in value && '_nanoseconds' in value) {
       // Convert to ISO string
@@ -36,7 +36,7 @@ const convertTimestamps = (obj) => {
       converted[key] = value;
     }
   }
-  
+
   return converted;
 };
 
@@ -54,10 +54,10 @@ blockchainService.initialize().catch(err => {
 router.get('/lots/pending', async (req, res) => {
   try {
     const { limit = 50, offset = 0 } = req.query;
-    
+
     // TODO: Add auth middleware to verify admin role
     // For now, assuming request is from authenticated admin
-    
+
     // Query pepper_lots collection for pending lots
     const lotsSnapshot = await db.collection('pepper_lots')
       .where('status', 'in', ['pending'])
@@ -65,34 +65,34 @@ router.get('/lots/pending', async (req, res) => {
       .limit(parseInt(limit))
       .offset(parseInt(offset))
       .get();
-    
+
     const compliancePendingSnapshot = await db.collection('pepper_lots')
       .where('compliance_status', '==', 'pending')
       .orderBy('created_at', 'desc')
       .limit(parseInt(limit))
       .offset(parseInt(offset))
       .get();
-    
+
     // Combine results and remove duplicates
     const lotMap = new Map();
-    
+
     for (const doc of lotsSnapshot.docs) {
       lotMap.set(doc.id, { id: doc.id, ...doc.data() });
     }
-    
+
     for (const doc of compliancePendingSnapshot.docs) {
       if (!lotMap.has(doc.id)) {
         lotMap.set(doc.id, { id: doc.id, ...doc.data() });
       }
     }
-    
+
     const lots = Array.from(lotMap.values());
-    
+
     // Fetch farmer details for each lot
     const lotsWithFarmers = await Promise.all(
       lots.map(async (lot) => {
         let farmerData = null;
-        
+
         // Try to fetch by farmer_id first
         if (lot.farmer_id) {
           const farmerDoc = await db.collection('users').doc(lot.farmer_id).get();
@@ -100,19 +100,19 @@ router.get('/lots/pending', async (req, res) => {
             farmerData = farmerDoc.data();
           }
         }
-        
+
         // If no farmer found by ID, try by wallet address
         if (!farmerData && lot.farmer_address) {
           const farmerSnapshot = await db.collection('users')
             .where('wallet_address_lower', '==', lot.farmer_address.toLowerCase())
             .limit(1)
             .get();
-          
+
           if (!farmerSnapshot.empty) {
             farmerData = farmerSnapshot.docs[0].data();
           }
         }
-        
+
         // Add farmer details if found
         if (farmerData) {
           return {
@@ -122,27 +122,27 @@ router.get('/lots/pending', async (req, res) => {
             farmer_phone: farmerData.phone
           };
         }
-        
+
         return lot;
       })
     );
-    
+
     // Get count for pending lots
     const pendingStatusSnapshot = await db.collection('pepper_lots')
       .where('status', '==', 'pending')
       .get();
-    
+
     const pendingComplianceSnapshot = await db.collection('pepper_lots')
       .where('compliance_status', '==', 'pending')
       .get();
-    
+
     // Count unique lots
     const countSet = new Set();
     pendingStatusSnapshot.docs.forEach(doc => countSet.add(doc.id));
     pendingComplianceSnapshot.docs.forEach(doc => countSet.add(doc.id));
-    
+
     logger.info(`Admin fetched ${lotsWithFarmers.length} pending lots`);
-    
+
     res.json({
       success: true,
       count: countSet.size,
@@ -165,45 +165,45 @@ router.get('/lots/pending', async (req, res) => {
 router.get('/lots/:lotId', async (req, res) => {
   try {
     const { lotId } = req.params;
-    
+
     // Get lot by lot_id field
     const lotsSnapshot = await db.collection('pepper_lots')
       .where('lot_id', '==', lotId)
       .limit(1)
       .get();
-    
+
     if (lotsSnapshot.empty) {
       return res.status(404).json({
         success: false,
         error: 'Lot not found'
       });
     }
-    
+
     const lotDoc = lotsSnapshot.docs[0];
     const lot = { id: lotDoc.id, ...lotDoc.data() };
-    
+
     // Fetch farmer details - try by farmer_id first, then by farmer_address
     let farmerData = null;
-    
+
     if (lot.farmer_id) {
       const farmerDoc = await db.collection('users').doc(lot.farmer_id).get();
       if (farmerDoc.exists) {
         farmerData = farmerDoc.data();
       }
     }
-    
+
     // If no farmer found by ID, try by wallet address
     if (!farmerData && lot.farmer_address) {
       const farmerSnapshot = await db.collection('users')
         .where('wallet_address_lower', '==', lot.farmer_address.toLowerCase())
         .limit(1)
         .get();
-      
+
       if (!farmerSnapshot.empty) {
         farmerData = farmerSnapshot.docs[0].data();
       }
     }
-    
+
     // Add farmer details to lot if found
     if (farmerData) {
       lot.farmer_name = farmerData.name;
@@ -214,7 +214,7 @@ router.get('/lots/:lotId', async (req, res) => {
       // Fallback: set farmer_address as the wallet_address
       lot.wallet_address = lot.farmer_address;
     }
-    
+
     // Parse lot_pictures and certificate_images if they're stored as JSON strings
     if (lot.lot_pictures && typeof lot.lot_pictures === 'string') {
       try {
@@ -223,7 +223,7 @@ router.get('/lots/:lotId', async (req, res) => {
         logger.warn('Failed to parse lot_pictures:', e);
       }
     }
-    
+
     if (lot.certificate_images && typeof lot.certificate_images === 'string') {
       try {
         lot.certificate_images = JSON.parse(lot.certificate_images);
@@ -231,9 +231,9 @@ router.get('/lots/:lotId', async (req, res) => {
         logger.warn('Failed to parse certificate_images:', e);
       }
     }
-    
+
     logger.info('Returning lot details:', { lotId, hasFarmerData: !!farmerData });
-    
+
     res.json({
       success: true,
       lot: convertTimestamps(lot)
@@ -256,7 +256,7 @@ router.put('/lots/:lotId/compliance', async (req, res) => {
   try {
     const { lotId } = req.params;
     const { status, reason, adminId, adminName } = req.body;
-    
+
     // Validate status
     if (!['approved', 'rejected'].includes(status)) {
       return res.status(400).json({
@@ -264,7 +264,7 @@ router.put('/lots/:lotId/compliance', async (req, res) => {
         error: 'Invalid status. Must be "approved" or "rejected"'
       });
     }
-    
+
     // If rejected, reason is required
     if (status === 'rejected' && !reason) {
       return res.status(400).json({
@@ -272,26 +272,26 @@ router.put('/lots/:lotId/compliance', async (req, res) => {
         error: 'Rejection reason is required'
       });
     }
-    
+
     logger.info(`Admin ${adminName || adminId} ${status} lot ${lotId}`, { reason });
-    
+
     // Find lot by lot_id
     const lotsSnapshot = await db.collection('pepper_lots')
       .where('lot_id', '==', lotId)
       .limit(1)
       .get();
-    
+
     if (lotsSnapshot.empty) {
       return res.status(404).json({
         success: false,
         error: 'Lot not found'
       });
     }
-    
+
     const lotDocRef = lotsSnapshot.docs[0].ref;
     const newStatus = status === 'approved' ? 'approved' : 'rejected';
     const lotStatus = status === 'approved' ? 'available' : 'rejected';
-    
+
     // Update lot compliance status
     const updateData = {
       compliance_status: newStatus,
@@ -300,13 +300,13 @@ router.put('/lots/:lotId/compliance', async (req, res) => {
       rejection_reason: status === 'rejected' ? reason : null,
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     };
-    
+
     await lotDocRef.update(updateData);
-    
+
     // Get updated lot
     const updatedLotDoc = await lotDocRef.get();
     const updatedLot = { id: updatedLotDoc.id, ...updatedLotDoc.data() };
-    
+
     // Log the admin action
     try {
       await db.collection('admin_actions').add({
@@ -321,18 +321,18 @@ router.put('/lots/:lotId/compliance', async (req, res) => {
       // Don't fail the main operation if logging fails
       logger.warn('Failed to log admin action:', err);
     }
-    
+
     // Update blockchain with compliance status
     let blockchainTxHash = null;
     let blockchainError = null;
-    
+
     try {
       logger.info('Attempting to update compliance status on blockchain', { lotId, status });
       blockchainTxHash = await blockchainService.updateLotComplianceOnChain(
         lotId,
         status === 'approved'
       );
-      
+
       // Update blockchain_tx_hash in database
       if (blockchainTxHash) {
         await lotDocRef.update({
@@ -346,7 +346,7 @@ router.put('/lots/:lotId/compliance', async (req, res) => {
       // Don't fail the entire operation if blockchain update fails
       // The database update already succeeded
     }
-    
+
     res.json({
       success: true,
       message: `Lot ${status} successfully`,
@@ -355,7 +355,7 @@ router.put('/lots/:lotId/compliance', async (req, res) => {
       blockchainError,
       blockchainTxRequired: !blockchainTxHash // True if blockchain update failed
     });
-    
+
   } catch (error) {
     logger.error('Error updating lot compliance:', error);
     res.status(500).json({
@@ -390,12 +390,12 @@ router.get('/stats', async (req, res) => {
       db.collection('auctions').where('status', '==', 'active').get(),
       db.collection('users').get()
     ]);
-    
+
     // Count unique pending lots (status OR compliance_status = pending)
     const pendingSet = new Set();
     pendingStatusSnapshot.docs.forEach(doc => pendingSet.add(doc.id));
     pendingComplianceSnapshot.docs.forEach(doc => pendingSet.add(doc.id));
-    
+
     res.json({
       success: true,
       stats: {
@@ -573,7 +573,7 @@ router.get('/recent-activity', async (req, res) => {
  */
 function getTimeAgo(timestamp) {
   if (!timestamp) return 'Unknown';
-  
+
   const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
   const now = new Date();
   const seconds = Math.floor((now - date) / 1000);
@@ -592,7 +592,7 @@ function getTimeAgo(timestamp) {
 router.get('/users/pending', async (req, res) => {
   try {
     const { limit = 50, offset = 0 } = req.query;
-    
+
     // Query users with pending approval status
     const pendingUsersSnapshot = await db.collection('users')
       .where('approval_status', '==', 'pending')
@@ -600,7 +600,7 @@ router.get('/users/pending', async (req, res) => {
       .limit(parseInt(limit))
       .offset(parseInt(offset))
       .get();
-    
+
     const users = pendingUsersSnapshot.docs.map(doc => {
       const data = doc.data();
       return {
@@ -645,24 +645,24 @@ router.get('/users/pending', async (req, res) => {
 router.get('/users', async (req, res) => {
   try {
     const { limit = 50, offset = 0, role, approval_status } = req.query;
-    
+
     let query = db.collection('users');
-    
+
     // Apply filters
     if (role) {
       query = query.where('role', '==', role);
     }
-    
+
     if (approval_status) {
       query = query.where('approval_status', '==', approval_status);
     }
-    
+
     const usersSnapshot = await query
       .orderBy('created_at', 'desc')
       .limit(parseInt(limit))
       .offset(parseInt(offset))
       .get();
-    
+
     const users = usersSnapshot.docs.map(doc => {
       const data = doc.data();
       return {
@@ -893,7 +893,7 @@ router.get('/exchange-rates/status', async (req, res) => {
   try {
     const exchangeRateService = require('../services/exchangeRateService');
     const status = exchangeRateService.getStatus();
-    
+
     res.json({
       success: true,
       status
@@ -915,11 +915,11 @@ router.get('/exchange-rates/status', async (req, res) => {
 router.post('/exchange-rates/update', async (req, res) => {
   try {
     const exchangeRateService = require('../services/exchangeRateService');
-    
+
     logger.info('Admin triggered exchange rate update');
-    
+
     const rates = await exchangeRateService.forceUpdate();
-    
+
     res.json({
       success: true,
       message: 'Exchange rates updated successfully',
@@ -947,12 +947,12 @@ router.post('/exchange-rates/update', async (req, res) => {
 router.get('/exchange-rates/history', async (req, res) => {
   try {
     const { limit = 50 } = req.query;
-    
+
     const snapshot = await db.collection('exchange_rates')
       .orderBy('updated_at', 'desc')
       .limit(parseInt(limit))
       .get();
-    
+
     const history = snapshot.docs.map(doc => {
       const data = doc.data();
       return {
@@ -960,7 +960,7 @@ router.get('/exchange-rates/history', async (req, res) => {
         ...convertTimestamps(data)
       };
     });
-    
+
     res.json({
       success: true,
       count: history.length,
@@ -1113,7 +1113,7 @@ router.post('/auctions/init-settlement-approval-field', async (req, res) => {
 
     snapshot.docs.forEach(doc => {
       const auction = doc.data();
-      
+
       // Only update if field is missing or undefined
       if (auction.admin_settlement_approved === undefined || auction.admin_settlement_approved === null) {
         batch.update(doc.ref, {
@@ -1280,7 +1280,7 @@ router.get('/auctions/pending-settlement', async (req, res) => {
     const auctions = [];
     for (const doc of snapshot.docs) {
       const auction = doc.data();
-      
+
       // Get lot details
       let lotDetails = null;
       if (auction.lot_id) {
@@ -1288,7 +1288,7 @@ router.get('/auctions/pending-settlement', async (req, res) => {
           .where('lot_id', '==', auction.lot_id)
           .limit(1)
           .get();
-        
+
         if (!lotSnapshot.empty) {
           const lot = lotSnapshot.docs[0].data();
           lotDetails = {

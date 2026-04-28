@@ -493,7 +493,7 @@ function BlockchainView({ data, copyToClipboard }: any) {
         <div className="space-y-2 text-sm">
           <InfoRow label="Total Transactions" value={data.blockchain_info.total_transactions} />
           <InfoRow label="Network" value="Hardhat Local (Chain ID: 1337)" />
-          <InfoRow label="RPC URL" value="http://192.168.1.153:8545" />
+          <InfoRow label="RPC URL" value="http://192.168.8.173:8545" />
         </div>
       </div>
     </div>

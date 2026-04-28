@@ -231,7 +231,7 @@ class _TaskCompletionPageState extends State<TaskCompletionPage> {
                 ),
                 const SizedBox(height: 16),
                 InputField(
-                  label: context.tr('task_completion_notes_optional'),
+                  label: context.tr('task_completion_notes_1'),
                   controller: _notesController,
                   maxLines: 3,
                 ),

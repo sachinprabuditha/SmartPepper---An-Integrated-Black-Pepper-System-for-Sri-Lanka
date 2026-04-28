@@ -3,6 +3,10 @@ import cron from 'node-cron';
 import { db } from '../config/firebase.js';
 import { DISTRICTS } from '../utils/districts.js';
 
+/** Returns today's date string (YYYY-MM-DD) in Sri Lanka time (Asia/Colombo). */
+const getSriLankaDateStr = () =>
+    new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Colombo' });
+
 /**
  * Fetches weather data for all districts, calculates features, and saves them to Firestore.
  */
@@ -13,12 +17,19 @@ export const updateWeatherFeatures = async () => {
         const lats = DISTRICTS.map(d => d.lat).join(',');
         const lons = DISTRICTS.map(d => d.lon).join(',');
 
-        const today = new Date();
-        const endDate = today.toISOString().split('T')[0];
+        // Archive API has a 1-2 day data lag — use yesterday as end_date to avoid HTTP 400
+        const slNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' }));
+        const yesterdayObj = new Date(slNow);
+        yesterdayObj.setDate(slNow.getDate() - 1);
+        const endDate = yesterdayObj.toLocaleDateString('en-CA', { timeZone: 'Asia/Colombo' });
 
-        const start = new Date();
-        start.setDate(today.getDate() - 30);
-        const startDate = start.toISOString().split('T')[0];
+        // startDate = 30 days before yesterday
+        const startDateObj = new Date(slNow);
+        startDateObj.setDate(slNow.getDate() - 31);
+        const startDate = startDateObj.toLocaleDateString('en-CA', { timeZone: 'Asia/Colombo' });
+
+        // todayStr is still today's SL date — used for the Firestore document ID/date field
+        const todayStr = getSriLankaDateStr();
 
         const url =
             `https://archive-api.open-meteo.com/v1/archive` +
@@ -34,7 +45,6 @@ export const updateWeatherFeatures = async () => {
         // Open-Meteo returns an Array of objects if multiple points are requested
         const results = Array.isArray(response.data) ? response.data : [response.data];
 
-        const todayStr = endDate;
         const batch = db.batch();
 
         // Delete existing data
@@ -95,16 +105,16 @@ export const updateWeatherFeatures = async () => {
  * Initializes the cron scheduler to run the weather update job daily.
  */
 export const startWeatherJob = async () => {
-    // Schedule to run every day at 2:00 PM
-    cron.schedule('0 14 * * *', () => {
+    // Schedule to run every day at 4:00 AM Sri Lanka time
+    cron.schedule('0 4 * * *', () => {
         console.log('[WeatherService] Cron job triggered - Updating weather features');
         updateWeatherFeatures();
-    });
-    console.log('[WeatherService] Cron job scheduled to run daily at 2:00 PM');
+    }, { timezone: 'Asia/Colombo' });
+    console.log('[WeatherService] Cron job scheduled to run daily at 4:00 AM (Asia/Colombo)');
 
     // Check if today's data exists on startup
     try {
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = getSriLankaDateStr();
         const snapshot = await db.collection('daily_weather_forecast').limit(1).get();
 
         let needsUpdate = true;
