@@ -231,8 +231,7 @@ export const KnowledgeBaseService = {
                     points: [{
                         id: ++idBase,
                         vector: {
-                            name: "dense",
-                            vector: embedding.data[0].embedding
+                            dense: embedding.data[0].embedding
                         },
                         payload: {
                             text,

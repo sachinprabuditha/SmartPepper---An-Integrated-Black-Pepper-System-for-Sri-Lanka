@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../config/theme.dart';
+import '../../../../localization/app_localizations.dart';
 import '../../services/plantation_api_client.dart';
 import '../../plantation/services/plantation_service.dart';
 import '../models/chat_model.dart';
@@ -10,7 +11,11 @@ import '../providers/chat_provider.dart';
 
 // Farm Logic
 import '../../plantation/controllers/plantation_controller.dart';
+import '../../../../widgets/language_picker_button.dart';
+import '../../../../providers/language_provider.dart';
 import '../../plantation/models/farm_record_model.dart';
+import '../../../../services/voice_service.dart';
+
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -19,7 +24,7 @@ class ChatPage extends StatefulWidget {
   State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -27,12 +32,23 @@ class _ChatPageState extends State<ChatPage> {
   bool _isLoadingFarms = true;
   String? _selectedFarmId;
   late PlantationController _plantationController;
+  
+  final VoiceService _voiceService = VoiceService();
+  bool _isRecording = false;
+  bool _isVoiceLoading = false;
+  late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
     _plantationController =
         PlantationController(PlantationService(PlantationApiClient()));
+    
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
     _loadFarms();
   }
 
@@ -56,6 +72,8 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    _voiceService.dispose();
+    _pulseController.dispose();
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -84,9 +102,49 @@ class _ChatPageState extends State<ChatPage> {
     _scrollToBottom();
 
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    await chatProvider.sendMessage(text, _selectedFarmId);
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    await chatProvider.sendMessage(text, _selectedFarmId, language: languageProvider.locale.languageCode);
 
     _scrollToBottom();
+  }
+
+  /// ===============================
+  /// VOICE RECORDING
+  /// ===============================
+  Future<void> _startRecording() async {
+    setState(() {
+      _isRecording = true;
+    });
+    _pulseController.repeat(reverse: true);
+    await _voiceService.startRecording();
+  }
+
+  Future<void> _stopRecording() async {
+    setState(() {
+      _isRecording = false;
+      _isVoiceLoading = true;
+    });
+    _pulseController.stop();
+    _pulseController.reset();
+
+    final answer = await _voiceService.stopAndSend();
+
+    if (mounted) {
+      setState(() {
+        _isVoiceLoading = false;
+      });
+
+      if (answer != null) {
+        final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+        // Add bot message
+        chatProvider.addMessage(ChatMessage(text: answer, isUser: false, timestamp: DateTime.now()));
+        _scrollToBottom();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.tr('chat_error_voice'))),
+        );
+      }
+    }
   }
 
   /// ===============================
@@ -116,31 +174,32 @@ class _ChatPageState extends State<ChatPage> {
           ],
         ),
         leadingWidth: 100, // Enough width for two icons
-        title: const Text('AI Assistant'),
+        title: Text(context.tr('chat_ai_assistant')),
         backgroundColor: AppTheme.forestGreen,
         foregroundColor: Colors.white,
         actions: [
+          const LanguagePickerButton(),
           if (!_isLoadingFarms && _farms.isNotEmpty)
             DropdownButtonHideUnderline(
               child: DropdownButton<String?>(
                 dropdownColor: AppTheme.deepEmerald,
                 icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
                 value: _selectedFarmId,
-                hint: const Text("Mode: Guide",
-                    style: TextStyle(color: Colors.white70)),
+                hint: Text(context.tr('chat_mode_guide'),
+                    style: const TextStyle(color: Colors.white70)),
                 items: [
-                  const DropdownMenuItem<String?>(
+                  DropdownMenuItem<String?>(
                     value: null,
                     child: Text(
-                      "Mode: Guide (General)",
-                      style: TextStyle(color: Colors.white),
+                      context.tr('chat_mode_guide_general'),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                   ..._farms.map(
                     (f) => DropdownMenuItem<String?>(
                       value: f.id,
                       child: Text(
-                        "Mode: ${f.farmName}",
+                        "${context.tr('chat_mode')}${f.farmName}",
                         style: const TextStyle(color: Colors.white),
                       ),
                     ),
@@ -165,8 +224,8 @@ class _ChatPageState extends State<ChatPage> {
                 : Colors.green[100],
             child: Text(
               _selectedFarmId == null
-                  ? "🌱 Guide Mode: General agronomy advice only."
-                  : "🌿 Farmer Mode: Advice tailored to this farm.",
+                  ? context.tr('chat_guide_desc')
+                  : context.tr('chat_farmer_desc'),
               style: TextStyle(
                 fontSize: 12,
                 color: _selectedFarmId == null
@@ -237,10 +296,10 @@ class _ChatPageState extends State<ChatPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Sources",
+                    Text(
+                      context.tr('chat_sources'),
                       style:
-                          TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                          const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     ...msg.sources!.map(
@@ -300,8 +359,8 @@ class _ChatPageState extends State<ChatPage> {
               controller: _controller,
               decoration: InputDecoration(
                 hintText: _selectedFarmId == null
-                    ? 'Ask about black pepper...'
-                    : 'Ask about your farm...',
+                    ? context.tr('chat_ask_general')
+                    : context.tr('chat_ask_farm'),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
@@ -311,11 +370,45 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
           const SizedBox(width: 8),
-          IconButton(
-            onPressed: _sendMessage,
-            icon: const Icon(Icons.send),
-            color: AppTheme.pepperGold,
-          ),
+          if (_isVoiceLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          else ...[
+            GestureDetector(
+              onLongPressStart: (_) => _startRecording(),
+              onLongPressEnd: (_) => _stopRecording(),
+              child: AnimatedBuilder(
+                animation: _pulseController,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _isRecording ? 1.0 + (_pulseController.value * 0.2) : 1.0,
+                    child: IconButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(context.tr('chat_hold_record'))),
+                        );
+                      },
+                      icon: Icon(
+                        _isRecording ? Icons.mic : Icons.mic_none,
+                        color: _isRecording ? Colors.red : AppTheme.pepperGold,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            IconButton(
+              onPressed: _sendMessage,
+              icon: const Icon(Icons.send),
+              color: AppTheme.pepperGold,
+            ),
+          ],
         ],
       ),
     );

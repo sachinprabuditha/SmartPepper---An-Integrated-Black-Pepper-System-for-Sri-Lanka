@@ -10,11 +10,13 @@ class ChatService {
     String message, {
     String? conversationId,
     String? activeFarmId,
+    String? language,
   }) async {
     final body = {
       "message": message,
       "conversationId": conversationId,
       "activeFarmId": activeFarmId,
+      "language": language ?? "en",
     };
 
     final response = await _client.dio.post(

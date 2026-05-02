@@ -9,6 +9,8 @@
         "dev": "nodemon src/app.js"
     },
     "dependencies": {
+        "@google-cloud/speech": "^7.3.0",
+        "@google-cloud/translate": "^9.3.0",
         "@qdrant/js-client-rest": "^1.17.0",
         "axios": "^1.13.6",
         "bcrypt": "^5.1.1",

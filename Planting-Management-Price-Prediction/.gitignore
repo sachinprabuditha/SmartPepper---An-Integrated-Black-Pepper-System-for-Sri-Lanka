@@ -51,12 +51,8 @@ android/app/libs/
 ios/Flutter/Generated.xcconfig
 ios/Flutter/flutter_export_environment.sh
 
-# ML Models
-*.onnx
-
 # Node.js
 node_modules/
-.env
-serviceAccountKey.json
-smartpepper-645db-firebase-adminsdk-fbsvc-*.json
 plantationmanagement/rag_data/
+uploads/
+

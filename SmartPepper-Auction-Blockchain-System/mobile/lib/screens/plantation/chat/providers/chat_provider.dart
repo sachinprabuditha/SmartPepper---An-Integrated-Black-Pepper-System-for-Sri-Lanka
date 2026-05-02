@@ -79,7 +79,7 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> sendMessage(String text, String? activeFarmId) async {
+  Future<void> sendMessage(String text, String? activeFarmId, {String? language}) async {
     addMessage(
         ChatMessage(text: text, isUser: true, timestamp: DateTime.now()));
 
@@ -88,6 +88,7 @@ class ChatProvider extends ChangeNotifier {
         text,
         conversationId: _activeConversationId,
         activeFarmId: activeFarmId,
+        language: language,
       );
 
       final isNewConversation = _activeConversationId == null;

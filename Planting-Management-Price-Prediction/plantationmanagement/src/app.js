@@ -44,6 +44,9 @@ import agricultureRoutes from './routes/agriculture.routes.js';
 app.use('/api/kb', knowledgebaseRoutes);
 app.use('/api/agriculture', agricultureRoutes);
 
+import voiceQueryRouter from './routes/voiceQuery.js';
+app.use('/api', voiceQueryRouter);
+
 import harvestRoutes from './routes/harvest.routes.js';
 app.use('/api', harvestRoutes); // Matches /api/seasons/user/:userId - broad mount moved to end
 
