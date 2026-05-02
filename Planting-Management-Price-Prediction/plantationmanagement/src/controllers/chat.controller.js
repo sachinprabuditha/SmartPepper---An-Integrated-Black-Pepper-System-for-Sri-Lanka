@@ -5,7 +5,7 @@ export const sendMessage = async (req, res) => {
         const userId = req.user.nameid;
 
         // ✅ correct fields
-        const { message, conversationId } = req.body;
+        const { message, conversationId, language } = req.body;
 
         if (!message || message.trim() === "") {
             return res.status(400).json({
@@ -18,7 +18,8 @@ export const sendMessage = async (req, res) => {
         const result = await chatService.processMessage(
             userId,
             message,
-            conversationId
+            conversationId,
+            language
         );
 
         res.status(200).json({

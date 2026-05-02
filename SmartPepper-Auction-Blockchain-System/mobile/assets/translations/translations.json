@@ -5380,5 +5380,71 @@
         "en": "No past gradings found.",
         "si": "අතීත ශ්‍රේණිගත කිරීම් හමු නොවීය.",
         "ta": "கடந்த மதிப்பீடுகள் எதுவும் காணப்படவில்லை."
+    },
+    {
+        "key": "chat_ai_assistant",
+        "en": "AI Assistant",
+        "si": "කෘතිම බුද්ධි සහායක",
+        "ta": "AI உதவியாளர்"
+    },
+    {
+        "key": "chat_mode_guide",
+        "en": "Mode: Guide",
+        "si": "මාදිලිය: මාර්ගෝපදේශක",
+        "ta": "முறை: வழிகாட்டி"
+    },
+    {
+        "key": "chat_mode_guide_general",
+        "en": "Mode: Guide (General)",
+        "si": "මාදිලිය: මාර්ගෝපදේශක (සාමාන්‍ය)",
+        "ta": "முறை: வழிகாட்டி (பொது)"
+    },
+    {
+        "key": "chat_mode",
+        "en": "Mode: ",
+        "si": "මාදිලිය: ",
+        "ta": "முறை: "
+    },
+    {
+        "key": "chat_guide_desc",
+        "en": "🌱 Guide Mode: General agronomy advice only.",
+        "si": "🌱 මාර්ගෝපදේශක මාදිලිය: සාමාන්‍ය කෘෂිකාර්මික උපදෙස් පමණි.",
+        "ta": "🌱 வழிகாட்டி முறை: பொது வேளாண்மை ஆலோசனை மட்டுமே."
+    },
+    {
+        "key": "chat_farmer_desc",
+        "en": "🌿 Farmer Mode: Advice tailored to this farm.",
+        "si": "🌿 ගොවි මාදිලිය: මෙම ගොවිපලට ගැලපෙන උපදෙස්.",
+        "ta": "🌿 விவசாயி முறை: இந்த பண்ணைக்கு ஏற்ற ஆலோசனை."
+    },
+    {
+        "key": "chat_sources",
+        "en": "Sources",
+        "si": "මූලාශ්‍ර",
+        "ta": "ஆதாரங்கள்"
+    },
+    {
+        "key": "chat_ask_general",
+        "en": "Ask about black pepper...",
+        "si": "ගම්මිරිස් ගැන අසන්න...",
+        "ta": "கறுப்பு மிளகு பற்றி கேளுங்கள்..."
+    },
+    {
+        "key": "chat_ask_farm",
+        "en": "Ask about your farm...",
+        "si": "ඔබේ ගොවිපල ගැන අසන්න...",
+        "ta": "உங்கள் பண்ணையை பற்றி கேளுங்கள்..."
+    },
+    {
+        "key": "chat_error_voice",
+        "en": "Could not process voice, please try again",
+        "si": "කටහඬ ක්‍රියාවට නැංවිය නොහැක, කරුණාකර නැවත උත්සාහ කරන්න",
+        "ta": "குரலை செயல்படுத்த முடியவில்லை, தயவுசெய்து மீண்டும் முயற்சிக்கவும்"
+    },
+    {
+        "key": "chat_hold_record",
+        "en": "Hold to record",
+        "si": "පටිගත කිරීමට රඳවා තබා ගන්න",
+        "ta": "பதிவு செய்ய பிடித்துக் கொள்ளவும்"
     }
 ]

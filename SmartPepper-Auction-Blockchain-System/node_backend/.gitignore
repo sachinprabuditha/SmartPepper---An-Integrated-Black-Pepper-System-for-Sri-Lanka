@@ -1,5 +1,4 @@
 # Environment variables (NEVER commit this!)
-.env
 
 # Uploaded files (temporary)
 uploads/

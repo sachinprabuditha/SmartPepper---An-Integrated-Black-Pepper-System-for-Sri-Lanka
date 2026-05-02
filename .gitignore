@@ -5,13 +5,6 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
 # Build outputs
 dist/
 build/
@@ -122,3 +115,17 @@ site/
 local-*.json
 test-data/
 .local/
+
+# Environment variables
+.env
+.env.*
+
+# Secrets
+*credentials*.json
+*serviceAccountKey*.json
+*firebase-adminsdk*.json
+
+# Machine Learning models
+*.onnx
+*.h5
+*.pb

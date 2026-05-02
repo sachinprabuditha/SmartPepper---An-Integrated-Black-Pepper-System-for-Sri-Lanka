@@ -447,10 +447,18 @@ router.post('/refresh', async (req, res) => {
       token: newToken
     });
   } catch (error) {
+    if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError') {
+      logger.info('Token refresh failed: Invalid or expired token');
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid or expired refresh token'
+      });
+    }
+
     logger.error('Token refresh error:', error);
-    res.status(401).json({
+    res.status(500).json({
       success: false,
-      error: 'Invalid or expired refresh token'
+      error: 'Failed to refresh token'
     });
   }
 });
@@ -530,15 +538,14 @@ router.put('/profile', async (req, res) => {
       user
     });
   } catch (error) {
-    logger.error('Update profile error:', error);
-
-    if (error.name === 'JsonWebTokenError') {
+    if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError') {
       return res.status(401).json({
         success: false,
-        error: 'Invalid token'
+        error: 'Invalid or expired token'
       });
     }
 
+    logger.error('Update profile error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to update profile'
@@ -629,15 +636,14 @@ router.post('/connect-wallet', async (req, res) => {
       walletAddress
     });
   } catch (error) {
-    logger.error('Connect wallet error:', error);
-
-    if (error.name === 'JsonWebTokenError') {
+    if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError') {
       return res.status(401).json({
         success: false,
-        error: 'Invalid token'
+        error: 'Invalid or expired token'
       });
     }
 
+    logger.error('Connect wallet error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to connect wallet'

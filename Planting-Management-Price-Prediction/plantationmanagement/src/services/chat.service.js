@@ -8,6 +8,14 @@ import { extractMemory } from './memory.extractor.js';
 import { saveMemory } from '../repositories/memory.vector.repository.js';
 import { searchRelevantMemories } from './memory.search.service.js';
 
+import { v2 } from '@google-cloud/translate';
+import OpenAI from 'openai';
+
+const translate = new v2.Translate();
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+});
+
 /**
  * Generate conversation title
  */
@@ -47,8 +55,23 @@ const generateTitle = (message) => {
 export const processMessage = async (
     userId,
     message,
-    conversationId
+    conversationId,
+    language = 'en'
 ) => {
+    let processMessageContent = message;
+
+    // =============================
+    // ⭐ Translation (To English)
+    // =============================
+    if (language !== 'en') {
+        try {
+            const [englishText] = await translate.translate(message, 'en');
+            processMessageContent = englishText;
+            console.log(`[CHAT] Translated to English: "${processMessageContent}"`);
+        } catch (err) {
+            console.error("Translation to English failed:", err);
+        }
+    }
 
     // =============================
     // 1️⃣ Create conversation
@@ -129,11 +152,33 @@ export const processMessage = async (
     // 5️⃣ RAG
     // =============================
     const ragResult = await askPepperRAG({
-        question: message,
+        question: processMessageContent,
         history,
         memory,
         semanticMemories
     });
+
+    let finalReply = ragResult.reply;
+
+    // =============================
+    // ⭐ Translation (To Local Language)
+    // =============================
+    if (language !== 'en') {
+        try {
+            const languageName = language === 'si' ? 'Sinhala' : 'Tamil';
+            const completion = await openai.chat.completions.create({
+                model: "gpt-4o-mini",
+                messages: [
+                    { role: "system", content: `You are an expert translator. Translate the following English agricultural advice into natural Sri Lankan ${languageName}.` },
+                    { role: "user", content: finalReply }
+                ]
+            });
+            finalReply = completion.choices[0].message.content;
+            console.log(`[CHAT] Translated reply to ${language}: "${finalReply}"`);
+        } catch (err) {
+             console.error("Translation back failed:", err);
+        }
+    }
 
     // =============================
     // 6️⃣ Save assistant reply
@@ -142,7 +187,7 @@ export const processMessage = async (
         userId,
         conversationId,
         'assistant',
-        ragResult.reply,
+        finalReply,
         ragResult.sources
     );
 
@@ -183,7 +228,7 @@ export const processMessage = async (
     // =============================
     try {
         const extracted =
-            await extractMemory(message);
+            await extractMemory(processMessageContent);
 
         if (extracted) {
             console.log(`[EXTRACT] New Permanent Fact Found: "${extracted}"`);
@@ -199,7 +244,7 @@ export const processMessage = async (
 
     return {
         conversationId,
-        reply: ragResult.reply,
+        reply: finalReply,
         sources: ragResult.sources,
         suggestions: ragResult.suggestions || []
     };
