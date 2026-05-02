@@ -126,6 +126,5 @@ test-data/
 *firebase-adminsdk*.json
 
 # Machine Learning models
-*.onnx
 *.h5
 *.pb
