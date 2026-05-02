@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartPepper - An Integrated Black Pepper System for Sri Lanka</title>
+    <link rel="icon" type="image/png" href="assets/SmartPepper-logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -56,7 +57,8 @@
             transition: box-shadow 0.3s;
         }
         .navbar .container { display: flex; justify-content: space-between; align-items: center; height: 100%; }
-        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 8px; }
+        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; }
+        .logo img { height: 38px; width: 38px; object-fit: contain; border-radius: 50%; box-shadow: 0 0 0 2px rgba(16,185,129,0.35), 0 2px 8px rgba(16,185,129,0.2); }
         .logo i { color: var(--primary); }
 
         .nav-links { display: flex; gap: 4px; list-style: none; }
@@ -83,6 +85,9 @@
         /* ── Section base ── */
         section { padding: 100px 0; }
         section:nth-child(even) { background: #f1f5f9; }
+        /* Override nth-child for intentionally dark sections */
+        section.milestones-section { background: var(--secondary); }
+        section.contact-section { background: var(--secondary); }
 
         .section-label {
             display: inline-block; padding: 5px 14px;
@@ -107,7 +112,19 @@
             content: ''; position: absolute; inset: 0; z-index: 0;
             background: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none"%3E%3Cg fill="%2310b981" fill-opacity="0.04"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
         }
-        .hero-content { position: relative; z-index: 1; text-align: center; max-width: 860px; margin: 0 auto; padding: 120px 24px 80px; }
+        .hero-content { position: relative; z-index: 1; text-align: center; max-width: 860px; margin: 0 auto; padding: 140px 24px 80px; }
+        .hero-logo-wrap { margin-bottom: 32px; display: block; }
+        .hero-logo {
+            width: 110px; height: 110px; object-fit: contain;
+            border-radius: 26px;
+            box-shadow: 0 0 0 8px rgba(16,185,129,0.1), 0 0 0 16px rgba(16,185,129,0.05), 0 16px 48px rgba(0,0,0,0.18), 0 4px 14px rgba(0,0,0,0.1);
+            animation: heroLogoFloat 4s ease-in-out infinite;
+            display: inline-block;
+        }
+        @keyframes heroLogoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
         .hero-badge {
             display: inline-block; padding: 7px 18px;
             background: rgba(16,185,129,0.1); color: var(--primary-dark);
@@ -235,12 +252,19 @@
             color: var(--primary); pointer-events: none;
         }
 
+        @keyframes milestoneIn {
+            from { opacity: 0; transform: translateY(22px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
         .milestone-detail {
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
             border-radius: 20px; padding: 40px; max-width: 800px; margin: 0 auto;
             display: none;
         }
-        .milestone-detail.active { display: block; }
+        .milestone-detail.active {
+            display: block;
+            animation: milestoneIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
         .milestone-detail h3 { color: var(--white); font-size: 1.6rem; margin-bottom: 24px; }
         .milestone-meta { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 28px; }
         .milestone-meta-item { display: flex; align-items: center; gap: 8px; }
@@ -256,13 +280,23 @@
         .milestone-timeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 2px; margin-bottom: 40px; }
         .timeline-item {
             background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-            padding: 20px 16px; text-align: center; cursor: pointer; transition: all 0.2s;
+            padding: 20px 16px; text-align: center; cursor: pointer;
+            transition: background 0.25s, border-color 0.25s, transform 0.25s, box-shadow 0.25s;
             position: relative;
         }
+        .timeline-item:hover { background: rgba(255,255,255,0.08); }
         .timeline-item:first-child { border-radius: 14px 0 0 14px; }
         .timeline-item:last-child { border-radius: 0 14px 14px 0; }
-        .timeline-item.current { background: rgba(16,185,129,0.15); border-color: var(--primary); }
         .timeline-item.done { background: rgba(16,185,129,0.08); }
+        .timeline-item.current { background: rgba(16,185,129,0.15); border-color: var(--primary); }
+        .timeline-item.selected {
+            background: rgba(16,185,129,0.25) !important;
+            border-color: var(--primary) !important;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(16,185,129,0.3);
+            z-index: 1;
+        }
+        .timeline-item.selected .timeline-dot { box-shadow: 0 0 0 4px rgba(16,185,129,0.4); }
         .timeline-dot {
             width: 10px; height: 10px; border-radius: 50%; margin: 0 auto 10px;
             background: rgba(255,255,255,0.2);
@@ -443,6 +477,10 @@
         footer { background: #020617; color: #64748b; padding: 60px 0 32px; }
         .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
         .footer-brand .logo { color: var(--white); margin-bottom: 16px; font-size: 1.25rem; }
+        .footer-brand .logo img { height: 34px; width: 34px; box-shadow: 0 0 0 2px rgba(16,185,129,0.5), 0 2px 10px rgba(16,185,129,0.25); filter: brightness(1.15); }
+
+        /* Mobile-only nav CTA inside hamburger menu */
+        .nav-mobile-cta { display: none; }
         .footer-brand p { font-size: 0.88rem; line-height: 1.7; max-width: 300px; }
         .footer-col h4 { color: var(--white); font-family: 'Outfit', sans-serif; font-size: 1rem; margin-bottom: 18px; }
         .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
@@ -483,7 +521,8 @@
             .nav-links, .nav-cta { display: none; }
             .hamburger { display: flex; }
             .nav-links.open { display: flex; flex-direction: column; position: absolute; top: var(--nav-height); left: 0; right: 0; background: var(--glass-bg); backdrop-filter: blur(14px); padding: 16px 24px; border-bottom: 1px solid rgba(16,185,129,0.12); }
-            .nav-links.open .nav-cta { display: inline-block; margin-top: 8px; }
+            .nav-links.open .nav-mobile-cta { display: list-item; margin-top: 4px; }
+            .nav-links.open .nav-cta { display: inline-block; }
             .section-header h2 { font-size: 1.9rem; }
             .form-row { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; gap: 28px; }
@@ -493,6 +532,7 @@
         }
         @media (max-width: 480px) {
             .hero-content { padding: 100px 16px 60px; }
+            .hero-logo { width: 88px; height: 88px; border-radius: 20px; }
             .hero-cta { flex-direction: column; align-items: center; }
             section { padding: 72px 0; }
             .domain-card { padding: 24px; }
@@ -505,7 +545,7 @@
 <nav class="navbar" id="navbar">
     <div class="container">
         <a href="#home" class="logo">
-            <i class="fa-solid fa-pepper-hot"></i> SmartPepper
+            <img src="assets/SmartPepper-logo.png" alt="SmartPepper Logo"> SmartPepper
         </a>
         <ul class="nav-links" id="navLinks">
             <li><a href="#home">Home</a></li>
@@ -515,7 +555,7 @@
             <li><a href="#presentations">Presentations</a></li>
             <li><a href="#about">About Us</a></li>
             <li><a href="#contact">Contact</a></li>
-            <li><a href="#contact" class="nav-cta" style="display:none">Contact Us</a></li>
+            <li class="nav-mobile-cta"><a href="#contact" class="nav-cta">Contact Us</a></li>
         </ul>
         <a href="#contact" class="nav-cta">Contact Us</a>
         <div class="hamburger" id="hamburger" onclick="toggleNav()">
@@ -528,6 +568,9 @@
 <section id="home">
     <div class="container">
         <div class="hero-content fade-up">
+            <div class="hero-logo-wrap">
+                <img src="assets/SmartPepper.png" alt="SmartPepper" class="hero-logo">
+            </div>
             <div class="hero-badge"><i class="fa-solid fa-flask" style="margin-right:6px"></i>Research Project 25-26J-501 &nbsp;·&nbsp; SLIIT</div>
             <h1>SmartPepper: Revolutionizing<br><span class="highlight">Sri Lanka's Black Pepper Industry</span></h1>
             <p>An intelligent, AI and Blockchain-driven platform integrating automated quality grading, disease detection, price forecasting, and transparent export trade for Sri Lankan pepper farmers.</p>
@@ -794,40 +837,40 @@
         </div>
 
         <div class="milestone-timeline fade-up">
-            <div class="timeline-item done" onclick="showMilestone('proposal')">
+            <div class="timeline-item done" onclick="showMilestone('proposal', true, this)">
                 <div class="timeline-dot"></div>
                 <strong>Proposal</strong>
-                <span>Mar 2025</span>
+                <span>September 2025</span>
             </div>
-            <div class="timeline-item done" onclick="showMilestone('pp1')">
+            <div class="timeline-item done" onclick="showMilestone('pp1', true, this)">
                 <div class="timeline-dot"></div>
                 <strong>Progress 1</strong>
-                <span>May 2025</span>
+                <span>January 2026</span>
             </div>
-            <div class="timeline-item current" onclick="showMilestone('pp2')">
+            <div class="timeline-item done" onclick="showMilestone('pp2', true, this)">
                 <div class="timeline-dot"></div>
                 <strong>Progress 2</strong>
-                <span>Aug 2025</span>
+                <span>March 2026</span>
             </div>
-            <div class="timeline-item" onclick="showMilestone('paper')">
+            <div class="timeline-item current" onclick="showMilestone('paper', true, this)">
                 <div class="timeline-dot"></div>
                 <strong>Research Paper</strong>
-                <span>Oct 2025</span>
+                <span>May 2026</span>
             </div>
-            <div class="timeline-item" onclick="showMilestone('final')">
+            <div class="timeline-item" onclick="showMilestone('final', true, this)">
                 <div class="timeline-dot"></div>
                 <strong>Final Report</strong>
-                <span>Nov 2025</span>
+                <span>May 2026</span>
             </div>
-            <div class="timeline-item" onclick="showMilestone('viva')">
+            <div class="timeline-item" onclick="showMilestone('viva', true, this)">
                 <div class="timeline-dot"></div>
                 <strong>Viva</strong>
-                <span>Dec 2025</span>
+                <span>May 2026</span>
             </div>
         </div>
 
         <div class="milestone-select-wrapper fade-up">
-            <select class="milestone-select" onchange="showMilestone(this.value)">
+            <select class="milestone-select" onchange="showMilestone(this.value, true)">
                 <option value="">— Select a Milestone to view details —</option>
                 <option value="proposal">Project Proposal</option>
                 <option value="pp1">Progress Presentation 1</option>
@@ -842,7 +885,7 @@
         <div class="milestone-detail" id="ms-proposal">
             <h3>Project Proposal</h3>
             <div class="milestone-meta">
-                <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>March 2025</strong></span></div>
+                <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>September 2025</strong></span></div>
                 <div class="milestone-meta-item"><i class="fa-solid fa-percent"></i><span>Marks Allocated: <strong>6%</strong></span></div>
                 <div class="milestone-meta-item"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span>Status: <strong style="color:#10b981">Completed</strong></span></div>
             </div>
@@ -861,7 +904,7 @@
         <div class="milestone-detail" id="ms-pp1">
             <h3>Progress Presentation 1</h3>
             <div class="milestone-meta">
-                <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>May 2025</strong></span></div>
+                <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>January 2026</strong></span></div>
                 <div class="milestone-meta-item"><i class="fa-solid fa-percent"></i><span>Marks Allocated: <strong>15%</strong></span></div>
                 <div class="milestone-meta-item"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span>Status: <strong style="color:#10b981">Completed</strong></span></div>
             </div>
@@ -881,9 +924,9 @@
         <div class="milestone-detail" id="ms-pp2">
             <h3>Progress Presentation 2</h3>
             <div class="milestone-meta">
-                <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>August 2025</strong></span></div>
+                <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>March 2026</strong></span></div>
                 <div class="milestone-meta-item"><i class="fa-solid fa-percent"></i><span>Marks Allocated: <strong>18%</strong></span></div>
-                <div class="milestone-meta-item"><i class="fa-solid fa-clock" style="color:#f97316"></i><span>Status: <strong style="color:#f97316">In Progress</strong></span></div>
+                <div class="milestone-meta-item"><i class="fa-solid fa-clock" style="color:#10b981"></i><span>Status: <strong style="color:#10b981">Completed</strong></span></div>
             </div>
             <div class="milestone-deliverables">
                 <h4>Deliverables</h4>
@@ -901,9 +944,9 @@
         <div class="milestone-detail" id="ms-paper">
             <h3>Research Paper</h3>
             <div class="milestone-meta">
-                <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>October 2025</strong></span></div>
+                <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>May 2026</strong></span></div>
                 <div class="milestone-meta-item"><i class="fa-solid fa-percent"></i><span>Marks Allocated: <strong>10%</strong></span></div>
-                <div class="milestone-meta-item"><i class="fa-regular fa-circle" style="color:#94a3b8"></i><span>Status: <strong style="color:#94a3b8">Upcoming</strong></span></div>
+                <div class="milestone-meta-item"><i class="fa-regular fa-circle" style="color:#f97316"></i><span>Status: <strong style="color:#f97316">In Progress</strong></span></div>
             </div>
             <div class="milestone-deliverables">
                 <h4>Deliverables</h4>
@@ -919,7 +962,7 @@
         <div class="milestone-detail" id="ms-final">
             <h3>Final Report & Assessment</h3>
             <div class="milestone-meta">
-                <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>November 2025</strong></span></div>
+                <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>May 2026</strong></span></div>
                 <div class="milestone-meta-item"><i class="fa-solid fa-percent"></i><span>Marks Allocated: <strong>35%</strong></span></div>
                 <div class="milestone-meta-item"><i class="fa-regular fa-circle" style="color:#94a3b8"></i><span>Status: <strong style="color:#94a3b8">Upcoming</strong></span></div>
             </div>
@@ -938,7 +981,7 @@
         <div class="milestone-detail" id="ms-viva">
             <h3>Viva</h3>
             <div class="milestone-meta">
-                <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>December 2025</strong></span></div>
+                <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>May 2026</strong></span></div>
                 <div class="milestone-meta-item"><i class="fa-solid fa-percent"></i><span>Marks Allocated: <strong>16%</strong></span></div>
                 <div class="milestone-meta-item"><i class="fa-regular fa-circle" style="color:#94a3b8"></i><span>Status: <strong style="color:#94a3b8">Upcoming</strong></span></div>
             </div>
@@ -1141,7 +1184,7 @@
             <div class="team-card fade-up delay-1">
                 <div class="team-avatar av1">P</div>
                 <h3>Premasiri J.G.P.L.</h3>
-                <div class="team-role">IoT / Hardware Lead</div>
+                <!-- <div class="team-role">IoT / Hardware Lead</div> -->
                 <div class="team-component">Module 02: Automated Quality Grading System</div>
                 <div class="team-id">IT22588500</div><br>
                 <div class="team-email"><a href="mailto:it22588500@my.sliit.lk"><i class="fa-regular fa-envelope" style="margin-right:5px"></i>it22588500@my.sliit.lk</a></div>
@@ -1150,7 +1193,7 @@
             <div class="team-card fade-up delay-2">
                 <div class="team-avatar av2">L</div>
                 <h3>Lahiru J.W.A.N.</h3>
-                <div class="team-role">AI / Mobile Lead</div>
+                <!-- <div class="team-role">AI / Mobile Lead</div> -->
                 <div class="team-component">Module 01: Disease Detection & Analysis</div>
                 <div class="team-id">IT22589286</div><br>
                 <div class="team-email"><a href="mailto:it22589286@my.sliit.lk"><i class="fa-regular fa-envelope" style="margin-right:5px"></i>it22589286@my.sliit.lk</a></div>
@@ -1159,7 +1202,7 @@
             <div class="team-card fade-up delay-3">
                 <div class="team-avatar av3">S</div>
                 <h3>Liyanage S.K.R.</h3>
-                <div class="team-role">ML / NLP Lead</div>
+                <!-- <div class="team-role">ML / NLP Lead</div> -->
                 <div class="team-component">Module 03: Price Prediction & RAG Chatbot</div>
                 <div class="team-id">IT22583178</div><br>
                 <div class="team-email"><a href="mailto:it22583178@my.sliit.lk"><i class="fa-regular fa-envelope" style="margin-right:5px"></i>it22583178@my.sliit.lk</a></div>
@@ -1168,7 +1211,7 @@
             <div class="team-card fade-up delay-4">
                 <div class="team-avatar av4">P</div>
                 <h3>Prabuditha K.S.</h3>
-                <div class="team-role">Web3 / Fullstack Lead</div>
+                <!-- <div class="team-role">Web3 / Fullstack Lead</div> -->
                 <div class="team-component">Module 04: Blockchain Auction System</div>
                 <div class="team-id">IT22594686</div><br>
                 <div class="team-email"><a href="mailto:it22594686@my.sliit.lk"><i class="fa-regular fa-envelope" style="margin-right:5px"></i>it22594686@my.sliit.lk</a></div>
@@ -1188,7 +1231,7 @@
 
         <div class="contact-grid">
             <div class="fade-up">
-                <h3 class="contact-info" style="color:white;font-size:1.3rem;margin-bottom:20px">Project Information</h3>
+                <h3 style="color:white;font-size:1.3rem;margin-bottom:20px">Project Information</h3>
                 <ul class="contact-info-list">
                     <li>
                         <div class="ci-icon"><i class="fa-solid fa-id-card"></i></div>
@@ -1258,7 +1301,7 @@
         <div class="footer-grid">
             <div class="footer-brand">
                 <a href="#home" class="logo">
-                    <i class="fa-solid fa-pepper-hot"></i> SmartPepper
+                    <img src="assets/SmartPepper-logo.png" alt="SmartPepper Logo" style="filter:brightness(1.15)"> SmartPepper
                 </a>
                 <p>A comprehensive academic research project developed at Sri Lanka Institute of Information Technology (SLIIT), aiming to digitize and elevate Sri Lanka's national black pepper industry through AI, IoT, and Blockchain.</p>
             </div>
@@ -1340,19 +1383,24 @@
     }
 
     // Milestone detail
-    function showMilestone(id) {
+    function showMilestone(id, scroll, clickedEl) {
         document.querySelectorAll('.milestone-detail').forEach(d => d.classList.remove('active'));
+        document.querySelectorAll('.timeline-item').forEach(t => t.classList.remove('selected'));
         if (id) {
-            const el = document.getElementById('ms-' + id);
-            if (el) {
-                el.classList.add('active');
-                el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            const detail = document.getElementById('ms-' + id);
+            if (detail) {
+                detail.classList.add('active');
+                if (scroll) detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
+            // Highlight the clicked timeline item, or find it by ID
+            const tItem = clickedEl || document.querySelector(`.timeline-item[onclick*="'${id}'"]`);
+            if (tItem) tItem.classList.add('selected');
         }
-        // Sync select
         const sel = document.querySelector('.milestone-select');
         if (sel && id) sel.value = id;
     }
+    // Auto-show current milestone on page load (no scroll, no click element)
+    showMilestone('pp2', false);
 
     // Contact form (mailto fallback)
     function handleFormSubmit(e) {
