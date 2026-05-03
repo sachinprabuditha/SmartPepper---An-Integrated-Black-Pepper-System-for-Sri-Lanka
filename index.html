@@ -500,6 +500,31 @@
         .delay-3 { transition-delay: 0.3s; }
         .delay-4 { transition-delay: 0.4s; }
 
+        /* ── Touch-friendly interactions ── */
+        .btn-primary, .btn-outline, .nav-cta, .tab-btn, .doc-link, .social-link {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            transition: all 0.2s ease;
+        }
+
+        /* Better form inputs for mobile */
+        .form-group input, .form-group textarea, .form-group select {
+            font-size: 16px; /* Prevent zoom on iOS input focus */
+            min-height: 44px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        /* Improved cards for touch */
+        .doc-card, .pres-card, .team-card, .supervisor-card, .domain-card {
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: pointer;
+        }
+
         /* ── Scroll to top ── */
         #scrollTop {
             position: fixed; bottom: 28px; right: 28px; z-index: 999;
@@ -513,29 +538,278 @@
 
         /* ── Responsive ── */
         @media (max-width: 1024px) {
+            .container { padding: 0 20px; }
             .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
             .contact-grid { grid-template-columns: 1fr; }
+            .hero-content h1 { font-size: 3rem; }
+            .section-header h2 { font-size: 2.2rem; }
+            .team-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+            .pres-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
         }
+
         @media (max-width: 768px) {
-            .hero-content h1 { font-size: 2.4rem; }
+            .container { padding: 0 16px; }
+            .hero-content { padding: 120px 16px 60px; }
+            .hero-content h1 { font-size: 2.2rem; line-height: 1.2; }
+            .hero-content > p { font-size: 1rem; }
+            .hero-logo { width: 90px; height: 90px; border-radius: 20px; }
+            .hero-stats { gap: 24px; }
+            .stat-num { font-size: 1.6rem; }
+            .stat-label { font-size: 0.75rem; }
+            
             .nav-links, .nav-cta { display: none; }
             .hamburger { display: flex; }
-            .nav-links.open { display: flex; flex-direction: column; position: absolute; top: var(--nav-height); left: 0; right: 0; background: var(--glass-bg); backdrop-filter: blur(14px); padding: 16px 24px; border-bottom: 1px solid rgba(16,185,129,0.12); }
-            .nav-links.open .nav-mobile-cta { display: list-item; margin-top: 4px; }
-            .nav-links.open .nav-cta { display: inline-block; }
-            .section-header h2 { font-size: 1.9rem; }
-            .form-row { grid-template-columns: 1fr; }
+            .nav-links.open { display: flex; flex-direction: column; position: absolute; top: var(--nav-height); left: 0; right: 0; background: var(--glass-bg); backdrop-filter: blur(14px); padding: 16px 24px; border-bottom: 1px solid rgba(16,185,129,0.12); max-height: calc(100vh - var(--nav-height)); overflow-y: auto; }
+            .nav-links.open li { padding: 8px 0; }
+            .nav-links.open a { display: block; padding: 8px 12px; font-size: 0.95rem; }
+            .nav-links.open .nav-mobile-cta { display: list-item; margin-top: 8px; }
+            .nav-links.open .nav-cta { display: inline-block; width: 100%; text-align: center; }
+            
+            section { padding: 60px 0; }
+            .section-header { margin-bottom: 48px; }
+            .section-header h2 { font-size: 1.8rem; margin-bottom: 12px; }
+            .section-header p { font-size: 0.95rem; }
+            
+            .domain-tabs { gap: 6px; margin-bottom: 36px; }
+            .tab-btn { padding: 8px 14px; font-size: 0.82rem; }
+            .domain-card { padding: 28px 20px; border-radius: 16px; }
+            .domain-card h3 { font-size: 1.3rem; }
+            .gap-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+            .obj-list { grid-template-columns: 1fr; gap: 12px; }
+            .meth-steps { gap: 16px; }
+            .meth-step { padding: 18px; gap: 14px; }
+            .meth-step-icon { width: 40px; height: 40px; min-width: 40px; }
+            .meth-step h4 { font-size: 0.95rem; }
+            .meth-step p { font-size: 0.85rem; }
+            
+            .form-row { grid-template-columns: 1fr; gap: 12px; }
+            .form-group { margin-bottom: 12px; }
+            .contact-grid { gap: 24px; }
+            .contact-info h3 { font-size: 1.2rem; }
+            .contact-form { padding: 24px; border-radius: 16px; }
+            .contact-form h3 { font-size: 1rem; }
+            
             .footer-grid { grid-template-columns: 1fr; gap: 28px; }
-            .milestone-timeline { grid-template-columns: 1fr 1fr; }
+            .footer-brand p { font-size: 0.82rem; max-width: 100%; }
+            .footer-col h4 { font-size: 0.95rem; margin-bottom: 14px; }
+            .footer-col ul li a, .footer-col ul li span { font-size: 0.81rem; }
+            .footer-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+            
+            .milestone-select-wrapper { max-width: 100%; }
+            .milestone-detail { padding: 28px 20px; border-radius: 16px; }
+            .milestone-detail h3 { font-size: 1.4rem; margin-bottom: 18px; }
+            .milestone-meta { gap: 16px; font-size: 0.85rem; }
+            .milestone-timeline { grid-template-columns: 1fr 1fr; gap: 1px; }
             .milestone-timeline .timeline-item:first-child { border-radius: 14px 0 0 0; }
+            .milestone-timeline .timeline-item:nth-child(2) { border-radius: 0 14px 0 0; }
+            .milestone-timeline .timeline-item:nth-last-child(2) { border-radius: 0 0 0 14px; }
             .milestone-timeline .timeline-item:last-child { border-radius: 0 0 14px 0; }
+            .timeline-item { padding: 14px 12px; }
+            .timeline-dot { width: 8px; height: 8px; margin-bottom: 8px; }
+            .timeline-item span { font-size: 0.72rem; }
+            .timeline-item strong { font-size: 0.8rem; }
+            
+            .doc-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+            .doc-card { padding: 20px; }
+            .doc-card h3 { font-size: 0.95rem; }
+            .doc-card p { font-size: 0.8rem; }
+            .doc-link { font-size: 0.8rem; }
+            
+            .pres-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+            .pres-card { border-radius: 14px; }
+            .pres-thumb { height: 120px; font-size: 2.5rem; }
+            .pres-thumb-label { font-size: 0.7rem; bottom: 8px; left: 10px; right: 10px; }
+            .pres-body { padding: 16px; }
+            .pres-body h3 { font-size: 0.9rem; margin-bottom: 6px; }
+            .pres-body .pres-meta { font-size: 0.75rem; margin-bottom: 10px; }
+            
+            .about-intro { padding: 28px; margin-bottom: 36px; border-radius: 16px; }
+            .about-intro p { font-size: 0.95rem; }
+            .supervisors-row { gap: 16px; margin-bottom: 36px; }
+            .supervisor-card { min-width: 180px; padding: 20px; border-radius: 14px; }
+            .supervisor-avatar { width: 60px; height: 60px; }
+            .supervisor-card h4 { font-size: 0.95rem; }
+            .supervisor-card .sup-role { font-size: 0.75rem; }
+            .supervisor-card .sup-email { font-size: 0.72rem; }
+            
+            .team-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+            .team-card { padding: 24px; border-radius: 18px; }
+            .team-avatar { width: 80px; height: 80px; margin-bottom: 14px; font-size: 1.8rem; border: 3px solid rgba(16,185,129,0.15); }
+            .team-card h3 { font-size: 0.95rem; }
+            .team-role { font-size: 0.78rem; }
+            .team-component { font-size: 0.75rem; }
+            .team-id { font-size: 0.7rem; padding: 3px 10px; }
+            .team-email { font-size: 0.75rem; }
+            
+            .lit-table { font-size: 0.82rem; }
+            .lit-table th { padding: 10px 12px; }
+            .lit-table td { padding: 10px 12px; }
+            
+            .contact-info-list li { gap: 10px; }
+            .contact-info-list li .ci-icon { width: 36px; height: 36px; min-width: 36px; font-size: 0.85rem; }
+            .contact-info-list li .ci-text span { font-size: 0.72rem; }
+            .contact-info-list li .ci-text strong { font-size: 0.85rem; }
+            
+            .social-links { gap: 10px; }
+            .social-link { width: 36px; height: 36px; font-size: 0.9rem; }
+            
+            #scrollTop { bottom: 20px; right: 20px; width: 40px; height: 40px; font-size: 0.9rem; }
         }
+
+        @media (max-width: 640px) {
+            .container { padding: 0 14px; }
+            .hero-content { padding: 100px 14px 50px; margin-top: 20px; }
+            .hero-content h1 { font-size: 1.8rem; line-height: 1.25; }
+            .hero-badge { font-size: 0.75rem; padding: 6px 12px; }
+            .hero-content > p { font-size: 0.9rem; margin-bottom: 28px; }
+            .hero-logo { width: 80px; height: 80px; box-shadow: 0 0 0 6px rgba(16,185,129,0.1), 0 0 0 12px rgba(16,185,129,0.05), 0 12px 36px rgba(0,0,0,0.15), 0 2px 10px rgba(0,0,0,0.08); }
+            .hero-cta { gap: 10px; }
+            .btn-primary, .btn-outline { padding: 11px 24px; font-size: 0.9rem; }
+            .hero-stats { gap: 16px; flex-wrap: wrap; }
+            .stat { min-width: 140px; }
+            .stat-num { font-size: 1.4rem; }
+            .stat-label { font-size: 0.7rem; }
+            
+            section { padding: 50px 0; }
+            .section-header { margin-bottom: 36px; }
+            .section-header h2 { font-size: 1.6rem; }
+            .section-label { font-size: 0.7rem; padding: 4px 10px; }
+            
+            .domain-tabs { gap: 5px; margin-bottom: 28px; }
+            .tab-btn { padding: 7px 12px; font-size: 0.75rem; }
+            .domain-card { padding: 20px 16px; }
+            .domain-card h3 { font-size: 1.1rem; }
+            .domain-card p { font-size: 0.85rem; }
+            
+            .gap-grid { grid-template-columns: 1fr; gap: 12px; }
+            .gap-item { padding: 16px; }
+            .gap-item h4 { font-size: 0.9rem; }
+            .gap-item p { font-size: 0.8rem; }
+            
+            .obj-list li { padding: 12px; border-radius: 10px; }
+            .obj-list li .obj-num { width: 24px; height: 24px; font-size: 0.7rem; }
+            .obj-list li span { font-size: 0.85rem; }
+            
+            .tech-grid { gap: 8px; }
+            .tech-tag { padding: 5px 10px; font-size: 0.75rem; }
+            
+            .meth-step { padding: 16px; gap: 12px; border-left-width: 3px; }
+            .meth-step-icon { width: 36px; height: 36px; min-width: 36px; font-size: 1rem; border-radius: 10px; }
+            .meth-step h4 { font-size: 0.9rem; }
+            .meth-step p { font-size: 0.8rem; }
+            
+            .lit-table { font-size: 0.75rem; }
+            .lit-table th, .lit-table td { padding: 8px 10px; }
+            
+            .contact-info h3 { font-size: 1.1rem; }
+            .contact-info-list li { gap: 10px; }
+            .contact-info-list li .ci-icon { width: 32px; height: 32px; min-width: 32px; }
+            .contact-form { padding: 20px; }
+            .contact-form h3 { font-size: 0.95rem; margin-bottom: 16px; }
+            .form-group label { font-size: 0.75rem; }
+            .form-group input, .form-group textarea, .form-group select { padding: 9px 12px; font-size: 0.85rem; }
+            .form-group textarea { min-height: 100px; }
+            .form-submit { padding: 11px; font-size: 0.9rem; }
+            
+            .footer-grid { gap: 20px; }
+            .footer-col h4 { font-size: 0.9rem; }
+            .footer-col ul li { margin-bottom: 6px; }
+            .footer-col ul li a, .footer-col ul li span { font-size: 0.78rem; }
+            .footer-bottom p { font-size: 0.75rem; }
+            
+            .doc-grid { grid-template-columns: 1fr; }
+            .doc-card { padding: 18px; }
+            .doc-icon { width: 44px; height: 44px; font-size: 1.1rem; }
+            .doc-card h3 { font-size: 0.9rem; }
+            .doc-card p { font-size: 0.78rem; }
+            
+            .pres-grid { grid-template-columns: 1fr; }
+            .pres-card { border-radius: 12px; }
+            .pres-thumb { height: 110px; }
+            
+            .about-intro { padding: 20px; }
+            .supervisors-row { gap: 12px; flex-direction: column; }
+            .supervisor-card { width: 100%; }
+            .team-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+            .team-card { padding: 20px; }
+            .team-avatar { width: 70px; height: 70px; font-size: 1.5rem; }
+            
+            .milestone-detail { padding: 24px 18px; }
+            .milestone-detail h3 { font-size: 1.2rem; }
+            .milestone-timeline { grid-template-columns: 1fr; }
+            .milestone-timeline .timeline-item { border-radius: 0 !important; border-right: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .milestone-timeline .timeline-item:first-child { border-radius: 14px 0 0 0; border-right: none; }
+            .milestone-timeline .timeline-item:last-child { border-radius: 0 0 0 14px; border-right: none; }
+            
+            .hamburger span { width: 22px; }
+        }
+
         @media (max-width: 480px) {
-            .hero-content { padding: 100px 16px 60px; }
-            .hero-logo { width: 88px; height: 88px; border-radius: 20px; }
-            .hero-cta { flex-direction: column; align-items: center; }
-            section { padding: 72px 0; }
-            .domain-card { padding: 24px; }
+            .container { padding: 0 12px; }
+            .hero-content { padding: 90px 12px 40px; }
+            .hero-content h1 { font-size: 1.5rem; }
+            .hero-logo { width: 70px; height: 70px; border-radius: 16px; }
+            .hero-cta { flex-direction: column; gap: 8px; }
+            .btn-primary, .btn-outline { width: 100%; padding: 10px 20px; }
+            .hero-stats { flex-direction: row; gap: 12px; justify-content: space-around; flex-wrap: wrap; }
+            .stat { min-width: 90px; }
+            .stat-num { font-size: 1.2rem; }
+            .stat-label { font-size: 0.65rem; }
+            
+            section { padding: 40px 0; }
+            .section-header h2 { font-size: 1.4rem; margin-bottom: 10px; }
+            .section-header p { font-size: 0.85rem; }
+            .section-label { font-size: 0.65rem; }
+            
+            .domain-card { padding: 16px 12px; border-radius: 14px; }
+            .domain-card h3 { font-size: 1rem; }
+            .domain-tabs { gap: 4px; }
+            .tab-btn { padding: 6px 10px; font-size: 0.7rem; }
+            
+            .gap-item { padding: 12px; border-radius: 10px; }
+            .gap-item h4 { font-size: 0.85rem; }
+            .gap-item p { font-size: 0.75rem; }
+            
+            .meth-step { padding: 12px; border-left-width: 3px; }
+            .meth-steps { gap: 12px; }
+            
+            .contact-form { padding: 16px; }
+            .contact-form h3 { font-size: 0.9rem; margin-bottom: 12px; }
+            .form-group input, .form-group textarea { padding: 8px 10px; font-size: 0.8rem; }
+            .form-submit { font-size: 0.85rem; padding: 9px; }
+            
+            .team-grid { grid-template-columns: 1fr; }
+            .team-card { padding: 18px; }
+            .team-avatar { width: 60px; height: 60px; font-size: 1.3rem; margin-bottom: 10px; }
+            
+            .doc-grid { grid-template-columns: 1fr; }
+            .pres-grid { grid-template-columns: 1fr; }
+            
+            .milestone-detail { padding: 20px 16px; }
+            .milestone-meta { flex-direction: column; gap: 8px; }
+            
+            .footer-brand .logo { font-size: 1.1rem; }
+            
+            #scrollTop { width: 36px; height: 36px; }
+        }
+
+        @media (max-width: 360px) {
+            .hero-content h1 { font-size: 1.3rem; word-break: break-word; }
+            .hero-badge { font-size: 0.7rem; }
+            .hero-stats { gap: 8px; }
+            .stat { min-width: 70px; }
+            .btn-primary, .btn-outline { padding: 9px 16px; font-size: 0.85rem; }
+            
+            section { padding: 30px 0; }
+            .section-header h2 { font-size: 1.2rem; }
+            .section-header p { font-size: 0.8rem; }
+            
+            .domain-card { padding: 12px; }
+            .domain-card h3 { font-size: 0.95rem; }
+            
+            .contact-form { padding: 12px; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group textarea { font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -857,7 +1131,7 @@
                 <strong>Research Paper</strong>
                 <span>May 2026</span>
             </div>
-            <div class="timeline-item" onclick="showMilestone('final', true, this)">
+            <div class="timeline-item done" onclick="showMilestone('final', true, this)">
                 <div class="timeline-dot"></div>
                 <strong>Final Report</strong>
                 <span>May 2026</span>
@@ -926,17 +1200,17 @@
             <div class="milestone-meta">
                 <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>March 2026</strong></span></div>
                 <div class="milestone-meta-item"><i class="fa-solid fa-percent"></i><span>Marks Allocated: <strong>18%</strong></span></div>
-                <div class="milestone-meta-item"><i class="fa-solid fa-clock" style="color:#10b981"></i><span>Status: <strong style="color:#10b981">Completed</strong></span></div>
+                <div class="milestone-meta-item"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span>Status: <strong style="color:#10b981">Completed</strong></span></div>
             </div>
             <div class="milestone-deliverables">
                 <h4>Deliverables</h4>
                 <ul>
                     <li><i class="fa-solid fa-check"></i>Trained YOLOv8-seg + ResNet18 disease detection pipeline</li>
                     <li><i class="fa-solid fa-check"></i>Stacked Boost Forest price prediction model (MAE &lt; 100 LKR/kg)</li>
-                    <li><i class="fa-regular fa-circle"></i>RAG chatbot with Qdrant vector search and Answerability Gate</li>
-                    <li><i class="fa-regular fa-circle"></i>Ethereum smart contracts (auction + escrow) deployed on testnet</li>
-                    <li><i class="fa-regular fa-circle"></i>Flutter mobile app (disease detection + harvest logging)</li>
-                    <li><i class="fa-regular fa-circle"></i>Progress Presentation 2 slides</li>
+                    <li><i class="fa-solid fa-check"></i>RAG chatbot with Qdrant vector search and Answerability Gate</li>
+                    <li><i class="fa-solid fa-check"></i>Ethereum smart contracts (auction + escrow) deployed on testnet</li>
+                    <li><i class="fa-solid fa-check"></i>Flutter mobile app (disease detection + harvest logging)</li>
+                    <li><i class="fa-solid fa-check"></i>Progress Presentation 2 slides</li>
                 </ul>
             </div>
         </div>
@@ -964,16 +1238,16 @@
             <div class="milestone-meta">
                 <div class="milestone-meta-item"><i class="fa-regular fa-calendar"></i><span>Date: <strong>May 2026</strong></span></div>
                 <div class="milestone-meta-item"><i class="fa-solid fa-percent"></i><span>Marks Allocated: <strong>35%</strong></span></div>
-                <div class="milestone-meta-item"><i class="fa-regular fa-circle" style="color:#94a3b8"></i><span>Status: <strong style="color:#94a3b8">Upcoming</strong></span></div>
+                <div class="milestone-meta-item"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span>Status: <strong style="color:#10b981">Completed</strong></span></div>
             </div>
             <div class="milestone-deliverables">
                 <h4>Deliverables</h4>
                 <ul>
-                    <li><i class="fa-regular fa-circle"></i>Complete final project report (main report + 4 individual component reports)</li>
-                    <li><i class="fa-regular fa-circle"></i>Final system demonstration (all 4 modules integrated)</li>
-                    <li><i class="fa-regular fa-circle"></i>Source code repository with documentation</li>
-                    <li><i class="fa-regular fa-circle"></i>Deployment-ready system on cloud infrastructure</li>
-                    <li><i class="fa-regular fa-circle"></i>Final Presentation slides</li>
+                    <li><i class="fa-solid fa-check"></i>Complete final project report (main report + 4 individual component reports)</li>
+                    <li><i class="fa-solid fa-check"></i>Final system demonstration (all 4 modules integrated)</li>
+                    <li><i class="fa-solid fa-check"></i>Source code repository with documentation</li>
+                    <li><i class="fa-solid fa-check"></i>Deployment-ready system on cloud infrastructure</li>
+                    <li><i class="fa-solid fa-check"></i>Final Presentation slides</li>
                 </ul>
             </div>
         </div>
@@ -1014,57 +1288,57 @@
                     <h3>Project Charter</h3>
                     <p>Formal project scope, team roles, responsibilities, timeline and stakeholder agreements.</p>
                 </div>
-                <a href="#" class="doc-link disabled"><i class="fa-solid fa-file-pdf"></i> View Document <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="https://drive.google.com/drive/folders/13m00M_Rwg1BxVZgRZUrgzKYpSx4fJpxu?usp=sharing" class="doc-link enabled"><i class="fa-solid fa-file-pdf"></i> View Document <i class="fa-solid fa-arrow-right"></i></a>
             </div>
 
             <div class="doc-card fade-up delay-2">
                 <div class="doc-icon green"><i class="fa-solid fa-file-lines"></i></div>
                 <div>
                     <div class="doc-status available"><i class="fa-solid fa-circle-check"></i> Available</div>
-                    <h3>Project Proposal</h3>
+                    <h3>Project Proposals</h3>
                     <p>Detailed proposal covering the problem statement, proposed solution, literature review, and methodology overview.</p>
                 </div>
-                <a href="#" class="doc-link disabled"><i class="fa-solid fa-file-pdf"></i> View Document <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="https://drive.google.com/drive/folders/17yn6dvlK4RA1E9ddSFhuzqucMjsEdfnO?usp=sharing" class="doc-link enabled"><i class="fa-solid fa-file-pdf"></i> View Document <i class="fa-solid fa-arrow-right"></i></a>
             </div>
 
             <div class="doc-card fade-up delay-3">
                 <div class="doc-icon purple"><i class="fa-solid fa-check-double"></i></div>
                 <div>
                     <div class="doc-status available"><i class="fa-solid fa-circle-check"></i> Available</div>
-                    <h3>Status Document I</h3>
+                    <h3>Progress Presentation-1</h3>
                     <p>Progress checklist and status document submitted at Progress Presentation 1 evaluation.</p>
                 </div>
-                <a href="#" class="doc-link disabled"><i class="fa-solid fa-file-pdf"></i> View Document <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="https://drive.google.com/drive/folders/1ntJb-uDbRKUC9VQrCNSzDp0v3CfI_Zpt?usp=sharing" class="doc-link enabled"><i class="fa-solid fa-file-pdf"></i> View Document <i class="fa-solid fa-arrow-right"></i></a>
             </div>
 
             <div class="doc-card fade-up delay-1">
                 <div class="doc-icon orange"><i class="fa-solid fa-check-double"></i></div>
                 <div>
-                    <div class="doc-status pending"><i class="fa-solid fa-clock"></i> Pending</div>
-                    <h3>Status Document II</h3>
+                    <div class="doc-status available"><i class="fa-solid fa-circle-check"></i> Available</div>
+                    <h3>Progress Presentation-2</h3>
                     <p>Progress checklist and status document to be submitted at Progress Presentation 2 evaluation.</p>
                 </div>
-                <span class="doc-link disabled"><i class="fa-solid fa-lock"></i> Not yet available</span>
+                <a href="https://drive.google.com/drive/folders/1KikhS6Rx1F8_AD-M-_24k8Do__ELKtF3?usp=drive_link" class="doc-link enabled"><i class="fa-solid fa-file-pdf"></i> View Document <i class="fa-solid fa-arrow-right"></i></a>
             </div>
 
             <div class="doc-card fade-up delay-2">
                 <div class="doc-icon red"><i class="fa-solid fa-book"></i></div>
                 <div>
-                    <div class="doc-status pending"><i class="fa-solid fa-clock"></i> Pending</div>
+                    <div class="doc-status available"><i class="fa-solid fa-circle-check"></i> Available</div>
                     <h3>Final Report (Main)</h3>
                     <p>Consolidated final project report covering all four modules, results, and conclusions.</p>
                 </div>
-                <span class="doc-link disabled"><i class="fa-solid fa-lock"></i> Not yet available</span>
+                <a href="https://drive.google.com/drive/folders/1gGQ1BQNUtgDqGLlhuzoaCNZ8o2MwAvAr?usp=drive_link" class="doc-link enabled"><i class="fa-solid fa-file-pdf"></i> View Document <i class="fa-solid fa-arrow-right"></i></a>
             </div>
 
             <div class="doc-card fade-up delay-3">
                 <div class="doc-icon blue"><i class="fa-solid fa-book-open"></i></div>
                 <div>
-                    <div class="doc-status pending"><i class="fa-solid fa-clock"></i> Pending</div>
+                    <div class="doc-status available"><i class="fa-solid fa-circle-check"></i> Available</div>
                     <h3>Individual Component Reports</h3>
                     <p>Four individual reports, one per research component, submitted as part of the final evaluation package.</p>
                 </div>
-                <span class="doc-link disabled"><i class="fa-solid fa-lock"></i> Not yet available</span>
+                <a href="https://drive.google.com/drive/folders/1KikhS6Rx1F8_AD-M-_24k8Do__ELKtF3?usp=drive_link" class="doc-link enabled"><i class="fa-solid fa-file-pdf"></i> View Document <i class="fa-solid fa-arrow-right"></i></a>
             </div>
         </div>
     </div>
@@ -1087,10 +1361,10 @@
                 <div class="pres-body">
                     <h3>Project Proposal</h3>
                     <div class="pres-meta">
-                        <span><i class="fa-regular fa-calendar" style="margin-right:4px"></i>March 2025</span>
+                        <span><i class="fa-regular fa-calendar" style="margin-right:4px"></i>September 2025</span>
                         <span><i class="fa-solid fa-users" style="margin-right:4px"></i>Full Team</span>
                     </div>
-                    <a href="#" class="doc-link disabled"><i class="fa-brands fa-google-drive"></i> View Slides <i class="fa-solid fa-arrow-right"></i></a>
+                    <a href="https://drive.google.com/drive/folders/1ylmdObHGiiydPYnaAyc_f6lBKYVk0PGP?usp=sharing" class="doc-link enabled"><i class="fa-brands fa-google-drive"></i> View Slides <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
             </div>
 
@@ -1102,10 +1376,10 @@
                 <div class="pres-body">
                     <h3>Progress Presentation 1</h3>
                     <div class="pres-meta">
-                        <span><i class="fa-regular fa-calendar" style="margin-right:4px"></i>May 2025</span>
+                        <span><i class="fa-regular fa-calendar" style="margin-right:4px"></i>January 2026</span>
                         <span><i class="fa-solid fa-users" style="margin-right:4px"></i>Full Team</span>
                     </div>
-                    <a href="#" class="doc-link disabled"><i class="fa-brands fa-google-drive"></i> View Slides <i class="fa-solid fa-arrow-right"></i></a>
+                    <a href="https://drive.google.com/drive/folders/1ntJb-uDbRKUC9VQrCNSzDp0v3CfI_Zpt?usp=drive_link" class="doc-link enabled"><i class="fa-brands fa-google-drive"></i> View Slides <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
             </div>
 
@@ -1117,10 +1391,10 @@
                 <div class="pres-body">
                     <h3>Progress Presentation 2</h3>
                     <div class="pres-meta">
-                        <span><i class="fa-regular fa-calendar" style="margin-right:4px"></i>August 2025</span>
+                        <span><i class="fa-regular fa-calendar" style="margin-right:4px"></i>March 2026</span>
                         <span><i class="fa-solid fa-users" style="margin-right:4px"></i>Full Team</span>
                     </div>
-                    <span class="doc-link disabled"><i class="fa-solid fa-lock"></i> Not yet available</span>
+                    <a href="https://drive.google.com/drive/folders/1KikhS6Rx1F8_AD-M-_24k8Do__ELKtF3?usp=drive_link" class="doc-link enabled"><i class="fa-brands fa-google-drive"></i> View Slides <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
             </div>
 
@@ -1132,10 +1406,10 @@
                 <div class="pres-body">
                     <h3>Final Presentation</h3>
                     <div class="pres-meta">
-                        <span><i class="fa-regular fa-calendar" style="margin-right:4px"></i>November 2025</span>
+                        <span><i class="fa-regular fa-calendar" style="margin-right:4px"></i>May 2026</span>
                         <span><i class="fa-solid fa-users" style="margin-right:4px"></i>Full Team</span>
                     </div>
-                    <span class="doc-link disabled"><i class="fa-solid fa-lock"></i> Not yet available</span>
+                    <a href="https://drive.google.com/drive/folders/1TxW2Cp8OWLdS7wEp-WEKRwS1g8t4GfRQ?usp=drive_link" class="doc-link enabled"><i class="fa-brands fa-google-drive"></i> View Slides <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
             </div>
         </div>
@@ -1349,30 +1623,67 @@
 </button>
 
 <script>
+    // Mobile detection
+    const isMobile = () => window.innerWidth <= 768;
+    
     // Scroll-triggered fade-up animations
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
     }, { threshold: 0.1 });
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-    // Navbar scroll effect
+    // Navbar scroll effect with mobile optimization
+    let lastScrollY = 0;
     window.addEventListener('scroll', () => {
         const nb = document.getElementById('navbar');
-        nb.style.boxShadow = window.scrollY > 40 ? '0 4px 20px rgba(0,0,0,0.08)' : 'none';
+        const scrollY = window.scrollY;
+        nb.style.boxShadow = scrollY > 40 ? '0 4px 20px rgba(0,0,0,0.08)' : 'none';
         const st = document.getElementById('scrollTop');
-        st.classList.toggle('visible', window.scrollY > 400);
-    });
+        st.classList.toggle('visible', scrollY > 400);
+        lastScrollY = scrollY;
+    }, { passive: true });
 
-    // Mobile nav toggle
+    // Mobile nav toggle with better UX
+    let isNavOpen = false;
     function toggleNav() {
-        document.getElementById('navLinks').classList.toggle('open');
+        const navLinks = document.getElementById('navLinks');
+        isNavOpen = !isNavOpen;
+        navLinks.classList.toggle('open');
+        
+        // Prevent body scroll when nav is open on mobile
+        if (isMobile()) {
+            document.body.style.overflow = isNavOpen ? 'hidden' : 'auto';
+        }
     }
-    // Close nav on link click
+    
+    // Close nav on link click and restore scroll
     document.querySelectorAll('.nav-links a').forEach(a => a.addEventListener('click', () => {
         document.getElementById('navLinks').classList.remove('open');
+        isNavOpen = false;
+        document.body.style.overflow = 'auto';
     }));
+    
+    // Close nav when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+        const nav = document.getElementById('navLinks');
+        const hamburger = document.getElementById('hamburger');
+        if (isNavOpen && !nav.contains(e.target) && !hamburger.contains(e.target)) {
+            nav.classList.remove('open');
+            isNavOpen = false;
+            document.body.style.overflow = 'auto';
+        }
+    });
+    
+    // Handle window resize to close nav if needed
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768 && isNavOpen) {
+            document.getElementById('navLinks').classList.remove('open');
+            isNavOpen = false;
+            document.body.style.overflow = 'auto';
+        }
+    });
 
-    // Domain tabs
+    // Domain tabs with touch optimization
     function switchTab(id) {
         document.querySelectorAll('.tab-btn').forEach((b, i) => {
             const ids = ['literature','gap','problem','objectives','methodology','technologies'];
@@ -1380,9 +1691,17 @@
         });
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
         document.getElementById('tab-' + id).classList.add('active');
+        
+        // Smooth scroll to content on mobile
+        if (isMobile()) {
+            const tabPanel = document.getElementById('tab-' + id);
+            setTimeout(() => {
+                tabPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
     }
 
-    // Milestone detail
+    // Milestone detail with improved mobile handling
     function showMilestone(id, scroll, clickedEl) {
         document.querySelectorAll('.milestone-detail').forEach(d => d.classList.remove('active'));
         document.querySelectorAll('.timeline-item').forEach(t => t.classList.remove('selected'));
@@ -1390,7 +1709,11 @@
             const detail = document.getElementById('ms-' + id);
             if (detail) {
                 detail.classList.add('active');
-                if (scroll) detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                if (scroll || isMobile()) {
+                    setTimeout(() => {
+                        detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
+                }
             }
             // Highlight the clicked timeline item, or find it by ID
             const tItem = clickedEl || document.querySelector(`.timeline-item[onclick*="'${id}'"]`);
@@ -1399,18 +1722,63 @@
         const sel = document.querySelector('.milestone-select');
         if (sel && id) sel.value = id;
     }
+    
     // Auto-show current milestone on page load (no scroll, no click element)
-    showMilestone('pp2', false);
+    showMilestone('paper', false);
+    
+    // Add milestone select change handler for mobile
+    const milestoneSelect = document.querySelector('.milestone-select');
+    if (milestoneSelect) {
+        milestoneSelect.addEventListener('change', (e) => {
+            showMilestone(e.target.value, true);
+        });
+    }
 
-    // Contact form (mailto fallback)
+    // Contact form (mailto fallback) with mobile improvements
     function handleFormSubmit(e) {
         e.preventDefault();
-        const name = document.querySelector('.contact-form input[type=text]').value;
-        const email = document.querySelector('.contact-form input[type=email]').value;
-        const msg = document.querySelector('.contact-form textarea').value;
-        if (!name || !email || !msg) { alert('Please fill in all required fields.'); return; }
+        const nameInput = document.querySelector('.contact-form input[type=text]');
+        const emailInput = document.querySelector('.contact-form input[type=email]');
+        const msgInput = document.querySelector('.contact-form textarea');
+        
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const msg = msgInput.value.trim();
+        
+        if (!name || !email || !msg) { 
+            alert('Please fill in all required fields.');
+            return; 
+        }
+        
         window.location.href = `mailto:it22594686@my.sliit.lk?subject=SmartPepper Enquiry from ${encodeURIComponent(name)}&body=${encodeURIComponent(msg + '\n\nFrom: ' + name + ' <' + email + '>')}`;
     }
+    
+    // Prevent zoom on input focus (iOS optimization - comment out if not desired)
+    // document.addEventListener('touchstart', () => {}, { passive: true });
+    
+    // Better touch feedback for interactive elements
+    document.addEventListener('touchstart', function(e) {
+        const btn = e.target.closest('.btn-primary, .btn-outline, .doc-link, .tab-btn, .timeline-item, .team-card, .doc-card, .pres-card, .supervisor-card');
+        if (btn) btn.style.opacity = '0.85';
+    }, { passive: true });
+    
+    document.addEventListener('touchend', function(e) {
+        const btn = e.target.closest('.btn-primary, .btn-outline, .doc-link, .tab-btn, .timeline-item, .team-card, .doc-card, .pres-card, .supervisor-card');
+        if (btn) btn.style.opacity = '1';
+    }, { passive: true });
+    
+    // Improve form input focus on mobile
+    const formInputs = document.querySelectorAll('.form-group input, .form-group textarea, .form-group select');
+    formInputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            // On mobile, scroll the input into view with some padding
+            if (isMobile()) {
+                setTimeout(() => {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        });
+    });
 </script>
 </body>
 </html>
