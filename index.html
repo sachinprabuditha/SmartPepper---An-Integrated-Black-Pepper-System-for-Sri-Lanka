@@ -1010,28 +1010,28 @@
                     <div class="meth-step">
                         <div class="meth-step-icon"><i class="fa-solid fa-microchip"></i></div>
                         <div>
-                            <h4>Module 1 — IoT Automated Quality Grading</h4>
+                            <h4>Module 1 - IoT Automated Quality Grading</h4>
                             <p>An ESP32 microcontroller orchestrates four sequential stations: a load-cell density station computing Gram-Liter (g/L = sample weight / cup volume), a conveyor motor system, a controlled-illumination imaging station with a mobile phone camera, and a wireless data transmission layer. ResNet18, pre-trained on ImageNet and fine-tuned on domain-specific pepper images, classifies each segmented seed as Normal, Moulded, or Discoloured. A rule-based decision engine combines density and visual results to assign a final export-grade. Hardware is managed through a web control interface, eliminating the need for physical tethering.</p>
                         </div>
                     </div>
                     <div class="meth-step">
                         <div class="meth-step-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
                         <div>
-                            <h4>Module 2 — Mobile Disease Detection</h4>
+                            <h4>Module 2 - Mobile Disease Detection</h4>
                             <p>Farmers photograph pepper vines via a Flutter mobile app. YOLOv8-seg performs instance segmentation to isolate individual leaf instances from complex multi-leaf field images. A fine-tuned ResNet18 classifies each segmented leaf into: Footrot (Quick Wilt), Pollu (Anthracnose), Slow Decline, or Healthy. Severity % = (infected leaves / total leaves) × 100. A spread prediction algorithm estimates time to full vine infection using disease-specific progression coefficients. Dual-path treatment recommendations (eco-friendly for low severity; targeted chemical protocols for high severity) are generated. GPS coordinates are captured simultaneously to populate a farm-level geomap.</p>
                         </div>
                     </div>
                     <div class="meth-step">
                         <div class="meth-step-icon"><i class="fa-solid fa-chart-line"></i></div>
                         <div>
-                            <h4>Module 3 — Price Forecasting & RAG Chatbot</h4>
+                            <h4>Module 3 - Price Forecasting & RAG Chatbot</h4>
                             <p>A three-stage Stacked Boost Forest ensemble is trained on 2016–2025 weekly purchase prices (Dept. of Export Agriculture), stratified by district (Matale, Kandy, Matara, Hambantota) and pepper grade, with the weekly USD/LKR exchange rate as an external feature. Stage 1: Random Forest (non-linear feature interactions). Stage 2: Gradient Boosting on Stage-1 residuals. Stage 3: Linear Regression meta-learner. Income projection uses Dried Yield = Fresh Yield × Drying Ratio and Income = Dried Yield × Expected Price. The RAG chatbot uses OpenAI Embeddings, Qdrant vector search, and an Answerability Gate to ensure only expert-validated agronomic knowledge is delivered.</p>
                         </div>
                     </div>
                     <div class="meth-step">
                         <div class="meth-step-icon"><i class="fa-solid fa-link"></i></div>
                         <div>
-                            <h4>Module 4 — Blockchain Auction & Export Compliance</h4>
+                            <h4>Module 4 - Blockchain Auction & Export Compliance</h4>
                             <p>Solidity smart contracts on Ethereum govern auction rules (minimum bid increment, duration) and escrow lifecycle (deposit → compliance approval + shipment confirmation → release). Lot provenance, auction outcomes and compliance events are written to an immutable ledger; IPFS stores certification documents via content-addressed hashes. Each lot receives a Digital Pepper Passport accessible via QR code or NFC tag. Firebase Realtime Database provides sub-second WebSocket bid propagation for the live auction interface. A rule-based compliance engine validates packaging, labelling and certification at pre-auction listing and pre-shipment checkpoints.</p>
                         </div>
                     </div>
@@ -1145,7 +1145,7 @@
 
         <div class="milestone-select-wrapper fade-up">
             <select class="milestone-select" onchange="showMilestone(this.value, true)">
-                <option value="">— Select a Milestone to view details —</option>
+                <option value="">- Select a Milestone to view details -</option>
                 <option value="proposal">Project Proposal</option>
                 <option value="pp1">Progress Presentation 1</option>
                 <option value="pp2">Progress Presentation 2</option>
@@ -1538,17 +1538,17 @@
                 <h3>Send a Message</h3>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Your Name</label>
-                        <input type="text" placeholder="John Doe">
+                        <label for="contact-name">Your Name</label>
+                        <input type="text" id="contact-name" placeholder="John Doe">
                     </div>
                     <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" placeholder="john@example.com">
+                        <label for="contact-email">Email Address</label>
+                        <input type="email" id="contact-email" placeholder="john@example.com">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Subject</label>
-                    <select>
+                    <label for="contact-subject">Subject</label>
+                    <select id="contact-subject">
                         <option value="">Select a subject</option>
                         <option>General Enquiry</option>
                         <option>Collaboration Opportunity</option>
@@ -1558,12 +1558,13 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Message</label>
-                    <textarea placeholder="Write your message here..."></textarea>
+                    <label for="contact-message">Message</label>
+                    <textarea id="contact-message" placeholder="Write your message here..."></textarea>
                 </div>
-                <button class="form-submit" onclick="handleFormSubmit(event)">
+                <button id="contact-submit" class="form-submit" onclick="handleFormSubmit(event)">
                     <i class="fa-solid fa-paper-plane" style="margin-right:8px"></i>Send Message
                 </button>
+                <div id="form-status" style="margin-top:12px;font-size:0.88rem;padding:10px 14px;border-radius:8px;display:none;"></div>
             </div>
         </div>
     </div>
@@ -1622,7 +1623,18 @@
     <i class="fa-solid fa-chevron-up"></i>
 </button>
 
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
 <script>
+    // ── EmailJS config ──────────────────────────────────────────────────────
+    // Replace these three values with your own from https://dashboard.emailjs.com
+    const EMAILJS_PUBLIC_KEY  = 'XDDnTT6YsiZO_yiXH';   // Account → API Keys
+    const EMAILJS_SERVICE_ID  = 'service_ub62mfa';   // Email Services tab
+    const EMAILJS_TEMPLATE_ID = 'template_xmjq1yt';  // Email Templates tab
+    // ────────────────────────────────────────────────────────────────────────
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
     // Mobile detection
     const isMobile = () => window.innerWidth <= 768;
     
@@ -1734,23 +1746,56 @@
         });
     }
 
-    // Contact form (mailto fallback) with mobile improvements
-    function handleFormSubmit(e) {
+    // Contact form — sends via EmailJS (no backend needed, works on GitHub Pages)
+    async function handleFormSubmit(e) {
         e.preventDefault();
-        const nameInput = document.querySelector('.contact-form input[type=text]');
-        const emailInput = document.querySelector('.contact-form input[type=email]');
-        const msgInput = document.querySelector('.contact-form textarea');
-        
-        const name = nameInput.value.trim();
-        const email = emailInput.value.trim();
-        const msg = msgInput.value.trim();
-        
-        if (!name || !email || !msg) { 
-            alert('Please fill in all required fields.');
-            return; 
+
+        const name    = document.getElementById('contact-name').value.trim();
+        const email   = document.getElementById('contact-email').value.trim();
+        const subject = document.getElementById('contact-subject').value.trim();
+        const message = document.getElementById('contact-message').value.trim();
+        const btn     = document.getElementById('contact-submit');
+        const status  = document.getElementById('form-status');
+
+        const showStatus = (msg, ok) => {
+            status.textContent = msg;
+            status.style.display = 'block';
+            status.style.background = ok ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)';
+            status.style.color = ok ? '#10b981' : '#ef4444';
+            status.style.border = `1px solid ${ok ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`;
+        };
+
+        if (!name || !email || !message) {
+            showStatus('Please fill in your name, email, and message.', false);
+            return;
         }
-        
-        window.location.href = `mailto:it22594686@my.sliit.lk?subject=SmartPepper Enquiry from ${encodeURIComponent(name)}&body=${encodeURIComponent(msg + '\n\nFrom: ' + name + ' <' + email + '>')}`;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:8px"></i>Sending…';
+        status.style.display = 'none';
+
+        try {
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                from_name:    name,
+                from_email:   email,
+                to_email:     'sliitprojectmail@gmail.com',
+                subject:      subject || 'General Enquiry',
+                message:      message,
+                reply_to:     email,
+            });
+
+            showStatus("Message sent! We'll get back to you soon.", true);
+            document.getElementById('contact-name').value    = '';
+            document.getElementById('contact-email').value   = '';
+            document.getElementById('contact-subject').value = '';
+            document.getElementById('contact-message').value = '';
+        } catch (err) {
+            console.error('EmailJS error status:', err.status, '| text:', err.text, '| full:', err);
+            showStatus(`Error ${err.status || ''}: ${err.text || 'Failed to send. Please try again.'}`, false);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:8px"></i>Send Message';
+        }
     }
     
     // Prevent zoom on input focus (iOS optimization - comment out if not desired)
