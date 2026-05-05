@@ -5,7 +5,7 @@ services:
     build:
       context: ./SmartPepper-Auction-Blockchain-System/backend
     ports:
-      - "80:5000"
+      - "80:3002"
     environment:
       - NODE_ENV=production
     env_file:
