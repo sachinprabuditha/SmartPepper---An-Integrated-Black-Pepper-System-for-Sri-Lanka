@@ -56,3 +56,13 @@ node_modules/
 plantationmanagement/rag_data/
 uploads/
 
+
+# Environment variables
+.env
+.env.*
+
+# Secrets
+*credentials*.json
+*serviceAccountKey*.json
+*firebase-adminsdk*.json
+
