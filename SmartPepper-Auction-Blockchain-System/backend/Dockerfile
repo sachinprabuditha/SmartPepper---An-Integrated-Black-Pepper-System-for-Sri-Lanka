@@ -14,6 +14,7 @@ WORKDIR /app
 # Set up Python virtual environment and install dependencies
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
 RUN pip install --no-cache-dir ultralytics opencv-python-headless numpy
 
 # Install Node.js dependencies
