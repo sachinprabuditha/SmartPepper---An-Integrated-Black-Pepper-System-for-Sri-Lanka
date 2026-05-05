@@ -1,6 +1,16 @@
 version: '3.8'
 
 services:
+  plantation-api:
+    build:
+      context: ./Planting-Management-Price-Prediction/plantationmanagement
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./Planting-Management-Price-Prediction/plantationmanagement/.env
+
   auction-api:
     build:
       context: ./SmartPepper-Auction-Blockchain-System/backend
