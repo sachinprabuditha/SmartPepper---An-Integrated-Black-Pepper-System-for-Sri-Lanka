@@ -332,7 +332,8 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(child: SizedBox()), // Placeholder for alignment
+                  const Expanded(
+                      child: SizedBox()), // Placeholder for alignment
                 ],
               ),
 
@@ -710,22 +711,22 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
               ),
             ),
             const SizedBox(width: 16),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Disease Management',
-                    style: TextStyle(
+                    context.tr('disease_management'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    'Detect and manage pepper diseases.',
-                    style: TextStyle(
+                    context.tr('disease_management_subtitle'),
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 12,
                     ),

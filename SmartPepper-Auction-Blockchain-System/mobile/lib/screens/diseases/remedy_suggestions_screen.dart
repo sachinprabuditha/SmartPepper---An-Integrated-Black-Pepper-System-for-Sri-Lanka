@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:smartpepper_mobile/config/theme.dart';
 import '../../localization/app_localizations.dart';
@@ -24,6 +25,25 @@ class RemedySuggestionsScreen extends StatefulWidget {
 class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  int _currentCarouselIndex = 0;
+
+  final List<_RemedyCarouselItem> _carouselItems = const [
+    _RemedyCarouselItem(
+      imagePath: 'assets/icons/banner1.jpg',
+      title: 'SmartPepper',
+      subtitle: 'Disease guidance and remedy support',
+    ),
+    _RemedyCarouselItem(
+      imagePath: 'assets/icons/banner2.jpg',
+      title: 'Eco-friendly care',
+      subtitle: 'Support healthier crop recovery',
+    ),
+    _RemedyCarouselItem(
+      imagePath: 'assets/icons/bannere4.jpg',
+      title: 'Chemical solutions',
+      subtitle: 'Use targeted treatments carefully',
+    ),
+  ];
 
   @override
   void initState() {
@@ -59,25 +79,6 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
             '${widget.diseaseName} ${context.tr('disease_remedies_title')}'),
         backgroundColor: AppTheme.forestGreen,
         foregroundColor: AppTheme.pepperGold,
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppTheme.pepperGold,
-          indicatorWeight: 3,
-          labelColor: AppTheme.pepperGold,
-          unselectedLabelColor: Colors.white70,
-          labelStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-          tabs: [
-            Tab(
-                icon: const Icon(Icons.eco),
-                text: context.tr('disease_eco_friendly_solutions')),
-            Tab(
-                icon: const Icon(Icons.science),
-                text: context.tr('disease_chemical_solutions')),
-          ],
-        ),
       ),
       body: Column(
         children: [
@@ -126,6 +127,84 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: CarouselSlider.builder(
+              itemCount: _carouselItems.length,
+              options: CarouselOptions(
+                height: 180,
+                viewportFraction: 1,
+                enlargeCenterPage: false,
+                autoPlay: _carouselItems.length > 1,
+                autoPlayInterval: const Duration(seconds: 4),
+                autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                enableInfiniteScroll: _carouselItems.length > 1,
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    _currentCarouselIndex = index;
+                  });
+                },
+              ),
+              itemBuilder: (context, index, realIndex) {
+                final item = _carouselItems[index];
+                return _buildCarouselCard(item);
+              },
+            ),
+          ),
+          const SizedBox(height: 10),
+          if (_carouselItems.length > 1)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                _carouselItems.length,
+                (index) => AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: _currentCarouselIndex == index ? 14 : 8,
+                  height: _currentCarouselIndex == index ? 14 : 8,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _currentCarouselIndex == index
+                        ? AppTheme.pepperGold
+                        : Colors.white54,
+                  ),
+                ),
+              ),
+            ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppTheme.pepperGold.withOpacity(0.25),
+                ),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                indicatorColor: AppTheme.pepperGold,
+                indicatorWeight: 3,
+                labelColor: AppTheme.pepperGold,
+                unselectedLabelColor: Colors.white70,
+                labelStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                tabs: [
+                  Tab(
+                      icon: const Icon(Icons.eco),
+                      text: context.tr('disease_eco_friendly_solutions')),
+                  Tab(
+                      icon: const Icon(Icons.science),
+                      text: context.tr('disease_chemical_solutions')),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -135,6 +214,61 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
                 // Chemical Solutions Tab
                 _buildRemedyList(chemList, const Color(0xFFFFA726)),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCarouselCard(_RemedyCarouselItem item) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            item.imagePath,
+            fit: BoxFit.cover,
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.1),
+                  Colors.black.withOpacity(0.55),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.subtitle,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -206,4 +340,16 @@ class _RemedySuggestionsScreenState extends State<RemedySuggestionsScreen>
       },
     );
   }
+}
+
+class _RemedyCarouselItem {
+  const _RemedyCarouselItem({
+    required this.imagePath,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final String imagePath;
+  final String title;
+  final String subtitle;
 }
