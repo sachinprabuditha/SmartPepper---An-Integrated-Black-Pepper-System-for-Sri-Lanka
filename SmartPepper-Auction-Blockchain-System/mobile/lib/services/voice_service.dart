@@ -34,7 +34,7 @@ class VoiceService {
     }
   }
 
-  Future<String?> stopAndSend() async {
+  Future<String?> stopAndSend({String languageCode = 'en'}) async {
     try {
       await _recorder.stop();
       _isRecording = false;
@@ -65,7 +65,11 @@ class VoiceService {
 
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(response.body);
-        return jsonResponse['answer'];
+        if (languageCode == 'si') {
+          return jsonResponse['sinhala_answer'];
+        } else {
+          return jsonResponse['english_answer'];
+        }
       } else {
         print('Voice query failed with status ${response.statusCode}: ${response.body}');
         return null;

@@ -127,7 +127,8 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
     _pulseController.stop();
     _pulseController.reset();
 
-    final answer = await _voiceService.stopAndSend();
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final answer = await _voiceService.stopAndSend(languageCode: languageProvider.locale.languageCode);
 
     if (mounted) {
       setState(() {
@@ -179,42 +180,50 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
         foregroundColor: Colors.white,
         actions: [
           const LanguagePickerButton(),
-          if (!_isLoadingFarms && _farms.isNotEmpty)
-            DropdownButtonHideUnderline(
-              child: DropdownButton<String?>(
-                dropdownColor: AppTheme.deepEmerald,
-                icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                value: _selectedFarmId,
-                hint: Text(context.tr('chat_mode_guide'),
-                    style: const TextStyle(color: Colors.white70)),
-                items: [
-                  DropdownMenuItem<String?>(
-                    value: null,
-                    child: Text(
-                      context.tr('chat_mode_guide_general'),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  ..._farms.map(
-                    (f) => DropdownMenuItem<String?>(
-                      value: f.id,
-                      child: Text(
-                        "${context.tr('chat_mode')}${f.farmName}",
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  )
-                ],
-                onChanged: (value) {
-                  setState(() => _selectedFarmId = value);
-                },
-              ),
-            ),
           const SizedBox(width: 16),
         ],
       ),
       body: Column(
         children: [
+          /// FARM SELECTOR (Moved from AppBar)
+          if (!_isLoadingFarms && _farms.isNotEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              color: AppTheme.deepEmerald,
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String?>(
+                  dropdownColor: AppTheme.deepEmerald,
+                  isExpanded: true,
+                  icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                  value: _selectedFarmId,
+                  hint: Text(context.tr('chat_mode_guide'),
+                      style: const TextStyle(color: Colors.white70)),
+                  items: [
+                    DropdownMenuItem<String?>(
+                      value: null,
+                      child: Text(
+                        context.tr('chat_mode_guide_general'),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    ..._farms.map(
+                      (f) => DropdownMenuItem<String?>(
+                        value: f.id,
+                        child: Text(
+                          "${context.tr('chat_mode')} ${f.farmName}",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    )
+                  ],
+                  onChanged: (value) {
+                    setState(() => _selectedFarmId = value);
+                  },
+                ),
+              ),
+            ),
+
           /// MODE INDICATOR
           Container(
             width: double.infinity,
