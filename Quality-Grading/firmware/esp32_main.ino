@@ -4,7 +4,7 @@
 #include <ArduinoJson.h> 
 
 /* ========= WIFI SETTINGS ========= */
-const char* ssid = "Not STARLINK";
+const char* ssid = "STARLINK";
 const char* password = "123456789";
 
 /* ========= HX711 ========= */
@@ -143,14 +143,8 @@ void handleCalibrate() {
   if (doc.containsKey("knownWeight")) {
     float knownWeight = doc["knownWeight"]; // in kg
     if (knownWeight != 0) {
-      // Logic: RAW / Factor = Weight  =>  Factor = RAW / KnownWeight
-      // We assume the user has already Tared (scale reads 0 for 0 weight).
-      // Now they placed a known weight.
-      // We need raw reading minus tare offset.
-      // scale.get_units() returns (raw - offset) / factor.
-      // scale.get_value() returns (raw - offset).
       
-      long rawValue = scale.get_value(10); // Average of 10 readings
+      long rawValue = scale.get_value(10); 
       calibration_factor = (float)rawValue / knownWeight;
       scale.set_scale(calibration_factor);
     }
