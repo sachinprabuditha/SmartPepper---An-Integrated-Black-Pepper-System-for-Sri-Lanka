@@ -33,5 +33,6 @@ jobs:
             echo ${{ secrets.AZURE_VM_PASSWORD }} | sudo -S DEBIAN_FRONTEND=noninteractive apt-get update
             echo ${{ secrets.AZURE_VM_PASSWORD }} | sudo -S DEBIAN_FRONTEND=noninteractive apt-get install -y docker.io docker-compose
             cd /home/${{ secrets.AZURE_VM_USER }}/deploy_folder
+            echo ${{ secrets.AZURE_VM_PASSWORD }} | sudo -S docker rm -f $(sudo docker ps -aq) || true
             echo ${{ secrets.AZURE_VM_PASSWORD }} | sudo -S docker system prune -a -f --volumes
             echo ${{ secrets.AZURE_VM_PASSWORD }} | sudo -S docker-compose up -d --build
