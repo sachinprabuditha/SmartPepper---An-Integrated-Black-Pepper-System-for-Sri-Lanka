@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.smartpepper_mobile"
     compileSdk = 36
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "25.1.8937393"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

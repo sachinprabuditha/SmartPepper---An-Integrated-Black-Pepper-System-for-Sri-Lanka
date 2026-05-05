@@ -19,21 +19,21 @@ const API_CONFIG = {
     ENDPOINTS: {
         // Disease Detection
         PREDICT: '/predict',
-        
+
         // Disease Locations
         DISEASE_LOCATIONS: '/api/disease-locations',
         GET_DISEASE_LOCATIONS: '/api/disease-locations',
         SAVE_DISEASE_LOCATION: '/api/disease-locations',
-        
+
         // Health Check
         HEALTH: '/health',
     },
 
-    
+
     FIREBASE: {
         DATABASE_URL: process.env.FIREBASE_DATABASE_URL || 'https://smartpepper-645db.firebaseio.com',
         PROJECT_ID: process.env.FIREBASE_PROJECT_ID || 'smartpepper-645db',
-        
+
         // Firestore Collections
         COLLECTIONS: {
             DISEASE_LOCATIONS: 'disease_locations',
@@ -47,12 +47,12 @@ const API_CONFIG = {
         ALLOWED_EXTENSIONS: ['.jpg', '.jpeg', '.png'],
     },
 
- 
+
     DISEASE: {
-        CLASS_NAMES: ['Footrot', 'Pollu_Disease', 'Slow-Decline', 'healthy leaves'],
-        DEBUG_FOLDERS: ['Footrot', 'Pollu_Disease', 'Slow-Decline', 'healthy leaves', 'Uncertain'],
+        CLASS_NAMES: ['Footrot', 'healthy leaves', 'Pollu_Disease', 'Slow-Decline'],
+        DEBUG_FOLDERS: ['Footrot', 'healthy leaves', 'Pollu_Disease', 'Slow-Decline', 'Uncertain'],
         DEBUG_ROOT: 'debug_crops',
-        
+
         // Severity Thresholds
         SEVERITY_LEVELS: {
             LOW: 20,        // 0-20%
@@ -74,7 +74,7 @@ const API_CONFIG = {
         },
     },
 
- 
+
     MESSAGES: {
         SUCCESS: 'success',
         ERROR: 'error',
@@ -109,7 +109,7 @@ const API_CONFIG = {
  * Get the full server URL
  * @returns {string} Full server URL (e.g., http://0.0.0.0:5000)
  */
-API_CONFIG.getServerUrl = function() {
+API_CONFIG.getServerUrl = function () {
     return `http://${this.SERVER.HOST}:${this.SERVER.PORT}`;
 };
 
@@ -118,7 +118,7 @@ API_CONFIG.getServerUrl = function() {
  * @param {string} endpoint - Endpoint path
  * @returns {string} Full endpoint URL
  */
-API_CONFIG.getEndpointUrl = function(endpoint) {
+API_CONFIG.getEndpointUrl = function (endpoint) {
     return `${this.getServerUrl()}${endpoint}`;
 };
 
@@ -126,7 +126,7 @@ API_CONFIG.getEndpointUrl = function(endpoint) {
  * Check if server is in production mode
  * @returns {boolean}
  */
-API_CONFIG.isProduction = function() {
+API_CONFIG.isProduction = function () {
     return this.SERVER.ENV === 'production';
 };
 
@@ -134,7 +134,7 @@ API_CONFIG.isProduction = function() {
  * Check if server is in development mode
  * @returns {boolean}
  */
-API_CONFIG.isDevelopment = function() {
+API_CONFIG.isDevelopment = function () {
     return this.SERVER.ENV === 'development';
 };
 
