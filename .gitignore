@@ -116,15 +116,6 @@ local-*.json
 test-data/
 .local/
 
-# Environment variables
-.env
-.env.*
-
-# Secrets
-*credentials*.json
-*serviceAccountKey*.json
-*firebase-adminsdk*.json
-
 # Machine Learning models
 *.h5
 *.pb
