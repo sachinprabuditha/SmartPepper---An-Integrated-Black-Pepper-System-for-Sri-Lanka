@@ -20,3 +20,13 @@ services:
       - NODE_ENV=production
     env_file:
       - ./SmartPepper-Auction-Blockchain-System/backend/.env
+
+  disease-api:
+    build:
+      context: ./SmartPepper-Auction-Blockchain-System/node_backend
+    ports:
+      - "5005:5005"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./SmartPepper-Auction-Blockchain-System/node_backend/.env
