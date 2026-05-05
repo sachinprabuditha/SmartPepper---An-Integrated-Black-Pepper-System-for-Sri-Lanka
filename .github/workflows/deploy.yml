@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          lfs: true
 
       - name: Copy files via SCP
         uses: appleboy/scp-action@master
