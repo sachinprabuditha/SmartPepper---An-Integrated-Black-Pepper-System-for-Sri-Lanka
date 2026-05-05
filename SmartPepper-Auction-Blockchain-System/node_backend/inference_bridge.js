@@ -34,7 +34,11 @@ function runPythonInference(imagePaths, timestamp) {
             if (code !== 0) {
                 console.error(`Python script exited with code ${code}`);
                 console.error(`Stderr: ${errorData}`);
-                return reject(new Error(`Python inference failed: ${errorData}`));
+                const combinedOutput = [
+                    errorData.trim() ? `stderr: ${errorData.trim()}` : null,
+                    outputData.trim() ? `stdout: ${outputData.trim()}` : null,
+                ].filter(Boolean).join(' | ');
+                return reject(new Error(`Python inference failed: ${combinedOutput || 'no output captured'}`));
             }
 
             try {

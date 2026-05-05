@@ -20,26 +20,25 @@ DEBUG_ROOT = os.path.join(BASE_DIR, "debug_crops")
 # Hardware config
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# YOLO Configuration with defaults
-YOLO_CONFIDENCE = float(os.getenv('YOLO_CONFIDENCE', '0.35'))
-YOLO_IOU = float(os.getenv('YOLO_IOU', '0.35'))
-YOLO_IMAGE_SIZE = int(os.getenv('YOLO_IMAGE_SIZE', '1024'))
+# YOLO Configuration — FIXED values
+YOLO_CONFIDENCE = float(os.getenv('YOLO_CONFIDENCE', '0.50'))   # was 0.70 — too high, dropping valid leaves
+YOLO_IOU        = float(os.getenv('YOLO_IOU',        '0.60'))   # was 0.45
+YOLO_IMAGE_SIZE = int(os.getenv('YOLO_IMAGE_SIZE',   '640'))    # was 1024 — must match training imgsz
 
-# Filtering thresholds
-MIN_LEAF_AREA = int(os.getenv('MIN_LEAF_AREA', '15000'))
-MAX_LEAF_AREA = int(os.getenv('MAX_LEAF_AREA', '500000'))
-CROP_PADDING = float(os.getenv('CROP_PADDING', '0.15'))
-MASK_THRESHOLD = float(os.getenv('MASK_THRESHOLD', '0.05'))
-# Increased dilation for better edge capture (important for footrot detection on leaf edges)
-DILATION_KERNEL_SIZE = int(os.getenv('DILATION_KERNEL_SIZE', '9'))
-DILATION_ITERATIONS = int(os.getenv('DILATION_ITERATIONS', '10'))
+# Filtering thresholds — FIXED values
+MIN_LEAF_AREA = int(os.getenv('MIN_LEAF_AREA', '200'))   # was 15000 — was killing all crops
+MAX_LEAF_AREA        = int(os.getenv('MAX_LEAF_AREA',        '500000'))
+CROP_PADDING         = float(os.getenv('CROP_PADDING',       '0.15'))
+MASK_THRESHOLD       = float(os.getenv('MASK_THRESHOLD',     '0.05'))
+DILATION_KERNEL_SIZE = int(os.getenv('DILATION_KERNEL_SIZE', '5'))
+DILATION_ITERATIONS  = int(os.getenv('DILATION_ITERATIONS',  '3'))
 
 # Load Class Names
 if os.path.exists(LABELS_PATH):
     with open(LABELS_PATH, "r") as f:
         class_names = json.load(f)
 else:
-    class_names = ["Footrot", "Pollu_Disease", "Slow-Decline", "healthy leaves"]
+    class_names = ["Footrot", "healthy leaves", "Pollu_Disease", "Slow-Decline"]
 
 NUM_CLASSES = len(class_names)
 folders_to_create = class_names + ["Uncertain"]

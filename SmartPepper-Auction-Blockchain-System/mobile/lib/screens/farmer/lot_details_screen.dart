@@ -1684,7 +1684,7 @@ class LotDetailsScreen extends StatelessWidget {
                       color: Colors.transparent,
                       child: OutlinedButton.icon(
                         onPressed: () async {
-                          final blockchainUrl = 'http://192.168.8.173:8545';
+                          final blockchainUrl = 'http://192.168.8.151:8545';
                           // Show blockchain details dialog
                           showDialog(
                             context: context,
