@@ -42,7 +42,7 @@ export default function LotReviewPage({ params }: { params: { lotId: string } })
   const [showCertificateModal, setShowCertificateModal] = useState(false);
   const [certificateUrl, setCertificateUrl] = useState<string>('');
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.116:3002' || 'http://192.168.8.116:3002' || 'http://192.168.1.153:3002'|| 'http://192.168.8.173:3002';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.116:3002' || 'http://192.168.8.116:3002' || 'http://192.168.1.153:3002'|| 'http://192.168.1.133:3002';
 
   // Use multiple IPFS gateways for redundancy
   const IPFS_GATEWAYS = [

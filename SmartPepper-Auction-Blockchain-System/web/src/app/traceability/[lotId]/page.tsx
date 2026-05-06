@@ -226,8 +226,8 @@ function TabButton({ active, onClick, icon, label }: any) {
     <button
       onClick={onClick}
       className={`flex items-center space-x-2 px-4 py-4 border-b-2 transition-colors ${active
-          ? 'border-green-600 text-green-600'
-          : 'border-transparent text-gray-600 hover:text-gray-900'
+        ? 'border-green-600 text-green-600'
+        : 'border-transparent text-gray-600 hover:text-gray-900'
         }`}
     >
       {icon}
@@ -416,8 +416,8 @@ function ComplianceView({ data, copyToClipboard }: any) {
                 </div>
               </div>
               <div className={`px-4 py-2 rounded-full text-sm font-medium ${isPassed
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-red-100 text-red-800'
                 }`}>
                 {isPassed ? 'PASSED' : 'FAILED'}
               </div>
@@ -493,7 +493,7 @@ function BlockchainView({ data, copyToClipboard }: any) {
         <div className="space-y-2 text-sm">
           <InfoRow label="Total Transactions" value={data.blockchain_info.total_transactions} />
           <InfoRow label="Network" value="Hardhat Local (Chain ID: 1337)" />
-          <InfoRow label="RPC URL" value="http://192.168.8.173:8545" />
+          <InfoRow label="RPC URL" value="http://192.168.1.133:8545" />
         </div>
       </div>
     </div>

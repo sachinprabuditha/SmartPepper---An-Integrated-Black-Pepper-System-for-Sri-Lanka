@@ -128,17 +128,32 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
     _pulseController.reset();
 
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
-    final answer = await _voiceService.stopAndSend(languageCode: languageProvider.locale.languageCode);
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+
+    final result = await _voiceService.stopAndSend(
+      languageCode: languageProvider.locale.languageCode,
+      conversationId: chatProvider.activeConversationId,
+      activeFarmId: _selectedFarmId,
+    );
 
     if (mounted) {
       setState(() {
         _isVoiceLoading = false;
       });
 
-      if (answer != null) {
-        final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+      if (result != null) {
+        final String question = result['question'] ?? '';
+        final String answer = result['answer'] ?? '';
+
+        // Add user message (what they asked via voice)
+        if (question.isNotEmpty) {
+          chatProvider.addMessage(ChatMessage(text: question, isUser: true, timestamp: DateTime.now()));
+        }
+        
         // Add bot message
-        chatProvider.addMessage(ChatMessage(text: answer, isUser: false, timestamp: DateTime.now()));
+        if (answer.isNotEmpty) {
+          chatProvider.addMessage(ChatMessage(text: answer, isUser: false, timestamp: DateTime.now()));
+        }
         _scrollToBottom();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

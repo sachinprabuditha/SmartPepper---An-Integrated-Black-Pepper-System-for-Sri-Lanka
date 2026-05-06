@@ -9,7 +9,7 @@ class DiseaseApiService {
 
   // Disease detection backend runs on port 5000
   // Update this IP address to match your computer's IP
-  static const String diseaseApiBaseUrl = 'http://192.168.1.68:5005';
+  static const String diseaseApiBaseUrl = 'http://192.168.1.133:5005';
 
   // API Endpoints
   static const String predictEndpoint = '/predict';
