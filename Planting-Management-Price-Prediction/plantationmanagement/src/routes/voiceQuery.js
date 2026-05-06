@@ -30,11 +30,18 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
 
-router.post('/voice-query', upload.single('audio'), async (req, res) => {
+import { authenticate } from '../middleware/auth.middleware.js';
+import * as chatService from '../services/chat.service.js';
+
+router.post('/voice-query', authenticate, upload.single('audio'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No audio file provided' });
         }
+
+        const userId = req.user.nameid;
+        const { language, conversationId, activeFarmId } = req.body;
+        const targetLanguage = language || 'en';
 
         // 1. Read audio as base64
         const audioBytes = fs.readFileSync(req.file.path).toString('base64');
@@ -47,39 +54,43 @@ router.post('/voice-query', upload.single('audio'), async (req, res) => {
             config: {
                 encoding: 'MP3',
                 sampleRateHertz: 16000,
-                languageCode: 'si-LK'
+                // If the app is set to Sinhala, STT language should be 'si-LK'
+                // For other languages or English, we default to 'en-US' or the specific language code
+                // Let's adapt this based on the frontend's language choice
+                languageCode: targetLanguage === 'si' ? 'si-LK' : (targetLanguage === 'ta' ? 'ta-IN' : 'en-US')
             }
         };
 
         const [response] = await speechClient.recognize(request);
-        const sinhalaText = response.results.map(r => r.alternatives[0].transcript).join(' ');
+        const sttText = response.results.map(r => r.alternatives[0].transcript).join(' ');
         
-        console.log(`[VOICE] Google STT Sinhala Transcript: "${sinhalaText}"`);
+        console.log(`[VOICE] Google STT Transcript (${targetLanguage}): "${sttText}"`);
 
-        // 3. Call Google Cloud Translate
-        const [englishText] = await translate.translate(sinhalaText, 'en');
-        console.log(`[VOICE] Translated to English: "${englishText}"`);
+        // If STT failed to transcribe anything
+        if (!sttText || sttText.trim() === '') {
+            return res.status(400).json({ error: 'Could not transcribe audio' });
+        }
 
-        // 4. RAG query
-        const ragResult = await askPepperRAG({ question: englishText });
-        const englishAnswer = ragResult.reply;
+        // 3. Instead of standalone RAG, pass directly to processMessage!
+        // processMessage handles translations natively based on the 'targetLanguage' passed to it!
+        // It also handles creating/updating the conversation in Firestore, extracting memory, etc.
+        const result = await chatService.processMessage(
+            userId,
+            sttText, // The native text spoken
+            conversationId,
+            targetLanguage
+        );
 
-        // 5. Translate answer back to Sinhala using OpenAI
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [
-                { role: "system", content: "You are an expert translator. Translate the following English agricultural advice into natural Sri Lankan Sinhala." },
-                { role: "user", content: englishAnswer }
-            ]
-        });
-        const sinhalaAnswer = completion.choices[0].message.content;
-
-        // 6. Return answer
+        // 4. Return answer in the new expected format
         res.json({
-            sinhala_question: sinhalaText,
-            english_question: englishText,
-            english_answer: englishAnswer,
-            sinhala_answer: sinhalaAnswer
+            success: true,
+            data: {
+                question: sttText,
+                reply: result.reply,
+                conversationId: result.conversationId,
+                sources: result.sources,
+                suggestions: result.suggestions
+            }
         });
 
     } catch (error) {

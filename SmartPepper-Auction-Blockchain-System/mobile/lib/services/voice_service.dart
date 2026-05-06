@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:record/record.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../constants/api_constants.dart';
 
 class VoiceService {
@@ -34,7 +35,11 @@ class VoiceService {
     }
   }
 
-  Future<String?> stopAndSend({String languageCode = 'en'}) async {
+  Future<Map<String, String>?> stopAndSend({
+    String languageCode = 'en',
+    String? conversationId,
+    String? activeFarmId,
+  }) async {
     try {
       await _recorder.stop();
       _isRecording = false;
@@ -49,6 +54,19 @@ class VoiceService {
       );
 
       request.files.add(await http.MultipartFile.fromPath('audio', _filePath!));
+      request.fields['language'] = languageCode;
+      if (conversationId != null) {
+        request.fields['conversationId'] = conversationId;
+      }
+      if (activeFarmId != null) {
+        request.fields['activeFarmId'] = activeFarmId;
+      }
+
+      // Add auth token since the voice endpoint will now use the authenticate middleware
+      final token = await const FlutterSecureStorage().read(key: 'auth_token');
+      if (token != null) {
+        request.headers['Authorization'] = 'Bearer $token';
+      }
 
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
@@ -65,10 +83,16 @@ class VoiceService {
 
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(response.body);
-        if (languageCode == 'si') {
-          return jsonResponse['sinhala_answer'];
+        
+        var data = jsonResponse['data'];
+        if (data != null) {
+          return {
+            'question': data['question']?.toString() ?? '',
+            'answer': data['reply']?.toString() ?? '',
+            'conversationId': data['conversationId']?.toString() ?? ''
+          };
         } else {
-          return jsonResponse['english_answer'];
+          return null;
         }
       } else {
         print('Voice query failed with status ${response.statusCode}: ${response.body}');
