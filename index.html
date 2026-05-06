@@ -385,8 +385,9 @@
             background: linear-gradient(135deg, var(--secondary), #334155);
             margin: 0 auto 14px; display: flex; align-items: center; justify-content: center;
             color: white; font-size: 1.5rem; font-weight: 700; font-family: 'Outfit', sans-serif;
-            border: 3px solid rgba(16,185,129,0.3);
+            border: 3px solid rgba(16,185,129,0.3); overflow: hidden;
         }
+        .supervisor-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
         .supervisor-card h4 { font-size: 1rem; margin-bottom: 4px; }
         .supervisor-card .sup-role { color: var(--primary); font-size: 0.82rem; font-weight: 600; margin-bottom: 10px; }
         .supervisor-card .sup-email { font-size: 0.8rem; color: var(--text-light); }
@@ -402,8 +403,9 @@
             width: 100px; height: 100px; border-radius: 50%;
             margin: 0 auto 18px; display: flex; align-items: center; justify-content: center;
             color: white; font-size: 2.2rem; font-weight: 800; font-family: 'Outfit', sans-serif;
-            border: 4px solid rgba(16,185,129,0.15);
+            border: 4px solid rgba(16,185,129,0.15); overflow: hidden;
         }
+        .team-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
         .av1 { background: linear-gradient(135deg, #10b981, #059669); }
         .av2 { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
         .av3 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
@@ -1335,10 +1337,10 @@
                 <div class="doc-icon blue"><i class="fa-solid fa-book-open"></i></div>
                 <div>
                     <div class="doc-status available"><i class="fa-solid fa-circle-check"></i> Available</div>
-                    <h3>Individual Component Reports</h3>
-                    <p>Four individual reports, one per research component, submitted as part of the final evaluation package.</p>
+                    <h3>Check List documents</h3>
+                    <p>Project checklists and evaluation criteria documentation for all presentation milestones and submission requirements.</p>
                 </div>
-                <a href="https://drive.google.com/drive/folders/1KikhS6Rx1F8_AD-M-_24k8Do__ELKtF3?usp=drive_link" class="doc-link enabled"><i class="fa-solid fa-file-pdf"></i> View Document <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="https://drive.google.com/drive/folders/1gGQ1BQNUtgDqGLlhuzoaCNZ8o2MwAvAr?usp=sharing" class="doc-link enabled"><i class="fa-solid fa-file-pdf"></i> View Document <i class="fa-solid fa-arrow-right"></i></a>
             </div>
         </div>
     </div>
@@ -1434,7 +1436,7 @@
         </div>
         <div class="supervisors-row fade-up">
             <div class="supervisor-card">
-                <div class="supervisor-avatar">H</div>
+                <div class="supervisor-avatar"><img src="assets/hansid.jpeg" alt="Ms. Hansi De Silva"></div>
                 <h4>Ms. Hansi De Silva</h4>
                 <div class="sup-role">Project Supervisor</div>
                 <div>Department of Software Engineering</div>
@@ -1442,7 +1444,7 @@
                 <div class="sup-email" style="margin-top:8px"><a href="mailto:hansi.d@sliit.lk">hansi.d@sliit.lk</a></div>
             </div>
             <div class="supervisor-card">
-                <div class="supervisor-avatar">I</div>
+                <div class="supervisor-avatar"><img src="assets/isharaw.jpeg" alt="Ms. Ishara Weerathunga"></div>
                 <h4>Ms. Ishara Weerathunga</h4>
                 <div class="sup-role">Co-Supervisor</div>
                 <div>Department of Software Engineering</div>
@@ -1456,7 +1458,7 @@
         </div>
         <div class="team-grid">
             <div class="team-card fade-up delay-1">
-                <div class="team-avatar av1">P</div>
+                <div class="team-avatar av1"><img src="assets/premasiri.jpeg" alt="Premasiri J.G.P.L."></div>
                 <h3>Premasiri J.G.P.L.</h3>
                 <!-- <div class="team-role">IoT / Hardware Lead</div> -->
                 <div class="team-component">Module 02: Automated Quality Grading System</div>
@@ -1465,7 +1467,7 @@
             </div>
 
             <div class="team-card fade-up delay-2">
-                <div class="team-avatar av2">L</div>
+                <div class="team-avatar av2"><img src="assets/Lahiru%20J%20W%20A%20N.jpeg" alt="Lahiru J.W.A.N."></div>
                 <h3>Lahiru J.W.A.N.</h3>
                 <!-- <div class="team-role">AI / Mobile Lead</div> -->
                 <div class="team-component">Module 01: Disease Detection & Analysis</div>
@@ -1474,7 +1476,7 @@
             </div>
 
             <div class="team-card fade-up delay-3">
-                <div class="team-avatar av3">S</div>
+                <div class="team-avatar av3"><img src="assets/Liyanage%20S%20K%20R.jpeg" alt="Liyanage S.K.R."></div>
                 <h3>Liyanage S.K.R.</h3>
                 <!-- <div class="team-role">ML / NLP Lead</div> -->
                 <div class="team-component">Module 03: Price Prediction & RAG Chatbot</div>
@@ -1483,7 +1485,7 @@
             </div>
 
             <div class="team-card fade-up delay-4">
-                <div class="team-avatar av4">P</div>
+                <div class="team-avatar av4"><img src="assets/Prabuditha%20K%20S.png" alt="Prabuditha K.S."></div>
                 <h3>Prabuditha K.S.</h3>
                 <!-- <div class="team-role">Web3 / Fullstack Lead</div> -->
                 <div class="team-component">Module 04: Blockchain Auction System</div>
