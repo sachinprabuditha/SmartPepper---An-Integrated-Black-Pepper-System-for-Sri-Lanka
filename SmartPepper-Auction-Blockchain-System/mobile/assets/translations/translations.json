@@ -5446,5 +5446,17 @@
         "en": "Hold to record",
         "si": "පටිගත කිරීමට රඳවා තබා ගන්න",
         "ta": "பதிவு செய்ய பிடித்துக் கொள்ளவும்"
+    },
+    {
+        "key": "disease_management",
+        "en": "Disease Management",
+        "si": "රෝග කළමනාකරණය",
+        "ta": "நோய் மேலாண்மை"
+    },
+    {
+        "key": "disease_management_subtitle",
+        "en": "Detect and manage pepper diseases",
+        "si": "ගම්මිරිස් රෝග හඳුනා ගෙන කළමනාකරණය කරන්න",
+        "ta": "மிளகு நோய்களைக் கண்டறிந்து நிர்வகிக்கவும்"
     }
 ]
