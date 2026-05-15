@@ -2,7 +2,7 @@ class ApiConfig {
   // IMPORTANT: Update this based on your testing environment
 
   // For Android Emulator (routes to host machine's localhost)
-  static const String baseUrl = 'http://192.168.1.133:3002';
+  static const String baseUrl = 'http://192.168.8.173:3002';
   // For Android Emulator: 'http://10.0.2.2:3002'
 
   // For iOS Simulator (use localhost or your machine's IP)

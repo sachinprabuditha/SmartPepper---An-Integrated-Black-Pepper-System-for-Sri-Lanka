@@ -43,7 +43,7 @@ export default function ManageLotsPage() {
   const fetchLots = async () => {
     try {
       setLoading(true);
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.8.116:3002' || 'http://192.168.1.133:3002';
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.8.116:3002' || 'http://192.168.8.173:3002';
 
       // Fetch from admin endpoint for pending lots if filter is 'pending'
       const endpoint = filterCompliance === 'pending'

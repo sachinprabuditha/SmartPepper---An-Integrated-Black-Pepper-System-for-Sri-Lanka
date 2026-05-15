@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// A shared Dio client for the Plantation Management microservice backend.
 /// This runs separately from the main SmartPepper backend.
 class PlantationApiClient {
-  static const String plantationBaseUrl = 'http://192.168.1.133:5000/api';
+  static const String plantationBaseUrl = 'http://192.168.8.173:5000/api';
   // For Android Emulator (Pixel): 'http://10.0.2.2:5000/api'
 
   late Dio _dio;

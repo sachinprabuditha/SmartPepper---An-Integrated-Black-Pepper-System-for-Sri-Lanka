@@ -770,7 +770,7 @@ class _TraceabilityScreenState extends State<TraceabilityScreen>
                   ),
                   _buildInfoRow(
                     'RPC URL',
-                    'http://192.168.1.133:8545',
+                    'http://192.168.8.173:8545',
                   ),
                 ],
               ),

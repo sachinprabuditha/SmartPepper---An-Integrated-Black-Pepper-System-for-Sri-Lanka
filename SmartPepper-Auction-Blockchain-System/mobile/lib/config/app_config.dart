@@ -4,7 +4,7 @@ class AppConfig {
   // static const String backendBaseUrl = 'http://192.168.1.153:5000';
 
   // New configuration (Incoming):
-  static const String backendBaseUrl = 'http://192.168.1.133:5005';
+  static const String backendBaseUrl = 'http://192.168.8.173:5005';
 
   static const String predictEndpoint = '/predict';
 
